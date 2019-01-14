@@ -1,0 +1,51 @@
+language: java
+
+jdk:
+  - oraclejdk8
+
+before_cache:
+  - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
+  - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
+
+cache:
+  directories:
+    - $HOME/.gradle/caches/
+    - $HOME/.gradle/wrapper/
+
+stages:
+  - name: build
+  - name: snapshot
+    if: branch = dev
+  - name: release
+    if: branch = master
+
+jobs:
+  include:
+    # run gradle build
+    - stage: build
+      script: ./gradlew build
+
+    # publish snapshot to oss.jfrog.org
+    - stage: snapshot
+      script: ./gradlew artifactoryPublish -x test -Dsnapshot=true -Dbintray.user=$BINTRAY_USER -Dbintray.key=$BINTRAY_KEY -Dbuild.number=$TRAVIS_BUILD_NUMBER
+
+    # release a new stable version to bintray
+    - stage: release
+      script:
+       - ./gradlew bintrayUpload -x test -Dbintray.user=$BINTRAY_USER -Dbintray.key=$BINTRAY_KEY -Dbuild.number=$TRAVIS_BUILD_NUMBER
+      before_deploy:
+        - VERSION=`./gradlew -q pV`
+        - TAG="v$VERSION"
+        - git config --global user.name "Travis CI"
+        - git config --global user.email "builds@travis-ci.com"
+        - git tag $TAG
+      deploy:
+        provider: releases
+        api_key:
+          secure: $GITHUB_OAUTH_TOKEN
+        body: "Please take a look into the [release notes](https://github.com/marc0olo/aepp-sdk-java/blob/${TAG}/docs/release-notes/RELEASE-NOTES-${VERSION}.md) for more information about the recent changes."
+        skip_cleanup: true
+        file_glob: true
+        file:
+          - build/libs/*.jar
+        on: master
