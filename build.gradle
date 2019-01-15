@@ -134,6 +134,10 @@ compileJava {
     source += sourceSets.swagger.java
 }
 
+tasks.withType(JavaCompile) {
+    options.encoding = 'UTF-8'
+}
+
 dependencies {
     // lombok
     compileOnly "org.projectlombok:lombok:${lombokVersion}"

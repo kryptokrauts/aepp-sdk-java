@@ -7,6 +7,7 @@ import org.bouncycastle.crypto.signers.Ed25519Signer;
 import org.bouncycastle.util.encoders.Hex;
 
 import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
 
 import static com.kryptokrauts.aeternity.sdk.constants.BaseConstants.AETERNITY_MESSAGE_PREFIX;
 import static com.kryptokrauts.aeternity.sdk.constants.BaseConstants.MAX_MESSAGE_LENGTH;
@@ -53,8 +54,8 @@ public class SignerServiceImpl implements SignerService {
     }
 
     private byte[] personalMessageToBinary(final String message) {
-        final byte[] p = AETERNITY_MESSAGE_PREFIX.getBytes();
-        final byte[] msg = message.getBytes();
+        final byte[] p = AETERNITY_MESSAGE_PREFIX.getBytes(StandardCharsets.UTF_8);
+        final byte[] msg = message.getBytes(StandardCharsets.UTF_8);
         if (msg.length > MAX_MESSAGE_LENGTH) {
             throw new IllegalArgumentException(String
                     .format("Message exceeds allow maximum size %s", MAX_MESSAGE_LENGTH));
