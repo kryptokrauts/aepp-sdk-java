@@ -43,7 +43,7 @@ jobs:
         provider: releases
         api_key:
           secure: $GITHUB_OAUTH_TOKEN
-        body: "Please take a look into the [release notes](https://github.com/marc0olo/aepp-sdk-java/blob/${TAG}/docs/release-notes/RELEASE-NOTES-${VERSION}.md) for more information about the recent changes."
+        body: "Please take a look into the [release notes](https://github.com/kryptokrauts/aepp-sdk-java/blob/${TAG}/docs/release-notes/RELEASE-NOTES-${VERSION}.md) for more information about the recent changes."
         skip_cleanup: true
         file_glob: true
         file:
