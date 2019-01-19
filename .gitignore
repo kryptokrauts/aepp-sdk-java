@@ -107,3 +107,9 @@ gradle-app.setting
 **/build/
 
 # End of https://www.gitignore.io/api/vertx,gradle,intellij+all
+
+### Eclipse specific files ###
+.classpath
+.settings
+.project
+bin/

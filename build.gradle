@@ -154,9 +154,6 @@ dependencies {
     compile "org.web3j:rlp:${web3jVersion}"
     compile "org.web3j:utils:${web3jVersion}"
 
-    // JSON processing
-    compile "com.google.code.gson:gson:${gsonVersion}"
-
     // needed for vertx client
     compile "io.swagger:swagger-annotations:${swaggerAnnotationsVersion}"
     compile "io.vertx:vertx-web-client:${vertxVersion}"

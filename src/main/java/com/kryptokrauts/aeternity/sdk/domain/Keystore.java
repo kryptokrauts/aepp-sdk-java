@@ -1,6 +1,7 @@
 package com.kryptokrauts.aeternity.sdk.domain;
 
-import com.google.gson.annotations.SerializedName;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -12,10 +13,10 @@ import lombok.NoArgsConstructor;
 @Builder
 public class Keystore {
 
-    @SerializedName("public_key")
+    @JsonProperty("public_key")
     private String publicKey;
 
-    @SerializedName("crypto")
+    @JsonProperty("crypto")
     private Crypto crypto;
 
     private String id;
@@ -29,21 +30,21 @@ public class Keystore {
     @AllArgsConstructor
     @Builder
     public static class Crypto {
-        @SerializedName("secret_type")
+        @JsonProperty("secret_type")
         private String secretType;
 
-        @SerializedName("symmetric_alg")
+        @JsonProperty("symmetric_alg")
         private String symmetricAlgorithm;
 
-        @SerializedName("ciphertext")
+        @JsonProperty("ciphertext")
         private String cipherText;
 
-        @SerializedName("cipher_params")
+        @JsonProperty("cipher_params")
         private CipherParams cipherParams;
 
         private String kdf;
 
-        @SerializedName("kdf_params")
+        @JsonProperty("kdf_params")
         private KdfParams kdfParams;
     }
 
@@ -61,10 +62,10 @@ public class Keystore {
     @Builder
     public static class KdfParams {
 
-        @SerializedName("memlimit_kib")
+        @JsonProperty("memlimit_kib")
         private int memLimitKib;
 
-        @SerializedName("opslimit")
+        @JsonProperty("opslimit")
         private int opsLimit;
 
         private String salt;
