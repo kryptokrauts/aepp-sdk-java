@@ -88,6 +88,8 @@ configurations {
     integrationTestCompile.extendsFrom testCompile
     integrationTestRuntime.extendsFrom testRuntime
     sharedCompile
+    // exclude transitive bcprov dep because we need the current one (see lib folder)
+    compile.exclude group: 'org.bouncycastle', module: 'bcprov-jdk15on'
 }
 
 sourceSets {
@@ -146,7 +148,6 @@ dependencies {
     // cryptography
     compile "org.bitcoinj:bitcoinj-core:${bitcoinjCoreVersion}"
     compile fileTree(include: ["*.jar"], dir: "lib")
-//    compile "org.bouncycastle:bcprov-jdk15on:1.60"
     compile "org.abstractj.kalium:kalium:${kaliumVersion}"
     compile "de.mkammerer:argon2-jvm:2.5"
 
