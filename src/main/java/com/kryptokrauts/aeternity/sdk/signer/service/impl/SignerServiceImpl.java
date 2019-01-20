@@ -1,12 +1,12 @@
 package com.kryptokrauts.aeternity.sdk.signer.service.impl;
 
 import com.kryptokrauts.aeternity.sdk.signer.service.SignerService;
+import com.kryptokrauts.aeternity.sdk.util.ByteUtils;
 import org.bouncycastle.crypto.CryptoException;
 import org.bouncycastle.crypto.Signer;
 import org.bouncycastle.crypto.signers.Ed25519Signer;
 import org.bouncycastle.util.encoders.Hex;
 
-import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 
 import static com.kryptokrauts.aeternity.sdk.constants.BaseConstants.AETERNITY_MESSAGE_PREFIX;
@@ -62,11 +62,6 @@ public class SignerServiceImpl implements SignerService {
         }
         final byte[] pLength = {(byte) p.length};
         final byte[] msgLength = {(byte) msg.length};
-        ByteBuffer byteBuffer = ByteBuffer.allocate(pLength.length + p.length + msgLength.length + msg.length)
-                                          .put(pLength)
-                                          .put(p)
-                                          .put(msgLength)
-                                          .put(msg);
-        return byteBuffer.array();
+        return ByteUtils.concatenate(pLength, p, msgLength, msg);
     }
 }

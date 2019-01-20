@@ -17,8 +17,8 @@ public class GenerationAndSigningTest extends BaseTest {
 
         final String privateKeyAsHex = "4d881dd1917036cc231f9881a0db978c8899dd76a817252418606b02bf6ab9d22378f892b7cc82c2d2739e994ec9953aa36461f1eb5a4a49a5b0de17b3d23ae8";
         final byte[] privateKey = Hex.decode(privateKeyAsHex);
-        final String publicKeyWithPrefix = "ak_Gd6iMVsoonGuTF8LeswwDDN2NF5wYHAoTRtzwdEcfS32LWoxm";
-        final byte[] publicKey = EncodingUtils.decodeCheck(publicKeyWithPrefix.split("_")[1], EncodingType.BASE58);
+        final String publicKeyEncoded = "ak_Gd6iMVsoonGuTF8LeswwDDN2NF5wYHAoTRtzwdEcfS32LWoxm";
+        final byte[] publicKey = EncodingUtils.decodeCheckWithIdentifier(publicKeyEncoded);
 
         final byte[] txBinaryAsArray = {(byte) 248, 76, 12, 1, (byte) 160, 35, 120, (byte) 248, (byte) 146, (byte) 183, (byte) 204, (byte) 130, (byte) 194, (byte) 210, 115, (byte) 158, (byte) 153, 78, (byte) 201, (byte) 149, 58, (byte) 163, 100, 97, (byte) 241, (byte) 235, 90, 74, 73, (byte) 165, (byte) 176, (byte) 222, 23, (byte) 179, (byte) 210, 58, (byte) 232, (byte) 160, 63, 40, 35, 12, 40, 65, 38, (byte) 215, (byte) 218, (byte) 236, (byte) 136, (byte) 133, 42, 120, (byte) 160, (byte) 179, 18, (byte) 191, (byte) 241, (byte) 162, (byte) 198, (byte) 203, (byte) 209, (byte) 173, 89, (byte) 136, (byte) 202, (byte) 211, (byte) 158, 59, 12, 122, 1, 1, 1, (byte) 132, 84, 101, 115, 116};
         final String txBinary = Hex.toHexString(txBinaryAsArray);
