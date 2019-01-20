@@ -166,7 +166,7 @@ public final class EncodingUtils {
         byte[] actualChecksum = Arrays.copyOfRange(Sha256Hash.hashTwice(data), 0, 4);
         if (!Arrays.equals(checksum, actualChecksum))
             throw new AddressFormatException("Checksum does not validate");
-        return new byte[0];
+        return data;
     }
 
     public static final boolean isAddressValid(final String address) {
