@@ -3,6 +3,7 @@ package com.kryptokrauts.aeternity.generated.epoch.api;
 import com.kryptokrauts.aeternity.generated.epoch.model.SpendTx;
 import com.kryptokrauts.aeternity.generated.epoch.model.UnsignedTx;
 import com.kryptokrauts.aeternity.sdk.AEKit;
+import com.kryptokrauts.aeternity.sdk.config.Network;
 import com.kryptokrauts.aeternity.sdk.keypair.service.KeyPairService;
 import io.reactivex.Observable;
 import io.vertx.ext.unit.Async;
@@ -30,10 +31,10 @@ public class TransactionApiTest extends BaseTest {
         spendTx.setTtl(100L);
         spendTx.setNonce(5L);
 
-        UnsignedTx unsignedTxNative = AEKit.getTransactionService(true).createTx(spendTx).toFuture().get();
+        UnsignedTx unsignedTxNative = AEKit.getTransactionService(true, Network.NETWORK_ID_TESTNET).createTx(spendTx).toFuture().get();
         System.out.println(unsignedTxNative.getTx());
 
-        Observable<UnsignedTx> unsignedTxObservable = AEKit.getTransactionService(false).createTx(spendTx);
+        Observable<UnsignedTx> unsignedTxObservable = AEKit.getTransactionService(false, Network.NETWORK_ID_TESTNET).createTx(spendTx);
         unsignedTxObservable.subscribe(
                 it -> {
                     Assertions.assertEquals(it, unsignedTxNative);

@@ -2,6 +2,7 @@ package com.kryptokrauts.aeternity.sdk;
 
 import com.kryptokrauts.aeternity.generated.epoch.ApiClient;
 import com.kryptokrauts.aeternity.generated.epoch.Configuration;
+import com.kryptokrauts.aeternity.sdk.config.Network;
 import com.kryptokrauts.aeternity.sdk.keypair.service.KeyPairService;
 import com.kryptokrauts.aeternity.sdk.keypair.service.KeyPairServiceFactory;
 import com.kryptokrauts.aeternity.sdk.service.ChainService;
@@ -47,10 +48,11 @@ public class AEKit {
 
     /**
      * @param nativeMode
+     * @param network
      * @return interface to transaction related functions
      */
-    public static TransactionService getTransactionService(final boolean nativeMode) {
-        return TransactionService.getInstance(nativeMode);
+    public static TransactionService getTransactionService(final boolean nativeMode, final Network network) {
+        return TransactionService.getInstance(nativeMode, network);
     }
 
     /**

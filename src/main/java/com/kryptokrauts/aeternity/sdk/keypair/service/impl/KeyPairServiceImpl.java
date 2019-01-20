@@ -4,7 +4,7 @@ import com.kryptokrauts.aeternity.sdk.constants.ApiIdentifiers;
 import com.kryptokrauts.aeternity.sdk.domain.secret.impl.BaseKeyPair;
 import com.kryptokrauts.aeternity.sdk.domain.secret.impl.RawKeyPair;
 import com.kryptokrauts.aeternity.sdk.keypair.service.KeyPairService;
-import com.kryptokrauts.aeternity.sdk.util.EncodingType;
+import com.kryptokrauts.aeternity.sdk.util.ByteUtils;
 import com.kryptokrauts.aeternity.sdk.util.EncodingUtils;
 import org.bitcoinj.core.Sha256Hash;
 import org.bouncycastle.crypto.AsymmetricCipherKeyPair;
@@ -16,7 +16,6 @@ import org.bouncycastle.util.encoders.Hex;
 
 import javax.crypto.*;
 import javax.crypto.spec.SecretKeySpec;
-import java.io.UnsupportedEncodingException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
@@ -24,8 +23,8 @@ import java.util.Arrays;
 
 import static com.kryptokrauts.aeternity.sdk.constants.BaseConstants.CIPHER_ALGORITHM;
 import static com.kryptokrauts.aeternity.sdk.constants.BaseConstants.SECRET_KEY_SPEC;
-import static com.kryptokrauts.aeternity.sdk.util.CryptoUtils.leftPad;
-import static com.kryptokrauts.aeternity.sdk.util.CryptoUtils.rightPad;
+import static com.kryptokrauts.aeternity.sdk.util.ByteUtils.leftPad;
+import static com.kryptokrauts.aeternity.sdk.util.ByteUtils.rightPad;
 
 public final class KeyPairServiceImpl implements KeyPairService {
 
@@ -43,11 +42,9 @@ public final class KeyPairServiceImpl implements KeyPairService {
         RawKeyPair rawKeyPair = generateKeyPairInternal();
         byte[] publicKey = rawKeyPair.getPublicKey();
         byte[] privateKey = rawKeyPair.getPrivateKey();
-
-        String aePublicKey = ApiIdentifiers.ACCOUNT_PUBKEY + "_" + EncodingUtils
-                .encodeCheck(publicKey, EncodingType.BASE58);
+        String aePublicKey = EncodingUtils
+                .encodeCheck(publicKey, ApiIdentifiers.ACCOUNT_PUBKEY);
         String privateKeyHex = Hex.toHexString(privateKey) + Hex.toHexString(publicKey);
-
         return BaseKeyPair.builder().publicKey(aePublicKey).privateKey(privateKeyHex).build();
     }
 
@@ -56,11 +53,7 @@ public final class KeyPairServiceImpl implements KeyPairService {
         RawKeyPair rawKeyPair = generateKeyPairInternal();
         byte[] publicKey = rawKeyPair.getPublicKey();
         byte[] privateKey = rawKeyPair.getPrivateKey();
-
-        byte[] privateAndPublicKey = new byte[privateKey.length + publicKey.length];
-        System.arraycopy(privateKey, 0, privateAndPublicKey, 0, privateKey.length);
-        System.arraycopy(publicKey, 0, privateAndPublicKey, privateKey.length, publicKey.length);
-
+        byte[] privateAndPublicKey = ByteUtils.concatenate(privateKey, publicKey);
         return RawKeyPair.builder().publicKey(publicKey).privateKey(privateAndPublicKey).build();
     }
 
@@ -77,7 +70,6 @@ public final class KeyPairServiceImpl implements KeyPairService {
                 .getPublic();
         Ed25519PrivateKeyParameters privateKeyParams = (Ed25519PrivateKeyParameters) asymmetricCipherKeyPair
                 .getPrivate();
-
         byte[] publicKey = publicKeyParams.getEncoded();
         byte[] privateKey = privateKeyParams.getEncoded();
         return RawKeyPair.builder().publicKey(publicKey).privateKey(privateKey).build();
@@ -113,7 +105,7 @@ public final class KeyPairServiceImpl implements KeyPairService {
 
     @Override
     public final byte[] decryptPrivateKey(final String password, final byte[] encryptedBinaryKey) throws
-            NoSuchPaddingException, UnsupportedEncodingException, IllegalBlockSizeException, BadPaddingException, NoSuchAlgorithmException, InvalidKeyException {
+            NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException, NoSuchAlgorithmException, InvalidKeyException {
         return decryptKey(password, encryptedBinaryKey);
     }
 

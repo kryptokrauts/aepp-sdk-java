@@ -1,12 +1,16 @@
 package com.kryptokrauts.aeternity.sdk.util;
 
 import com.kryptokrauts.aeternity.sdk.constants.ApiIdentifiers;
+import com.kryptokrauts.aeternity.sdk.constants.SerializationTags;
 import com.kryptokrauts.aeternity.sdk.exception.EncodingNotSupportedException;
+import org.bitcoinj.core.AddressFormatException;
 import org.bitcoinj.core.Base58;
 import org.bitcoinj.core.Sha256Hash;
+import org.bouncycastle.crypto.digests.Blake2bDigest;
 import org.bouncycastle.util.encoders.Base64;
 import org.bouncycastle.util.encoders.Hex;
 
+import java.math.BigInteger;
 import java.util.Arrays;
 
 import static com.kryptokrauts.aeternity.sdk.constants.ApiIdentifiers.IDENTIFIERS_B58_LIST;
@@ -28,14 +32,18 @@ public final class EncodingUtils {
      * @return
      * @throws EncodingNotSupportedException
      */
-    public static final String encodeCheck(final byte[] input, String identifier) throws EncodingNotSupportedException {
+    public static final String encodeCheck(final byte[] input, String identifier) throws IllegalArgumentException, EncodingNotSupportedException {
         if (identifier != null && identifier.trim().length() > 0) {
+            String encoded;
             //determine encoding from given identifier
             if (IDENTIFIERS_B58_LIST.contains(identifier)) {
-                return encodeCheck(input, BASE58);
+                encoded = encodeCheck(input, BASE58);
             } else if (IDENTIFIERS_B64_LIST.contains(identifier)) {
-                return encodeCheck(input, BASE64);
+                encoded = encodeCheck(input, BASE64);
+            } else {
+                throw new IllegalArgumentException("unknown identifier");
             }
+            return identifier + "_" + encoded;
         }
         // if we get to this point, we cannot determine the encoding
         throw new EncodingNotSupportedException(String
@@ -63,6 +71,22 @@ public final class EncodingUtils {
     }
 
     /**
+     * decode input which is combined of the identifier and the encoded string (e.g. ak_[encoded])
+     *
+     * @param input
+     * @return
+     */
+    public static final byte[] decodeCheckWithIdentifier(final String input) throws IllegalArgumentException {
+        String[] splitted = input.split("_");
+        if (splitted.length != 2) {
+            throw new IllegalArgumentException("input has wrong format");
+        }
+        String identifier = splitted[0];
+        String encoded = splitted[1];
+        return decodeCheck(encoded, identifier);
+    }
+
+    /**
      * decode input with encoding determined from given identifier String
      *
      * @param input
@@ -70,7 +94,7 @@ public final class EncodingUtils {
      * @return
      * @throws EncodingNotSupportedException
      */
-    public static final byte[] decodeCheck(final String input, String identifier) throws EncodingNotSupportedException {
+    private static final byte[] decodeCheck(final String input, String identifier) throws EncodingNotSupportedException {
         if (identifier != null && identifier.trim().length() > 0) {
             //determine encoding from given identifier
             if (IDENTIFIERS_B58_LIST.contains(identifier)) {
@@ -104,11 +128,21 @@ public final class EncodingUtils {
         }
     }
 
+    /**
+     *
+     * @param input
+     * @param serializationTag see {@link SerializationTags}
+     * @return
+     */
+    public static final byte[] decodeCheckAndTag(final String input, final int serializationTag) {
+        byte[] tag = BigInteger.valueOf(serializationTag).toByteArray();
+        byte[] decoded = EncodingUtils.decodeCheckWithIdentifier(input);
+        return ByteUtils.concatenate(tag, decoded);
+    }
+
     private static final String encodeBase58Check(final byte[] input) {
         byte[] checksum = Arrays.copyOfRange(Sha256Hash.hashTwice(input), 0, 4);
-        byte[] base58checksum = new byte[input.length + checksum.length];
-        System.arraycopy(input, 0, base58checksum, 0, input.length);
-        System.arraycopy(checksum, 0, base58checksum, input.length, checksum.length);
+        byte[] base58checksum = ByteUtils.concatenate(input, checksum);
         return Base58.encode(base58checksum);
     }
 
@@ -118,14 +152,20 @@ public final class EncodingUtils {
 
     private static final String encodeBase64Check(byte[] input) {
         byte[] checksum = Arrays.copyOfRange(Sha256Hash.hashTwice(input), 0, 4);
-        byte[] base64checksum = new byte[input.length + checksum.length];
-        System.arraycopy(input, 0, base64checksum, 0, input.length);
-        System.arraycopy(checksum, 0, base64checksum, input.length, checksum.length);
+        byte[] base64checksum = ByteUtils.concatenate(input, checksum);
         return new String(Base64.encode(base64checksum));
     }
 
     private static final byte[] decodeBase64Check(String base64encoded) {
-        // TODO decode base64 with checksum
+        // TODO logic copied from Base58.decodeChecked -> can this be reused here?
+        byte[] decoded  = Base64.decode(base64encoded);
+        if (decoded.length < 4)
+            throw new AddressFormatException("Input too short");
+        byte[] data = Arrays.copyOfRange(decoded, 0, decoded.length - 4);
+        byte[] checksum = Arrays.copyOfRange(decoded, decoded.length - 4, decoded.length);
+        byte[] actualChecksum = Arrays.copyOfRange(Sha256Hash.hashTwice(data), 0, 4);
+        if (!Arrays.equals(checksum, actualChecksum))
+            throw new AddressFormatException("Checksum does not validate");
         return new byte[0];
     }
 
@@ -150,5 +190,13 @@ public final class EncodingUtils {
         } else {
             throw new IllegalArgumentException("Data doesn't match expected type " + type);
         }
+    }
+
+    public static String hashEncode(final byte[] input, final String identifier) {
+        Blake2bDigest digest = new Blake2bDigest(256);
+        digest.update(input, 0, input.length);
+        byte[] hash = new byte[digest.getDigestSize()];
+        digest.doFinal(hash, 0);
+        return EncodingUtils.encodeCheck(hash, identifier);
     }
 }
