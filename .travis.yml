@@ -11,6 +11,10 @@ cache:
   directories:
     - $HOME/.gradle/caches/
     - $HOME/.gradle/wrapper/
+    - $HOME/libsodium
+
+install:
+  - ./travis-install-libsodium.sh
 
 stages:
   - name: build
