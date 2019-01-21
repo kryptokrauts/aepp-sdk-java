@@ -10,5 +10,5 @@ public interface WalletService
 
     byte[] recoverPrivateKeyFromWalletFile( String json, String walletPassword ) throws AException;
 
-    String getWalletAddress( RawKeyPair rawKeyPair );
+    String getPublicKey( RawKeyPair rawKeyPair );
 }

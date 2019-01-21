@@ -27,7 +27,7 @@ public class WalletServiceImpl implements WalletService
     {
         // create derived key with Argon2
         Argon2Advanced argon2Advanced = Argon2Factory.createAdvanced( Argon2Factory.Argon2Types.ARGON2id );
-        byte[] salt = CryptoUtils.generateSalt( Argon2Configuration.SALT_HEX_SIZE );
+        byte[] salt = CryptoUtils.generateSalt( Argon2Configuration.DEFAULT_SALT_LENGTH);
 
         // generate hash from password
         byte[] rawHash = argon2Advanced.rawHash( Argon2Configuration.OPSLIMIT, Argon2Configuration.MEMLIMIT_KIB, Argon2Configuration.PARALLELISM,
@@ -49,7 +49,7 @@ public class WalletServiceImpl implements WalletService
         }
 
         // generate the domain object for keystore
-        Keystore wallet = Keystore.builder().publicKey( getWalletAddress( rawKeyPair ) )
+        Keystore wallet = Keystore.builder().publicKey( getPublicKey( rawKeyPair ) )
         .crypto( Keystore.Crypto.builder().secretType( Argon2Configuration.SECRET_TYPE ).symmetricAlgorithm( Argon2Configuration.SYMMETRIC_ALGORITHM )
         .cipherText( Hex.toHexString( ciphertext ) ).cipherParams( Keystore.CipherParams.builder().nonce( Hex.toHexString( nonce.bytesArray() ) ).build() )
         .kdf( Argon2Configuration.argon2Mode )
@@ -87,7 +87,9 @@ public class WalletServiceImpl implements WalletService
 
             // recover private key
             byte[] decrypted = SecretBox.decrypt( ciphertext, SecretBox.Key.fromBytes(rawHash), SecretBox.Nonce.fromBytes(nonce) );
-
+            if( decrypted == null ) {
+                throw new AException( "Error recovering privateKey: wrong password." );
+            }
             return decrypted;
         }
         catch ( IOException e )
@@ -97,7 +99,7 @@ public class WalletServiceImpl implements WalletService
     }
 
     @Override
-    public String getWalletAddress( RawKeyPair rawKeyPair )
+    public String getPublicKey( RawKeyPair rawKeyPair )
     {
         return EncodingUtils.encodeCheck( rawKeyPair.getPublicKey(), ApiIdentifiers.ACCOUNT_PUBKEY);
     }
