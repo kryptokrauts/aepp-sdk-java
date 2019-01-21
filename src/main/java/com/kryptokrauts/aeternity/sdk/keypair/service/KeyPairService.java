@@ -1,46 +1,45 @@
 package com.kryptokrauts.aeternity.sdk.keypair.service;
 
-import com.kryptokrauts.aeternity.sdk.domain.secret.impl.BaseKeyPair;
-import com.kryptokrauts.aeternity.sdk.domain.secret.impl.RawKeyPair;
-import org.bouncycastle.crypto.AsymmetricCipherKeyPair;
-
-import javax.crypto.BadPaddingException;
-import javax.crypto.IllegalBlockSizeException;
-import javax.crypto.NoSuchPaddingException;
 import java.io.UnsupportedEncodingException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 
+import javax.crypto.BadPaddingException;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
+
+import org.bouncycastle.crypto.AsymmetricCipherKeyPair;
+
+import com.kryptokrauts.aeternity.sdk.domain.secret.impl.BaseKeyPair;
+import com.kryptokrauts.aeternity.sdk.domain.secret.impl.RawKeyPair;
+
 public interface KeyPairService {
 
-    /**
-     * generate a securely randomed salt of given size
-     *
-     * @param size
-     * @return
-     */
-    byte[] generateSalt(int size);
+	/**
+	 * @return a base58 encoded keypair
+	 */
+	BaseKeyPair generateBaseKeyPair();
 
-    /**
-     * @return a base58 encoded keypair
-     */
-    BaseKeyPair generateBaseKeyPair();
+	/**
+	 * @return a raw keypair
+	 */
+	RawKeyPair generateRawKeyPair();
 
-    /**
-     * @return a raw keypair
-     */
-    RawKeyPair generateRawKeyPair();
+	AsymmetricCipherKeyPair generateKeyPairFromSecret(String privateKey);
 
-    AsymmetricCipherKeyPair generateKeyPairFromSecret(String privateKey);
+	byte[] encryptPrivateKey(String password, byte[] binaryKey) throws NoSuchPaddingException,
+			IllegalBlockSizeException, BadPaddingException, NoSuchAlgorithmException, InvalidKeyException;
 
+	byte[] encryptPublicKey(String password, byte[] binaryKey) throws NoSuchPaddingException, IllegalBlockSizeException,
+			BadPaddingException, NoSuchAlgorithmException, InvalidKeyException;
 
-    byte[] encryptPrivateKey(String password, byte[] binaryKey) throws NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException, NoSuchAlgorithmException, InvalidKeyException;
+	byte[] decryptPrivateKey(String password, byte[] encryptedBinaryKey)
+			throws NoSuchPaddingException, UnsupportedEncodingException, IllegalBlockSizeException, BadPaddingException,
+			NoSuchAlgorithmException, InvalidKeyException;
 
-    byte[] encryptPublicKey(String password, byte[] binaryKey) throws NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException, NoSuchAlgorithmException, InvalidKeyException;
+	byte[] decryptPublicKey(String password, byte[] encryptedBinaryKey) throws NoSuchPaddingException,
+			IllegalBlockSizeException, BadPaddingException, NoSuchAlgorithmException, InvalidKeyException;
 
-    byte[] decryptPrivateKey(String password, byte[] encryptedBinaryKey) throws NoSuchPaddingException, UnsupportedEncodingException, IllegalBlockSizeException, BadPaddingException, NoSuchAlgorithmException, InvalidKeyException;
-
-    byte[] decryptPublicKey(String password, byte[] encryptedBinaryKey) throws NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException, NoSuchAlgorithmException, InvalidKeyException;
-
-    RawKeyPair encryptRawKeyPair(RawKeyPair keyPairRaw, String password) throws IllegalBlockSizeException, InvalidKeyException, BadPaddingException, NoSuchAlgorithmException, NoSuchPaddingException;
+	RawKeyPair encryptRawKeyPair(RawKeyPair keyPairRaw, String password) throws IllegalBlockSizeException,
+			InvalidKeyException, BadPaddingException, NoSuchAlgorithmException, NoSuchPaddingException;
 }
