@@ -12,7 +12,7 @@ import com.kryptokrauts.aeternity.sdk.util.EncodingUtils;
 import com.kryptokrauts.aeternity.sdk.wallet.service.WalletService;
 import de.mkammerer.argon2.Argon2Advanced;
 import de.mkammerer.argon2.Argon2Factory;
-import org.abstractj.kalium.crypto.SecretBox;
+import net.consensys.cava.crypto.sodium.SecretBox;
 import org.bouncycastle.util.encoders.Hex;
 
 import java.io.IOException;
@@ -33,19 +33,14 @@ public class WalletServiceImpl implements WalletService
         byte[] rawHash = argon2Advanced.rawHash( Argon2Configuration.OPSLIMIT, Argon2Configuration.MEMLIMIT_KIB, Argon2Configuration.PARALLELISM,
                                                  walletPassword.toCharArray(), StandardCharsets.UTF_8, salt );
 
-        // initialize secretBox with derived key
-        SecretBox secretBox = new SecretBox( rawHash );
-
-        // create nonce
-        byte[] nonce = CryptoUtils.generateSalt( Argon2Configuration.NONCE_HEX_SIZE );
-
         // chain public and private key byte arrays
         byte[] privateAndPublicKey = new byte[rawKeyPair.getPrivateKey().length + rawKeyPair.getPublicKey().length];
         System.arraycopy( rawKeyPair.getPrivateKey(), 0, privateAndPublicKey, 0, rawKeyPair.getPrivateKey().length );
         System.arraycopy( rawKeyPair.getPublicKey(), 0, privateAndPublicKey, rawKeyPair.getPrivateKey().length, rawKeyPair.getPublicKey().length );
 
         // encrypt the key arrays with nonce and derived key
-        byte[] ciphertext = secretBox.encrypt( nonce, privateAndPublicKey );
+        SecretBox.Nonce nonce = SecretBox.Nonce.random();
+        byte[] ciphertext = SecretBox.encrypt(privateAndPublicKey, SecretBox.Key.fromBytes(rawHash), nonce );
 
         // generate walletName if not given
         if ( walletName == null || walletName.trim().length() == 0 )
@@ -56,7 +51,7 @@ public class WalletServiceImpl implements WalletService
         // generate the domain object for keystore
         Keystore wallet = Keystore.builder().publicKey( getWalletAddress( rawKeyPair ) )
         .crypto( Keystore.Crypto.builder().secretType( Argon2Configuration.SECRET_TYPE ).symmetricAlgorithm( Argon2Configuration.SYMMETRIC_ALGORITHM )
-        .cipherText( Hex.toHexString( ciphertext ) ).cipherParams( Keystore.CipherParams.builder().nonce( Hex.toHexString( nonce ) ).build() )
+        .cipherText( Hex.toHexString( ciphertext ) ).cipherParams( Keystore.CipherParams.builder().nonce( Hex.toHexString( nonce.bytesArray() ) ).build() )
         .kdf( Argon2Configuration.argon2Mode )
         .kdfParams( Keystore.KdfParams.builder().memLimitKib( Argon2Configuration.MEMLIMIT_KIB ).opsLimit( Argon2Configuration.OPSLIMIT )
         .salt( Hex.toHexString( salt ) ).parallelism( 1 ).build() ).build() ).id( UUID.randomUUID().toString() ).name( walletName )
@@ -84,16 +79,14 @@ public class WalletServiceImpl implements WalletService
             // generate hash from password
             byte[] rawHash = argon2Advanced.rawHash( Argon2Configuration.OPSLIMIT, Argon2Configuration.MEMLIMIT_KIB, Argon2Configuration.PARALLELISM,
                                                      walletPassword.toCharArray(), StandardCharsets.UTF_8, salt );
-            // initialize secretBox with derived key
-            SecretBox secretBox = new SecretBox( rawHash );
-
             // extract nonce
             byte[] nonce = Hex.decode( recoverWallet.getCrypto().getCipherParams().getNonce() );
 
             // extract cipertext
             byte[] ciphertext = Hex.decode( recoverWallet.getCrypto().getCipherText() );
+
             // recover private key
-            byte[] decrypted = secretBox.decrypt( nonce, ciphertext );
+            byte[] decrypted = SecretBox.decrypt( ciphertext, SecretBox.Key.fromBytes(rawHash), SecretBox.Nonce.fromBytes(nonce) );
 
             return decrypted;
         }
