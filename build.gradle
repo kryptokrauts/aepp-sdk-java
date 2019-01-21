@@ -31,7 +31,7 @@ ext {
     bintrayKey = System.getProperty("bintray.key")
     buildNumber = System.getProperty("build.number")
 
-    epochVersion = "1.1.0"
+    epochVersion = "1.2.0"
 
     apiPackage   = "com.kryptokrauts.aeternity.generated.epoch.api"
     modelPackage = "com.kryptokrauts.aeternity.generated.epoch.model"

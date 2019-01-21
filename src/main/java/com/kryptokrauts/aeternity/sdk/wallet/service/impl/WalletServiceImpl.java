@@ -1,121 +1,115 @@
 package com.kryptokrauts.aeternity.sdk.wallet.service.impl;
 
+import java.io.IOException;
+import java.nio.charset.Charset;
+import java.sql.Timestamp;
+import java.util.UUID;
+
+import org.abstractj.kalium.crypto.SecretBox;
+import org.spongycastle.util.encoders.Hex;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.kryptokrauts.aeternity.sdk.constants.ApiIdentifiers;
 import com.kryptokrauts.aeternity.sdk.constants.Argon2Configuration;
 import com.kryptokrauts.aeternity.sdk.domain.Keystore;
-import com.kryptokrauts.aeternity.sdk.domain.secret.impl.BaseKeyPair;
+import com.kryptokrauts.aeternity.sdk.domain.secret.impl.RawKeyPair;
 import com.kryptokrauts.aeternity.sdk.exception.AException;
+import com.kryptokrauts.aeternity.sdk.util.CryptoUtils;
+import com.kryptokrauts.aeternity.sdk.util.EncodingType;
+import com.kryptokrauts.aeternity.sdk.util.EncodingUtils;
 import com.kryptokrauts.aeternity.sdk.wallet.service.WalletService;
-import de.mkammerer.argon2.Argon2;
+
+import de.mkammerer.argon2.Argon2Advanced;
 import de.mkammerer.argon2.Argon2Factory;
-import org.abstractj.kalium.NaCl;
-import org.abstractj.kalium.crypto.Random;
-import org.bouncycastle.crypto.generators.Argon2BytesGenerator;
-import org.bouncycastle.crypto.params.Argon2Parameters;
 
-public class WalletServiceImpl implements WalletService {
-    // TODO generate wallet-file
-    // TODO recover wallet-file
-
-
-
-
-    /*public static void main(String[] args) throws Exception {
-        //1 Schlüsselpaar aus privateKey generieren
-        AsymmetricCipherKeyPair as = KeyPairServiceImpl.getInstance()
-                                                       .generateKeyPairFromSecret("706c8b80b9a0dc73fa3a446082d523502704819f29c7e0597a889b799f3a2361");
-
-        Ed25519PublicKeyParameters pub = (Ed25519PublicKeyParameters) as.getPublic();
-        Ed25519PrivateKeyParameters privateKeyParams = (Ed25519PrivateKeyParameters) as.getPrivate();
-
-        System.out.println("Wallet-Adresse (PublicKey): ak_" + KeyPairServiceImpl.getInstance()
-                                                                                 .encodeBase58Check(pub.getEncoded()));
-
-        //2 mit Argon2 derivedKey erzeugen
-        Argon2Advanced argon2 = Argon2Factory.createAdvanced(Argon2Factory.Argon2Types.ARGON2id);
-        String salt = "a84887d9539cbd9490d2b1a5c41262b2";
-
-        byte[] rawHash = argon2
-                .rawHash(2, 65536, 1, "aeternity".toCharArray(), Charset.forName("UTF-8"), Hex.decode(salt));
-
-        //3 mit derivedKey secretBox initialisieren
-        SecretBox secretBox = new SecretBox(rawHash);
-
-        //4 Nonce erzeugen
-        byte[] nonce = Hex.decode("375673a887fd10910fe3bfa9c9abfd72d3d240d124ed3f3b");
-
-        //5 private und public key byte arrays aneinanderhängen
-        byte[] privateAndPublicKey = new byte[privateKeyParams.getEncoded().length + pub.getEncoded().length];
-        System.arraycopy(privateKeyParams.getEncoded(), 0, privateAndPublicKey, 0, privateKeyParams
-                .getEncoded().length);
-        System.arraycopy(pub.getEncoded(), 0, privateAndPublicKey, privateKeyParams.getEncoded().length, pub
-                .getEncoded().length);
-
-        //6 encrypt mit nonce und key ausführen
-        byte[] ciphertext = secretBox
-                .encrypt(nonce, privateAndPublicKey);
-
-        System.out.println("cipher: " + Hex.toHexString(ciphertext));
-
-        //decrypten
-        byte[] dec = secretBox.decrypt(nonce, Hex
-                .decode("71acf8412331806b3ad5482cda1f6e682c541c522f61715056faf5ed2d21a9c4d68fe2cdcf147b1be99fbab20b33433f82b2a2d3bbc772957bd2fb6cf9a97f611670e0f044d8076efbe31fe30142e6f5"));
-
-        System.out.println(Hex.toHexString(dec));
-        System.out.println(KeyPairServiceImpl.getInstance()
-                                             .encodeBase58Check(Hex
-                                                     .decode("df827a01b927f687419be62597c6ea6dd5e9c133d9aeb7c691d99e69028a6de0")
-                                             ));
-    }*/
-
+public class WalletServiceImpl implements WalletService
+{
     @Override
-    public String generateWalletJSON(BaseKeyPair baseKeyPair, String password, String walletName) throws AException {
+    public String generateWalletFile( RawKeyPair rawKeyPair, String walletPassword, String walletName ) throws AException
+    {
+        // create derived key with Argon2
+        Argon2Advanced argon2Advanced = Argon2Factory.createAdvanced( Argon2Factory.Argon2Types.ARGON2id );
+        byte[] salt = CryptoUtils.generateSalt( Argon2Configuration.SALT_HEX_SIZE );
 
-        //Salt
-        byte[] salt = new Random().randomBytes(NaCl.Sodium.CRYPTO_BOX_CURVE25519XSALSA20POLY1305_BOXZEROBYTES);
-        int memLimit = NaCl.Sodium.CRYPTO_PWHASH_SCRYPTSALSA208SHA256_MEMLIMIT_INTERACTIVE;
-        int opsLimit = NaCl.Sodium.CRYPTO_PWHASH_SCRYPTSALSA208SHA256_OPSLIMIT_INTERACTIVE;
+        // generate hash from password
+        byte[] rawHash = argon2Advanced.rawHash( Argon2Configuration.OPSLIMIT, Argon2Configuration.MEMLIMIT_KIB, Argon2Configuration.PARALLELISM,
+                                                 walletPassword.toCharArray(), Charset.forName( "UTF-8" ), salt );
 
-        Argon2 argon2 = Argon2Factory.create(Argon2Factory.Argon2Types.ARGON2id);
-        String derivedKey = argon2.hash(10, 65536, 1, password);
+        // initialize secretBox with derived key
+        SecretBox secretBox = new SecretBox( rawHash );
 
-        //Argon2 configuration
-        Argon2Parameters argon2Parameters = new Argon2Parameters.Builder(Argon2Configuration.argon2Parameter)
-                .withVersion(Argon2Configuration.VERSION).withMemoryAsKB(Argon2Configuration.MEMLIMIT_KIB)
-                .withParallelism(Argon2Configuration.PARALLELISM).withIterations(Argon2Configuration.OPSLIMIT).build();
+        // create nonce
+        byte[] nonce = CryptoUtils.generateSalt( Argon2Configuration.NONCE_HEX_SIZE );
 
-        Argon2BytesGenerator argon2BytesGenerator = new Argon2BytesGenerator();
-        argon2BytesGenerator.init(argon2Parameters);
+        // chain public and private key byte arrays
+        byte[] privateAndPublicKey = new byte[rawKeyPair.getPrivateKey().length + rawKeyPair.getPublicKey().length];
+        System.arraycopy( rawKeyPair.getPrivateKey(), 0, privateAndPublicKey, 0, rawKeyPair.getPrivateKey().length );
+        System.arraycopy( rawKeyPair.getPublicKey(), 0, privateAndPublicKey, rawKeyPair.getPrivateKey().length, rawKeyPair.getPublicKey().length );
 
+        // encrypt the key arrays with nonce and derived key
+        byte[] ciphertext = secretBox.encrypt( nonce, privateAndPublicKey );
 
-        Keystore wallet = Keystore.builder()
-                                  .publicKey(baseKeyPair.getPublicKey())
-                                  .crypto(Keystore.Crypto.builder().secretType("ed25519")
-                                                         .symmetricAlgorithm("xsalsa20-poly1305")
-                                                         .cipherText("71acf8412331806b3ad5482cda1f6e682c541c522f61715056faf5ed2d21a9c4d68fe2cdcf147b1be99fbab20b33433f82b2a2d3bbc772957bd2fb6cf9a97f611670e0f044d8076efbe31fe30142e6f5")
-                                                         .cipherParams(Keystore.CipherParams.builder()
-                                                                                            .nonce("375673a887fd10910fe3bfa9c9abfd72d3d240d124ed3f3b")
-                                                                                            .build())
-                                                         .kdf("argon2id")
-                                                         .kdfParams(Keystore.KdfParams.builder()
-                                                                                      .memLimitKib(65536)
-                                                                                      .opsLimit(2)
-                                                                                      .salt("a84887d9539cbd9490d2b1a5c41262b2")
-                                                                                      .parallelism(1).build())
-                                                         .build())
-                                  .id("ff7d9f9c-e0ab-4fab-b8fc-beab2d322f6b")
-                                  .name("!!!FOR TESTING PURPOSE ONLY!!! - Wed 14 Nov 2018 09:40:10 CET - password:aeternity")
-                                  .version(1).build();
+        // generate walletName if not given
+        if ( walletName == null || walletName.trim().length() == 0 )
+        {
+            walletName = "generated wallet file -" + new Timestamp( System.currentTimeMillis() );
+        }
 
-        ObjectMapper objectMapper = new ObjectMapper();
+        // generate the domain object for keystore
+        Keystore wallet = Keystore.builder().publicKey( getWalletAddress( rawKeyPair ) )
+        .crypto( Keystore.Crypto.builder().secretType( Argon2Configuration.SECRET_TYPE ).symmetricAlgorithm( Argon2Configuration.SYMMETRIC_ALGORITHM )
+        .cipherText( Hex.toHexString( ciphertext ) ).cipherParams( Keystore.CipherParams.builder().nonce( Hex.toHexString( nonce ) ).build() )
+        .kdf( Argon2Configuration.argon2Mode )
+        .kdfParams( Keystore.KdfParams.builder().memLimitKib( Argon2Configuration.MEMLIMIT_KIB ).opsLimit( Argon2Configuration.OPSLIMIT )
+        .salt( Hex.toHexString( salt ) ).parallelism( 1 ).build() ).build() ).id( UUID.randomUUID().toString() ).name( walletName )
+        .version( Argon2Configuration.VERSION ).build();
 
-        try {
-            return objectMapper.writeValueAsString(wallet);
-        } catch (JsonProcessingException e) {
-            throw new AException("Error occured generating json of domain object", e);
+        try
+        {
+            return new ObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString( wallet );
+        }
+        catch ( JsonProcessingException e )
+        {
+            throw new AException( "Error creating wallet-json", e );
         }
     }
 
+    @Override
+    public byte[] recoverPrivateKeyFromWalletFile( String json, String walletPassword ) throws AException
+    {
+        try
+        {
+            Keystore recoverWallet = new ObjectMapper().readValue( json, Keystore.class );
+            Argon2Advanced argon2Advanced = Argon2Factory.createAdvanced( Argon2Factory.Argon2Types.ARGON2id );
+            // extract salt
+            byte[] salt = Hex.decode( recoverWallet.getCrypto().getKdfParams().getSalt() );
+            // generate hash from password
+            byte[] rawHash = argon2Advanced.rawHash( Argon2Configuration.OPSLIMIT, Argon2Configuration.MEMLIMIT_KIB, Argon2Configuration.PARALLELISM,
+                                                     walletPassword.toCharArray(), Charset.forName( "UTF-8" ), salt );
+            // initialize secretBox with derived key
+            SecretBox secretBox = new SecretBox( rawHash );
+
+            // extract nonce
+            byte[] nonce = Hex.decode( recoverWallet.getCrypto().getCipherParams().getNonce() );
+
+            // extract cipertext
+            byte[] ciphertext = Hex.decode( recoverWallet.getCrypto().getCipherText() );
+            // recover private key
+            byte[] decrypted = secretBox.decrypt( nonce, ciphertext );
+
+            return decrypted;
+        }
+        catch ( IOException e )
+        {
+            throw new AException( "Error recovering wallet-json", e );
+        }
+    }
+
+    @Override
+    public String getWalletAddress( RawKeyPair rawKeyPair )
+    {
+        return ApiIdentifiers.ACCOUNT_PUBKEY + "_" + EncodingUtils.encodeCheck( rawKeyPair.getPublicKey(), EncodingType.BASE58 );
+    }
 
 }
