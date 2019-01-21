@@ -45,15 +45,13 @@ ext {
 
     bouncycastleVersion = ""
     bitcoinjCoreVersion = "0.14.7"
-    kaliumVersion = "0.8.0"
+    cavaVersion = "0.6.0"
 
     web3jVersion = "4.1.0"
 
     junitVersion = "5.3.2"
     junitPlatformVersion = "1.3.2"
     spectrumVersion = "1.2.0"
-
-    gsonVersion = "2.8.5"
 }
 
 
@@ -148,7 +146,8 @@ dependencies {
     // cryptography
     compile "org.bitcoinj:bitcoinj-core:${bitcoinjCoreVersion}"
     compile fileTree(include: ["*.jar"], dir: "lib")
-    compile "org.abstractj.kalium:kalium:${kaliumVersion}"
+    compile "net.consensys.cava:cava-crypto:${cavaVersion}"
+    compile "net.consensys.cava:cava-rlp:${cavaVersion}"
     compile "de.mkammerer:argon2-jvm:2.5"
 
     // web3j
@@ -172,7 +171,6 @@ dependencies {
     testCompile "org.junit.jupiter:junit-jupiter-params:${junitVersion}"
     testCompile "org.junit.vintage:junit-vintage-engine:${junitVersion}"
     testCompile "com.greghaskins:spectrum:${spectrumVersion}"
-    testCompile "com.google.code.gson:gson:${gsonVersion}"
     testCompile "io.vertx:vertx-unit:${vertxVersion}"
     testCompile "io.vertx:vertx-junit5:${vertxVersion}"
 }
