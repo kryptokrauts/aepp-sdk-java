@@ -170,6 +170,7 @@ dependencies {
     testCompile "org.junit.jupiter:junit-jupiter-api:${junitVersion}"
     testCompile "org.junit.jupiter:junit-jupiter-params:${junitVersion}"
     testCompile "org.junit.vintage:junit-vintage-engine:${junitVersion}"
+    testCompile "commons-io:commons-io:2.6"
     testCompile "com.greghaskins:spectrum:${spectrumVersion}"
     testCompile "io.vertx:vertx-unit:${vertxVersion}"
     testCompile "io.vertx:vertx-junit5:${vertxVersion}"
