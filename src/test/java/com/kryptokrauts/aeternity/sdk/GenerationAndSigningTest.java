@@ -12,6 +12,7 @@ import java.nio.charset.StandardCharsets;
 
 import org.bouncycastle.util.encoders.Hex;
 
+import com.kryptokrauts.aeternity.sdk.constants.ApiIdentifiers;
 import com.kryptokrauts.aeternity.sdk.domain.secret.impl.BaseKeyPair;
 import com.kryptokrauts.aeternity.sdk.domain.secret.impl.RawKeyPair;
 import com.kryptokrauts.aeternity.sdk.util.CryptoUtils;
@@ -59,7 +60,7 @@ public class GenerationAndSigningTest extends BaseTest
                     final String password = "verysecret";
 
                     it( "works for private keys", () -> {
-                        final byte[] privateBinary = ( (RawKeyPair) keyPair ).getPrivateKey();
+                        final byte[] privateBinary = keyPair.getConcatenatedPrivateKey();
                         final byte[] encryptedBinary = AEKit.getKeyPairService().encryptPrivateKey( password, privateBinary );
                         final byte[] decryptedBinary = AEKit.getKeyPairService().decryptPrivateKey( password, encryptedBinary );
                         assertArrayEquals( privateBinary, decryptedBinary );
@@ -82,6 +83,15 @@ public class GenerationAndSigningTest extends BaseTest
                     final byte[] decodedBinary = EncodingUtils.decodeCheck( encoded, EncodingType.BASE58 );
                     final String decoded = new String( decodedBinary );
                     assertEquals( input, decoded );
+                } );
+            } );
+
+            describe( "recover", () -> {
+                it( "check for the correct private key for the beneficiary", () -> {
+                    final String beneficiaryPub = "ak_twR4h7dEcUtc2iSEDv8kB7UFJJDGiEDQCXr85C3fYF8FdVdyo";
+                    final BaseKeyPair keyPair = AEKit.getKeyPairService()
+                    .generateBaseKeyPairFromSecret( "79816BBF860B95600DDFABF9D81FEE81BDB30BE823B17D80B9E48BE0A7015ADF" );
+                    assertEquals( beneficiaryPub, keyPair.getPublicKey() );
                 } );
             } );
 
@@ -134,12 +144,11 @@ public class GenerationAndSigningTest extends BaseTest
 
             } );
 
-            // TODO do we need that?
             it( "hashing produces 256 bit blake2b byte buffers", () -> {
                 final String foobar = "foobar";
                 final String foobarHashedHex = "93a0e84a8cdd4166267dbe1263e937f08087723ac24e7dcc35b3d5941775ef47";
-                // TODO hash foobar
-                // TODO check foobarHashedHex
+                byte[] hash = EncodingUtils.hash( foobar.getBytes( StandardCharsets.UTF_8 ) );
+                assertEquals( foobarHashedHex, Hex.toHexString( hash ) );
             } );
 
             // TODO do we need that?
@@ -160,7 +169,7 @@ public class GenerationAndSigningTest extends BaseTest
             it( "convert base58Check address to hex", () -> {
                 final String address = "ak_Gd6iMVsoonGuTF8LeswwDDN2NF5wYHAoTRtzwdEcfS32LWoxm";
                 final String hex = EncodingUtils.addressToHex( address );
-                final String fromHexAddress = "ak_" + EncodingUtils.encodeCheck( Hex.decode( hex.substring( 2 ) ), EncodingType.BASE58 );
+                final String fromHexAddress = EncodingUtils.encodeCheck( Hex.decode( hex.substring( 2 ) ), ApiIdentifiers.ACCOUNT_PUBKEY );
                 assertEquals( fromHexAddress, address );
             } );
         } );

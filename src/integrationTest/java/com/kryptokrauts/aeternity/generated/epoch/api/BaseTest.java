@@ -1,6 +1,11 @@
 package com.kryptokrauts.aeternity.generated.epoch.api;
 
 import com.kryptokrauts.aeternity.generated.epoch.Configuration;
+import com.kryptokrauts.aeternity.sdk.AEKit;
+import com.kryptokrauts.aeternity.sdk.config.Network;
+import com.kryptokrauts.aeternity.sdk.keypair.service.KeyPairService;
+import com.kryptokrauts.aeternity.sdk.service.ChainService;
+import com.kryptokrauts.aeternity.sdk.service.TransactionService;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.unit.TestContext;
@@ -20,17 +25,10 @@ public abstract class BaseTest {
     private static final String CONFIG_PROPERTIES = "config.properties";
     private static final String EPOCH_BASE_URL = "epoch.api.baseUrl";
 
-    private AccountApi accountApi;
-    private ChainApi chainApi;
-    private ChannelApi channelApi;
-    private ContractApi contractApi;
-    private DebugApi debugApi;
-    private ExternalApi externalApi;
-    private InternalApi internalApi;
-    private NameServiceApi nameServiceApi;
-    private NodeInfoApi nodeInfoApi;
-    private OracleApi oracleApi;
-    private TransactionApi transactionApi;
+    protected static final String BENEFICIARY_PRIVATE_KEY = "79816BBF860B95600DDFABF9D81FEE81BDB30BE823B17D80B9E48BE0A7015ADF";
+    protected KeyPairService keyPairService;
+    protected ChainService chainService;
+    protected TransactionService transactionService;
 
     @Rule
     public RunTestOnContext rule = new RunTestOnContext();
@@ -39,17 +37,9 @@ public abstract class BaseTest {
     public void setupApiClient(TestContext context) {
         Vertx vertx = rule.vertx();
         Configuration.setupDefaultApiClient(vertx, getConfig());
-//        accountApi = new AccountApiImpl();
-//        chainApi = new ChainApiImpl();
-//        channelApi = new ChannelApiImpl();
-//        contractApi = new ContractApiImpl();
-//        debugApi = new DebugApiImpl();
-//        externalApi = new ExternalApiImpl();
-//        internalApi = new InternalApiImpl();
-//        nameServiceApi = new NameServiceApiImpl();
-//        nodeInfoApi = new NodeInfoApiImpl();
-//        oracleApi = new OracleApiImpl();
-//        transactionApi = new TransactionApiImpl();
+        keyPairService = AEKit.getKeyPairService();
+        chainService =  AEKit.getChainService();
+        transactionService = AEKit.getTransactionService(true, Network.TESTNET);
     }
 
     private JsonObject getConfig() {
@@ -70,49 +60,5 @@ public abstract class BaseTest {
         } catch (IOException ignored) {
         }
         return epochBaseUrl;
-    }
-
-    public AccountApi getAccountApi() {
-        return accountApi;
-    }
-
-    public ChainApi getChainApi() {
-        return chainApi;
-    }
-
-    public ChannelApi getChannelApi() {
-        return channelApi;
-    }
-
-    public ContractApi getContractApi() {
-        return contractApi;
-    }
-
-    public DebugApi getDebugApi() {
-        return debugApi;
-    }
-
-    public ExternalApi getExternalApi() {
-        return externalApi;
-    }
-
-    public InternalApi getInternalApi() {
-        return internalApi;
-    }
-
-    public NameServiceApi getNameServiceApi() {
-        return nameServiceApi;
-    }
-
-    public NodeInfoApi getNodeInfoApi() {
-        return nodeInfoApi;
-    }
-
-    public OracleApi getOracleApi() {
-        return oracleApi;
-    }
-
-    public TransactionApi getTransactionApi() {
-        return transactionApi;
     }
 }
