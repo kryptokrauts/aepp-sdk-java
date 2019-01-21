@@ -2,8 +2,7 @@ package com.kryptokrauts.aeternity.sdk.service;
 
 import com.kryptokrauts.aeternity.generated.epoch.api.TransactionApiImpl;
 import com.kryptokrauts.aeternity.generated.epoch.api.rxjava.TransactionApi;
-import com.kryptokrauts.aeternity.generated.epoch.model.SpendTx;
-import com.kryptokrauts.aeternity.generated.epoch.model.UnsignedTx;
+import com.kryptokrauts.aeternity.generated.epoch.model.*;
 import com.kryptokrauts.aeternity.sdk.AEKit;
 import com.kryptokrauts.aeternity.sdk.config.Network;
 import com.kryptokrauts.aeternity.sdk.constants.ApiIdentifiers;
@@ -37,9 +36,6 @@ public class TransactionService {
     private boolean nativeMode;
     private Network network;
 
-    // don't allow instantiation via default constructor
-    private TransactionService(){}
-
     public TransactionService(final Network network) {
         this.network = network;
     }
@@ -62,6 +58,14 @@ public class TransactionService {
 
     public Observable<UnsignedTx> createTx(SpendTx spendTx) {
         return this.nativeMode ? Observable.just(spendTxNative(spendTx)) : spendTxInternal(spendTx);
+    }
+
+    public Observable<PostTxResponse> postTransaction(Tx tx) {
+        return transactionApi.rxPostTransaction(tx).toObservable();
+    }
+
+    public Observable<GenericSignedTx> getTransactionByHash(String txHash) {
+        return transactionApi.rxGetTransactionByHash(txHash).toObservable();
     }
 
     private Observable<UnsignedTx> spendTxInternal(SpendTx spendTx) {
@@ -104,14 +108,16 @@ public class TransactionService {
      * @return signed and encoded transaction
      * @throws CryptoException
      */
-    public String signTransaction(final UnsignedTx unsignedTx, final String privateKey) throws CryptoException {
+    public Tx signTransaction(final UnsignedTx unsignedTx, final String privateKey) throws CryptoException {
         byte[] networkData = this.network.getId().getBytes(StandardCharsets.UTF_8);
         byte[] txData = EncodingUtils.decodeCheckWithIdentifier(unsignedTx.getTx());
         byte[] txAndNetwork = ByteUtils.concatenate(networkData, txData);
         SignerService signerService = AEKit.getSignerService(); // TODO the right way to access other services?
         byte[] signedTxData = signerService.sign(txAndNetwork, privateKey);
         String encodedSignedTx = encodeSignedTransaction(txData, signedTxData);
-        return encodedSignedTx;
+        Tx tx = new Tx();
+        tx.setTx(encodedSignedTx);
+        return tx;
     }
 
     /**

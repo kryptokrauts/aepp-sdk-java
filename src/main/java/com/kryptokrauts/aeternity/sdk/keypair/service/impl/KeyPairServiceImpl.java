@@ -57,6 +57,24 @@ public final class KeyPairServiceImpl implements KeyPairService {
         return RawKeyPair.builder().publicKey(publicKey).privateKey(privateAndPublicKey).build();
     }
 
+    @Override
+    public BaseKeyPair generateBaseKeyPairFromSecret(String privateKey) {
+        final String privateKey32;
+        if (privateKey.length() == 128) {
+            privateKey32 = privateKey.substring(0, 64);
+        } else {
+            privateKey32 = privateKey;
+        }
+        Ed25519PrivateKeyParameters privateKeyParams = new Ed25519PrivateKeyParameters(Hex.decode(privateKey32), 0);
+        Ed25519PublicKeyParameters publicKeyParams = privateKeyParams.generatePublicKey();
+        byte[] publicBinary = publicKeyParams.getEncoded();
+        byte[] privateBinary = privateKeyParams.getEncoded();
+        String aePublicKey = EncodingUtils
+                .encodeCheck(publicBinary, ApiIdentifiers.ACCOUNT_PUBKEY);
+        String privateKeyHex = Hex.toHexString(privateBinary) + Hex.toHexString(publicBinary);
+        return BaseKeyPair.builder().publicKey(aePublicKey).privateKey(privateKeyHex).build();
+    }
+
     /**
      * the actual keypair generation method
      *
@@ -76,7 +94,7 @@ public final class KeyPairServiceImpl implements KeyPairService {
     }
 
     @Override
-    public AsymmetricCipherKeyPair generateKeyPairFromSecret(final String privateKey) {
+    public RawKeyPair generateRawKeyPairFromSecret(final String privateKey) {
         final String privateKey32;
         if (privateKey.length() == 128) {
             privateKey32 = privateKey.substring(0, 64);
@@ -85,10 +103,10 @@ public final class KeyPairServiceImpl implements KeyPairService {
         }
         Ed25519PrivateKeyParameters privateKeyParams = new Ed25519PrivateKeyParameters(Hex.decode(privateKey32), 0);
         Ed25519PublicKeyParameters publicKeyParams = privateKeyParams.generatePublicKey();
-        AsymmetricCipherKeyPair asymmetricCipherKeyPair = new AsymmetricCipherKeyPair(publicKeyParams, privateKeyParams);
-        return asymmetricCipherKeyPair;
+        byte[] publicBinary = publicKeyParams.getEncoded();
+        byte[] privateBinary = privateKeyParams.getEncoded();
+        return RawKeyPair.builder().publicKey(publicBinary).privateKey(privateBinary).build();
     }
-
 
     @Override
     public final byte[] encryptPrivateKey(final String password, final byte[] binaryKey) throws

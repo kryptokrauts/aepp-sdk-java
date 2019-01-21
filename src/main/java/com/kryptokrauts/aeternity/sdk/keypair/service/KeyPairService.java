@@ -2,7 +2,6 @@ package com.kryptokrauts.aeternity.sdk.keypair.service;
 
 import com.kryptokrauts.aeternity.sdk.domain.secret.impl.BaseKeyPair;
 import com.kryptokrauts.aeternity.sdk.domain.secret.impl.RawKeyPair;
-import org.bouncycastle.crypto.AsymmetricCipherKeyPair;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
@@ -31,8 +30,19 @@ public interface KeyPairService {
      */
     RawKeyPair generateRawKeyPair();
 
-    AsymmetricCipherKeyPair generateKeyPairFromSecret(String privateKey);
+    /**
+     *
+     * @param privateKey
+     * @return a base58 encoded keypair
+     */
+    BaseKeyPair generateBaseKeyPairFromSecret(String privateKey);
 
+    /**
+     *
+     * @param privateKey
+     * @return a raw keypair
+     */
+    RawKeyPair generateRawKeyPairFromSecret(String privateKey);
 
     byte[] encryptPrivateKey(String password, byte[] binaryKey) throws NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException, NoSuchAlgorithmException, InvalidKeyException;
 

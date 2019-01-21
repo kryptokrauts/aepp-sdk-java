@@ -121,7 +121,7 @@ public final class EncodingUtils {
             case BASE58:
                 return decodeBase58Check(input);
             case BASE64:
-                return decodeBase58Check(input);
+                return decodeBase64Check(input);
             default:
                 throw new EncodingNotSupportedException(String
                         .format("Encoding %s is currently not supported", encodingType));
@@ -193,10 +193,15 @@ public final class EncodingUtils {
     }
 
     public static String hashEncode(final byte[] input, final String identifier) {
+        byte[] hash = hash(input);
+        return EncodingUtils.encodeCheck(hash, identifier);
+    }
+
+    public static byte[] hash(final byte[] input) {
         Blake2bDigest digest = new Blake2bDigest(256);
         digest.update(input, 0, input.length);
         byte[] hash = new byte[digest.getDigestSize()];
         digest.doFinal(hash, 0);
-        return EncodingUtils.encodeCheck(hash, identifier);
+        return hash;
     }
 }
