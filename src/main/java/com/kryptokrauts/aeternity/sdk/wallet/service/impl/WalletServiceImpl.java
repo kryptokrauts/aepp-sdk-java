@@ -1,13 +1,5 @@
 package com.kryptokrauts.aeternity.sdk.wallet.service.impl;
 
-import java.io.IOException;
-import java.nio.charset.Charset;
-import java.sql.Timestamp;
-import java.util.UUID;
-
-import org.abstractj.kalium.crypto.SecretBox;
-import org.spongycastle.util.encoders.Hex;
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kryptokrauts.aeternity.sdk.constants.ApiIdentifiers;
@@ -16,12 +8,17 @@ import com.kryptokrauts.aeternity.sdk.domain.Keystore;
 import com.kryptokrauts.aeternity.sdk.domain.secret.impl.RawKeyPair;
 import com.kryptokrauts.aeternity.sdk.exception.AException;
 import com.kryptokrauts.aeternity.sdk.util.CryptoUtils;
-import com.kryptokrauts.aeternity.sdk.util.EncodingType;
 import com.kryptokrauts.aeternity.sdk.util.EncodingUtils;
 import com.kryptokrauts.aeternity.sdk.wallet.service.WalletService;
-
 import de.mkammerer.argon2.Argon2Advanced;
 import de.mkammerer.argon2.Argon2Factory;
+import org.abstractj.kalium.crypto.SecretBox;
+import org.bouncycastle.util.encoders.Hex;
+
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.sql.Timestamp;
+import java.util.UUID;
 
 public class WalletServiceImpl implements WalletService
 {
@@ -34,7 +31,7 @@ public class WalletServiceImpl implements WalletService
 
         // generate hash from password
         byte[] rawHash = argon2Advanced.rawHash( Argon2Configuration.OPSLIMIT, Argon2Configuration.MEMLIMIT_KIB, Argon2Configuration.PARALLELISM,
-                                                 walletPassword.toCharArray(), Charset.forName( "UTF-8" ), salt );
+                                                 walletPassword.toCharArray(), StandardCharsets.UTF_8, salt );
 
         // initialize secretBox with derived key
         SecretBox secretBox = new SecretBox( rawHash );
@@ -86,7 +83,7 @@ public class WalletServiceImpl implements WalletService
             byte[] salt = Hex.decode( recoverWallet.getCrypto().getKdfParams().getSalt() );
             // generate hash from password
             byte[] rawHash = argon2Advanced.rawHash( Argon2Configuration.OPSLIMIT, Argon2Configuration.MEMLIMIT_KIB, Argon2Configuration.PARALLELISM,
-                                                     walletPassword.toCharArray(), Charset.forName( "UTF-8" ), salt );
+                                                     walletPassword.toCharArray(), StandardCharsets.UTF_8, salt );
             // initialize secretBox with derived key
             SecretBox secretBox = new SecretBox( rawHash );
 
@@ -109,7 +106,7 @@ public class WalletServiceImpl implements WalletService
     @Override
     public String getWalletAddress( RawKeyPair rawKeyPair )
     {
-        return ApiIdentifiers.ACCOUNT_PUBKEY + "_" + EncodingUtils.encodeCheck( rawKeyPair.getPublicKey(), EncodingType.BASE58 );
+        return EncodingUtils.encodeCheck( rawKeyPair.getPublicKey(), ApiIdentifiers.ACCOUNT_PUBKEY);
     }
 
 }
