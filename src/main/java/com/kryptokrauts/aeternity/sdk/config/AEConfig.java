@@ -48,7 +48,7 @@ public class AEConfig {
 
 
     // network id
-    public static final Network DEFAULT_NETWORK_ID = Network.NETWORK_ID_MAINNET;
+    public static final Network DEFAULT_NETWORK_ID = Network.MAINNET;
 
     // TUNING
     public static final int MAX_RETRIES = 8; // used in exponential backoff when checking a transaction

@@ -6,8 +6,8 @@ package com.kryptokrauts.aeternity.sdk.config;
  */
 public enum Network {
 
-    NETWORK_ID_TESTNET("ae_devnet"),
-    NETWORK_ID_MAINNET("ae_mainnet");
+    TESTNET("ae_devnet"),
+    MAINNET("ae_mainnet");
 
     private String id;
 
