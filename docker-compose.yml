@@ -1,0 +1,13 @@
+version: '3'
+services:
+  node:
+    image: aeternity/epoch:v1.2.0
+    hostname: node
+    expose: [3013, 3113]
+    environment:
+      EPOCH_CONFIG: /home/epoch/epoch.yaml
+    command: -aecore expected_mine_rate ${EPOCH_MINE_RATE:-15000}
+    volumes:
+      - ./docker/epoch.yaml:/home/epoch/epoch.yaml
+      - ./docker/keys/node:/home/epoch/node/keys
+      - ./docker/accounts_test.json:/home/epoch/node/data/aecore/.genesis/accounts_test.json

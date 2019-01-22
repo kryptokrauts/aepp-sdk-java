@@ -5,8 +5,7 @@ import io.reactivex.Observable;
 import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
 import org.junit.Test;
-
-import static org.junit.Assert.assertTrue;
+import org.junit.jupiter.api.Assertions;
 
 public class ChainApiTest extends BaseTest {
 
@@ -17,7 +16,7 @@ public class ChainApiTest extends BaseTest {
         keyBlockObservable.subscribe(
                 keyBlock -> {
                     System.out.println(keyBlock.toString());
-                    assertTrue(keyBlock.getHeight() > 0);
+                    Assertions.assertTrue(keyBlock.getHeight().longValue() > 0);
                     async.complete();
                 },
                 failure -> {

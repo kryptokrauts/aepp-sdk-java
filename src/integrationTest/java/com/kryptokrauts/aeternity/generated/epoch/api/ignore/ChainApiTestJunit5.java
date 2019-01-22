@@ -14,7 +14,7 @@ public class ChainApiTestJunit5 extends BaseTestJunit5 {
         getChainApi().getCurrentKeyBlock(testContext.succeeding(keyBlock -> {
             testContext.verify(() -> {
                 System.out.println(keyBlock.toString());
-                assertTrue(keyBlock.getHeight() > 0);
+                assertTrue(keyBlock.getHeight().longValue() > 0);
                 testContext.completeNow();
             });
         }));
@@ -28,7 +28,7 @@ public class ChainApiTestJunit5 extends BaseTestJunit5 {
                 fail();
             }
             System.out.println(res.result().toString());
-            assertTrue(res.result().getHeight() > 0);
+            assertTrue(res.result().getHeight().longValue() > 0);
         });
     }
 }

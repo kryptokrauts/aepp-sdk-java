@@ -28,7 +28,8 @@ public abstract class BaseTest {
     protected static final String BENEFICIARY_PRIVATE_KEY = "79816BBF860B95600DDFABF9D81FEE81BDB30BE823B17D80B9E48BE0A7015ADF";
     protected KeyPairService keyPairService;
     protected ChainService chainService;
-    protected TransactionService transactionService;
+    protected TransactionService transactionServiceNative;
+    protected TransactionService transactionServiceDebug;
 
     @Rule
     public RunTestOnContext rule = new RunTestOnContext();
@@ -39,7 +40,8 @@ public abstract class BaseTest {
         Configuration.setupDefaultApiClient(vertx, getConfig());
         keyPairService = AEKit.getKeyPairService();
         chainService =  AEKit.getChainService();
-        transactionService = AEKit.getTransactionService(true, Network.TESTNET);
+        transactionServiceNative = AEKit.getTransactionService(true, Network.TESTNET);
+        transactionServiceDebug = AEKit.getTransactionService(false, Network.TESTNET);
     }
 
     private JsonObject getConfig() {
