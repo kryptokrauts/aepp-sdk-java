@@ -78,6 +78,9 @@ task generateApiClient {
                 "title"        :  rootProject.name,
                 "useTags"      : "true"
         ])
+        config.setTypeMappings([
+                "Long"  :   "java.math.BigInteger"
+        ])
         new DefaultGenerator().opts(config.toClientOptInput()).generate()
     }
 }
