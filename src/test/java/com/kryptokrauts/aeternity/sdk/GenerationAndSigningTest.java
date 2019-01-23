@@ -6,7 +6,6 @@ import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 import java.nio.charset.StandardCharsets;
 
@@ -15,7 +14,6 @@ import org.bouncycastle.util.encoders.Hex;
 import com.kryptokrauts.aeternity.sdk.constants.ApiIdentifiers;
 import com.kryptokrauts.aeternity.sdk.domain.secret.impl.BaseKeyPair;
 import com.kryptokrauts.aeternity.sdk.domain.secret.impl.RawKeyPair;
-import com.kryptokrauts.aeternity.sdk.util.CryptoUtils;
 import com.kryptokrauts.aeternity.sdk.util.EncodingType;
 import com.kryptokrauts.aeternity.sdk.util.EncodingUtils;
 
@@ -24,7 +22,6 @@ public class GenerationAndSigningTest extends BaseTest
     {
 
         final String privateKeyAsHex = "4d881dd1917036cc231f9881a0db978c8899dd76a817252418606b02bf6ab9d22378f892b7cc82c2d2739e994ec9953aa36461f1eb5a4a49a5b0de17b3d23ae8";
-        final byte[] privateKey = Hex.decode( privateKeyAsHex );
         final String publicKeyWithPrefix = "ak_Gd6iMVsoonGuTF8LeswwDDN2NF5wYHAoTRtzwdEcfS32LWoxm";
         final byte[] publicKey = EncodingUtils.decodeCheck( publicKeyWithPrefix.split( "_" )[1], EncodingType.BASE58 );
 
@@ -34,13 +31,11 @@ public class GenerationAndSigningTest extends BaseTest
                                         40, 65, 38, (byte) 215, (byte) 218, (byte) 236, (byte) 136, (byte) 133, 42, 120, (byte) 160, (byte) 179, 18, (byte) 191,
                                         (byte) 241, (byte) 162, (byte) 198, (byte) 203, (byte) 209, (byte) 173, 89, (byte) 136, (byte) 202, (byte) 211,
                                         (byte) 158, 59, 12, 122, 1, 1, 1, (byte) 132, 84, 101, 115, 116 };
-        final String txBinary = Hex.toHexString( txBinaryAsArray );
         final byte[] signatureAsArray = {95, (byte) 146, 31, 37, 95, (byte) 194, 36, 76, 58, 49, (byte) 167, (byte) 156, 127, (byte) 131, (byte) 142,
                                          (byte) 248, 25, 121, (byte) 139, 109, 59, (byte) 243, (byte) 203, (byte) 205, 16, (byte) 172, 115, (byte) 143,
                                          (byte) 254, (byte) 236, 33, 4, 43, 46, 16, (byte) 190, 46, 46, (byte) 140, (byte) 166, 76, 39, (byte) 249, 54, 38, 27,
                                          93, (byte) 159, 58, (byte) 148, 67, (byte) 198, 81, (byte) 206, 106, (byte) 237, 91, (byte) 131, 27, 14, (byte) 143,
                                          (byte) 178, (byte) 130, 2 };
-        final String signature = Hex.toHexString( txBinaryAsArray );
 
         describe( "crypto", () -> {
             describe( "generateKeyPair", () -> {
@@ -149,21 +144,6 @@ public class GenerationAndSigningTest extends BaseTest
                 final String foobarHashedHex = "93a0e84a8cdd4166267dbe1263e937f08087723ac24e7dcc35b3d5941775ef47";
                 byte[] hash = EncodingUtils.hash( foobar.getBytes( StandardCharsets.UTF_8 ) );
                 assertEquals( foobarHashedHex, Hex.toHexString( hash ) );
-            } );
-
-            // TODO do we need that?
-            it( "salt produces random sequences every time", () -> {
-                final byte[] salt1 = CryptoUtils.generateSalt( 32 );
-                final byte[] salt2 = CryptoUtils.generateSalt( 32 );
-                try
-                {
-                    assertArrayEquals( salt1, salt2 );
-                    fail( "different salts may not be equal" );
-                }
-                catch ( AssertionError e )
-                {
-                    // expected error
-                }
             } );
 
             it( "convert base58Check address to hex", () -> {
