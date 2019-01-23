@@ -130,8 +130,8 @@ public class TransactionService {
         List<RlpType> rlpTypes = new ArrayList<>();
         rlpTypes.add(RlpString.create(SerializationTags.OBJECT_TAG_SIGNED_TRANSACTION));
         rlpTypes.add(RlpString.create(SerializationTags.VSN));
-        rlpTypes.add(RlpString.create(txData));
         rlpTypes.add(RlpString.create(signedTx));
+        rlpTypes.add(RlpString.create(txData));
         RlpList rlpList = new RlpList(rlpTypes);
         byte[] encodedRlp = RlpEncoder.encode(rlpList);
         return EncodingUtils.encodeCheck(encodedRlp, ApiIdentifiers.TRANSACTION);
