@@ -3,6 +3,9 @@ services:
   node:
     image: aeternity/aeternity:v1.2.0
     hostname: node
+    ports:
+      - "3013:3013"
+      - "3113:3113"
     environment:
       EPOCH_CONFIG: /home/aeternity/aeternity.yaml
     command: >

@@ -110,11 +110,11 @@ public class TransactionService {
      */
     public Tx signTransaction(final UnsignedTx unsignedTx, final String privateKey) throws CryptoException {
         byte[] networkData = this.network.getId().getBytes(StandardCharsets.UTF_8);
-        byte[] txData = EncodingUtils.decodeCheckWithIdentifier(unsignedTx.getTx());
-        byte[] txAndNetwork = ByteUtils.concatenate(networkData, txData);
+        byte[] binaryTx = EncodingUtils.decodeCheckWithIdentifier(unsignedTx.getTx());
+        byte[] txAndNetwork = ByteUtils.concatenate(networkData, binaryTx);
         SignerService signerService = AEKit.getSignerService(); // TODO the right way to access other services?
-        byte[] signedTxData = signerService.sign(txAndNetwork, privateKey);
-        String encodedSignedTx = encodeSignedTransaction(txData, signedTxData);
+        byte[] sig = signerService.sign(txAndNetwork, privateKey);
+        String encodedSignedTx = encodeSignedTransaction(sig, binaryTx);
         Tx tx = new Tx();
         tx.setTx(encodedSignedTx);
         return tx;
@@ -122,16 +122,16 @@ public class TransactionService {
 
     /**
      *
-     * @param txData
-     * @param signedTx
+     * @param sig
+     * @param binaryTx
      * @return encoded transaction
      */
-    private String encodeSignedTransaction(byte[] txData, byte[] signedTx) {
+    private String encodeSignedTransaction(byte[] sig, byte[] binaryTx) {
         List<RlpType> rlpTypes = new ArrayList<>();
         rlpTypes.add(RlpString.create(SerializationTags.OBJECT_TAG_SIGNED_TRANSACTION));
         rlpTypes.add(RlpString.create(SerializationTags.VSN));
-        rlpTypes.add(RlpString.create(signedTx));
-        rlpTypes.add(RlpString.create(txData));
+        rlpTypes.add(RlpString.create(sig));
+        rlpTypes.add(RlpString.create(binaryTx));
         RlpList rlpList = new RlpList(rlpTypes);
         byte[] encodedRlp = RlpEncoder.encode(rlpList);
         return EncodingUtils.encodeCheck(encodedRlp, ApiIdentifiers.TRANSACTION);
