@@ -3,6 +3,9 @@ language: java
 jdk:
   - oraclejdk8
 
+services:
+  - docker
+
 before_cache:
   - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
   - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
@@ -29,7 +32,10 @@ jobs:
   include:
     # run gradle build
     - stage: build
-      script: ./gradlew build
+      script:
+        - docker-compose up -d
+        - ./gradlew integrationTest
+        - ./gradlew build
 
     # publish snapshot to oss.jfrog.org
     - stage: snapshot
