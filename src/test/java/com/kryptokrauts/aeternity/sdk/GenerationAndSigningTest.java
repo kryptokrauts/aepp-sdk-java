@@ -23,7 +23,7 @@ public class GenerationAndSigningTest extends BaseTest
 
         final String privateKeyAsHex = "4d881dd1917036cc231f9881a0db978c8899dd76a817252418606b02bf6ab9d22378f892b7cc82c2d2739e994ec9953aa36461f1eb5a4a49a5b0de17b3d23ae8";
         final String publicKeyWithPrefix = "ak_Gd6iMVsoonGuTF8LeswwDDN2NF5wYHAoTRtzwdEcfS32LWoxm";
-        final byte[] publicKey = EncodingUtils.decodeCheck( publicKeyWithPrefix.split( "_" )[1], EncodingType.BASE58 );
+        final byte[] publicKey = EncodingUtils.decodeCheckWithIdentifier( publicKeyWithPrefix );
 
         final byte[] txBinaryAsArray = {(byte) 248, 76, 12, 1, (byte) 160, 35, 120, (byte) 248, (byte) 146, (byte) 183, (byte) 204, (byte) 130, (byte) 194,
                                         (byte) 210, 115, (byte) 158, (byte) 153, 78, (byte) 201, (byte) 149, 58, (byte) 163, 100, 97, (byte) 241, (byte) 235,

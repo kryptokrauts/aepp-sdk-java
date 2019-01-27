@@ -11,15 +11,12 @@ import com.kryptokrauts.aeternity.sdk.signer.service.SignerService;
 import com.kryptokrauts.aeternity.sdk.util.ByteUtils;
 import com.kryptokrauts.aeternity.sdk.util.EncodingUtils;
 import io.reactivex.Observable;
+import net.consensys.cava.bytes.Bytes;
+import net.consensys.cava.rlp.RLP;
 import org.bouncycastle.crypto.CryptoException;
-import org.web3j.rlp.RlpEncoder;
-import org.web3j.rlp.RlpList;
-import org.web3j.rlp.RlpString;
-import org.web3j.rlp.RlpType;
 
+import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * @TODO refactor to factory pattern
@@ -73,21 +70,20 @@ public class TransactionService {
     }
 
     private UnsignedTx spendTxNative(SpendTx spendTx) {
-        List<RlpType> rlpTypes = new ArrayList<>();
-        rlpTypes.add(RlpString.create(SerializationTags.OBJECT_TAG_SPEND_TRANSACTION));
-        rlpTypes.add(RlpString.create(SerializationTags.VSN));
-        byte[] senderWithTag = EncodingUtils.decodeCheckAndTag(spendTx.getSenderId(), SerializationTags.ID_TAG_ACCOUNT);
-        byte[] recipientWithTag = EncodingUtils.decodeCheckAndTag(spendTx.getRecipientId(), SerializationTags.ID_TAG_ACCOUNT);
-        rlpTypes.add(RlpString.create(senderWithTag));
-        rlpTypes.add(RlpString.create(recipientWithTag));
-        rlpTypes.add(RlpString.create(spendTx.getAmount()));
-        rlpTypes.add(RlpString.create(spendTx.getFee()));
-        rlpTypes.add(RlpString.create(spendTx.getTtl()));
-        rlpTypes.add(RlpString.create(spendTx.getNonce()));
-        rlpTypes.add(RlpString.create(spendTx.getPayload()));
-        RlpList rlpList = new RlpList(rlpTypes);
-        byte[] rawTx = RlpEncoder.encode(rlpList);
-        UnsignedTx unsignedTx = new UnsignedTx().tx(EncodingUtils.encodeCheck(rawTx, ApiIdentifiers.TRANSACTION));
+        Bytes encodedRlp = RLP.encodeList(rlpWriter -> {
+            rlpWriter.writeInt(SerializationTags.OBJECT_TAG_SPEND_TRANSACTION);
+            rlpWriter.writeInt(SerializationTags.VSN);
+            byte[] senderWithTag = EncodingUtils.decodeCheckAndTag(spendTx.getSenderId(), SerializationTags.ID_TAG_ACCOUNT);
+            byte[] recipientWithTag = EncodingUtils.decodeCheckAndTag(spendTx.getRecipientId(), SerializationTags.ID_TAG_ACCOUNT);
+            rlpWriter.writeByteArray(senderWithTag);
+            rlpWriter.writeByteArray(recipientWithTag);
+            rlpWriter.writeBigInteger(spendTx.getAmount());
+            rlpWriter.writeBigInteger(spendTx.getFee());
+            rlpWriter.writeBigInteger(spendTx.getTtl());
+            rlpWriter.writeBigInteger(spendTx.getNonce());
+            rlpWriter.writeString(spendTx.getPayload());
+        });
+        UnsignedTx unsignedTx = new UnsignedTx().tx(EncodingUtils.encodeCheck(encodedRlp.toArray(), ApiIdentifiers.TRANSACTION));
         return unsignedTx;
     }
 
@@ -127,13 +123,14 @@ public class TransactionService {
      * @return encoded transaction
      */
     private String encodeSignedTransaction(byte[] sig, byte[] binaryTx) {
-        List<RlpType> rlpTypes = new ArrayList<>();
-        rlpTypes.add(RlpString.create(SerializationTags.OBJECT_TAG_SIGNED_TRANSACTION));
-        rlpTypes.add(RlpString.create(SerializationTags.VSN));
-        rlpTypes.add(RlpString.create(sig));
-        rlpTypes.add(RlpString.create(binaryTx));
-        RlpList rlpList = new RlpList(rlpTypes);
-        byte[] encodedRlp = RlpEncoder.encode(rlpList);
-        return EncodingUtils.encodeCheck(encodedRlp, ApiIdentifiers.TRANSACTION);
+        Bytes encodedRlp = RLP.encodeList(rlpWriter -> {
+            rlpWriter.writeBigInteger(BigInteger.valueOf(SerializationTags.OBJECT_TAG_SIGNED_TRANSACTION));
+            rlpWriter.writeBigInteger(BigInteger.valueOf(SerializationTags.VSN));
+            rlpWriter.writeList(writer -> {
+                writer.writeByteArray(sig);
+            });
+            rlpWriter.writeByteArray(binaryTx);
+        });
+        return EncodingUtils.encodeCheck(encodedRlp.toArray(), ApiIdentifiers.TRANSACTION);
     }
 }
