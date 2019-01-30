@@ -9,6 +9,7 @@ import org.junit.Rule;
 import org.junit.runner.RunWith;
 
 import com.kryptokrauts.aeternity.sdk.service.chain.ChainService;
+import com.kryptokrauts.aeternity.sdk.service.chain.ChainServiceConfiguration;
 import com.kryptokrauts.aeternity.sdk.service.chain.ChainServiceFactory;
 import com.kryptokrauts.aeternity.sdk.service.keypair.KeyPairService;
 import com.kryptokrauts.aeternity.sdk.service.keypair.KeyPairServiceFactory;
@@ -43,7 +44,7 @@ public abstract class BaseTest {
     @Before
     public void setupApiClient( TestContext context ) {
         keyPairService = new KeyPairServiceFactory().getService();
-        chainService = new ChainServiceFactory().getService();
+        chainService = new ChainServiceFactory().getService( ChainServiceConfiguration.builder().base_url( getEpochBaseUrl() ).build() );
         transactionServiceNative = new TransactionServiceFactory()
         .getService( TransactionServiceConfiguration.builder().base_url( getEpochBaseUrl() ).vertx( rule.vertx() ).build() );
         transactionServiceDebug = new TransactionServiceFactory()
