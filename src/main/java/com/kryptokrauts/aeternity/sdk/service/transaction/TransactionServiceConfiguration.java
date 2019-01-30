@@ -29,14 +29,4 @@ public class TransactionServiceConfiguration extends ServiceConfiguration {
         return new TransactionApi( new TransactionApiImpl( new ApiClient( vertx, new JsonObject( new HashMap<String, Object>( ImmutableMap
         .of( BaseConstants.VERTX_BASE_PATH, base_url ) ) ) ) ) );
     }
-
-    // public TransactionApi transactionApi = new TransactionApi( new
-    // TransactionApiImpl() );
-
-    // private void initTransactionApi() {
-    // new TransactionApi( new TransactionApiImpl( new ApiClient( vertx, new
-    // JsonObject( ImmutableMap.of( BaseConstants.VERTX_BASE_PATH, base_url ) )
-    // ) ) );
-    // }
-
 }

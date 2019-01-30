@@ -1,10 +1,15 @@
 package com.kryptokrauts.aeternity.sdk.service.chain;
 
+import java.util.HashMap;
+
+import com.google.common.collect.ImmutableMap;
+import com.kryptokrauts.aeternity.generated.epoch.ApiClient;
 import com.kryptokrauts.aeternity.generated.epoch.api.ChainApiImpl;
 import com.kryptokrauts.aeternity.generated.epoch.api.rxjava.ChainApi;
+import com.kryptokrauts.aeternity.sdk.constants.BaseConstants;
 import com.kryptokrauts.aeternity.sdk.service.config.ServiceConfiguration;
 
-import lombok.Builder.Default;
+import io.vertx.core.json.JsonObject;
 import lombok.Getter;
 import lombok.experimental.SuperBuilder;
 
@@ -12,6 +17,9 @@ import lombok.experimental.SuperBuilder;
 // @Builder( builderMethodName = "configure", buildMethodName = "compile" )
 @SuperBuilder
 public class ChainServiceConfiguration extends ServiceConfiguration {
-    @Default
-    private ChainApi chainApi = new ChainApi( new ChainApiImpl() );
+
+    public ChainApi getChainApi() {
+        return new ChainApi( new ChainApiImpl( new ApiClient( vertx, new JsonObject( new HashMap<String, Object>( ImmutableMap
+        .of( BaseConstants.VERTX_BASE_PATH, base_url ) ) ) ) ) );
+    }
 }
