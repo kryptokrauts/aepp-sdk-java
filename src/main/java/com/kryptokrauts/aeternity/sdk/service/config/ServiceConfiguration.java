@@ -34,7 +34,9 @@ import lombok.experimental.SuperBuilder;
 public class ServiceConfiguration {
 
     /**
-     * points to testnet
+     * points to testnet --> @TODO refactoring: make builder method an recreate
+     * api Client, create abstract method which initalizes fe
+     * transactionApiClient
      */
     @Default
     protected String base_url = "https://sdk-edgenet.aepps.com/v2";
