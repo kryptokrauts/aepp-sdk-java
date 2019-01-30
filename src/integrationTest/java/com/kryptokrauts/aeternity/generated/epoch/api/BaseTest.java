@@ -44,7 +44,7 @@ public abstract class BaseTest {
     @Before
     public void setupApiClient( TestContext context ) {
         keyPairService = new KeyPairServiceFactory().getService();
-        chainService = new ChainServiceFactory().getService( ChainServiceConfiguration.builder().base_url( getEpochBaseUrl() ).build() );
+        chainService = new ChainServiceFactory().getService( ChainServiceConfiguration.builder().base_url( getEpochBaseUrl() ).vertx( rule.vertx() ).build() );
         transactionServiceNative = new TransactionServiceFactory()
         .getService( TransactionServiceConfiguration.builder().base_url( getEpochBaseUrl() ).vertx( rule.vertx() ).build() );
         transactionServiceDebug = new TransactionServiceFactory()
