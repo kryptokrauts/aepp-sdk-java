@@ -23,11 +23,18 @@ public class TransactionServiceConfiguration extends ServiceConfiguration {
     @Default
     private Network network = Network.TESTNET;
 
-    private TransactionApi transactionApi;
-
-    public TransactionServiceConfiguration() {
-        super();
-        transactionApi = new TransactionApi( new TransactionApiImpl( new ApiClient( vertx, new JsonObject( ImmutableMap
-        .of( BaseConstants.VERTX_BASE_PATH, base_url ) ) ) ) );
+    public TransactionApi getTransactionApi() {
+        return new TransactionApi( new TransactionApiImpl( new ApiClient( vertx,
+                                                                          new JsonObject( ImmutableMap.of( BaseConstants.VERTX_BASE_PATH, base_url ) ) ) ) );
     }
+
+    // public TransactionApi transactionApi = new TransactionApi( new
+    // TransactionApiImpl() );
+
+    // private void initTransactionApi() {
+    // new TransactionApi( new TransactionApiImpl( new ApiClient( vertx, new
+    // JsonObject( ImmutableMap.of( BaseConstants.VERTX_BASE_PATH, base_url ) )
+    // ) ) );
+    // }
+
 }

@@ -18,12 +18,10 @@ import io.reactivex.Observable;
 import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
 
-public class TransactionApiTest extends BaseTest
-{
+public class TransactionApiTest extends BaseTest {
 
     @Test
-    public void buildNativeTransactionTest( TestContext context ) throws ExecutionException, InterruptedException
-    {
+    public void buildNativeTransactionTest( TestContext context ) throws ExecutionException, InterruptedException {
         Async async = context.async();
 
         String sender = keyPairService.generateBaseKeyPair().getPublicKey();
@@ -48,10 +46,8 @@ public class TransactionApiTest extends BaseTest
         } );
     }
 
-    // @Ignore // tx is invalid at the moment
     @Test
-    public void postSpendTxTest( TestContext context ) throws ExecutionException, InterruptedException, CryptoException
-    {
+    public void postSpendTxTest( TestContext context ) throws ExecutionException, InterruptedException, CryptoException {
         Async async = context.async();
 
         BaseKeyPair keyPair = keyPairService.generateBaseKeyPairFromSecret( BENEFICIARY_PRIVATE_KEY );
