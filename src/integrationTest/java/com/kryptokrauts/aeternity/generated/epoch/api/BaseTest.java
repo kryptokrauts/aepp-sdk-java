@@ -17,6 +17,7 @@ import com.kryptokrauts.aeternity.sdk.service.transaction.TransactionService;
 import com.kryptokrauts.aeternity.sdk.service.transaction.TransactionServiceConfiguration;
 import com.kryptokrauts.aeternity.sdk.service.transaction.TransactionServiceFactory;
 
+import io.vertx.core.Vertx;
 import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.RunTestOnContext;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
@@ -43,12 +44,13 @@ public abstract class BaseTest {
 
     @Before
     public void setupApiClient( TestContext context ) {
+        Vertx vertx = rule.vertx();
         keyPairService = new KeyPairServiceFactory().getService();
-        chainService = new ChainServiceFactory().getService( ChainServiceConfiguration.builder().base_url( getEpochBaseUrl() ).vertx( rule.vertx() ).build() );
+        chainService = new ChainServiceFactory().getService( ChainServiceConfiguration.builder().base_url( getEpochBaseUrl() ).vertx( vertx ).build() );
         transactionServiceNative = new TransactionServiceFactory()
-        .getService( TransactionServiceConfiguration.builder().base_url( getEpochBaseUrl() ).vertx( rule.vertx() ).build() );
+        .getService( TransactionServiceConfiguration.builder().base_url( getEpochBaseUrl() ).vertx( vertx ).build() );
         transactionServiceDebug = new TransactionServiceFactory()
-        .getService( TransactionServiceConfiguration.builder().nativeMode( false ).base_url( getEpochBaseUrl() ).vertx( rule.vertx() ).build() );
+        .getService( TransactionServiceConfiguration.builder().nativeMode( false ).base_url( getEpochBaseUrl() ).vertx( vertx ).build() );
     }
 
     private String getEpochBaseUrl() {
