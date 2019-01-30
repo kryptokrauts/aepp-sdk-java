@@ -8,7 +8,6 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.runner.RunWith;
 
-import com.kryptokrauts.aeternity.generated.epoch.Configuration;
 import com.kryptokrauts.aeternity.sdk.service.chain.ChainService;
 import com.kryptokrauts.aeternity.sdk.service.chain.ChainServiceFactory;
 import com.kryptokrauts.aeternity.sdk.service.keypair.KeyPairService;
@@ -17,8 +16,6 @@ import com.kryptokrauts.aeternity.sdk.service.transaction.TransactionService;
 import com.kryptokrauts.aeternity.sdk.service.transaction.TransactionServiceConfiguration;
 import com.kryptokrauts.aeternity.sdk.service.transaction.TransactionServiceFactory;
 
-import io.vertx.core.Vertx;
-import io.vertx.core.json.JsonObject;
 import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.RunTestOnContext;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
@@ -45,18 +42,12 @@ public abstract class BaseTest {
 
     @Before
     public void setupApiClient( TestContext context ) {
-        Vertx vertx = rule.vertx();
-        Configuration.setupDefaultApiClient( vertx, getConfig() );
         keyPairService = new KeyPairServiceFactory().getService();
         chainService = new ChainServiceFactory().getService();
-        transactionServiceNative = new TransactionServiceFactory().getService();
-        transactionServiceDebug = new TransactionServiceFactory().getService( TransactionServiceConfiguration.builder().nativeMode( false ).build() );
-    }
-
-    private JsonObject getConfig() {
-        JsonObject config = new JsonObject();
-        config.put( "basePath", getEpochBaseUrl() );
-        return config;
+        transactionServiceNative = new TransactionServiceFactory()
+        .getService( TransactionServiceConfiguration.builder().base_url( getEpochBaseUrl() ).vertx( rule.vertx() ).build() );
+        transactionServiceDebug = new TransactionServiceFactory()
+        .getService( TransactionServiceConfiguration.builder().nativeMode( false ).base_url( getEpochBaseUrl() ).vertx( rule.vertx() ).build() );
     }
 
     private String getEpochBaseUrl() {
