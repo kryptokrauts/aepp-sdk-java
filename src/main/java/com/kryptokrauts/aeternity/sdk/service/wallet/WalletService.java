@@ -1,10 +1,9 @@
-package com.kryptokrauts.aeternity.sdk.wallet.service;
+package com.kryptokrauts.aeternity.sdk.service.wallet;
 
 import com.kryptokrauts.aeternity.sdk.domain.secret.impl.RawKeyPair;
 import com.kryptokrauts.aeternity.sdk.exception.AException;
 
-public interface WalletService
-{
+public interface WalletService {
 
     String generateWalletFile( RawKeyPair rawKeyPair, String walletPassword, String walletName ) throws AException;
 

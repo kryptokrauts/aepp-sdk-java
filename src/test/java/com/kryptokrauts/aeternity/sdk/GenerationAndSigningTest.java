@@ -14,12 +14,15 @@ import org.bouncycastle.util.encoders.Hex;
 import com.kryptokrauts.aeternity.sdk.constants.ApiIdentifiers;
 import com.kryptokrauts.aeternity.sdk.domain.secret.impl.BaseKeyPair;
 import com.kryptokrauts.aeternity.sdk.domain.secret.impl.RawKeyPair;
+import com.kryptokrauts.aeternity.sdk.service.keypair.KeyPairService;
+import com.kryptokrauts.aeternity.sdk.service.keypair.KeyPairServiceFactory;
 import com.kryptokrauts.aeternity.sdk.util.EncodingType;
 import com.kryptokrauts.aeternity.sdk.util.EncodingUtils;
+import com.kryptokrauts.aeternity.sdk.util.SigningUtil;
 
-public class GenerationAndSigningTest extends BaseTest
-{
+public class GenerationAndSigningTest extends BaseTest {
     {
+        final KeyPairService keypairService = new KeyPairServiceFactory().getService();
 
         final String privateKeyAsHex = "4d881dd1917036cc231f9881a0db978c8899dd76a817252418606b02bf6ab9d22378f892b7cc82c2d2739e994ec9953aa36461f1eb5a4a49a5b0de17b3d23ae8";
         final String publicKeyWithPrefix = "ak_Gd6iMVsoonGuTF8LeswwDDN2NF5wYHAoTRtzwdEcfS32LWoxm";
@@ -40,7 +43,7 @@ public class GenerationAndSigningTest extends BaseTest
         describe( "crypto", () -> {
             describe( "generateKeyPair", () -> {
                 it( "generates an account key pair", () -> {
-                    BaseKeyPair keyPair = AEKit.getKeyPairService().generateBaseKeyPair();
+                    BaseKeyPair keyPair = keypairService.generateBaseKeyPair();
                     assertNotNull( keyPair );
                     assertTrue( EncodingUtils.isAddressValid( keyPair.getPublicKey() ) );
                     assertTrue( keyPair.getPublicKey().startsWith( "ak_" ) );
@@ -51,20 +54,20 @@ public class GenerationAndSigningTest extends BaseTest
 
             describe( "encryptPassword", () -> {
                 describe( "generate a password encrypted key pair", () -> {
-                    RawKeyPair keyPair = AEKit.getKeyPairService().generateRawKeyPair();
+                    RawKeyPair keyPair = keypairService.generateRawKeyPair();
                     final String password = "verysecret";
 
                     it( "works for private keys", () -> {
                         final byte[] privateBinary = keyPair.getConcatenatedPrivateKey();
-                        final byte[] encryptedBinary = AEKit.getKeyPairService().encryptPrivateKey( password, privateBinary );
-                        final byte[] decryptedBinary = AEKit.getKeyPairService().decryptPrivateKey( password, encryptedBinary );
+                        final byte[] encryptedBinary = keypairService.encryptPrivateKey( password, privateBinary );
+                        final byte[] decryptedBinary = keypairService.decryptPrivateKey( password, encryptedBinary );
                         assertArrayEquals( privateBinary, decryptedBinary );
                     } );
 
                     it( "works for public keys", () -> {
                         final byte[] publicBinary = ( (RawKeyPair) keyPair ).getPublicKey();
-                        final byte[] encryptedBinary = AEKit.getKeyPairService().encryptPublicKey( password, publicBinary );
-                        final byte[] decryptedBinary = AEKit.getKeyPairService().decryptPublicKey( password, encryptedBinary );
+                        final byte[] encryptedBinary = keypairService.encryptPublicKey( password, publicBinary );
+                        final byte[] decryptedBinary = keypairService.decryptPublicKey( password, encryptedBinary );
                         assertArrayEquals( publicBinary, decryptedBinary );
                     } );
                 } );
@@ -84,7 +87,7 @@ public class GenerationAndSigningTest extends BaseTest
             describe( "recover", () -> {
                 it( "check for the correct private key for the beneficiary", () -> {
                     final String beneficiaryPub = "ak_twR4h7dEcUtc2iSEDv8kB7UFJJDGiEDQCXr85C3fYF8FdVdyo";
-                    final BaseKeyPair keyPair = AEKit.getKeyPairService()
+                    final BaseKeyPair keyPair = keypairService
                     .generateBaseKeyPairFromSecret( "79816BBF860B95600DDFABF9D81FEE81BDB30BE823B17D80B9E48BE0A7015ADF" );
                     assertEquals( beneficiaryPub, keyPair.getPublicKey() );
                 } );
@@ -92,14 +95,14 @@ public class GenerationAndSigningTest extends BaseTest
 
             describe( "sign", () -> {
                 it( "should produce correct signature", () -> {
-                    final byte[] txSignature = AEKit.getSignerService().sign( txBinaryAsArray, privateKeyAsHex );
+                    final byte[] txSignature = SigningUtil.sign( txBinaryAsArray, privateKeyAsHex );
                     assertArrayEquals( txSignature, signatureAsArray );
                 } );
             } );
 
             describe( "verify", () -> {
                 it( "should verify tx with correct signature", () -> {
-                    final boolean verified = AEKit.getSignerService().verify( txBinaryAsArray, signatureAsArray, Hex.toHexString( publicKey ) );
+                    final boolean verified = SigningUtil.verify( txBinaryAsArray, signatureAsArray, Hex.toHexString( publicKey ) );
                     assertTrue( verified );
                 } );
             } );
@@ -115,24 +118,23 @@ public class GenerationAndSigningTest extends BaseTest
 
                 describe( "sign", () -> {
                     it( "should produce correct signature of message", () -> {
-                        final byte[] msgSignature = AEKit.getSignerService().signPersonalMessage( message, privateKeyAsHex );
+                        final byte[] msgSignature = SigningUtil.signPersonalMessage( message, privateKeyAsHex );
                         assertArrayEquals( msgSignature, messageSignature );
                     } );
 
                     it( "should produce correct signature of message with non-ASCII chars", () -> {
-                        final byte[] msgSignature = AEKit.getSignerService().signPersonalMessage( messageNonASCII, privateKeyAsHex );
+                        final byte[] msgSignature = SigningUtil.signPersonalMessage( messageNonASCII, privateKeyAsHex );
                         assertArrayEquals( msgSignature, messageNonASCIISignature );
                     } );
                 } );
                 describe( "verify", () -> {
                     it( "should verify message", () -> {
-                        final boolean verified = AEKit.getSignerService().verifyPersonalMessage( message, messageSignature, Hex.toHexString( publicKey ) );
+                        final boolean verified = SigningUtil.verifyPersonalMessage( message, messageSignature, Hex.toHexString( publicKey ) );
                         assertTrue( verified );
                     } );
 
                     it( "should verify message with non-ASCII chars", () -> {
-                        final boolean verified = AEKit.getSignerService()
-                        .verifyPersonalMessage( messageNonASCII, messageNonASCIISignature, Hex.toHexString( publicKey ) );
+                        final boolean verified = SigningUtil.verifyPersonalMessage( messageNonASCII, messageNonASCIISignature, Hex.toHexString( publicKey ) );
                         assertTrue( verified );
                     } );
                 } );
