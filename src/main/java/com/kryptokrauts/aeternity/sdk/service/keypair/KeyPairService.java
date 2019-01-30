@@ -1,4 +1,4 @@
-package com.kryptokrauts.aeternity.sdk.keypair.service;
+package com.kryptokrauts.aeternity.sdk.service.keypair;
 
 import java.io.UnsupportedEncodingException;
 import java.security.InvalidKeyException;
@@ -11,8 +11,7 @@ import javax.crypto.NoSuchPaddingException;
 import com.kryptokrauts.aeternity.sdk.domain.secret.impl.BaseKeyPair;
 import com.kryptokrauts.aeternity.sdk.domain.secret.impl.RawKeyPair;
 
-public interface KeyPairService
-{
+public interface KeyPairService {
 
     /**
      * @return a base58 encoded keypair

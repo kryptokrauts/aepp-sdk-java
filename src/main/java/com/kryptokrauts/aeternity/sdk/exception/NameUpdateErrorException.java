@@ -1,4 +1,3 @@
 package com.kryptokrauts.aeternity.sdk.exception;
 
-public class NameUpdateErrorException extends AENSException {
-}
+public class NameUpdateErrorException extends AENSException {}

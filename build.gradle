@@ -143,7 +143,7 @@ dependencies {
     // lombok
     compileOnly "org.projectlombok:lombok:${lombokVersion}"
     annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
-
+    
     // cryptography
     compile "org.bitcoinj:bitcoinj-core:${bitcoinjCoreVersion}"
     compile fileTree(include: ["*.jar"], dir: "lib")

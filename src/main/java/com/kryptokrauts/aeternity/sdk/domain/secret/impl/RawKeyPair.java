@@ -9,21 +9,18 @@ import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor
-public class RawKeyPair implements KeyPair<byte[]>
-{
+public class RawKeyPair implements KeyPair<byte[]> {
     private byte[] publicKey;
 
     private byte[] privateKey;
 
     @Builder
-    public RawKeyPair( final byte[] publicKey, final byte[] privateKey )
-    {
+    public RawKeyPair( final byte[] publicKey, final byte[] privateKey ) {
         this.publicKey = publicKey;
         this.privateKey = privateKey;
     }
 
-    public byte[] getConcatenatedPrivateKey()
-    {
+    public byte[] getConcatenatedPrivateKey() {
         return ByteUtils.concatenate( privateKey, publicKey );
     }
 }
