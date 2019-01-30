@@ -1,5 +1,7 @@
 package com.kryptokrauts.aeternity.sdk.service.transaction;
 
+import java.util.HashMap;
+
 import com.google.common.collect.ImmutableMap;
 import com.kryptokrauts.aeternity.generated.epoch.ApiClient;
 import com.kryptokrauts.aeternity.generated.epoch.api.TransactionApiImpl;
@@ -24,8 +26,8 @@ public class TransactionServiceConfiguration extends ServiceConfiguration {
     private Network network = Network.TESTNET;
 
     public TransactionApi getTransactionApi() {
-        return new TransactionApi( new TransactionApiImpl( new ApiClient( vertx,
-                                                                          new JsonObject( ImmutableMap.of( BaseConstants.VERTX_BASE_PATH, base_url ) ) ) ) );
+        return new TransactionApi( new TransactionApiImpl( new ApiClient( vertx, new JsonObject( new HashMap<String, Object>( ImmutableMap
+        .of( BaseConstants.VERTX_BASE_PATH, base_url ) ) ) ) ) );
     }
 
     // public TransactionApi transactionApi = new TransactionApi( new
