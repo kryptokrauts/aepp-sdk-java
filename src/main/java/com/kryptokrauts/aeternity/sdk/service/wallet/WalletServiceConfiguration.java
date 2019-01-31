@@ -1,6 +1,6 @@
 package com.kryptokrauts.aeternity.sdk.service.wallet;
 
-import com.kryptokrauts.aeternity.sdk.service.config.ServiceConfiguration;
+import com.kryptokrauts.aeternity.sdk.service.ServiceConfiguration;
 
 import de.mkammerer.argon2.Argon2Factory.Argon2Types;
 import lombok.Builder.Default;
@@ -8,7 +8,7 @@ import lombok.Getter;
 import lombok.experimental.SuperBuilder;
 
 @Getter
-@SuperBuilder
+@SuperBuilder( builderMethodName = "configure", buildMethodName = "compile" )
 public class WalletServiceConfiguration extends ServiceConfiguration {
     @Default
     private String secretType = "ed25519";

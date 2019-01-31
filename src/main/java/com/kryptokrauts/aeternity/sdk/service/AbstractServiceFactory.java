@@ -3,8 +3,6 @@ package com.kryptokrauts.aeternity.sdk.service;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.kryptokrauts.aeternity.sdk.service.config.ServiceConfiguration;
-
 /**
  * This abstract factory defines the process of retrieving service
  * implementations of different versions in a uniform way

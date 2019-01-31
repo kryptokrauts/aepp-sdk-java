@@ -1,4 +1,4 @@
-package com.kryptokrauts.aeternity.sdk.service.config;
+package com.kryptokrauts.aeternity.sdk.service;
 
 import com.kryptokrauts.aeternity.sdk.service.wallet.WalletServiceConfiguration;
 
@@ -29,7 +29,7 @@ import lombok.experimental.SuperBuilder;
  * 
  * examples see {@link WalletServiceConfiguration}
  */
-@SuperBuilder
+@SuperBuilder( builderMethodName = "configure", buildMethodName = "compile" )
 @NoArgsConstructor
 public class ServiceConfiguration {
 

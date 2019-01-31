@@ -46,11 +46,11 @@ public abstract class BaseTest {
     public void setupApiClient( TestContext context ) {
         Vertx vertx = rule.vertx();
         keyPairService = new KeyPairServiceFactory().getService();
-        chainService = new ChainServiceFactory().getService( ChainServiceConfiguration.builder().base_url( getEpochBaseUrl() ).vertx( vertx ).build() );
+        chainService = new ChainServiceFactory().getService( ChainServiceConfiguration.configure().base_url( getEpochBaseUrl() ).vertx( vertx ).compile() );
         transactionServiceNative = new TransactionServiceFactory()
-        .getService( TransactionServiceConfiguration.builder().base_url( getEpochBaseUrl() ).vertx( vertx ).build() );
+        .getService( TransactionServiceConfiguration.configure().base_url( getEpochBaseUrl() ).vertx( vertx ).compile() );
         transactionServiceDebug = new TransactionServiceFactory()
-        .getService( TransactionServiceConfiguration.builder().nativeMode( false ).base_url( getEpochBaseUrl() ).vertx( vertx ).build() );
+        .getService( TransactionServiceConfiguration.configure().nativeMode( false ).base_url( getEpochBaseUrl() ).vertx( vertx ).compile() );
     }
 
     private String getEpochBaseUrl() {

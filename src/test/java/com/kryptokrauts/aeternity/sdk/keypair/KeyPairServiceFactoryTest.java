@@ -14,8 +14,8 @@ public class KeyPairServiceFactoryTest extends BaseTest {
             Spectrum.it( " returns same instance for configuration", () -> {
                 KeyPairServiceFactory addressServiceFactory = new KeyPairServiceFactory();
 
-                KeyPairServiceConfiguration config = KeyPairServiceConfiguration.builder().cipherAlgorithm( "Blowfish" ).secretKeySpec( "PBKDF2WithHmacSHA1" )
-                .build();
+                KeyPairServiceConfiguration config = KeyPairServiceConfiguration.configure().cipherAlgorithm( "Blowfish" ).secretKeySpec( "PBKDF2WithHmacSHA1" )
+                .compile();
 
                 KeyPairService firstGet = addressServiceFactory.getService( config );
                 KeyPairService secondGet = addressServiceFactory.getService( config );
