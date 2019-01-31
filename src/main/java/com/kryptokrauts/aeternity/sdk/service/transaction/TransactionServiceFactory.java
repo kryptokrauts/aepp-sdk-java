@@ -6,7 +6,7 @@ import com.kryptokrauts.aeternity.sdk.service.transaction.impl.TransactionServic
 public class TransactionServiceFactory extends AbstractServiceFactory<TransactionService, TransactionServiceConfiguration> {
     @Override
     public TransactionService getService() {
-        return getServiceWithConfig( TransactionServiceConfiguration.builder().build() );
+        return getServiceWithConfig( TransactionServiceConfiguration.configure().compile() );
     }
 
     @Override

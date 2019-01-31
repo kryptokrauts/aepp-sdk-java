@@ -28,8 +28,8 @@ public class SigningUtil {
         return signer.generateSignature();
     }
 
-    public static final byte[] signPersonalMessage( final String message, final String privateKey ) throws CryptoException {
-        return sign( personalMessageToBinary( message ), privateKey );
+    public static final byte[] signMessage( final String message, final String privateKey ) throws CryptoException {
+        return sign( messageToBinary( message ), privateKey );
     }
 
     public static final boolean verify( final String data, final byte[] signature, final String publicKey ) {
@@ -44,11 +44,11 @@ public class SigningUtil {
         return verifier.verifySignature( signature );
     }
 
-    public static final boolean verifyPersonalMessage( final String message, final byte[] signature, final String publicKey ) {
-        return verify( personalMessageToBinary( message ), signature, publicKey );
+    public static final boolean verifyMessage( final String message, final byte[] signature, final String publicKey ) {
+        return verify( messageToBinary( message ), signature, publicKey );
     }
 
-    private static final byte[] personalMessageToBinary( final String message ) {
+    private static final byte[] messageToBinary( final String message ) {
         final byte[] p = BaseConstants.AETERNITY_MESSAGE_PREFIX.getBytes( StandardCharsets.UTF_8 );
         final byte[] msg = message.getBytes( StandardCharsets.UTF_8 );
         if ( msg.length > BaseConstants.MAX_MESSAGE_LENGTH ) {

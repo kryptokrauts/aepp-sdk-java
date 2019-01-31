@@ -7,15 +7,14 @@ import com.kryptokrauts.aeternity.generated.epoch.ApiClient;
 import com.kryptokrauts.aeternity.generated.epoch.api.ChainApiImpl;
 import com.kryptokrauts.aeternity.generated.epoch.api.rxjava.ChainApi;
 import com.kryptokrauts.aeternity.sdk.constants.BaseConstants;
-import com.kryptokrauts.aeternity.sdk.service.config.ServiceConfiguration;
+import com.kryptokrauts.aeternity.sdk.service.ServiceConfiguration;
 
 import io.vertx.core.json.JsonObject;
 import lombok.Getter;
 import lombok.experimental.SuperBuilder;
 
 @Getter
-// @Builder( builderMethodName = "configure", buildMethodName = "compile" )
-@SuperBuilder
+@SuperBuilder( builderMethodName = "configure", buildMethodName = "compile" )
 public class ChainServiceConfiguration extends ServiceConfiguration {
 
     public ChainApi getChainApi() {

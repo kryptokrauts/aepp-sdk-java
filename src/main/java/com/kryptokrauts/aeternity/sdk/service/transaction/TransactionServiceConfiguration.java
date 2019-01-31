@@ -8,7 +8,7 @@ import com.kryptokrauts.aeternity.generated.epoch.api.TransactionApiImpl;
 import com.kryptokrauts.aeternity.generated.epoch.api.rxjava.TransactionApi;
 import com.kryptokrauts.aeternity.sdk.constants.BaseConstants;
 import com.kryptokrauts.aeternity.sdk.constants.Network;
-import com.kryptokrauts.aeternity.sdk.service.config.ServiceConfiguration;
+import com.kryptokrauts.aeternity.sdk.service.ServiceConfiguration;
 
 import io.vertx.core.json.JsonObject;
 import lombok.Builder.Default;
@@ -16,7 +16,7 @@ import lombok.Getter;
 import lombok.experimental.SuperBuilder;
 
 @Getter
-@SuperBuilder
+@SuperBuilder( builderMethodName = "configure", buildMethodName = "compile" )
 public class TransactionServiceConfiguration extends ServiceConfiguration {
 
     @Default

@@ -6,7 +6,7 @@ import com.kryptokrauts.aeternity.sdk.service.keypair.impl.KeyPairServiceImpl;
 public class KeyPairServiceFactory extends AbstractServiceFactory<KeyPairService, KeyPairServiceConfiguration> {
     @Override
     public KeyPairService getService() {
-        return getService( KeyPairServiceConfiguration.builder().build() );
+        return getService( KeyPairServiceConfiguration.configure().compile() );
     }
 
     @Override

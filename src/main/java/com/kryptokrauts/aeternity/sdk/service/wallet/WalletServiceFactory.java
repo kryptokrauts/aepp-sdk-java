@@ -6,7 +6,7 @@ import com.kryptokrauts.aeternity.sdk.service.wallet.impl.WalletServiceImpl;
 public class WalletServiceFactory extends AbstractServiceFactory<WalletService, WalletServiceConfiguration> {
     @Override
     public WalletService getService() {
-        return getServiceWithConfig( WalletServiceConfiguration.builder().build() );
+        return getServiceWithConfig( WalletServiceConfiguration.configure().compile() );
     }
 
     @Override

@@ -1,6 +1,7 @@
 package com.kryptokrauts.aeternity.sdk.constants;
 
 public interface BaseConstants {
+
     public static final String PREFIX_ZERO_X = "0x";
 
     // default fee for posting transaction

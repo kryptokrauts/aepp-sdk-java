@@ -118,23 +118,23 @@ public class GenerationAndSigningTest extends BaseTest {
 
                 describe( "sign", () -> {
                     it( "should produce correct signature of message", () -> {
-                        final byte[] msgSignature = SigningUtil.signPersonalMessage( message, privateKeyAsHex );
+                        final byte[] msgSignature = SigningUtil.signMessage( message, privateKeyAsHex );
                         assertArrayEquals( msgSignature, messageSignature );
                     } );
 
                     it( "should produce correct signature of message with non-ASCII chars", () -> {
-                        final byte[] msgSignature = SigningUtil.signPersonalMessage( messageNonASCII, privateKeyAsHex );
+                        final byte[] msgSignature = SigningUtil.signMessage( messageNonASCII, privateKeyAsHex );
                         assertArrayEquals( msgSignature, messageNonASCIISignature );
                     } );
                 } );
                 describe( "verify", () -> {
                     it( "should verify message", () -> {
-                        final boolean verified = SigningUtil.verifyPersonalMessage( message, messageSignature, Hex.toHexString( publicKey ) );
+                        final boolean verified = SigningUtil.verifyMessage( message, messageSignature, Hex.toHexString( publicKey ) );
                         assertTrue( verified );
                     } );
 
                     it( "should verify message with non-ASCII chars", () -> {
-                        final boolean verified = SigningUtil.verifyPersonalMessage( messageNonASCII, messageNonASCIISignature, Hex.toHexString( publicKey ) );
+                        final boolean verified = SigningUtil.verifyMessage( messageNonASCII, messageNonASCIISignature, Hex.toHexString( publicKey ) );
                         assertTrue( verified );
                     } );
                 } );
