@@ -2,9 +2,9 @@ package com.kryptokrauts.aeternity.sdk.service.chain.impl;
 
 import javax.annotation.Nonnull;
 
-import com.kryptokrauts.aeternity.generated.epoch.api.ChainApiImpl;
-import com.kryptokrauts.aeternity.generated.epoch.api.rxjava.ChainApi;
-import com.kryptokrauts.aeternity.generated.epoch.model.KeyBlock;
+import com.kryptokrauts.aeternity.generated.api.ChainApiImpl;
+import com.kryptokrauts.aeternity.generated.api.rxjava.ChainApi;
+import com.kryptokrauts.aeternity.generated.model.KeyBlock;
 import com.kryptokrauts.aeternity.sdk.service.ServiceConfiguration;
 import com.kryptokrauts.aeternity.sdk.service.chain.ChainService;
 

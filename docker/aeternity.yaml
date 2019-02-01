@@ -5,6 +5,7 @@ http:
   internal:
     port: 3113
     listen_address: 0.0.0.0
+    debug_endpoints: true
 
 keys:
   peer_password: "top secret"

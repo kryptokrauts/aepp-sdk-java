@@ -1,7 +1,7 @@
-package com.kryptokrauts.aeternity.generated.epoch.api.ignore;
+package com.kryptokrauts.aeternity.generated.api.ignore;
 
-import com.kryptokrauts.aeternity.generated.epoch.Configuration;
-import com.kryptokrauts.aeternity.generated.epoch.api.*;
+import com.kryptokrauts.aeternity.generated.Configuration;
+import com.kryptokrauts.aeternity.generated.api.*;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
 import io.vertx.junit5.VertxExtension;

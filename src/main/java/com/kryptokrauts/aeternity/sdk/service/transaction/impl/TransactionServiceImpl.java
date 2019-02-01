@@ -7,13 +7,13 @@ import javax.annotation.Nonnull;
 
 import org.bouncycastle.crypto.CryptoException;
 
-import com.kryptokrauts.aeternity.generated.epoch.api.TransactionApiImpl;
-import com.kryptokrauts.aeternity.generated.epoch.api.rxjava.TransactionApi;
-import com.kryptokrauts.aeternity.generated.epoch.model.GenericSignedTx;
-import com.kryptokrauts.aeternity.generated.epoch.model.PostTxResponse;
-import com.kryptokrauts.aeternity.generated.epoch.model.SpendTx;
-import com.kryptokrauts.aeternity.generated.epoch.model.Tx;
-import com.kryptokrauts.aeternity.generated.epoch.model.UnsignedTx;
+import com.kryptokrauts.aeternity.generated.api.TransactionApiImpl;
+import com.kryptokrauts.aeternity.generated.api.rxjava.TransactionApi;
+import com.kryptokrauts.aeternity.generated.model.GenericSignedTx;
+import com.kryptokrauts.aeternity.generated.model.PostTxResponse;
+import com.kryptokrauts.aeternity.generated.model.SpendTx;
+import com.kryptokrauts.aeternity.generated.model.Tx;
+import com.kryptokrauts.aeternity.generated.model.UnsignedTx;
 import com.kryptokrauts.aeternity.sdk.constants.ApiIdentifiers;
 import com.kryptokrauts.aeternity.sdk.constants.SerializationTags;
 import com.kryptokrauts.aeternity.sdk.service.transaction.TransactionService;

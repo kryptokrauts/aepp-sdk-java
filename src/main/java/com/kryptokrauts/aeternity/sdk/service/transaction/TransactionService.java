@@ -2,11 +2,11 @@ package com.kryptokrauts.aeternity.sdk.service.transaction;
 
 import org.bouncycastle.crypto.CryptoException;
 
-import com.kryptokrauts.aeternity.generated.epoch.model.GenericSignedTx;
-import com.kryptokrauts.aeternity.generated.epoch.model.PostTxResponse;
-import com.kryptokrauts.aeternity.generated.epoch.model.SpendTx;
-import com.kryptokrauts.aeternity.generated.epoch.model.Tx;
-import com.kryptokrauts.aeternity.generated.epoch.model.UnsignedTx;
+import com.kryptokrauts.aeternity.generated.model.GenericSignedTx;
+import com.kryptokrauts.aeternity.generated.model.PostTxResponse;
+import com.kryptokrauts.aeternity.generated.model.SpendTx;
+import com.kryptokrauts.aeternity.generated.model.Tx;
+import com.kryptokrauts.aeternity.generated.model.UnsignedTx;
 
 import io.reactivex.Observable;
 

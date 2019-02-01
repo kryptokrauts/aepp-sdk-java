@@ -1,10 +1,10 @@
-package com.kryptokrauts.aeternity.generated.epoch.api;
+package com.kryptokrauts.aeternity.generated.api;
 
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.jupiter.api.Assertions;
 
-import com.kryptokrauts.aeternity.generated.epoch.model.KeyBlock;
+import com.kryptokrauts.aeternity.generated.model.KeyBlock;
 import com.kryptokrauts.aeternity.sdk.service.chain.ChainServiceFactory;
 
 import io.reactivex.Observable;

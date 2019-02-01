@@ -2,9 +2,9 @@ package com.kryptokrauts.aeternity.sdk.service.account.impl;
 
 import javax.annotation.Nonnull;
 
-import com.kryptokrauts.aeternity.generated.epoch.api.AccountApiImpl;
-import com.kryptokrauts.aeternity.generated.epoch.api.rxjava.AccountApi;
-import com.kryptokrauts.aeternity.generated.epoch.model.Account;
+import com.kryptokrauts.aeternity.generated.api.AccountApiImpl;
+import com.kryptokrauts.aeternity.generated.api.rxjava.AccountApi;
+import com.kryptokrauts.aeternity.generated.model.Account;
 import com.kryptokrauts.aeternity.sdk.service.ServiceConfiguration;
 import com.kryptokrauts.aeternity.sdk.service.account.AccountService;
 

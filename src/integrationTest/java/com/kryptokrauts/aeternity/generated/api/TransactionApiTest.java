@@ -1,4 +1,4 @@
-package com.kryptokrauts.aeternity.generated.epoch.api;
+package com.kryptokrauts.aeternity.generated.api;
 
 import java.math.BigInteger;
 import java.util.concurrent.ExecutionException;
@@ -7,11 +7,11 @@ import org.bouncycastle.crypto.CryptoException;
 import org.junit.Test;
 import org.junit.jupiter.api.Assertions;
 
-import com.kryptokrauts.aeternity.generated.epoch.model.Account;
-import com.kryptokrauts.aeternity.generated.epoch.model.PostTxResponse;
-import com.kryptokrauts.aeternity.generated.epoch.model.SpendTx;
-import com.kryptokrauts.aeternity.generated.epoch.model.Tx;
-import com.kryptokrauts.aeternity.generated.epoch.model.UnsignedTx;
+import com.kryptokrauts.aeternity.generated.model.Account;
+import com.kryptokrauts.aeternity.generated.model.PostTxResponse;
+import com.kryptokrauts.aeternity.generated.model.SpendTx;
+import com.kryptokrauts.aeternity.generated.model.Tx;
+import com.kryptokrauts.aeternity.generated.model.UnsignedTx;
 import com.kryptokrauts.aeternity.sdk.constants.BaseConstants;
 import com.kryptokrauts.aeternity.sdk.domain.secret.impl.BaseKeyPair;
 

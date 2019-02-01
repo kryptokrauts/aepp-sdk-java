@@ -1,4 +1,4 @@
-package com.kryptokrauts.aeternity.generated.epoch.api;
+package com.kryptokrauts.aeternity.generated.api;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -29,7 +29,7 @@ public abstract class BaseTest {
 
     private static final String CONFIG_PROPERTIES = "config.properties";
 
-    private static final String EPOCH_BASE_URL = "epoch.api.baseUrl";
+    private static final String API_BASE_URL = "api.baseUrl";
 
     protected static final String BENEFICIARY_PRIVATE_KEY = "79816BBF860B95600DDFABF9D81FEE81BDB30BE823B17D80B9E48BE0A7015ADF";
 
@@ -66,7 +66,7 @@ public abstract class BaseTest {
                 throw new IOException( CONFIG_PROPERTIES + " not found" );
             }
             properties.load( inputStream );
-            epochBaseUrl = properties.getProperty( EPOCH_BASE_URL );
+            epochBaseUrl = properties.getProperty(API_BASE_URL);
         }
         catch ( IOException ignored ) {}
         return epochBaseUrl;
