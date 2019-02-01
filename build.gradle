@@ -31,12 +31,12 @@ ext {
     bintrayKey = System.getProperty("bintray.key")
     buildNumber = System.getProperty("build.number")
 
-    epochVersion = "1.2.0"
+    aeternityVersion = "v1.4.0"
 
-    apiPackage   = "com.kryptokrauts.aeternity.generated.epoch.api"
-    modelPackage = "com.kryptokrauts.aeternity.generated.epoch.model"
-    swaggerFile  = "${rootDir}/epoch-api/swagger_${epochVersion}.yml"
-    templateDir = "${rootDir}/epoch-api/vertx-templates"
+    apiPackage   = "com.kryptokrauts.aeternity.generated.api"
+    modelPackage = "com.kryptokrauts.aeternity.generated.model"
+    swaggerFile  = "${rootDir}/api/swagger_${aeternityVersion}.yml"
+    templateDir = "${rootDir}/api/vertx-templates"
     swaggerAnnotationsVersion = "1.5.21"
     vertxVersion = "3.6.2"
     jacksonVersion = "2.9.8"
@@ -65,7 +65,7 @@ task generateApiClient {
         config.setLibrary("vertx")
         config.setGroupId("${group}")
         config.setArtifactId("epoch-client-vertx")
-        config.setArtifactVersion("${epochVersion}")
+        config.setArtifactVersion("${aeternityVersion}")
         config.setApiPackage("${apiPackage}")
         config.setModelPackage("${modelPackage}")
         config.setInputSpec(project.swaggerFile.toString())

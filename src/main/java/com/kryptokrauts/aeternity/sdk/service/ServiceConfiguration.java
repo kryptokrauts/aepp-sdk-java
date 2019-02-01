@@ -8,7 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.ImmutableMap;
-import com.kryptokrauts.aeternity.generated.epoch.ApiClient;
+import com.kryptokrauts.aeternity.generated.ApiClient;
 import com.kryptokrauts.aeternity.sdk.constants.BaseConstants;
 import com.kryptokrauts.aeternity.sdk.service.wallet.WalletServiceConfiguration;
 

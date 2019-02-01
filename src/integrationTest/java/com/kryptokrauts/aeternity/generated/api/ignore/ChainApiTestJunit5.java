@@ -1,4 +1,4 @@
-package com.kryptokrauts.aeternity.generated.epoch.api.ignore;
+package com.kryptokrauts.aeternity.generated.api.ignore;
 
 import io.vertx.core.Vertx;
 import io.vertx.junit5.VertxTestContext;

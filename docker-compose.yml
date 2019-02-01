@@ -1,7 +1,7 @@
 version: '3'
 services:
   node:
-    image: aeternity/aeternity:v1.2.0
+    image: aeternity/aeternity:v1.4.0
     hostname: node
     ports:
       - "3013:3013"
