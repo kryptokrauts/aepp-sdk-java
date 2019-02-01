@@ -1,7 +1,5 @@
-package com.kryptokrauts.aeternity.sdk.keypair.service.impl;
+package com.kryptokrauts.aeternity.sdk.service.keypair.impl;
 
-import static com.kryptokrauts.aeternity.sdk.constants.BaseConstants.CIPHER_ALGORITHM;
-import static com.kryptokrauts.aeternity.sdk.constants.BaseConstants.SECRET_KEY_SPEC;
 import static com.kryptokrauts.aeternity.sdk.util.ByteUtils.leftPad;
 import static com.kryptokrauts.aeternity.sdk.util.ByteUtils.rightPad;
 
@@ -10,6 +8,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.Arrays;
 
+import javax.annotation.Nonnull;
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
@@ -28,17 +27,21 @@ import org.bouncycastle.util.encoders.Hex;
 import com.kryptokrauts.aeternity.sdk.constants.ApiIdentifiers;
 import com.kryptokrauts.aeternity.sdk.domain.secret.impl.BaseKeyPair;
 import com.kryptokrauts.aeternity.sdk.domain.secret.impl.RawKeyPair;
-import com.kryptokrauts.aeternity.sdk.keypair.service.KeyPairService;
+import com.kryptokrauts.aeternity.sdk.service.keypair.KeyPairService;
+import com.kryptokrauts.aeternity.sdk.service.keypair.KeyPairServiceConfiguration;
 import com.kryptokrauts.aeternity.sdk.util.EncodingUtils;
 
-public final class KeyPairServiceImpl implements KeyPairService
-{
+import lombok.RequiredArgsConstructor;
 
-    private final SecureRandom secureRandom = new SecureRandom();
+@RequiredArgsConstructor
+public final class KeyPairServiceImpl implements KeyPairService {
+    private static final SecureRandom secureRandom = new SecureRandom();
+
+    @Nonnull
+    private KeyPairServiceConfiguration config;
 
     @Override
-    public BaseKeyPair generateBaseKeyPair()
-    {
+    public BaseKeyPair generateBaseKeyPair() {
         RawKeyPair rawKeyPair = generateKeyPairInternal();
         byte[] publicKey = rawKeyPair.getPublicKey();
         byte[] privateKey = rawKeyPair.getPrivateKey();
@@ -48,8 +51,7 @@ public final class KeyPairServiceImpl implements KeyPairService
     }
 
     @Override
-    public RawKeyPair generateRawKeyPair()
-    {
+    public RawKeyPair generateRawKeyPair() {
         RawKeyPair rawKeyPair = generateKeyPairInternal();
         byte[] publicKey = rawKeyPair.getPublicKey();
         byte[] privateKey = rawKeyPair.getPrivateKey();
@@ -59,15 +61,12 @@ public final class KeyPairServiceImpl implements KeyPairService
     }
 
     @Override
-    public BaseKeyPair generateBaseKeyPairFromSecret( String privateKey )
-    {
+    public BaseKeyPair generateBaseKeyPairFromSecret( String privateKey ) {
         final String privateKey32;
-        if ( privateKey.length() == 128 )
-        {
+        if ( privateKey.length() == 128 ) {
             privateKey32 = privateKey.substring( 0, 64 );
         }
-        else
-        {
+        else {
             privateKey32 = privateKey;
         }
         Ed25519PrivateKeyParameters privateKeyParams = new Ed25519PrivateKeyParameters( Hex.decode( privateKey32 ), 0 );
@@ -84,8 +83,7 @@ public final class KeyPairServiceImpl implements KeyPairService
      *
      * @return the raw byte arrays for private and public key
      */
-    private RawKeyPair generateKeyPairInternal()
-    {
+    private RawKeyPair generateKeyPairInternal() {
         Ed25519KeyPairGenerator keyPairGenerator = new Ed25519KeyPairGenerator();
         keyPairGenerator.init( new Ed25519KeyGenerationParameters( secureRandom ) );
         AsymmetricCipherKeyPair asymmetricCipherKeyPair = keyPairGenerator.generateKeyPair();
@@ -97,15 +95,12 @@ public final class KeyPairServiceImpl implements KeyPairService
     }
 
     @Override
-    public RawKeyPair generateRawKeyPairFromSecret( final String privateKey )
-    {
+    public RawKeyPair generateRawKeyPairFromSecret( final String privateKey ) {
         final String privateKey32;
-        if ( privateKey.length() == 128 )
-        {
+        if ( privateKey.length() == 128 ) {
             privateKey32 = privateKey.substring( 0, 64 );
         }
-        else
-        {
+        else {
             privateKey32 = privateKey;
         }
         Ed25519PrivateKeyParameters privateKeyParams = new Ed25519PrivateKeyParameters( Hex.decode( privateKey32 ), 0 );
@@ -156,8 +151,8 @@ public final class KeyPairServiceImpl implements KeyPairService
     throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException
     {
         byte[] hashedPassword = Sha256Hash.hash( password.getBytes() );
-        Cipher cipher = Cipher.getInstance( CIPHER_ALGORITHM );
-        SecretKey secretKey = new SecretKeySpec( hashedPassword, SECRET_KEY_SPEC );
+        Cipher cipher = Cipher.getInstance( config.getCipherAlgorithm() );
+        SecretKey secretKey = new SecretKeySpec( hashedPassword, config.getSecretKeySpec() );
         cipher.init( Cipher.ENCRYPT_MODE, secretKey );
         return cipher.doFinal( binaryData );
     }
@@ -166,8 +161,8 @@ public final class KeyPairServiceImpl implements KeyPairService
     throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, BadPaddingException, IllegalBlockSizeException
     {
         byte[] hashedPassword = Sha256Hash.hash( password.getBytes() );
-        Cipher cipher = Cipher.getInstance( CIPHER_ALGORITHM );
-        SecretKey secretKey = new SecretKeySpec( hashedPassword, SECRET_KEY_SPEC );
+        Cipher cipher = Cipher.getInstance( config.getCipherAlgorithm() );
+        SecretKey secretKey = new SecretKeySpec( hashedPassword, config.getSecretKeySpec() );
         cipher.init( Cipher.DECRYPT_MODE, secretKey );
         return cipher.doFinal( encryptedBinaryData );
     }

@@ -1,16 +1,20 @@
 package com.kryptokrauts.aeternity.sdk.constants;
 
-public interface BaseConstants
-{
+public interface BaseConstants {
 
     public static final String PREFIX_ZERO_X = "0x";
+
+    // default fee for posting transaction
+    public static final long DEFAULT_FEE = 20000;
 
     public static final String AETERNITY_MESSAGE_PREFIX = "æternity Signed Message:\n";
 
     public static final int MAX_MESSAGE_LENGTH = 0xFD;
 
-    public static final String CIPHER_ALGORITHM = "AES/ECB/NoPadding";
+    // vertx base_path parameter
+    public static final String VERTX_BASE_PATH = "basePath";
 
-    public static final String SECRET_KEY_SPEC = "AES";
+    // the default testnet url
+    public static final String DEFAULT_TESTNET_URL = "https://sdk-edgenet.aepps.com/v2";
 
 }

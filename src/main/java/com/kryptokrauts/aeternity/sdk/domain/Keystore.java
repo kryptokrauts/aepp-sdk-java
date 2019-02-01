@@ -11,12 +11,16 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+/**
+ * the representation of a wallet json file (keystore) containing all necessary
+ * information to recover the private key
+ */
 public class Keystore {
 
-    @JsonProperty("public_key")
+    @JsonProperty( "public_key" )
     private String publicKey;
 
-    @JsonProperty("crypto")
+    @JsonProperty( "crypto" )
     private Crypto crypto;
 
     private String id;
@@ -30,21 +34,21 @@ public class Keystore {
     @AllArgsConstructor
     @Builder
     public static class Crypto {
-        @JsonProperty("secret_type")
+        @JsonProperty( "secret_type" )
         private String secretType;
 
-        @JsonProperty("symmetric_alg")
+        @JsonProperty( "symmetric_alg" )
         private String symmetricAlgorithm;
 
-        @JsonProperty("ciphertext")
+        @JsonProperty( "ciphertext" )
         private String cipherText;
 
-        @JsonProperty("cipher_params")
+        @JsonProperty( "cipher_params" )
         private CipherParams cipherParams;
 
         private String kdf;
 
-        @JsonProperty("kdf_params")
+        @JsonProperty( "kdf_params" )
         private KdfParams kdfParams;
     }
 
@@ -62,10 +66,10 @@ public class Keystore {
     @Builder
     public static class KdfParams {
 
-        @JsonProperty("memlimit_kib")
+        @JsonProperty( "memlimit_kib" )
         private int memLimitKib;
 
-        @JsonProperty("opslimit")
+        @JsonProperty( "opslimit" )
         private int opsLimit;
 
         private String salt;
