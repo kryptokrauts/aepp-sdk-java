@@ -7,6 +7,8 @@ import javax.annotation.Nonnull;
 
 import org.bouncycastle.crypto.CryptoException;
 
+import com.kryptokrauts.aeternity.generated.epoch.api.TransactionApiImpl;
+import com.kryptokrauts.aeternity.generated.epoch.api.rxjava.TransactionApi;
 import com.kryptokrauts.aeternity.generated.epoch.model.GenericSignedTx;
 import com.kryptokrauts.aeternity.generated.epoch.model.PostTxResponse;
 import com.kryptokrauts.aeternity.generated.epoch.model.SpendTx;
@@ -27,8 +29,18 @@ import net.consensys.cava.rlp.RLP;
 
 @RequiredArgsConstructor
 public class TransactionServiceImpl implements TransactionService {
+
     @Nonnull
     private TransactionServiceConfiguration config;
+
+    private TransactionApi transactionApi;
+
+    private TransactionApi getTransactionApi() {
+        if ( transactionApi == null ) {
+            transactionApi = new TransactionApi( new TransactionApiImpl( config.getApiClient() ) );
+        }
+        return transactionApi;
+    }
 
     @Override
     public Observable<UnsignedTx> createTx( SpendTx spendTx ) {
@@ -37,12 +49,12 @@ public class TransactionServiceImpl implements TransactionService {
 
     @Override
     public Observable<PostTxResponse> postTransaction( Tx tx ) {
-        return config.getTransactionApi().rxPostTransaction( tx ).toObservable();
+        return getTransactionApi().rxPostTransaction( tx ).toObservable();
     }
 
     @Override
     public Observable<GenericSignedTx> getTransactionByHash( String txHash ) {
-        return config.getTransactionApi().rxGetTransactionByHash( txHash ).toObservable();
+        return getTransactionApi().rxGetTransactionByHash( txHash ).toObservable();
     }
 
     @Override
@@ -67,7 +79,7 @@ public class TransactionServiceImpl implements TransactionService {
      * for validate native tx generation
      */
     private Observable<UnsignedTx> spendTxInternal( SpendTx spendTx ) {
-        return config.getTransactionApi().rxPostSpend( spendTx ).toObservable();
+        return getTransactionApi().rxPostSpend( spendTx ).toObservable();
     }
 
     private UnsignedTx spendTxNative( SpendTx spendTx ) {

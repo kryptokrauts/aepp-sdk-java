@@ -1,8 +1,19 @@
 package com.kryptokrauts.aeternity.sdk.service;
 
+import java.util.HashMap;
+
+import javax.annotation.Nonnull;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.google.common.collect.ImmutableMap;
+import com.kryptokrauts.aeternity.generated.epoch.ApiClient;
+import com.kryptokrauts.aeternity.sdk.constants.BaseConstants;
 import com.kryptokrauts.aeternity.sdk.service.wallet.WalletServiceConfiguration;
 
 import io.vertx.core.Vertx;
+import io.vertx.core.json.JsonObject;
 import lombok.Builder.Default;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
@@ -33,18 +44,33 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 public class ServiceConfiguration {
 
-    /**
-     * points to testnet --> @TODO refactoring: make builder method an recreate
-     * api Client, create abstract method which initalizes fe
-     * transactionApiClient
-     */
+    private static final Logger _logger = LoggerFactory.getLogger( ServiceConfiguration.class );
+
     @Default
-    protected String base_url = "https://sdk-edgenet.aepps.com/v2";
+    @Nonnull
+    protected String baseUrl = BaseConstants.DEFAULT_TESTNET_URL;
 
     /**
      * the vertx instance
      */
-    @Default
-    protected Vertx vertx = Vertx.vertx();
+    protected Vertx vertx;
+
+    /**
+     * 
+     * @return apiClient initalized with default or given values of vertx and
+     *         baseURL
+     */
+    public ApiClient getApiClient() {
+        if ( vertx == null ) {
+            _logger.debug( "Vertx entry point not initialized, creating default" );
+            vertx = Vertx.vertx();
+        }
+        if ( vertx != null && baseUrl != null ) {
+            _logger.debug( String.format( "Initializing Vertx ApiClient using baseUrl", baseUrl ) );
+            return new ApiClient( vertx, new JsonObject( new HashMap<String, Object>( ImmutableMap.of( BaseConstants.VERTX_BASE_PATH, baseUrl ) ) ) );
+        }
+        else
+            throw new RuntimeException( "Cannot intantiate ApiClient due to missing params vertx and or baseUrl" );
+    }
 
 }

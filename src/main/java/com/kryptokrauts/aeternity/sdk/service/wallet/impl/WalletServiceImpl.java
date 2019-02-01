@@ -27,6 +27,7 @@ import net.consensys.cava.crypto.sodium.SecretBox;
 
 @RequiredArgsConstructor
 public class WalletServiceImpl implements WalletService {
+
     @Nonnull
     private WalletServiceConfiguration config;
 
@@ -41,7 +42,7 @@ public class WalletServiceImpl implements WalletService {
     }
 
     @Override
-    public String generateWalletFile( RawKeyPair rawKeyPair, String walletPassword, String walletName ) throws AException {
+    public String generateKeystore( RawKeyPair rawKeyPair, String walletPassword, String walletName ) throws AException {
         // create derived key with Argon2
         Argon2Advanced argon2Advanced = Argon2Factory.createAdvanced( config.getArgon2Type() );
         byte[] salt = CryptoUtils.generateSalt( config.getDefaultSaltLength() );
@@ -82,7 +83,7 @@ public class WalletServiceImpl implements WalletService {
     }
 
     @Override
-    public byte[] recoverPrivateKeyFromWalletFile( String json, String walletPassword ) throws AException {
+    public byte[] recoverPrivateKeyFromKeystore( String json, String walletPassword ) throws AException {
         try {
             Keystore recoverWallet = new ObjectMapper().readValue( json, Keystore.class );
             Argon2Advanced argon2Advanced = Argon2Factory.createAdvanced( config.getArgon2Type() );

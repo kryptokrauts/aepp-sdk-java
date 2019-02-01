@@ -28,11 +28,11 @@ public class WalletServiceTest extends BaseTest {
 
                 // generate Keypair
                 RawKeyPair keypair = keypairService.generateRawKeyPair();
-                String json = walletService.generateWalletFile( keypair, walletFileSecret, null );
+                String json = walletService.generateKeystore( keypair, walletFileSecret, null );
                 Assertions.assertNotNull( json );
 
                 // recover Keypair
-                byte[] recoveredPrivateKey = walletService.recoverPrivateKeyFromWalletFile( json, walletFileSecret );
+                byte[] recoveredPrivateKey = walletService.recoverPrivateKeyFromKeystore( json, walletFileSecret );
                 RawKeyPair recoveredRawKeypair = keypairService.generateRawKeyPairFromSecret( Hex.toHexString( recoveredPrivateKey ) );
                 Assertions.assertNotNull( recoveredRawKeypair );
 
@@ -44,7 +44,7 @@ public class WalletServiceTest extends BaseTest {
                 final String expectedPubKey = "ak_2hSFmdK98bhUw4ar7MUdTRzNQuMJfBFQYxdhN9kaiopDGqj3Cr";
                 final InputStream inputStream = Thread.currentThread().getContextClassLoader().getResourceAsStream( "keystore.json" );
                 String keystore = IOUtils.toString( inputStream, StandardCharsets.UTF_8.toString() );
-                byte[] privateKey = walletService.recoverPrivateKeyFromWalletFile( keystore, walletFileSecret );
+                byte[] privateKey = walletService.recoverPrivateKeyFromKeystore( keystore, walletFileSecret );
                 BaseKeyPair keyPair = keypairService.generateBaseKeyPairFromSecret( Hex.toHexString( privateKey ) );
                 Assertions.assertEquals( expectedPubKey, keyPair.getPublicKey() );
             } );
@@ -53,7 +53,7 @@ public class WalletServiceTest extends BaseTest {
                 final InputStream inputStream = Thread.currentThread().getContextClassLoader().getResourceAsStream( "keystore.json" );
                 String keystore = IOUtils.toString( inputStream, StandardCharsets.UTF_8.toString() );
                 try {
-                    walletService.recoverPrivateKeyFromWalletFile( keystore, walletFileSecret );
+                    walletService.recoverPrivateKeyFromKeystore( keystore, walletFileSecret );
                     Assertions.fail();
                 }
                 catch ( AException e ) {

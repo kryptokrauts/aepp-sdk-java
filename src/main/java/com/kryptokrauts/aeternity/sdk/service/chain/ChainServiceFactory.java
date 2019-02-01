@@ -1,16 +1,17 @@
 package com.kryptokrauts.aeternity.sdk.service.chain;
 
 import com.kryptokrauts.aeternity.sdk.service.AbstractServiceFactory;
+import com.kryptokrauts.aeternity.sdk.service.ServiceConfiguration;
 import com.kryptokrauts.aeternity.sdk.service.chain.impl.ChainServiceImpl;
 
-public class ChainServiceFactory extends AbstractServiceFactory<ChainService, ChainServiceConfiguration> {
+public class ChainServiceFactory extends AbstractServiceFactory<ChainService, ServiceConfiguration> {
     @Override
     public ChainService getService() {
-        return getServiceWithConfig( ChainServiceConfiguration.configure().compile() );
+        return getServiceWithConfig( ServiceConfiguration.configure().compile() );
     }
 
     @Override
-    public ChainService getServiceWithConfig( ChainServiceConfiguration config ) {
+    public ChainService getServiceWithConfig( ServiceConfiguration config ) {
         return new ChainServiceImpl( config );
     }
 }
