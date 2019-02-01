@@ -5,7 +5,7 @@ public class EncodingNotSupportedException extends RuntimeException {
     public EncodingNotSupportedException() {
     }
 
-    public EncodingNotSupportedException(String message) {
-        super(message);
+    public EncodingNotSupportedException( String message ) {
+        super( message );
     }
 }

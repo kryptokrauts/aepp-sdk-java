@@ -1,4 +1,3 @@
 package com.kryptokrauts.aeternity.sdk.exception;
 
-public class ConfigException extends AException {
-}
+public class ConfigException extends AException {}
