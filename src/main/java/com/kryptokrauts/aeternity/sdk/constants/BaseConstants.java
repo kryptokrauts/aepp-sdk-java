@@ -11,6 +11,10 @@ public interface BaseConstants {
 
     public static final int MAX_MESSAGE_LENGTH = 0xFD;
 
+    // vertx base_path parameter
     public static final String VERTX_BASE_PATH = "basePath";
+
+    // the default testnet url
+    public static final String DEFAULT_TESTNET_URL = "https://sdk-edgenet.aepps.com/v2";
 
 }

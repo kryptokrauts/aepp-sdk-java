@@ -177,6 +177,12 @@ public final class EncodingUtils {
         return data;
     }
 
+    /**
+     * check if the given address has the correct length
+     * 
+     * @param address
+     * @return
+     */
     public static final boolean isAddressValid( final String address ) {
         boolean isValid;
         try {
@@ -188,6 +194,11 @@ public final class EncodingUtils {
         return isValid;
     }
 
+    /**
+     * 
+     * @param base58CheckAddress
+     * @return the readable public key as hex
+     */
     public static final String addressToHex( final String base58CheckAddress ) {
         return PREFIX_ZERO_X + Hex.toHexString( decodeBase58Check( assertedType( base58CheckAddress, ApiIdentifiers.ACCOUNT_PUBKEY ) ) );
     }

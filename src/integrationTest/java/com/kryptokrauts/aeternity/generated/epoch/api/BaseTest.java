@@ -8,8 +8,10 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.runner.RunWith;
 
+import com.kryptokrauts.aeternity.sdk.service.ServiceConfiguration;
+import com.kryptokrauts.aeternity.sdk.service.account.AccountService;
+import com.kryptokrauts.aeternity.sdk.service.account.AccountServiceFactory;
 import com.kryptokrauts.aeternity.sdk.service.chain.ChainService;
-import com.kryptokrauts.aeternity.sdk.service.chain.ChainServiceConfiguration;
 import com.kryptokrauts.aeternity.sdk.service.chain.ChainServiceFactory;
 import com.kryptokrauts.aeternity.sdk.service.keypair.KeyPairService;
 import com.kryptokrauts.aeternity.sdk.service.keypair.KeyPairServiceFactory;
@@ -39,6 +41,8 @@ public abstract class BaseTest {
 
     protected TransactionService transactionServiceDebug;
 
+    protected AccountService accountService;
+
     @Rule
     public RunTestOnContext rule = new RunTestOnContext();
 
@@ -46,11 +50,12 @@ public abstract class BaseTest {
     public void setupApiClient( TestContext context ) {
         Vertx vertx = rule.vertx();
         keyPairService = new KeyPairServiceFactory().getService();
-        chainService = new ChainServiceFactory().getService( ChainServiceConfiguration.configure().base_url( getEpochBaseUrl() ).vertx( vertx ).compile() );
+        chainService = new ChainServiceFactory().getService( ServiceConfiguration.configure().baseUrl( getEpochBaseUrl() ).vertx( vertx ).compile() );
         transactionServiceNative = new TransactionServiceFactory()
-        .getService( TransactionServiceConfiguration.configure().base_url( getEpochBaseUrl() ).vertx( vertx ).compile() );
+        .getService( TransactionServiceConfiguration.configure().baseUrl( getEpochBaseUrl() ).vertx( vertx ).compile() );
         transactionServiceDebug = new TransactionServiceFactory()
-        .getService( TransactionServiceConfiguration.configure().nativeMode( false ).base_url( getEpochBaseUrl() ).vertx( vertx ).compile() );
+        .getService( TransactionServiceConfiguration.configure().nativeMode( false ).baseUrl( getEpochBaseUrl() ).vertx( vertx ).compile() );
+        accountService = new AccountServiceFactory().getService( ServiceConfiguration.configure().baseUrl( getEpochBaseUrl() ).vertx( vertx ).compile() );
     }
 
     private String getEpochBaseUrl() {

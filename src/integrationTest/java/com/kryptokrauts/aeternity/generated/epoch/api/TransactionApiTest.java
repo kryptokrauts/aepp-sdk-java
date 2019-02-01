@@ -7,6 +7,7 @@ import org.bouncycastle.crypto.CryptoException;
 import org.junit.Test;
 import org.junit.jupiter.api.Assertions;
 
+import com.kryptokrauts.aeternity.generated.epoch.model.Account;
 import com.kryptokrauts.aeternity.generated.epoch.model.PostTxResponse;
 import com.kryptokrauts.aeternity.generated.epoch.model.SpendTx;
 import com.kryptokrauts.aeternity.generated.epoch.model.Tx;
@@ -53,25 +54,29 @@ public class TransactionApiTest extends BaseTest {
         BaseKeyPair keyPair = keyPairService.generateBaseKeyPairFromSecret( BENEFICIARY_PRIVATE_KEY );
         SpendTx spendTx = new SpendTx();
         spendTx.setSenderId( keyPair.getPublicKey() );
-        System.out.println( keyPair.getPublicKey() );
 
-        BaseKeyPair kp = keyPairService.generateBaseKeyPair();
-        spendTx.setRecipientId( kp.getPublicKey() );
+        // get the currents accounts nonce in case a transaction is already
+        // created and increase it by one
+        Observable<Account> acc = accountService.getAccount( keyPair.getPublicKey() );
+        acc.subscribe( account -> {
+            BaseKeyPair kp = keyPairService.generateBaseKeyPair();
+            spendTx.setRecipientId( kp.getPublicKey() );
 
-        spendTx.setAmount( BigInteger.valueOf( 1 ) );
-        spendTx.setPayload( "payload" );
-        spendTx.setFee( BigInteger.valueOf( BaseConstants.DEFAULT_FEE ) );
-        spendTx.setTtl( BigInteger.valueOf( 20000 ) );
-        spendTx.setNonce( BigInteger.valueOf( 1 ) );
+            spendTx.setAmount( BigInteger.valueOf( 1 ) );
+            spendTx.setPayload( "payload" );
+            spendTx.setFee( BigInteger.valueOf( BaseConstants.DEFAULT_FEE ) );
+            spendTx.setTtl( BigInteger.valueOf( 20000 ) );
+            spendTx.setNonce( account.getNonce().add( BigInteger.ONE ) );
 
-        UnsignedTx unsignedTxNative = transactionServiceNative.createTx( spendTx ).toFuture().get();
-        Tx signedTx = transactionServiceNative.signTransaction( unsignedTxNative, keyPair.getPrivateKey() );
-        Observable<PostTxResponse> txResponseObservable = transactionServiceNative.postTransaction( signedTx );
-        txResponseObservable.subscribe( it -> {
-            Assertions.assertEquals( it.getTxHash(), transactionServiceNative.computeTxHash( signedTx.getTx() ) );
-            async.complete();
-        }, failure -> {
-            context.fail();
+            UnsignedTx unsignedTxNative = transactionServiceNative.createTx( spendTx ).toFuture().get();
+            Tx signedTx = transactionServiceNative.signTransaction( unsignedTxNative, keyPair.getPrivateKey() );
+            Observable<PostTxResponse> txResponseObservable = transactionServiceNative.postTransaction( signedTx );
+            txResponseObservable.subscribe( it -> {
+                Assertions.assertEquals( it.getTxHash(), transactionServiceNative.computeTxHash( signedTx.getTx() ) );
+                async.complete();
+            }, failure -> {
+                context.fail();
+            } );
         } );
     }
 }

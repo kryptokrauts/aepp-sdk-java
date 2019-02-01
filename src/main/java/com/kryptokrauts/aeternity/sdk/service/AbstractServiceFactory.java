@@ -47,6 +47,8 @@ public abstract class AbstractServiceFactory<T, C extends ServiceConfiguration> 
     }
 
     /**
+     * this method must be provided by the concrete factory to create a service
+     * instance with the concrete service configuration
      * 
      * @param config
      *            the configuration pojo
