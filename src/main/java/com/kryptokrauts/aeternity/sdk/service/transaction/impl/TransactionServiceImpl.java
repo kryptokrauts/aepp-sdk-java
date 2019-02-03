@@ -1,19 +1,8 @@
 package com.kryptokrauts.aeternity.sdk.service.transaction.impl;
 
-import java.math.BigInteger;
-import java.nio.charset.StandardCharsets;
-
-import javax.annotation.Nonnull;
-
-import org.bouncycastle.crypto.CryptoException;
-
 import com.kryptokrauts.aeternity.generated.api.TransactionApiImpl;
 import com.kryptokrauts.aeternity.generated.api.rxjava.TransactionApi;
-import com.kryptokrauts.aeternity.generated.model.GenericSignedTx;
-import com.kryptokrauts.aeternity.generated.model.PostTxResponse;
-import com.kryptokrauts.aeternity.generated.model.SpendTx;
-import com.kryptokrauts.aeternity.generated.model.Tx;
-import com.kryptokrauts.aeternity.generated.model.UnsignedTx;
+import com.kryptokrauts.aeternity.generated.model.*;
 import com.kryptokrauts.aeternity.sdk.constants.ApiIdentifiers;
 import com.kryptokrauts.aeternity.sdk.constants.SerializationTags;
 import com.kryptokrauts.aeternity.sdk.service.transaction.TransactionService;
@@ -21,11 +10,15 @@ import com.kryptokrauts.aeternity.sdk.service.transaction.TransactionServiceConf
 import com.kryptokrauts.aeternity.sdk.util.ByteUtils;
 import com.kryptokrauts.aeternity.sdk.util.EncodingUtils;
 import com.kryptokrauts.aeternity.sdk.util.SigningUtil;
-
 import io.reactivex.Observable;
 import lombok.RequiredArgsConstructor;
 import net.consensys.cava.bytes.Bytes;
 import net.consensys.cava.rlp.RLP;
+import org.bouncycastle.crypto.CryptoException;
+
+import javax.annotation.Nonnull;
+import java.math.BigInteger;
+import java.nio.charset.StandardCharsets;
 
 @RequiredArgsConstructor
 public class TransactionServiceImpl implements TransactionService {
@@ -43,7 +36,15 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     @Override
-    public Observable<UnsignedTx> createTx( SpendTx spendTx ) {
+    public Observable<UnsignedTx> createSpendTx( String sender, String recipient, BigInteger amount, String payload, BigInteger fee, BigInteger ttl, BigInteger nonce ) {
+        SpendTx spendTx = new SpendTx();
+        spendTx.setSenderId( sender );
+        spendTx.setRecipientId( recipient );
+        spendTx.setAmount( amount );
+        spendTx.setPayload( payload );
+        spendTx.setFee( fee );
+        spendTx.setTtl( ttl );
+        spendTx.setNonce( nonce );
         return config.isNativeMode() ? Observable.just( spendTxNative( spendTx ) ) : spendTxInternal( spendTx );
     }
 

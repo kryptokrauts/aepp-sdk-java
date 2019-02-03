@@ -1,18 +1,17 @@
 package com.kryptokrauts.aeternity.sdk.service.transaction;
 
-import org.bouncycastle.crypto.CryptoException;
-
 import com.kryptokrauts.aeternity.generated.model.GenericSignedTx;
 import com.kryptokrauts.aeternity.generated.model.PostTxResponse;
-import com.kryptokrauts.aeternity.generated.model.SpendTx;
 import com.kryptokrauts.aeternity.generated.model.Tx;
 import com.kryptokrauts.aeternity.generated.model.UnsignedTx;
-
 import io.reactivex.Observable;
+import org.bouncycastle.crypto.CryptoException;
+
+import java.math.BigInteger;
 
 public interface TransactionService {
 
-    Observable<UnsignedTx> createTx( SpendTx spendTx );
+    Observable<UnsignedTx> createSpendTx( String sender, String recipient, BigInteger amount, String payload, BigInteger fee, BigInteger ttl, BigInteger nonce );
 
     Observable<PostTxResponse> postTransaction( Tx tx );
 
