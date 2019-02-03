@@ -173,13 +173,6 @@ dependencies {
     testCompile "io.vertx:vertx-junit5:${vertxVersion}"
 }
 
-jar {
-    from file("lib/bcprov-jdk15on-161b20.jar")
-    manifest {
-        attributes "Class-Path": "bcprov-jdk15on-161b20.jar"
-    }
-}
-
 test { finalizedBy jacocoTestReport }
 
 jacocoTestReport {
