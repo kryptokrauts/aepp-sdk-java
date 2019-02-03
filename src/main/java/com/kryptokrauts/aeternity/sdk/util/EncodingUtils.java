@@ -9,6 +9,7 @@ import static com.kryptokrauts.aeternity.sdk.util.EncodingType.BASE64;
 import java.math.BigInteger;
 import java.util.Arrays;
 
+import com.kryptokrauts.aeternity.sdk.domain.secret.impl.BaseKeyPair;
 import com.kryptokrauts.aeternity.sdk.domain.secret.impl.RawKeyPair;
 import org.bitcoinj.core.AddressFormatException;
 import org.bitcoinj.core.Base58;
@@ -226,11 +227,9 @@ public final class EncodingUtils {
         return hash;
     }
 
-    public static String encodePrivateKey( final RawKeyPair rawKeyPair) {
-        return Hex.toHexString( rawKeyPair.getPrivateKey() ) + Hex.toHexString( rawKeyPair.getPublicKey() );
-    }
-
-    public static String encodePublicKey( final RawKeyPair rawKeyPair ) {
-        return encodeCheck( rawKeyPair.getPublicKey(), ApiIdentifiers.ACCOUNT_PUBKEY  );
+    public static BaseKeyPair createBaseKeyPair( final RawKeyPair rawKeyPair ) {
+        String privateKey = Hex.toHexString( rawKeyPair.getPrivateKey() ) + Hex.toHexString( rawKeyPair.getPublicKey() );
+        String publicKey = encodeCheck( rawKeyPair.getPublicKey(), ApiIdentifiers.ACCOUNT_PUBKEY  );
+        return BaseKeyPair.builder().privateKey( privateKey ).publicKey( publicKey ).build();
     }
 }
