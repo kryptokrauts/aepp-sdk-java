@@ -55,7 +55,7 @@ Here's the [list of snapshot versions](https://oss.jfrog.org/webapp/#/artifacts/
 <repositories>
   <repository>
     <id>oss-snapshot-local</id>
-    <url>https://oss.jfrog.org/webapp/#/artifacts/browse/tree/General/oss-snapshot-local/com/kryptokrauts/aepp-sdk-java</url>
+    <url>https://oss.jfrog.org/artifactory/oss-snapshot-local</url>
   </repository>
 </repositories>
 
