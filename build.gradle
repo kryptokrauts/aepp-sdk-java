@@ -177,9 +177,12 @@ dependencies {
 }
 
 jar {
-    from {
-        configurations.extLibs.collect { it.isDirectory() ? it : zipTree(it) }
+    doFirst {
+        from {
+            configurations.extLibs.collect { it.isDirectory() ? it : zipTree(it) }
+        }
     }
+    exclude "META-INF/*.RSA", "META-INF/*.SF","META-INF/*.DSA"
 }
 
 test { finalizedBy jacocoTestReport }
