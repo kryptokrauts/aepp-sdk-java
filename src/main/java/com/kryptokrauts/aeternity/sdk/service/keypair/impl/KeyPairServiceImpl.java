@@ -55,8 +55,6 @@ public final class KeyPairServiceImpl implements KeyPairService {
         RawKeyPair rawKeyPair = generateKeyPairInternal();
         byte[] publicKey = rawKeyPair.getPublicKey();
         byte[] privateKey = rawKeyPair.getPrivateKey();
-        // byte[] privateAndPublicKey = ByteUtils.concatenate( privateKey,
-        // publicKey );
         return RawKeyPair.builder().publicKey( publicKey ).privateKey( privateKey ).build();
     }
 
