@@ -174,7 +174,12 @@ dependencies {
 }
 
 jar {
-    from file("lib/bcprov-jdk15on-161b20.jar")
+    into('META-INF/lib') {
+        from 'lib'
+    }
+    manifest {
+        attributes "Class-Path": "lib/bcprov-jdk15on-161b20.jar"
+    }
 }
 
 test { finalizedBy jacocoTestReport }
