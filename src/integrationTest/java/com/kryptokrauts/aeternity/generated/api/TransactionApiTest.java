@@ -1,23 +1,20 @@
 package com.kryptokrauts.aeternity.generated.api;
 
-import java.math.BigInteger;
-import java.util.concurrent.ExecutionException;
-
-import org.bouncycastle.crypto.CryptoException;
-import org.junit.Test;
-import org.junit.jupiter.api.Assertions;
-
 import com.kryptokrauts.aeternity.generated.model.Account;
 import com.kryptokrauts.aeternity.generated.model.PostTxResponse;
-import com.kryptokrauts.aeternity.generated.model.SpendTx;
 import com.kryptokrauts.aeternity.generated.model.Tx;
 import com.kryptokrauts.aeternity.generated.model.UnsignedTx;
 import com.kryptokrauts.aeternity.sdk.constants.BaseConstants;
 import com.kryptokrauts.aeternity.sdk.domain.secret.impl.BaseKeyPair;
-
 import io.reactivex.Observable;
 import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
+import org.bouncycastle.crypto.CryptoException;
+import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+
+import java.math.BigInteger;
+import java.util.concurrent.ExecutionException;
 
 public class TransactionApiTest extends BaseTest {
 
@@ -27,18 +24,15 @@ public class TransactionApiTest extends BaseTest {
 
         String sender = keyPairService.generateBaseKeyPair().getPublicKey();
         String recipient = keyPairService.generateBaseKeyPair().getPublicKey();
-        SpendTx spendTx = new SpendTx();
-        spendTx.setSenderId( sender );
-        spendTx.setRecipientId( recipient );
-        spendTx.setAmount( BigInteger.valueOf( 1000 ) );
-        spendTx.setPayload( "payload" );
-        spendTx.setFee( BigInteger.valueOf( 1 ) );
-        spendTx.setTtl( BigInteger.valueOf( 100 ) );
-        spendTx.setNonce( BigInteger.valueOf( 5 ) );
+        BigInteger amount = BigInteger.valueOf( 1000 );
+        String payload = "payload";
+        BigInteger fee = BigInteger.valueOf( BaseConstants.DEFAULT_FEE );
+        BigInteger ttl = BigInteger.valueOf( 100 );
+        BigInteger nonce = BigInteger.valueOf( 5 );
 
-        UnsignedTx unsignedTxNative = transactionServiceNative.createTx( spendTx ).toFuture().get();
+        UnsignedTx unsignedTxNative = transactionServiceNative.createSpendTx( sender, recipient, amount, payload, fee, ttl, nonce ).toFuture().get();
 
-        Observable<UnsignedTx> unsignedTxObservable = transactionServiceDebug.createTx( spendTx );
+        Observable<UnsignedTx> unsignedTxObservable = transactionServiceDebug.createSpendTx( sender, recipient, amount, payload, fee, ttl, nonce );
         unsignedTxObservable.subscribe( it -> {
             Assertions.assertEquals( it, unsignedTxNative );
             async.complete();
@@ -52,23 +46,19 @@ public class TransactionApiTest extends BaseTest {
         Async async = context.async();
 
         BaseKeyPair keyPair = keyPairService.generateBaseKeyPairFromSecret( BENEFICIARY_PRIVATE_KEY );
-        SpendTx spendTx = new SpendTx();
-        spendTx.setSenderId( keyPair.getPublicKey() );
 
         // get the currents accounts nonce in case a transaction is already
         // created and increase it by one
         Observable<Account> acc = accountService.getAccount( keyPair.getPublicKey() );
         acc.subscribe( account -> {
             BaseKeyPair kp = keyPairService.generateBaseKeyPair();
-            spendTx.setRecipientId( kp.getPublicKey() );
-
-            spendTx.setAmount( BigInteger.valueOf( 1 ) );
-            spendTx.setPayload( "payload" );
-            spendTx.setFee( BigInteger.valueOf( BaseConstants.DEFAULT_FEE ) );
-            spendTx.setTtl( BigInteger.valueOf( 20000 ) );
-            spendTx.setNonce( account.getNonce().add( BigInteger.ONE ) );
-
-            UnsignedTx unsignedTxNative = transactionServiceNative.createTx( spendTx ).toFuture().get();
+            String recipient = kp.getPublicKey();
+            BigInteger amount = BigInteger.valueOf( 1 );
+            String payload = "payload";
+            BigInteger fee = BigInteger.valueOf( BaseConstants.DEFAULT_FEE );
+            BigInteger ttl = BigInteger.valueOf( 20000 );
+            BigInteger nonce = account.getNonce().add( BigInteger.ONE );
+            UnsignedTx unsignedTxNative = transactionServiceNative.createSpendTx( keyPair.getPublicKey(), recipient, amount, payload, fee, ttl, nonce ).toFuture().get();
             Tx signedTx = transactionServiceNative.signTransaction( unsignedTxNative, keyPair.getPrivateKey() );
             Observable<PostTxResponse> txResponseObservable = transactionServiceNative.postTransaction( signedTx );
             txResponseObservable.subscribe( it -> {
