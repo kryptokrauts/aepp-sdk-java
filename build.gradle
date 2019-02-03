@@ -89,6 +89,9 @@ configurations {
     sharedCompile
     // exclude transitive bcprov dep because we need the current one (see lib folder)
     compile.exclude group: 'org.bouncycastle', module: 'bcprov-jdk15on'
+    // needed to include bouncycastle in fat jar
+    extLibs
+    compile.extendsFrom(extLibs)
 }
 
 sourceSets {
@@ -146,7 +149,7 @@ dependencies {
     
     // cryptography
     compile "org.bitcoinj:bitcoinj-core:${bitcoinjCoreVersion}"
-    compile fileTree(include: ["*.jar"], dir: "lib")
+    extLibs fileTree(include: ["*.jar"], dir: "lib")
     compile "net.consensys.cava:cava-crypto:${cavaVersion}"
     compile "net.consensys.cava:cava-rlp:${cavaVersion}"
     compile "de.mkammerer:argon2-jvm:2.5"
@@ -174,11 +177,8 @@ dependencies {
 }
 
 jar {
-    into('META-INF/lib') {
-        from 'lib'
-    }
-    manifest {
-        attributes "Class-Path": "lib/bcprov-jdk15on-161b20.jar"
+    from {
+        configurations.extLibs.collect { it.isDirectory() ? it : zipTree(it) }
     }
 }
 
