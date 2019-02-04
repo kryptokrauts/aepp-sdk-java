@@ -34,5 +34,10 @@ public interface WalletService {
      */
     byte[] recoverPrivateKeyFromKeystore( String json, String walletPassword ) throws AException;
 
+    /**
+     * 
+     * @param rawKeyPair
+     * @return base58 encoded human readable publicKey
+     */
     String getPublicKey( RawKeyPair rawKeyPair );
 }
