@@ -26,7 +26,7 @@ stages:
   - name: snapshot
     if: branch = dev
   - name: release
-    if: branch = master
+    if: (NOT type IN (pull_request)) AND (branch = master)
 
 jobs:
   include:
