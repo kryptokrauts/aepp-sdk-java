@@ -113,7 +113,7 @@ compile "com.kryptokrauts:aepp-sdk-java:1.0.1-SNAPSHOT"
 
 The services of the SDK can be accessed using the factory pattern. Every service has its own factory which allows to get the service either with default config (`ae_devnet` using `https://sdk-testnet.aepps.com/v2`) or using a XServiceConfiguration builder pattern configuration object:
 
-```
+```java
 new ChainServiceFactory().getService(); // get default configured service
 
 new TransactionServiceFactory().getService( TransactionServiceConfiguration.configure().baseUrl( "http://localhost/v2").compile() ); //set the baseUrl to localhost
