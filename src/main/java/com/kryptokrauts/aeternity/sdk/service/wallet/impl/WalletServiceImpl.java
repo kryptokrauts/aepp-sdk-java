@@ -31,16 +31,6 @@ public class WalletServiceImpl implements WalletService {
     @Nonnull
     private WalletServiceConfiguration config;
 
-    static {
-        try {
-            // fix for testing, will most probably not work when shipped
-            System.loadLibrary( "src/main/resources/libsodium" );
-        }
-        catch ( UnsatisfiedLinkError e ) {
-            System.out.println( e );
-        }
-    }
-
     @Override
     public String generateKeystore( RawKeyPair rawKeyPair, String walletPassword, String walletName ) throws AException {
         // create derived key with Argon2
