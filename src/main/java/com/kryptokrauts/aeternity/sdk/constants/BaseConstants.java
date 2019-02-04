@@ -15,6 +15,6 @@ public interface BaseConstants {
     public static final String VERTX_BASE_PATH = "basePath";
 
     // the default testnet url
-    public static final String DEFAULT_TESTNET_URL = "https://sdk-edgenet.aepps.com/v2";
+    public static final String DEFAULT_TESTNET_URL = "https://sdk-testnet.aepps.com/v2";
 
 }
