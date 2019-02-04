@@ -1,10 +1,13 @@
-# Release notes ([vX.X.X](https://github.com/kryptokrauts/aepp-sdk-java/releases/tag/vX.X.X))
+# Release notes ([v1.0.0](https://github.com/kryptokrauts/aepp-sdk-java/releases/tag/v1.0.0))
 
-TO BE ANNOUNCED ...
+Initial release of our Java SDK to interact with the Æternity blockchain.
 
-## Added
+## Initial functionalities
 
-## Fixed
+- generate and recover KeyPair
+- generate and recover Keystore-JSON
+- create and sign spendTx
+- various utils (crypto, encoding, signing)
 
 ## Contributors
 
