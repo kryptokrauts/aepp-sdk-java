@@ -1,0 +1,27 @@
+peers: []
+http:
+  external:
+    port: 3013
+  internal:
+    port: 3113
+    listen_address: 0.0.0.0
+    debug_endpoints: true
+
+keys:
+  peer_password: "top secret"
+  dir: ./keys
+
+chain:
+  persist: true
+
+mining:
+  beneficiary: "ak_twR4h7dEcUtc2iSEDv8kB7UFJJDGiEDQCXr85C3fYF8FdVdyo"
+  beneficiary_reward_delay: 2
+  autostart: true
+  cuckoo:
+    edge_bits: 15
+    miners:
+      - executable: mean15-generic
+
+fork_management:
+  network_id: ae_devnet

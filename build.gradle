@@ -1,0 +1,315 @@
+buildscript {
+    repositories {
+        mavenLocal()
+        mavenCentral()
+        jcenter()
+    }
+    dependencies {
+        classpath "io.swagger.codegen.v3:swagger-codegen:3.0.3"
+    }
+}
+
+plugins {
+    id "com.jfrog.artifactory" version "4.8.1"
+    id "com.jfrog.bintray" version "1.8.4"
+    id "maven-publish"
+    id "jacoco"
+    id "java"
+}
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+    jcenter()
+}
+
+version = (Boolean.valueOf(System.getProperty("snapshot")) ? project.version : project.version[0..4])
+sourceCompatibility = JavaVersion.VERSION_1_8
+
+ext {
+    bintrayUser = System.getProperty("bintray.user")
+    bintrayKey = System.getProperty("bintray.key")
+    buildNumber = System.getProperty("build.number")
+
+    aeternityVersion = "v1.4.0"
+
+    apiPackage   = "com.kryptokrauts.aeternity.generated.api"
+    modelPackage = "com.kryptokrauts.aeternity.generated.model"
+    swaggerFile  = "${rootDir}/api/swagger_${aeternityVersion}.yml"
+    templateDir = "${rootDir}/api/vertx-templates"
+    swaggerAnnotationsVersion = "1.5.21"
+    vertxVersion = "3.6.2"
+    jacksonVersion = "2.9.8"
+
+    lombokVersion = "1.18.4"
+
+    bouncycastleVersion = ""
+    bitcoinjCoreVersion = "0.14.7"
+    cavaVersion = "0.6.0"
+
+    junitVersion = "5.3.2"
+    junitPlatformVersion = "1.3.2"
+    spectrumVersion = "1.2.0"
+}
+
+
+
+import io.swagger.codegen.DefaultGenerator
+import io.swagger.codegen.config.CodegenConfigurator
+
+def swaggerOutputDir = file("build/swagger")
+task generateApiClient {
+    doLast {
+        def config = new CodegenConfigurator()
+        config.setLang("java")
+        config.setLibrary("vertx")
+        config.setGroupId("${group}")
+        config.setArtifactId("epoch-client-vertx")
+        config.setArtifactVersion("${aeternityVersion}")
+        config.setApiPackage("${apiPackage}")
+        config.setModelPackage("${modelPackage}")
+        config.setInputSpec(project.swaggerFile.toString())
+        config.setOutputDir(swaggerOutputDir.path)
+        config.setTemplateDir(project.templateDir)
+        config.setAdditionalProperties([
+                "dateLibrary"  : "java8",
+                "title"        :  rootProject.name,
+                "useTags"      : "true"
+        ])
+        config.setTypeMappings([
+                "Long"  :   "java.math.BigInteger"
+        ])
+        new DefaultGenerator().opts(config.toClientOptInput()).generate()
+    }
+}
+
+configurations {
+    integrationTestCompile.extendsFrom testCompile
+    integrationTestRuntime.extendsFrom testRuntime
+    sharedCompile
+    // exclude transitive bcprov dep because we need the current one (see lib folder)
+    compile.exclude group: 'org.bouncycastle', module: 'bcprov-jdk15on'
+}
+
+sourceSets {
+    swagger {
+        java {
+            srcDir file("${project.buildDir.path}/swagger/src/main/java")
+        }
+    }
+    main {
+        compileClasspath += swagger.output
+        runtimeClasspath += swagger.output
+    }
+    test {
+        compileClasspath += swagger.output
+        runtimeClasspath += swagger.output
+    }
+    integrationTest {
+        java {
+            compileClasspath += main.output + test.output + swagger.output
+            runtimeClasspath += main.output + test.output + swagger.output
+            srcDir file("src/integrationTest/java")
+        }
+        resources.srcDir file("src/integrationTest/resources")
+    }
+}
+
+task integrationTest(type: JavaExec, dependsOn: integrationTestClasses) {
+    group = "Verification"
+    description = "runs integration tests"
+    classpath = sourceSets.integrationTest.runtimeClasspath
+    main = "org.junit.platform.console.ConsoleLauncher"
+    args = ["--scan-classpath", sourceSets.integrationTest.output.classesDirs.asPath,
+            "--details", "tree",
+            "--reports-dir", "${buildDir}/testResults/junit-integrationTest",
+            "--fail-if-no-tests"]
+}
+
+compileSwaggerJava {
+    dependsOn(generateApiClient)
+    classpath = configurations.compile
+}
+compileJava {
+    dependsOn(compileSwaggerJava)
+    source += sourceSets.swagger.java
+}
+
+tasks.withType(JavaCompile) {
+    options.encoding = 'UTF-8'
+}
+
+dependencies {
+    // lombok
+    compileOnly "org.projectlombok:lombok:${lombokVersion}"
+    annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
+    
+    // cryptography
+    compile "org.bitcoinj:bitcoinj-core:${bitcoinjCoreVersion}"
+    compile fileTree(include: ["*.jar"], dir: "lib")
+    compile "net.consensys.cava:cava-crypto:${cavaVersion}"
+    compile "net.consensys.cava:cava-rlp:${cavaVersion}"
+    compile "de.mkammerer:argon2-jvm:2.5"
+
+    // needed for vertx client
+    compile "io.swagger:swagger-annotations:${swaggerAnnotationsVersion}"
+    compile "io.vertx:vertx-web-client:${vertxVersion}"
+    compile "io.vertx:vertx-rx-java2:${vertxVersion}"
+    compile "com.fasterxml.jackson.core:jackson-core:${jacksonVersion}"
+    compile "com.fasterxml.jackson.core:jackson-annotations:${jacksonVersion}"
+    compile "com.fasterxml.jackson.core:jackson-databind:${jacksonVersion}"
+    compile "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:${jacksonVersion}"
+
+    // tests
+    testImplementation enforcedPlatform("org.junit:junit-bom:${junitVersion}")
+    testRuntime "org.junit.platform:junit-platform-console:${junitPlatformVersion}"
+    testRuntime "org.junit.jupiter:junit-jupiter-engine:${junitVersion}"
+    testCompile "org.junit.jupiter:junit-jupiter-api:${junitVersion}"
+    testCompile "org.junit.jupiter:junit-jupiter-params:${junitVersion}"
+    testCompile "org.junit.vintage:junit-vintage-engine:${junitVersion}"
+    testCompile "commons-io:commons-io:2.6"
+    testCompile "com.greghaskins:spectrum:${spectrumVersion}"
+    testCompile "io.vertx:vertx-unit:${vertxVersion}"
+    testCompile "io.vertx:vertx-junit5:${vertxVersion}"
+}
+
+test { finalizedBy jacocoTestReport }
+
+jacocoTestReport {
+    dependsOn project*.test
+    sourceSets sourceSets.main
+
+    executionData fileTree(project.rootDir.absolutePath).include("**/build/jacoco/*.exec")
+
+    reports {
+        xml.enabled = true
+        html.enabled = true
+        html.destination file("${buildDir}/jacocoHtml")
+    }
+}
+
+task sourcesJar(type: Jar, dependsOn: classes) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
+
+javadoc.failOnError = false
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    classifier = 'javadoc'
+    from javadoc.destinationDir
+}
+
+artifacts {
+    archives sourcesJar
+    archives javadocJar
+}
+
+def pomConfig = {
+    licenses {
+        license {
+            name "ISC License"
+            url "https://opensource.org/licenses/isc-license.txt"
+            distribution "repo"
+        }
+    }
+    developers {
+        developer {
+            id "marc0olo"
+            name "Marco Walz"
+            email "walz.marcoo@gmail.com"
+        }
+        developer {
+            id "mitch-lbw"
+            name "Michel Meier"
+            email "dna.fan@gmx.de"
+        }
+    }
+    scm {
+        url "https://github.com/${organization}/${project.name}"
+    }
+}
+
+publishing {
+    publications {
+        mavenPublication(MavenPublication) {
+            from components.java
+            artifact sourcesJar {
+                classifier "sources"
+            }
+            artifact javadocJar {
+                classifier "javadoc"
+            }
+            groupId "${group}"
+            artifactId project.name
+            version project.version
+            pom.withXml {
+                def root = asNode()
+                root.appendNode("description", "A community developed Java SDK to interact with the Æternity blockchain")
+                root.appendNode("name", "${project.name}")
+                root.appendNode("url", "https://github.com/${organization}/${project.name}")
+                root.children().last() + pomConfig
+            }
+        }
+    }
+}
+
+artifactory {
+    contextUrl = "https://oss.jfrog.org"
+    publish {
+        repository {
+            repoKey = "oss-snapshot-local"
+            username = bintrayUser
+            password = bintrayKey
+        }
+        defaults {
+            publications("mavenPublication")
+            publishArtifacts = true
+            publishPom = true
+            properties = [
+                    "build.number": buildNumber,
+                    "build.name"  : "${project.name}"
+            ]
+            publishBuildInfo = false // no permission atm
+        }
+    }
+    resolve {
+        repoKey = "jcenter"
+    }
+    clientConfig.info.setBuildNumber(buildNumber)
+    clientConfig.info.setBuildName("${project.name}")
+}
+
+bintray {
+    user = bintrayUser
+    key = bintrayKey
+    publications = ["mavenPublication"]
+
+    pkg {
+        repo = "maven"
+        name = project.name
+        userOrg = "${organization}"
+        desc = "A community developed Java SDK to interact with the Æternity blockchain"
+        websiteUrl = "https://github.com/${organization}/${project.name}"
+        issueTrackerUrl  = "https://github.com/${organization}/${project.name}/issues"
+        vcsUrl = "https://github.com:${organization}/${project.name}.git"
+        licenses = ["ISC"]
+        labels = ["${organization}", "java", "sdk", "blockchain", "aeternity", "crypto"]
+        publicDownloadNumbers = true
+
+        githubRepo = "kryptokrauts/aepp-sdk-java"
+        githubReleaseNotesFile = "docs/release-notes/RELEASE-NOTES-${project.version}.md"
+
+        version {
+            name = project.version
+            vcsTag = "v${project.version}"
+            released = new Date()
+        }
+    }
+    publish = true
+}
+
+task printVersion {
+    doLast {
+        println project.version
+    }
+}
