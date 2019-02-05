@@ -1,15 +1,14 @@
 package com.kryptokrauts.aeternity.sdk.service.account.impl;
 
-import javax.annotation.Nonnull;
-
 import com.kryptokrauts.aeternity.generated.api.AccountApiImpl;
 import com.kryptokrauts.aeternity.generated.api.rxjava.AccountApi;
 import com.kryptokrauts.aeternity.generated.model.Account;
 import com.kryptokrauts.aeternity.sdk.service.ServiceConfiguration;
 import com.kryptokrauts.aeternity.sdk.service.account.AccountService;
-
-import io.reactivex.Observable;
+import io.reactivex.Single;
 import lombok.RequiredArgsConstructor;
+
+import javax.annotation.Nonnull;
 
 @RequiredArgsConstructor
 public final class AccountServiceImpl implements AccountService {
@@ -27,8 +26,8 @@ public final class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public Observable<Account> getAccount( final String base58PublicKey ) {
-        return getAccountApi().rxGetAccountByPubkey( base58PublicKey ).toObservable();
+    public Single<Account> getAccount(final String base58PublicKey ) {
+        return getAccountApi().rxGetAccountByPubkey( base58PublicKey );
     }
 
 }

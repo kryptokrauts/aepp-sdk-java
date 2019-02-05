@@ -4,18 +4,18 @@ import com.kryptokrauts.aeternity.generated.model.GenericSignedTx;
 import com.kryptokrauts.aeternity.generated.model.PostTxResponse;
 import com.kryptokrauts.aeternity.generated.model.Tx;
 import com.kryptokrauts.aeternity.generated.model.UnsignedTx;
-import io.reactivex.Observable;
+import io.reactivex.Single;
 import org.bouncycastle.crypto.CryptoException;
 
 import java.math.BigInteger;
 
 public interface TransactionService {
 
-    Observable<UnsignedTx> createSpendTx( String sender, String recipient, BigInteger amount, String payload, BigInteger fee, BigInteger ttl, BigInteger nonce );
+    Single<UnsignedTx> createSpendTx(String sender, String recipient, BigInteger amount, String payload, BigInteger fee, BigInteger ttl, BigInteger nonce );
 
-    Observable<PostTxResponse> postTransaction( Tx tx );
+    Single<PostTxResponse> postTransaction( Tx tx );
 
-    Observable<GenericSignedTx> getTransactionByHash( String txHash );
+    Single<GenericSignedTx> getTransactionByHash( String txHash );
 
     /**
      *

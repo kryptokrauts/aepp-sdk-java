@@ -6,7 +6,7 @@ import com.kryptokrauts.aeternity.generated.model.Tx;
 import com.kryptokrauts.aeternity.generated.model.UnsignedTx;
 import com.kryptokrauts.aeternity.sdk.constants.BaseConstants;
 import com.kryptokrauts.aeternity.sdk.domain.secret.impl.BaseKeyPair;
-import io.reactivex.Observable;
+import io.reactivex.Single;
 import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
 import org.bouncycastle.crypto.CryptoException;
@@ -32,11 +32,11 @@ public class TransactionApiTest extends BaseTest {
 
         UnsignedTx unsignedTxNative = transactionServiceNative.createSpendTx( sender, recipient, amount, payload, fee, ttl, nonce ).toFuture().get();
 
-        Observable<UnsignedTx> unsignedTxObservable = transactionServiceDebug.createSpendTx( sender, recipient, amount, payload, fee, ttl, nonce );
-        unsignedTxObservable.subscribe( it -> {
+        Single<UnsignedTx> unsignedTx = transactionServiceDebug.createSpendTx( sender, recipient, amount, payload, fee, ttl, nonce );
+        unsignedTx.subscribe( it -> {
             Assertions.assertEquals( it, unsignedTxNative );
             async.complete();
-        }, failure -> {
+        }, throwable -> {
             context.fail();
         } );
     }
@@ -49,7 +49,7 @@ public class TransactionApiTest extends BaseTest {
 
         // get the currents accounts nonce in case a transaction is already
         // created and increase it by one
-        Observable<Account> acc = accountService.getAccount( keyPair.getPublicKey() );
+        Single<Account> acc = accountService.getAccount( keyPair.getPublicKey() );
         acc.subscribe( account -> {
             BaseKeyPair kp = keyPairService.generateBaseKeyPair();
             String recipient = kp.getPublicKey();
@@ -60,13 +60,15 @@ public class TransactionApiTest extends BaseTest {
             BigInteger nonce = account.getNonce().add( BigInteger.ONE );
             UnsignedTx unsignedTxNative = transactionServiceNative.createSpendTx( keyPair.getPublicKey(), recipient, amount, payload, fee, ttl, nonce ).toFuture().get();
             Tx signedTx = transactionServiceNative.signTransaction( unsignedTxNative, keyPair.getPrivateKey() );
-            Observable<PostTxResponse> txResponseObservable = transactionServiceNative.postTransaction( signedTx );
-            txResponseObservable.subscribe( it -> {
+            Single<PostTxResponse> txResponse = transactionServiceNative.postTransaction( signedTx );
+            txResponse.subscribe( it -> {
                 Assertions.assertEquals( it.getTxHash(), transactionServiceNative.computeTxHash( signedTx.getTx() ) );
                 async.complete();
-            }, failure -> {
+            }, throwable -> {
                 context.fail();
             } );
-        } );
+        }, throwable -> {
+            context.fail();
+        });
     }
 }

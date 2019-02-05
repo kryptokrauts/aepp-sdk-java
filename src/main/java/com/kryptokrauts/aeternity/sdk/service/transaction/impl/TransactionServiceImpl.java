@@ -10,7 +10,7 @@ import com.kryptokrauts.aeternity.sdk.service.transaction.TransactionServiceConf
 import com.kryptokrauts.aeternity.sdk.util.ByteUtils;
 import com.kryptokrauts.aeternity.sdk.util.EncodingUtils;
 import com.kryptokrauts.aeternity.sdk.util.SigningUtil;
-import io.reactivex.Observable;
+import io.reactivex.Single;
 import lombok.RequiredArgsConstructor;
 import net.consensys.cava.bytes.Bytes;
 import net.consensys.cava.rlp.RLP;
@@ -36,7 +36,7 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     @Override
-    public Observable<UnsignedTx> createSpendTx( String sender, String recipient, BigInteger amount, String payload, BigInteger fee, BigInteger ttl, BigInteger nonce ) {
+    public Single<UnsignedTx> createSpendTx( String sender, String recipient, BigInteger amount, String payload, BigInteger fee, BigInteger ttl, BigInteger nonce ) {
         SpendTx spendTx = new SpendTx();
         spendTx.setSenderId( sender );
         spendTx.setRecipientId( recipient );
@@ -45,17 +45,17 @@ public class TransactionServiceImpl implements TransactionService {
         spendTx.setFee( fee );
         spendTx.setTtl( ttl );
         spendTx.setNonce( nonce );
-        return config.isNativeMode() ? Observable.just( spendTxNative( spendTx ) ) : spendTxInternal( spendTx );
+        return config.isNativeMode() ? Single.just( spendTxNative( spendTx ) ) : spendTxInternal( spendTx );
     }
 
     @Override
-    public Observable<PostTxResponse> postTransaction( Tx tx ) {
-        return getTransactionApi().rxPostTransaction( tx ).toObservable();
+    public Single<PostTxResponse> postTransaction(Tx tx ) {
+        return getTransactionApi().rxPostTransaction( tx );
     }
 
     @Override
-    public Observable<GenericSignedTx> getTransactionByHash( String txHash ) {
-        return getTransactionApi().rxGetTransactionByHash( txHash ).toObservable();
+    public Single<GenericSignedTx> getTransactionByHash( String txHash ) {
+        return getTransactionApi().rxGetTransactionByHash( txHash );
     }
 
     @Override
@@ -79,8 +79,8 @@ public class TransactionServiceImpl implements TransactionService {
     /**
      * for validate native tx generation
      */
-    private Observable<UnsignedTx> spendTxInternal( SpendTx spendTx ) {
-        return getTransactionApi().rxPostSpend( spendTx ).toObservable();
+    private Single<UnsignedTx> spendTxInternal( SpendTx spendTx ) {
+        return getTransactionApi().rxPostSpend( spendTx );
     }
 
     private UnsignedTx spendTxNative( SpendTx spendTx ) {
