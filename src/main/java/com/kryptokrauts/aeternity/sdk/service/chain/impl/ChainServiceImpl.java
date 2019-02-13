@@ -1,15 +1,14 @@
 package com.kryptokrauts.aeternity.sdk.service.chain.impl;
 
-import javax.annotation.Nonnull;
-
 import com.kryptokrauts.aeternity.generated.api.ChainApiImpl;
 import com.kryptokrauts.aeternity.generated.api.rxjava.ChainApi;
 import com.kryptokrauts.aeternity.generated.model.KeyBlock;
 import com.kryptokrauts.aeternity.sdk.service.ServiceConfiguration;
 import com.kryptokrauts.aeternity.sdk.service.chain.ChainService;
-
-import io.reactivex.Observable;
+import io.reactivex.Single;
 import lombok.RequiredArgsConstructor;
+
+import javax.annotation.Nonnull;
 
 @RequiredArgsConstructor
 public class ChainServiceImpl implements ChainService {
@@ -26,7 +25,7 @@ public class ChainServiceImpl implements ChainService {
     }
 
     @Override
-    public Observable<KeyBlock> getCurrentKeyBlock() {
-        return getChainApi().rxGetCurrentKeyBlock().toObservable();
+    public Single<KeyBlock> getCurrentKeyBlock() {
+        return getChainApi().rxGetCurrentKeyBlock();
     }
 }

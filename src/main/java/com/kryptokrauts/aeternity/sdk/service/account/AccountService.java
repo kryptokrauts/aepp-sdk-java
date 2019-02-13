@@ -3,8 +3,7 @@ package com.kryptokrauts.aeternity.sdk.service.account;
 import com.kryptokrauts.aeternity.generated.model.Account;
 import com.kryptokrauts.aeternity.sdk.util.EncodingType;
 import com.kryptokrauts.aeternity.sdk.util.EncodingUtils;
-
-import io.reactivex.Observable;
+import io.reactivex.Single;
 
 public interface AccountService {
 
@@ -13,8 +12,8 @@ public interface AccountService {
      * {@link EncodingUtils}
      * 
      * @param publicKey
-     * @return the account wrapped in an observable
+     * @return the account wrapped in a single
      */
-    Observable<Account> getAccount( String publicKey );
+    Single<Account> getAccount(String publicKey );
 
 }
