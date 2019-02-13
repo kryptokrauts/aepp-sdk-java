@@ -43,7 +43,7 @@ ext {
 
     lombokVersion = "1.18.4"
 
-    bouncycastleVersion = ""
+    bouncycastleVersion = "1.61"
     bitcoinjCoreVersion = "0.14.7"
     cavaVersion = "0.6.0"
 
@@ -87,8 +87,6 @@ configurations {
     integrationTestCompile.extendsFrom testCompile
     integrationTestRuntime.extendsFrom testRuntime
     sharedCompile
-    // exclude transitive bcprov dep because we need the current one (see lib folder)
-    compile.exclude group: 'org.bouncycastle', module: 'bcprov-jdk15on'
 }
 
 sourceSets {
@@ -146,7 +144,7 @@ dependencies {
     
     // cryptography
     compile "org.bitcoinj:bitcoinj-core:${bitcoinjCoreVersion}"
-    compile fileTree(include: ["*.jar"], dir: "lib")
+    compile "org.bouncycastle:bcprov-jdk15on:${bouncycastleVersion}"
     compile "net.consensys.cava:cava-crypto:${cavaVersion}"
     compile "net.consensys.cava:cava-rlp:${cavaVersion}"
     compile "de.mkammerer:argon2-jvm:2.5"

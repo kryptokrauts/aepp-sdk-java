@@ -17,26 +17,10 @@ A community developed Java SDK to interact with the Æternity blockchain.
         - get latest release [libsodium](https://download.libsodium.org/libsodium/releases/)
         - download the latest pre-built binary (e.g. `libsodium-1.0.16-msvc.zip`)
         - extract `libsodium.dll` to `C:\Windows\System32`
-- bouncycastle version 161b20 (beta and currently not available in a public maven repository)
-    - copy `bcprov-jdk15on-161b20.jar` into your projects `lib` folder
-    - Maven
-      ```xml
-     	<dependency>
-          <groupId>org.bouncycastle</groupId>
-          <artifactId>bcprov-jdk15on</artifactId>
-          <version>161b20</version>
-          <scope>system</scope>
-          <systemPath>${basedir}/lib/bcprov-jdk15on-161b20.jar</systemPath>
-      </dependency>
-      ```
-    - Gradle
-      ```xml
-      compile fileTree(include: ["*.jar"], dir: "lib")
-      ```
 
 ## Latest stable release
 
-- [v1.0.0](https://github.com/kryptokrauts/aepp-sdk-java/releases/tag/v1.0.0)
+- [v1.0.1](https://github.com/kryptokrauts/aepp-sdk-java/releases/tag/v1.0.1)
 
 ### Download
 
@@ -56,7 +40,7 @@ A community developed Java SDK to interact with the Æternity blockchain.
 <dependency>
     <groupId>com.kryptokrauts</groupId>
     <artifactId>aepp-sdk-java</artifactId>
-    <version>X.X.X</version>
+    <version>1.0.1</version>
 </dependency>
 ...
 ```
@@ -68,7 +52,7 @@ repositories {
   jcenter()
 }
 
-compile "com.kryptokrauts:aepp-sdk-java:X.X.X"
+compile "com.kryptokrauts:aepp-sdk-java:1.0.1"
 ```
 
 ### Snapshots
@@ -94,7 +78,7 @@ Here's the [list of snapshot versions](https://oss.jfrog.org/webapp/#/artifacts/
   <dependency>
     <groupId>com.kryptokrauts</groupId>
     <artifactId>aepp-sdk-java</artifactId>
-    <version>1.0.1-SNAPSHOT</version>
+    <version>1.0.2-SNAPSHOT</version>
   </dependency>
 </dependencies>
 ...
@@ -106,7 +90,7 @@ repositories {
   maven { url "https://oss.jfrog.org/artifactory/oss-snapshot-local" }
 }
 
-compile "com.kryptokrauts:aepp-sdk-java:1.0.1-SNAPSHOT"
+compile "com.kryptokrauts:aepp-sdk-java:1.0.2-SNAPSHOT"
 ```
 
 ## Documentation
@@ -121,6 +105,7 @@ new TransactionServiceFactory().getService( TransactionServiceConfiguration.conf
 
 ## Release notes
 
+- [v1.0.1](docs/release-notes/RELEASE-NOTES-1.0.1.md)
 - [v1.0.0](docs/release-notes/RELEASE-NOTES-1.0.0.md)
 
 ## License
