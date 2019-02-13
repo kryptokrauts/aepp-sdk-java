@@ -1,11 +1,9 @@
 # Release notes ([v1.0.1](https://github.com/kryptokrauts/aepp-sdk-java/releases/tag/v1.0.1))
 
-Initial release of our Java SDK to interact with the Æternity blockchain.
-
 ## Changes
 
 - return Single instead of Observable for responses that return only one object
-- switch from bouncycastle 1.61-beta to the release version (no need to manually add it)
+- switch from bouncycastle 1.61-beta to the release version (no more need to manually add it)
 
 ## Contributors
 
