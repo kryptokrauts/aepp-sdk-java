@@ -6,7 +6,7 @@ package com.kryptokrauts.aeternity.sdk.constants;
  */
 public enum Network {
 
-    TESTNET("ae_devnet"), MAINNET("ae_mainnet");
+    DEVNET("ae_devnet"), TESTNET("ae_uat"), MAINNET("ae_mainnet");
 
     private String id;
 

@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
+import com.kryptokrauts.aeternity.sdk.constants.Network;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.runner.RunWith;
@@ -50,12 +51,12 @@ public abstract class BaseTest {
     public void setupApiClient( TestContext context ) {
         Vertx vertx = rule.vertx();
         keyPairService = new KeyPairServiceFactory().getService();
+        accountService = new AccountServiceFactory().getService( ServiceConfiguration.configure().baseUrl( getEpochBaseUrl() ).vertx( vertx ).compile() );
         chainService = new ChainServiceFactory().getService( ServiceConfiguration.configure().baseUrl( getEpochBaseUrl() ).vertx( vertx ).compile() );
         transactionServiceNative = new TransactionServiceFactory()
-        .getService( TransactionServiceConfiguration.configure().baseUrl( getEpochBaseUrl() ).vertx( vertx ).compile() );
+        .getService( TransactionServiceConfiguration.configure().baseUrl( getEpochBaseUrl() ).network( Network.DEVNET ).vertx( vertx ).compile() );
         transactionServiceDebug = new TransactionServiceFactory()
-        .getService( TransactionServiceConfiguration.configure().nativeMode( false ).baseUrl( getEpochBaseUrl() ).vertx( vertx ).compile() );
-        accountService = new AccountServiceFactory().getService( ServiceConfiguration.configure().baseUrl( getEpochBaseUrl() ).vertx( vertx ).compile() );
+        .getService( TransactionServiceConfiguration.configure().nativeMode( false ).baseUrl( getEpochBaseUrl() ).network( Network.DEVNET ).vertx( vertx ).compile() );
     }
 
     private String getEpochBaseUrl() {
