@@ -20,7 +20,7 @@ A community developed Java SDK to interact with the Æternity blockchain.
 
 ## Latest stable release
 
-- [v1.0.1](https://github.com/kryptokrauts/aepp-sdk-java/releases/tag/v1.0.1)
+- [v1.0.2](https://github.com/kryptokrauts/aepp-sdk-java/releases/tag/v1.0.2)
 
 ### Download
 
@@ -40,7 +40,7 @@ A community developed Java SDK to interact with the Æternity blockchain.
 <dependency>
     <groupId>com.kryptokrauts</groupId>
     <artifactId>aepp-sdk-java</artifactId>
-    <version>1.0.1</version>
+    <version>1.0.2</version>
 </dependency>
 ...
 ```
@@ -52,7 +52,7 @@ repositories {
   jcenter()
 }
 
-compile "com.kryptokrauts:aepp-sdk-java:1.0.1"
+compile "com.kryptokrauts:aepp-sdk-java:1.0.2"
 ```
 
 ### Snapshots
@@ -69,6 +69,10 @@ Here's the [list of snapshot versions](https://oss.jfrog.org/webapp/#/artifacts/
 ...
 <repositories>
   <repository>
+    <id>jcenter</id>
+    <url>https://jcenter.bintray.com/</url>
+  </repository>
+  <repository>
     <id>oss-snapshot-local</id>
     <url>https://oss.jfrog.org/artifactory/oss-snapshot-local</url>
   </repository>
@@ -78,7 +82,7 @@ Here's the [list of snapshot versions](https://oss.jfrog.org/webapp/#/artifacts/
   <dependency>
     <groupId>com.kryptokrauts</groupId>
     <artifactId>aepp-sdk-java</artifactId>
-    <version>1.0.2-SNAPSHOT</version>
+    <version>1.0.3-SNAPSHOT</version>
   </dependency>
 </dependencies>
 ...
@@ -87,15 +91,16 @@ Here's the [list of snapshot versions](https://oss.jfrog.org/webapp/#/artifacts/
 #### Gradle
 ```groovy
 repositories {
+  jcenter()
   maven { url "https://oss.jfrog.org/artifactory/oss-snapshot-local" }
 }
 
-compile "com.kryptokrauts:aepp-sdk-java:1.0.2-SNAPSHOT"
+compile "com.kryptokrauts:aepp-sdk-java:1.0.3-SNAPSHOT"
 ```
 
 ## Documentation
 
-The services of the SDK can be accessed using the factory pattern. Every service has its own factory which allows to get the service either with default config (`ae_devnet` using `https://sdk-testnet.aepps.com/v2`) or using a XServiceConfiguration builder pattern configuration object:
+The services of the SDK can be accessed using the factory pattern. Every service has its own factory which allows to get the service either with default config (`ae_uat` using `https://sdk-testnet.aepps.com/v2`) or using a XServiceConfiguration builder pattern configuration object:
 
 ```java
 new ChainServiceFactory().getService(); // get default configured service
@@ -103,8 +108,56 @@ new ChainServiceFactory().getService(); // get default configured service
 new TransactionServiceFactory().getService( TransactionServiceConfiguration.configure().baseUrl( "http://localhost/v2").compile() ); //set the baseUrl to localhost
 ```
 
+### Example code to generate and post a transaction
+```java
+// secret needed to recover KeyPair and sign tx
+final String testSecret = "<your_private_key>";
+
+// the KeyPairService doesn't need specific configuration parameters
+final KeyPairService keyPairService = new KeyPairServiceFactory().getService();
+BaseKeyPair keyPair = keyPairService.generateBaseKeyPairFromSecret(testSecret);
+
+final String baseUrl = "https://sdk-testnet.aepps.com/v2"; // default: https://sdk-testnet.aepps.com/v2
+final Network testnet = Network.TESTNET; // default: TESTNET -> ae_uat
+
+// get services with required configuration
+// you can also call getService() which will load the default settings (see above)
+ServiceConfiguration serviceConf = ServiceConfiguration.configure().baseUrl(baseUrl).compile();
+final AccountService accountService = new AccountServiceFactory().getService(serviceConf);
+final ChainService chainService = new ChainServiceFactory().getService(serviceConf);
+// the TransactionService needs to know the network because the signature of tx is handled differently
+final TransactionService transactionService = new TransactionServiceFactory().getService(TransactionServiceConfiguration.configure().baseUrl(baseUrl).network(testnet).compile());
+
+final String toAddress = "<recipient_address>";
+
+// get block to determine current height for calculation of TTL
+KeyBlock block = chainService.getCurrentKeyBlock().blockingGet();
+// get the current account to determine nonce which has to be increased
+Account account = accountService.getAccount( keyPair.getPublicKey() ).blockingGet();
+
+// amount to send (we need utils to calculate æternity units
+BigInteger amount = BigInteger.valueOf( 1 );
+// some payload included within tx
+String payload = "works =)";
+// we need to provide a way to determine optimal fee
+BigInteger fee = BigInteger.valueOf( BaseConstants.DEFAULT_FEE );
+// tx will be valid for the next ten blocks
+BigInteger ttl = block.getHeight().add(BigInteger.TEN);
+// we need to increase the current account nonce by one
+BigInteger nonce = account.getNonce().add( BigInteger.ONE );
+
+// create the tx
+UnsignedTx unsignedTxNative = transactionService.createSpendTx( keyPair.getPublicKey(), toAddress, amount, payload, fee, ttl, nonce ).blockingGet();
+// sign the tx
+Tx signedTx = transactionService.signTransaction( unsignedTxNative, keyPair.getPrivateKey() );
+
+// hopefully you receive a successful txResponse
+PostTxResponse txResponse = transactionService.postTransaction( signedTx ).blockingGet();
+```
+
 ## Release notes
 
+- [v1.0.2](docs/release-notes/RELEASE-NOTES-1.0.2.md)
 - [v1.0.1](docs/release-notes/RELEASE-NOTES-1.0.1.md)
 - [v1.0.0](docs/release-notes/RELEASE-NOTES-1.0.0.md)
 
