@@ -14,4 +14,12 @@ public class KeyPairServiceConfiguration extends ServiceConfiguration {
 
     @Default
     private String secretKeySpec = "AES";
+    
+    /**
+     * this param has direct influence to the number of mnemonic seed words
+     * for correlation of entropy bit size and number of words see spec
+     * {@linkplain https://github.com/bitcoin/bips/blob/master/bip-0039.mediawiki#Generating_the_mnemonic}
+     */
+    @Default
+    private int entropySizeInByte = 256 / 8;
 }
