@@ -10,7 +10,7 @@ public class TransactionServiceFactory extends AbstractServiceFactory<Transactio
     }
 
     @Override
-    public TransactionService getServiceWithConfig( TransactionServiceConfiguration config ) {
+    protected TransactionService getServiceWithConfig( TransactionServiceConfiguration config ) {
         return new TransactionServiceImpl( config );
     }
 }
