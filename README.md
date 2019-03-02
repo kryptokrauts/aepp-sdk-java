@@ -154,6 +154,24 @@ Tx signedTx = transactionService.signTransaction( unsignedTxNative, keyPair.getP
 // hopefully you receive a successful txResponse
 PostTxResponse txResponse = transactionService.postTransaction( signedTx ).blockingGet();
 ```
+### Example code to generate a HD wallet
+:exclamation: Altough possible, it's not recommended to create the hd wallet based on a user choosen list of mnemonic words, because this will lack randomisity. Additionally it's strongly recommend to set password, which additionally salts the mnemonic phrase and increases security.
+All derived keys should be created with the hardended flag. Otherwise it is possible to reconstruct all descendent private and public keys from a known private key and all descendent public keys from a known public key. 
+
+```
+final KeyPairService keyPairService = new KeyPairServiceFactory().getService();
+
+// create the master
+MnemonicKeyPair generatedKeyPair =
+                    keyPairService.generateMasterMnemonicKeyPair("superSafeRandomSaltPassword");
+// get the mnemonics
+master.getMnemonicSeedWords()
+
+// derive a key                    
+BaseKeyPair generatedDerivedKey =
+                            EncodingUtils.createBaseKeyPair(
+                                keyPairService.generateDerivedKey(master, true).toRawKeyPair());
+```
 
 ## Release notes
 
