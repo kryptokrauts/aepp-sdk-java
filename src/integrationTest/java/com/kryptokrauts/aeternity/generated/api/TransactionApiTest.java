@@ -27,7 +27,7 @@ public class TransactionApiTest extends BaseTest {
         BigInteger amount = BigInteger.valueOf( 1000 );
         String payload = "payload";
         // TODO calculate that correctly
-        long additionalGasCostAccordingToByteSize = BaseConstants.BASE_GAS;
+        long additionalGasCostAccordingToByteSize = 50000000;
         BigInteger fee = BigInteger.valueOf( ( BaseConstants.BASE_GAS + additionalGasCostAccordingToByteSize ) * BaseConstants.ON_CHAIN_FEE_MULTIPLIER );
         BigInteger ttl = BigInteger.valueOf( 100 );
         BigInteger nonce = BigInteger.valueOf( 5 );
@@ -58,7 +58,7 @@ public class TransactionApiTest extends BaseTest {
             BigInteger amount = BigInteger.valueOf( 1 );
             String payload = "payload";
             // TODO calculate that correctly
-            long additionalGasCostAccordingToByteSize = BaseConstants.BASE_GAS;
+            long additionalGasCostAccordingToByteSize = 50000000;
             BigInteger fee = BigInteger.valueOf( ( BaseConstants.BASE_GAS + additionalGasCostAccordingToByteSize ) * BaseConstants.ON_CHAIN_FEE_MULTIPLIER );
             BigInteger ttl = BigInteger.valueOf( 20000 );
             BigInteger nonce = account.getNonce().add( BigInteger.ONE );
