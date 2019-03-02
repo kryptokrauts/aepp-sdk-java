@@ -5,6 +5,5 @@ import io.reactivex.Single;
 
 public interface ChainService {
 
-    Single<KeyBlock> getCurrentKeyBlock();
-
+  Single<KeyBlock> getCurrentKeyBlock();
 }
