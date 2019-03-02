@@ -2,19 +2,22 @@ package com.kryptokrauts.aeternity.sdk.constants;
 
 public interface BaseConstants {
 
-    public static final String PREFIX_ZERO_X = "0x";
+    String PREFIX_ZERO_X = "0x";
 
-    // default fee for posting transaction
-    public static final long DEFAULT_FEE = 20000;
+    // https://github.com/aeternity/protocol/blob/master/consensus/consensus.md#gas
+    long BASE_GAS = 15000;
 
-    public static final String AETERNITY_MESSAGE_PREFIX = "æternity Signed Message:\n";
+    // https://github.com/aeternity/protocol/blob/master/consensus/consensus.md#common-fields-for-transactions
+    long ON_CHAIN_FEE_MULTIPLIER = 1000000;
 
-    public static final int MAX_MESSAGE_LENGTH = 0xFD;
+    String AETERNITY_MESSAGE_PREFIX = "æternity Signed Message:\n";
+
+    int MAX_MESSAGE_LENGTH = 0xFD;
 
     // vertx base_path parameter
-    public static final String VERTX_BASE_PATH = "basePath";
+    String VERTX_BASE_PATH = "basePath";
 
     // the default testnet url
-    public static final String DEFAULT_TESTNET_URL = "https://sdk-testnet.aepps.com/v2";
+    String DEFAULT_TESTNET_URL = "https://sdk-testnet.aepps.com/v2";
 
 }
