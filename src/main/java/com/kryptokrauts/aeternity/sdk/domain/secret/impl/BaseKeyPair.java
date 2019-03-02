@@ -9,13 +9,13 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class BaseKeyPair implements KeyPair<String> {
 
-    private String publicKey;
+  private String publicKey;
 
-    private String privateKey;
+  private String privateKey;
 
-    @Builder
-    public BaseKeyPair( final String publicKey, final String privateKey ) {
-        this.publicKey = publicKey;
-        this.privateKey = privateKey;
-    }
+  @Builder
+  public BaseKeyPair(final String publicKey, final String privateKey) {
+    this.publicKey = publicKey;
+    this.privateKey = privateKey;
+  }
 }

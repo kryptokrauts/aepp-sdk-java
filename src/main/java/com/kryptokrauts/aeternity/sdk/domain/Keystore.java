@@ -1,7 +1,6 @@
 package com.kryptokrauts.aeternity.sdk.domain;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -12,68 +11,68 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 /**
- * the representation of a wallet json file (keystore) containing all necessary
- * information to recover the private key
+ * the representation of a wallet json file (keystore) containing all necessary information to
+ * recover the private key
  */
 public class Keystore {
 
-    @JsonProperty( "public_key" )
-    private String publicKey;
+  @JsonProperty("public_key")
+  private String publicKey;
 
-    @JsonProperty( "crypto" )
-    private Crypto crypto;
+  @JsonProperty("crypto")
+  private Crypto crypto;
 
-    private String id;
+  private String id;
 
-    private String name;
+  private String name;
 
-    private int version;
+  private int version;
 
-    @Data
-    @NoArgsConstructor
-    @AllArgsConstructor
-    @Builder
-    public static class Crypto {
-        @JsonProperty( "secret_type" )
-        private String secretType;
+  @Data
+  @NoArgsConstructor
+  @AllArgsConstructor
+  @Builder
+  public static class Crypto {
+    @JsonProperty("secret_type")
+    private String secretType;
 
-        @JsonProperty( "symmetric_alg" )
-        private String symmetricAlgorithm;
+    @JsonProperty("symmetric_alg")
+    private String symmetricAlgorithm;
 
-        @JsonProperty( "ciphertext" )
-        private String cipherText;
+    @JsonProperty("ciphertext")
+    private String cipherText;
 
-        @JsonProperty( "cipher_params" )
-        private CipherParams cipherParams;
+    @JsonProperty("cipher_params")
+    private CipherParams cipherParams;
 
-        private String kdf;
+    private String kdf;
 
-        @JsonProperty( "kdf_params" )
-        private KdfParams kdfParams;
-    }
+    @JsonProperty("kdf_params")
+    private KdfParams kdfParams;
+  }
 
-    @Data
-    @NoArgsConstructor
-    @AllArgsConstructor
-    @Builder
-    public static class CipherParams {
-        private String nonce;
-    }
+  @Data
+  @NoArgsConstructor
+  @AllArgsConstructor
+  @Builder
+  public static class CipherParams {
+    private String nonce;
+  }
 
-    @Data
-    @NoArgsConstructor
-    @AllArgsConstructor
-    @Builder
-    public static class KdfParams {
+  @Data
+  @NoArgsConstructor
+  @AllArgsConstructor
+  @Builder
+  public static class KdfParams {
 
-        @JsonProperty( "memlimit_kib" )
-        private int memLimitKib;
+    @JsonProperty("memlimit_kib")
+    private int memLimitKib;
 
-        @JsonProperty( "opslimit" )
-        private int opsLimit;
+    @JsonProperty("opslimit")
+    private int opsLimit;
 
-        private String salt;
+    private String salt;
 
-        private int parallelism;
-    }
+    private int parallelism;
+  }
 }

@@ -3,14 +3,15 @@ package com.kryptokrauts.aeternity.sdk.service.transaction;
 import com.kryptokrauts.aeternity.sdk.service.AbstractServiceFactory;
 import com.kryptokrauts.aeternity.sdk.service.transaction.impl.TransactionServiceImpl;
 
-public class TransactionServiceFactory extends AbstractServiceFactory<TransactionService, TransactionServiceConfiguration> {
-    @Override
-    public TransactionService getService() {
-        return getServiceWithConfig( TransactionServiceConfiguration.configure().compile() );
-    }
+public class TransactionServiceFactory
+    extends AbstractServiceFactory<TransactionService, TransactionServiceConfiguration> {
+  @Override
+  public TransactionService getService() {
+    return getServiceWithConfig(TransactionServiceConfiguration.configure().compile());
+  }
 
-    @Override
-    protected TransactionService getServiceWithConfig( TransactionServiceConfiguration config ) {
-        return new TransactionServiceImpl( config );
-    }
+  @Override
+  protected TransactionService getServiceWithConfig(TransactionServiceConfiguration config) {
+    return new TransactionServiceImpl(config);
+  }
 }
