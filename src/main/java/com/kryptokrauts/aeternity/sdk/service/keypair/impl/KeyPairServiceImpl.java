@@ -3,20 +3,12 @@ package com.kryptokrauts.aeternity.sdk.service.keypair.impl;
 import static com.kryptokrauts.aeternity.sdk.util.ByteUtils.leftPad;
 import static com.kryptokrauts.aeternity.sdk.util.ByteUtils.rightPad;
 
-import com.kryptokrauts.aeternity.sdk.constants.ApiIdentifiers;
-import com.kryptokrauts.aeternity.sdk.domain.secret.impl.BaseKeyPair;
-import com.kryptokrauts.aeternity.sdk.domain.secret.impl.MnemonicKeyPair;
-import com.kryptokrauts.aeternity.sdk.domain.secret.impl.RawKeyPair;
-import com.kryptokrauts.aeternity.sdk.exception.AException;
-import com.kryptokrauts.aeternity.sdk.service.keypair.KeyPairService;
-import com.kryptokrauts.aeternity.sdk.service.keypair.KeyPairServiceConfiguration;
-import com.kryptokrauts.aeternity.sdk.util.CryptoUtils;
-import com.kryptokrauts.aeternity.sdk.util.EncodingUtils;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.Arrays;
 import java.util.List;
+
 import javax.annotation.Nonnull;
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
@@ -24,8 +16,10 @@ import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
-import lombok.RequiredArgsConstructor;
+
 import org.bitcoinj.core.Sha256Hash;
+import org.bitcoinj.crypto.ChildNumber;
+import org.bitcoinj.crypto.DeterministicHierarchy;
 import org.bitcoinj.crypto.DeterministicKey;
 import org.bitcoinj.crypto.HDKeyDerivation;
 import org.bitcoinj.crypto.MnemonicCode;
@@ -36,6 +30,19 @@ import org.bouncycastle.crypto.params.Ed25519PrivateKeyParameters;
 import org.bouncycastle.crypto.params.Ed25519PublicKeyParameters;
 import org.bouncycastle.util.encoders.Hex;
 
+import com.google.common.collect.ImmutableList;
+import com.kryptokrauts.aeternity.sdk.constants.ApiIdentifiers;
+import com.kryptokrauts.aeternity.sdk.domain.secret.impl.BaseKeyPair;
+import com.kryptokrauts.aeternity.sdk.domain.secret.impl.MnemonicKeyPair;
+import com.kryptokrauts.aeternity.sdk.domain.secret.impl.RawKeyPair;
+import com.kryptokrauts.aeternity.sdk.exception.AException;
+import com.kryptokrauts.aeternity.sdk.service.keypair.KeyPairService;
+import com.kryptokrauts.aeternity.sdk.service.keypair.KeyPairServiceConfiguration;
+import com.kryptokrauts.aeternity.sdk.util.CryptoUtils;
+import com.kryptokrauts.aeternity.sdk.util.EncodingUtils;
+
+import lombok.RequiredArgsConstructor;
+
 @RequiredArgsConstructor
 public final class KeyPairServiceImpl implements KeyPairService {
   private static final SecureRandom secureRandom = new SecureRandom();
@@ -43,7 +50,8 @@ public final class KeyPairServiceImpl implements KeyPairService {
   @Nonnull private KeyPairServiceConfiguration config;
 
   @Override
-  public MnemonicKeyPair generateMnemonicKeyPair(String mnemonicSeedPassword) throws AException {
+  public MnemonicKeyPair generateMasterMnemonicKeyPair(String mnemonicSeedPassword)
+      throws AException {
     try {
       if (mnemonicSeedPassword == null) {
         mnemonicSeedPassword = "";
@@ -52,7 +60,7 @@ public final class KeyPairServiceImpl implements KeyPairService {
       byte[] entropy = CryptoUtils.generateSalt(config.getEntropySizeInByte());
       // generate the list of mnemonic seed words based on the random byte array
       List<String> mnemonicSeedWords = MnemonicCode.INSTANCE.toMnemonic(entropy);
-      return recoverMnemonicKeyPair(mnemonicSeedWords, mnemonicSeedPassword);
+      return recoverMasterMnemonicKeyPair(mnemonicSeedWords, mnemonicSeedPassword);
     } catch (Exception e) {
       throw new AException(
           String.format("An error occured generating keyPair %s", e.getLocalizedMessage()), e);
@@ -60,7 +68,7 @@ public final class KeyPairServiceImpl implements KeyPairService {
   }
 
   @Override
-  public MnemonicKeyPair recoverMnemonicKeyPair(
+  public MnemonicKeyPair recoverMasterMnemonicKeyPair(
       List<String> mnemonicSeedWords, String mnemonicSeedPassword) throws AException {
 
     if (mnemonicSeedPassword == null) {
@@ -73,7 +81,40 @@ public final class KeyPairServiceImpl implements KeyPairService {
     DeterministicKey master = HDKeyDerivation.createMasterPrivateKey(seed);
     RawKeyPair generatedKeyPair = generateRawKeyPairFromSecret(master.getPrivateKeyAsHex());
 
-    return new MnemonicKeyPair(generatedKeyPair, mnemonicSeedWords);
+    return new MnemonicKeyPair(
+        generatedKeyPair, mnemonicSeedWords, new DeterministicHierarchy(master));
+  }
+
+  @Override
+  public MnemonicKeyPair generateDerivedKey(MnemonicKeyPair mnemonicKeyPair, boolean hardened)
+      throws AException {
+    DeterministicKey master = mnemonicKeyPair.getDeterministicHierarchy().getRootKey();
+    // check if we really have the masterKey at hand
+    if (master.getDepth() != 0) {
+      throw new AException("Given mnemonicKeyPair object does not contain the master key");
+    }
+    /**
+     * following the BIP32 specification create the following tree account -> external chain ->
+     * child address
+     */
+
+    // set path for account and external chain
+    ImmutableList<ChildNumber> pathToDerivedKey =
+        ImmutableList.of(new ChildNumber(0, hardened), new ChildNumber(0, hardened));
+
+    DeterministicKey nextChildDeterministicKey =
+        mnemonicKeyPair
+            .getDeterministicHierarchy()
+            .deriveNextChild(pathToDerivedKey, false, true, hardened);
+
+    // derive a new child
+    RawKeyPair childRawKeyPair =
+        generateRawKeyPairFromSecret(nextChildDeterministicKey.getPrivateKeyAsHex());
+
+    return new MnemonicKeyPair(
+        childRawKeyPair,
+        mnemonicKeyPair.getMnemonicSeedWords(),
+        new DeterministicHierarchy(nextChildDeterministicKey));
   }
 
   @Override
