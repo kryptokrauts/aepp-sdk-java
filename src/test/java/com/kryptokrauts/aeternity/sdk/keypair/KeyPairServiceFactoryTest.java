@@ -2,6 +2,9 @@ package com.kryptokrauts.aeternity.sdk.keypair;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import org.junit.Assert;
+import org.spongycastle.util.encoders.Hex;
+
 import com.greghaskins.spectrum.Spectrum;
 import com.kryptokrauts.aeternity.sdk.BaseTest;
 import com.kryptokrauts.aeternity.sdk.domain.secret.impl.MnemonicKeyPair;
@@ -9,8 +12,6 @@ import com.kryptokrauts.aeternity.sdk.exception.AException;
 import com.kryptokrauts.aeternity.sdk.service.keypair.KeyPairService;
 import com.kryptokrauts.aeternity.sdk.service.keypair.KeyPairServiceConfiguration;
 import com.kryptokrauts.aeternity.sdk.service.keypair.KeyPairServiceFactory;
-import org.junit.Assert;
-import org.spongycastle.util.encoders.Hex;
 
 public class KeyPairServiceFactoryTest extends BaseTest {
   {
@@ -41,12 +42,13 @@ public class KeyPairServiceFactoryTest extends BaseTest {
 
           KeyPairService keyPairService = new KeyPairServiceFactory().getService();
           MnemonicKeyPair generatedKeyPair =
-              keyPairService.generateMnemonicKeyPair(mnemonicSeedPassword);
+              keyPairService.generateMasterMnemonicKeyPair(mnemonicSeedPassword);
           MnemonicKeyPair restoredKeyPairWithSamePWD =
-              keyPairService.recoverMnemonicKeyPair(
+              keyPairService.recoverMasterMnemonicKeyPair(
                   generatedKeyPair.getMnemonicSeedWords(), mnemonicSeedPassword);
           MnemonicKeyPair restoredKeyPairWithoutPWD =
-              keyPairService.recoverMnemonicKeyPair(generatedKeyPair.getMnemonicSeedWords(), null);
+              keyPairService.recoverMasterMnemonicKeyPair(
+                  generatedKeyPair.getMnemonicSeedWords(), null);
 
           Spectrum.it(
               "mnemonic keypair recovered from word seed list is same",
@@ -72,7 +74,7 @@ public class KeyPairServiceFactoryTest extends BaseTest {
                 assertThrows(
                     AException.class,
                     () -> {
-                      keyPairServiceWrongConfig.generateMnemonicKeyPair(null);
+                      keyPairServiceWrongConfig.generateMasterMnemonicKeyPair(null);
                     });
               });
         });
