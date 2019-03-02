@@ -28,14 +28,12 @@ public class KeyPairServiceTest extends BaseTest {
           Spectrum.describe(
               "Mnemonic keypair generation tests",
               () -> {
-                final String mnemonicSeedPassword = "kryptokrauts";
-
                 KeyPairService keyPairService = new KeyPairServiceFactory().getService();
                 MnemonicKeyPair generatedKeyPair =
-                    keyPairService.generateMasterMnemonicKeyPair(mnemonicSeedPassword);
+                    keyPairService.generateMasterMnemonicKeyPair(defaultPassword);
                 MnemonicKeyPair restoredKeyPairWithSamePWD =
                     keyPairService.recoverMasterMnemonicKeyPair(
-                        generatedKeyPair.getMnemonicSeedWords(), mnemonicSeedPassword);
+                        generatedKeyPair.getMnemonicSeedWords(), defaultPassword);
                 MnemonicKeyPair restoredKeyPairWithoutPWD =
                     keyPairService.recoverMasterMnemonicKeyPair(
                         generatedKeyPair.getMnemonicSeedWords(), null);
