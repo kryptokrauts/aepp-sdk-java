@@ -123,7 +123,7 @@ public interface KeyPairService {
    *     words
    * @throws KeyPairGenerationException
    */
-  MnemonicKeyPair generateMnemonicKeyPair(String mnemonicSeedPassword) throws AException;
+  MnemonicKeyPair generateMasterMnemonicKeyPair(String mnemonicSeedPassword) throws AException;
 
   /**
    * recover keypair from given mnemonic seed word list with given seed password
@@ -133,6 +133,22 @@ public interface KeyPairService {
    * @return
    * @throws AException
    */
-  MnemonicKeyPair recoverMnemonicKeyPair(
+  MnemonicKeyPair recoverMasterMnemonicKeyPair(
       List<String> mnemonicSeedWords, String mnemonicSeedPassword) throws AException;
+
+  /**
+   * get a key derived from the master key passed within the mnemonicKeyPair the derived keys are
+   * generated according to the deterministic tree stated in <a
+   * href=https://github.com/bitcoin/bips/blob/master/bip-0032.mediawiki#Master_key_generation>BIP32</a>
+   *
+   * @param mnemonicKeyPair mnemonicKeyPair containing the masterKey
+   * @param hardened Given a hardened key, it is not possible to derive a child public key if you
+   *     know only the hardened public key. For Further information see BIP32 and {@link
+   *     ChildNumber}
+   * @return a new mnemonic object containing the derived child key according to the hierarchical
+   *     tree
+   * @throws AException
+   */
+  MnemonicKeyPair generateDerivedKey(MnemonicKeyPair mnemonicKeyPair, boolean hardened)
+      throws AException;
 }
