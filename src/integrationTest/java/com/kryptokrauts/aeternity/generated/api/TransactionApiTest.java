@@ -27,8 +27,8 @@ public class TransactionApiTest extends BaseTest {
         BigInteger amount = BigInteger.valueOf( 1000 );
         String payload = "payload";
         // TODO calculate that correctly
-        long additionalGasCostAccordingToByteSize = 20000000;
-        BigInteger fee = BigInteger.valueOf( BaseConstants.BASE_GAS * BaseConstants.ON_CHAIN_FEE_MULTIPLIER + additionalGasCostAccordingToByteSize );
+        long additionalGasCostAccordingToByteSize = BaseConstants.BASE_GAS;
+        BigInteger fee = BigInteger.valueOf( ( BaseConstants.BASE_GAS + additionalGasCostAccordingToByteSize ) * BaseConstants.ON_CHAIN_FEE_MULTIPLIER );
         BigInteger ttl = BigInteger.valueOf( 100 );
         BigInteger nonce = BigInteger.valueOf( 5 );
 
@@ -58,8 +58,8 @@ public class TransactionApiTest extends BaseTest {
             BigInteger amount = BigInteger.valueOf( 1 );
             String payload = "payload";
             // TODO calculate that correctly
-            long additionalGasCostAccordingToByteSize = 20000000;
-            BigInteger fee = BigInteger.valueOf( BaseConstants.BASE_GAS * BaseConstants.ON_CHAIN_FEE_MULTIPLIER + additionalGasCostAccordingToByteSize );
+            long additionalGasCostAccordingToByteSize = BaseConstants.BASE_GAS;
+            BigInteger fee = BigInteger.valueOf( ( BaseConstants.BASE_GAS + additionalGasCostAccordingToByteSize ) * BaseConstants.ON_CHAIN_FEE_MULTIPLIER );
             BigInteger ttl = BigInteger.valueOf( 20000 );
             BigInteger nonce = account.getNonce().add( BigInteger.ONE );
             UnsignedTx unsignedTxNative = transactionServiceNative.createSpendTx( keyPair.getPublicKey(), recipient, amount, payload, fee, ttl, nonce ).toFuture().get();
