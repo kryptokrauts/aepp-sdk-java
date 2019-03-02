@@ -51,25 +51,25 @@ public abstract class BaseTest {
     public void setupApiClient( TestContext context ) {
         Vertx vertx = rule.vertx();
         keyPairService = new KeyPairServiceFactory().getService();
-        accountService = new AccountServiceFactory().getService( ServiceConfiguration.configure().baseUrl( getEpochBaseUrl() ).vertx( vertx ).compile() );
-        chainService = new ChainServiceFactory().getService( ServiceConfiguration.configure().baseUrl( getEpochBaseUrl() ).vertx( vertx ).compile() );
+        accountService = new AccountServiceFactory().getService( ServiceConfiguration.configure().baseUrl( getAeternityBaseUrl() ).vertx( vertx ).compile() );
+        chainService = new ChainServiceFactory().getService( ServiceConfiguration.configure().baseUrl( getAeternityBaseUrl() ).vertx( vertx ).compile() );
         transactionServiceNative = new TransactionServiceFactory()
-        .getService( TransactionServiceConfiguration.configure().baseUrl( getEpochBaseUrl() ).network( Network.DEVNET ).vertx( vertx ).compile() );
+        .getService( TransactionServiceConfiguration.configure().baseUrl( getAeternityBaseUrl() ).network( Network.DEVNET ).vertx( vertx ).compile() );
         transactionServiceDebug = new TransactionServiceFactory()
-        .getService( TransactionServiceConfiguration.configure().nativeMode( false ).baseUrl( getEpochBaseUrl() ).network( Network.DEVNET ).vertx( vertx ).compile() );
+        .getService( TransactionServiceConfiguration.configure().nativeMode( false ).baseUrl( getAeternityBaseUrl() ).network( Network.DEVNET ).vertx( vertx ).compile() );
     }
 
-    private String getEpochBaseUrl() {
-        String epochBaseUrl = null;
+    private String getAeternityBaseUrl() {
+        String aeternityBaseUrl = null;
         final Properties properties = new Properties();
         try (InputStream inputStream = BaseTest.class.getClassLoader().getResourceAsStream( CONFIG_PROPERTIES )) {
             if ( inputStream == null ) {
                 throw new IOException( CONFIG_PROPERTIES + " not found" );
             }
             properties.load( inputStream );
-            epochBaseUrl = properties.getProperty(API_BASE_URL);
+            aeternityBaseUrl = properties.getProperty(API_BASE_URL);
         }
         catch ( IOException ignored ) {}
-        return epochBaseUrl;
+        return aeternityBaseUrl;
     }
 }

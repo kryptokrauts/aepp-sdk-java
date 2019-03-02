@@ -1,13 +1,13 @@
 version: '3'
 services:
   node:
-    image: aeternity/aeternity:v1.4.0
+    image: aeternity/aeternity:v2.0.0
     hostname: node
     ports:
       - "3013:3013"
       - "3113:3113"
     environment:
-      EPOCH_CONFIG: /home/aeternity/aeternity.yaml
+      AETERNITY_CONFIG: /home/aeternity/aeternity.yaml
     command: >
       -aecore expected_mine_rate 15000
       -aehttp enable_debug_endpoints true
@@ -15,7 +15,6 @@ services:
       - ${PWD}/docker/aeternity.yaml:/home/aeternity/aeternity.yaml
       - ${PWD}/docker/keys/node:/home/aeternity/node/keys
       - ${PWD}/docker/accounts_test.json:/home/aeternity/node/data/aecore/.genesis/accounts_test.json
-      - node_db:/home/aeternity/node/data/mnesia
 
   proxy:
     image: nginx:1.13.8
@@ -25,6 +24,3 @@ services:
     volumes:
       - ${PWD}/docker/nginx-default.conf:/etc/nginx/conf.d/default.conf
       - ${PWD}/docker/nginx-cors.conf:/etc/nginx/cors.conf
-
-volumes:
-  node_db:
