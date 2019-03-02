@@ -31,14 +31,14 @@ ext {
     bintrayKey = System.getProperty("bintray.key")
     buildNumber = System.getProperty("build.number")
 
-    aeternityVersion = "v1.4.0"
+    aeternityVersion = "v2.0.0"
 
     apiPackage   = "com.kryptokrauts.aeternity.generated.api"
     modelPackage = "com.kryptokrauts.aeternity.generated.model"
     swaggerFile  = "${rootDir}/api/swagger_${aeternityVersion}.yml"
     templateDir = "${rootDir}/api/vertx-templates"
-    swaggerAnnotationsVersion = "1.5.21"
-    vertxVersion = "3.6.2"
+    swaggerAnnotationsVersion = "1.5.22"
+    vertxVersion = "3.6.3"
     jacksonVersion = "2.9.8"
 
     lombokVersion = "1.18.4"
