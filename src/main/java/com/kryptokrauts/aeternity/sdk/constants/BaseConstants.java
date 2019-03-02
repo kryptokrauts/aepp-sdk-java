@@ -8,7 +8,7 @@ public interface BaseConstants {
     long BASE_GAS = 15000;
 
     // https://github.com/aeternity/protocol/blob/master/consensus/consensus.md#common-fields-for-transactions
-    long ON_CHAIN_FEE_MULTIPLIER = 1000000;
+        long ON_CHAIN_FEE_MULTIPLIER = 1000000;
 
     String AETERNITY_MESSAGE_PREFIX = "æternity Signed Message:\n";
 
