@@ -12,6 +12,7 @@ buildscript {
 plugins {
     id "com.jfrog.artifactory" version "4.8.1"
     id "com.jfrog.bintray" version "1.8.4"
+    id 'com.github.sherter.google-java-format' version '0.8'
     id "maven-publish"
     id "jacoco"
     id "java"
@@ -25,6 +26,10 @@ repositories {
 
 version = (Boolean.valueOf(System.getProperty("snapshot")) ? project.version : project.version[0..4])
 sourceCompatibility = JavaVersion.VERSION_1_8
+
+googleJavaFormat {
+    toolVersion = '1.7'
+}
 
 ext {
     bintrayUser = System.getProperty("bintray.user")
@@ -51,8 +56,6 @@ ext {
     junitPlatformVersion = "1.3.2"
     spectrumVersion = "1.2.0"
 }
-
-
 
 import io.swagger.codegen.DefaultGenerator
 import io.swagger.codegen.config.CodegenConfigurator
@@ -171,7 +174,10 @@ dependencies {
     testCompile "io.vertx:vertx-junit5:${vertxVersion}"
 }
 
-test { finalizedBy jacocoTestReport }
+test {
+    dependsOn verifyGoogleJavaFormat
+    finalizedBy jacocoTestReport
+}
 
 jacocoTestReport {
     dependsOn project*.test

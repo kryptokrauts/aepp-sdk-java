@@ -7,13 +7,11 @@ import io.reactivex.Single;
 
 public interface AccountService {
 
-    /**
-     * the publicKey encoded using Base58 encoding, see {@link EncodingType},
-     * {@link EncodingUtils}
-     * 
-     * @param publicKey
-     * @return the account wrapped in a single
-     */
-    Single<Account> getAccount(String publicKey );
-
+  /**
+   * the publicKey encoded using Base58 encoding, see {@link EncodingType}, {@link EncodingUtils}
+   *
+   * @param publicKey
+   * @return the account wrapped in a single
+   */
+  Single<Account> getAccount(String publicKey);
 }
