@@ -3,12 +3,21 @@ package com.kryptokrauts.aeternity.sdk.service.keypair.impl;
 import static com.kryptokrauts.aeternity.sdk.util.ByteUtils.leftPad;
 import static com.kryptokrauts.aeternity.sdk.util.ByteUtils.rightPad;
 
+import com.google.common.collect.ImmutableList;
+import com.kryptokrauts.aeternity.sdk.constants.ApiIdentifiers;
+import com.kryptokrauts.aeternity.sdk.domain.secret.impl.BaseKeyPair;
+import com.kryptokrauts.aeternity.sdk.domain.secret.impl.MnemonicKeyPair;
+import com.kryptokrauts.aeternity.sdk.domain.secret.impl.RawKeyPair;
+import com.kryptokrauts.aeternity.sdk.exception.AException;
+import com.kryptokrauts.aeternity.sdk.service.keypair.KeyPairService;
+import com.kryptokrauts.aeternity.sdk.service.keypair.KeyPairServiceConfiguration;
+import com.kryptokrauts.aeternity.sdk.util.CryptoUtils;
+import com.kryptokrauts.aeternity.sdk.util.EncodingUtils;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.Arrays;
 import java.util.List;
-
 import javax.annotation.Nonnull;
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
@@ -16,7 +25,7 @@ import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
-
+import lombok.RequiredArgsConstructor;
 import org.bitcoinj.core.Sha256Hash;
 import org.bitcoinj.crypto.ChildNumber;
 import org.bitcoinj.crypto.DeterministicHierarchy;
@@ -29,19 +38,6 @@ import org.bouncycastle.crypto.params.Ed25519KeyGenerationParameters;
 import org.bouncycastle.crypto.params.Ed25519PrivateKeyParameters;
 import org.bouncycastle.crypto.params.Ed25519PublicKeyParameters;
 import org.bouncycastle.util.encoders.Hex;
-
-import com.google.common.collect.ImmutableList;
-import com.kryptokrauts.aeternity.sdk.constants.ApiIdentifiers;
-import com.kryptokrauts.aeternity.sdk.domain.secret.impl.BaseKeyPair;
-import com.kryptokrauts.aeternity.sdk.domain.secret.impl.MnemonicKeyPair;
-import com.kryptokrauts.aeternity.sdk.domain.secret.impl.RawKeyPair;
-import com.kryptokrauts.aeternity.sdk.exception.AException;
-import com.kryptokrauts.aeternity.sdk.service.keypair.KeyPairService;
-import com.kryptokrauts.aeternity.sdk.service.keypair.KeyPairServiceConfiguration;
-import com.kryptokrauts.aeternity.sdk.util.CryptoUtils;
-import com.kryptokrauts.aeternity.sdk.util.EncodingUtils;
-
-import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 public final class KeyPairServiceImpl implements KeyPairService {
