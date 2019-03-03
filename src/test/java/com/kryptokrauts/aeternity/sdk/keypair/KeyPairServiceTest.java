@@ -74,9 +74,9 @@ public class KeyPairServiceTest extends BaseTest {
                               "abandon", "abandon", "abandon", "abandon", "abandon", "about");
 
                       String privateKeyAsHex =
-                          "c3509e5731235221c9bfea8f90468edbc646c16535119788d34a02ddf9bd72d32e79912cf3443060e3081fa78df1438bd422095a2ea56cf19144fac9c9b8603a";
+                          "61ae3ed32d9c82749be2f4bf122ea01de434705de3662ed416394df9be045ea9d8607b3a21a3d35529c0f4f60c7f3ddc782ce928d73dae02b0aad92ba38bd94f";
                       String publicKeyAsHex =
-                          "ak_MU91xV8BxuA3Bm4n8kFAqDykDeQJSwEFzHMDnVtnHo2dVtSFq";
+                          "ak_2eJ4Jk8F9yc1Hn4icG2apyExwrXcxZZADYLGDiMkyfoSpPSEM3";
 
                       MnemonicKeyPair restoredDefault =
                           keyPairService.recoverMasterMnemonicKeyPair(mnemonic, defaultPassword);
