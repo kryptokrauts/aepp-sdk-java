@@ -2,14 +2,6 @@ package com.kryptokrauts.aeternity.sdk.keypair;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.MissingResourceException;
-import java.util.ResourceBundle;
-
-import org.junit.Assert;
-import org.spongycastle.util.encoders.Hex;
-
 import com.greghaskins.spectrum.Spectrum;
 import com.kryptokrauts.aeternity.sdk.BaseTest;
 import com.kryptokrauts.aeternity.sdk.domain.secret.impl.BaseKeyPair;
@@ -19,6 +11,12 @@ import com.kryptokrauts.aeternity.sdk.service.keypair.KeyPairService;
 import com.kryptokrauts.aeternity.sdk.service.keypair.KeyPairServiceConfiguration;
 import com.kryptokrauts.aeternity.sdk.service.keypair.KeyPairServiceFactory;
 import com.kryptokrauts.aeternity.sdk.util.EncodingUtils;
+import java.util.Arrays;
+import java.util.List;
+import java.util.MissingResourceException;
+import java.util.ResourceBundle;
+import org.junit.Assert;
+import org.spongycastle.util.encoders.Hex;
 
 public class KeyPairServiceTest extends BaseTest {
   {
