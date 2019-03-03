@@ -2,9 +2,6 @@ package com.kryptokrauts.aeternity.sdk.keypair;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import org.junit.Assert;
-import org.spongycastle.util.encoders.Hex;
-
 import com.greghaskins.spectrum.Spectrum;
 import com.kryptokrauts.aeternity.sdk.BaseTest;
 import com.kryptokrauts.aeternity.sdk.domain.secret.impl.MnemonicKeyPair;
@@ -12,6 +9,8 @@ import com.kryptokrauts.aeternity.sdk.exception.AException;
 import com.kryptokrauts.aeternity.sdk.service.keypair.KeyPairService;
 import com.kryptokrauts.aeternity.sdk.service.keypair.KeyPairServiceConfiguration;
 import com.kryptokrauts.aeternity.sdk.service.keypair.KeyPairServiceFactory;
+import org.junit.Assert;
+import org.spongycastle.util.encoders.Hex;
 
 public class KeyPairServiceFactoryTest extends BaseTest {
   {
