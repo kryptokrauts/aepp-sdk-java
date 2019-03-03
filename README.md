@@ -158,7 +158,7 @@ PostTxResponse txResponse = transactionService.postTransaction( signedTx ).block
 The implementation of hd wallets is based on [bitcoinj](https://github.com/bitcoinj/bitcoinj)
 
 Although possible, it's not recommended to create the hd wallet based on a user choosen list of mnemonic words, because this will lack randomicity. Additionally it's strongly recommended to set password, which additionally salts the mnemonic phrase and increases security.
-All derived keys should be created with the hardend flag. Otherwise it is possible to reconstruct all descendent private and public keys from a known private key and all descendent public keys from a known public key. 
+All derived keys should be created with the hardened flag. Otherwise it is possible to reconstruct all descendent private and public keys from a known private key and all descendent public keys from a known public key. 
 
 ```
 final KeyPairService keyPairService = new KeyPairServiceFactory().getService();
