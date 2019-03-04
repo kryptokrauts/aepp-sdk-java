@@ -11,6 +11,7 @@ import java.util.List;
 import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
+import org.bitcoinj.crypto.ChildNumber;
 
 public interface KeyPairService {
 
@@ -149,6 +150,7 @@ public interface KeyPairService {
    *     tree
    * @throws AException
    */
-  MnemonicKeyPair generateDerivedKey(MnemonicKeyPair mnemonicKeyPair, boolean hardened)
+  MnemonicKeyPair generateDerivedKey(
+      MnemonicKeyPair mnemonicKeyPair, boolean hardened, ChildNumber... derivationPath)
       throws AException;
 }

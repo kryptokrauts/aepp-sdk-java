@@ -5,6 +5,7 @@ import static com.kryptokrauts.aeternity.sdk.util.ByteUtils.rightPad;
 
 import com.google.common.collect.ImmutableList;
 import com.kryptokrauts.aeternity.sdk.constants.ApiIdentifiers;
+import com.kryptokrauts.aeternity.sdk.constants.BaseConstants;
 import com.kryptokrauts.aeternity.sdk.domain.secret.impl.BaseKeyPair;
 import com.kryptokrauts.aeternity.sdk.domain.secret.impl.MnemonicKeyPair;
 import com.kryptokrauts.aeternity.sdk.domain.secret.impl.RawKeyPair;
@@ -17,6 +18,7 @@ import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 import javax.annotation.Nonnull;
 import javax.crypto.BadPaddingException;
@@ -82,7 +84,8 @@ public final class KeyPairServiceImpl implements KeyPairService {
   }
 
   @Override
-  public MnemonicKeyPair generateDerivedKey(MnemonicKeyPair mnemonicKeyPair, boolean hardened)
+  public MnemonicKeyPair generateDerivedKey(
+      MnemonicKeyPair mnemonicKeyPair, boolean hardened, ChildNumber... derivationPath)
       throws AException {
     DeterministicKey master = mnemonicKeyPair.getDeterministicHierarchy().getRootKey();
     // check if we really have the masterKey at hand
@@ -90,18 +93,32 @@ public final class KeyPairServiceImpl implements KeyPairService {
       throw new AException("Given mnemonicKeyPair object does not contain the master key");
     }
     /**
-     * following the BIP32 specification create the following tree account -> external chain ->
-     * child address
+     * following the BIP32 specification create the following tree purpose -> coin -> account ->
+     * external chain -> child address
      */
 
-    // set path for account and external chain
-    ImmutableList<ChildNumber> pathToDerivedKey =
-        ImmutableList.of(new ChildNumber(0, hardened), new ChildNumber(0, hardened));
+    /**
+     * always set path for purpose {@link BaseConstants.HD_CHAIN_PURPOSE}, coin {@link
+     * BaseConstants.HD_CHAIN_CODE_AETERNITY}
+     */
+    List<ChildNumber> pathToDerivedKey = new LinkedList();
+    pathToDerivedKey.addAll(
+        Arrays.asList(
+            new ChildNumber(BaseConstants.HD_CHAIN_PURPOSE, true),
+            new ChildNumber(BaseConstants.HD_CHAIN_CODE_AETERNITY, true)));
+
+    /** if no arguments are given, set default account and external chain (0h, 0h) */
+    if (derivationPath == null || derivationPath.length == 0) {
+      pathToDerivedKey.addAll(Arrays.asList(new ChildNumber(0, true), new ChildNumber(0, true)));
+      /** in case arguments are given - add warning */
+    } else {
+      pathToDerivedKey.addAll(Arrays.asList(derivationPath));
+    }
 
     DeterministicKey nextChildDeterministicKey =
         mnemonicKeyPair
             .getDeterministicHierarchy()
-            .deriveNextChild(pathToDerivedKey, false, true, hardened);
+            .deriveNextChild(ImmutableList.copyOf(pathToDerivedKey), false, true, hardened);
 
     // derive a new child
     RawKeyPair childRawKeyPair =

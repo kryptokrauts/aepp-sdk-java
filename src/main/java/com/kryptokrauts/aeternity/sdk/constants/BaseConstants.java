@@ -4,6 +4,11 @@ public interface BaseConstants {
 
   String PREFIX_ZERO_X = "0x";
 
+  // https://github.com/bitcoin/bips/blob/master/bip-0044.mediawiki
+  int HD_CHAIN_PURPOSE = 44;
+
+  int HD_CHAIN_CODE_AETERNITY = 457;
+
   // https://github.com/aeternity/protocol/blob/master/consensus/consensus.md#gas
   long BASE_GAS = 15000;
 
