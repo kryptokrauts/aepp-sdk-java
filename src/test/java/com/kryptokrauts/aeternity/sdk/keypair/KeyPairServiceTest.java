@@ -15,6 +15,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
+import org.bitcoinj.crypto.ChildNumber;
 import org.junit.Assert;
 import org.spongycastle.util.encoders.Hex;
 
@@ -118,8 +119,18 @@ public class KeyPairServiceTest extends BaseTest {
                         BaseKeyPair generatedDerivedKeyNoPwd =
                             EncodingUtils.createBaseKeyPair(
                                 keyPairService
-                                    .generateDerivedKey(masterNoPWD, false)
+                                    .generateDerivedKey(masterNoPWD, true)
                                     .toRawKeyPair());
+                        BaseKeyPair generatedDerivedKeyWithCustomPath =
+                            EncodingUtils.createBaseKeyPair(
+                                keyPairService
+                                    .generateDerivedKey(
+                                        master,
+                                        true,
+                                        new ChildNumber(4711, true),
+                                        new ChildNumber(4712, true))
+                                    .toRawKeyPair());
+                        // assert that the generated keys are the same
                         Assert.assertEquals(
                             derivedKeys.getObject(generatedDerivedKey.getPublicKey()),
                             generatedDerivedKey.getPrivateKey());
@@ -136,6 +147,13 @@ public class KeyPairServiceTest extends BaseTest {
                             MissingResourceException.class,
                             () -> {
                               derivedKeys.getObject(generatedDerivedKeyNoPwd.getPublicKey());
+                            });
+                        // make sure, keys from other derivation path differ
+                        assertThrows(
+                            MissingResourceException.class,
+                            () -> {
+                              derivedKeys.getObject(
+                                  generatedDerivedKeyWithCustomPath.getPublicKey());
                             });
                       }
                     });
