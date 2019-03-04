@@ -146,6 +146,9 @@ public interface KeyPairService {
    * @param hardened Given a hardened key, it is not possible to derive a child public key if you
    *     know only the hardened public key. For Further information see BIP32 and {@link
    *     ChildNumber}
+   * @param derivationPath a custom path for derivating child key. this path will be appended to the
+   *     aeternity base path "m/44h/457h" and has to be passed as list of ChildNumbers, beginning
+   *     from the coin level, appended subsequently
    * @return a new mnemonic object containing the derived child key according to the hierarchical
    *     tree
    * @throws AException
