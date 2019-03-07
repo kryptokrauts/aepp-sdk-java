@@ -4,20 +4,12 @@ import com.kryptokrauts.aeternity.generated.model.GenericSignedTx;
 import com.kryptokrauts.aeternity.generated.model.PostTxResponse;
 import com.kryptokrauts.aeternity.generated.model.Tx;
 import com.kryptokrauts.aeternity.generated.model.UnsignedTx;
+import com.kryptokrauts.aeternity.sdk.service.transaction.type.AbstractTransaction;
+import com.kryptokrauts.aeternity.sdk.service.transaction.type.TransactionFactory;
 import io.reactivex.Single;
-import java.math.BigInteger;
 import org.bouncycastle.crypto.CryptoException;
 
 public interface TransactionService {
-
-  Single<UnsignedTx> createSpendTx(
-      String sender,
-      String recipient,
-      BigInteger amount,
-      String payload,
-      BigInteger fee,
-      BigInteger ttl,
-      BigInteger nonce);
 
   Single<PostTxResponse> postTransaction(Tx tx);
 
@@ -36,4 +28,15 @@ public interface TransactionService {
    * @throws CryptoException
    */
   Tx signTransaction(UnsignedTx unsignedTx, String privateKey) throws CryptoException;
+
+  /**
+   * creates an unsignedTx object for further processing and especially abstracts the fee
+   * calculation for this transaction
+   *
+   * @param tx transaction typed model, one of {link AbstractTransaction}
+   * @return a single-wrapped unsignedTx object
+   */
+  Single<UnsignedTx> createUnsignedTransaction(AbstractTransaction<?> tx);
+
+  TransactionFactory getTransactionFactory();
 }

@@ -1,12 +1,21 @@
 package com.kryptokrauts.aeternity.sdk.service.transaction.impl;
 
+import com.kryptokrauts.aeternity.generated.api.ChannelApiImpl;
+import com.kryptokrauts.aeternity.generated.api.ContractApiImpl;
 import com.kryptokrauts.aeternity.generated.api.TransactionApiImpl;
+import com.kryptokrauts.aeternity.generated.api.rxjava.ChannelApi;
+import com.kryptokrauts.aeternity.generated.api.rxjava.ContractApi;
 import com.kryptokrauts.aeternity.generated.api.rxjava.TransactionApi;
-import com.kryptokrauts.aeternity.generated.model.*;
+import com.kryptokrauts.aeternity.generated.model.GenericSignedTx;
+import com.kryptokrauts.aeternity.generated.model.PostTxResponse;
+import com.kryptokrauts.aeternity.generated.model.Tx;
+import com.kryptokrauts.aeternity.generated.model.UnsignedTx;
 import com.kryptokrauts.aeternity.sdk.constants.ApiIdentifiers;
 import com.kryptokrauts.aeternity.sdk.constants.SerializationTags;
 import com.kryptokrauts.aeternity.sdk.service.transaction.TransactionService;
 import com.kryptokrauts.aeternity.sdk.service.transaction.TransactionServiceConfiguration;
+import com.kryptokrauts.aeternity.sdk.service.transaction.type.AbstractTransaction;
+import com.kryptokrauts.aeternity.sdk.service.transaction.type.TransactionFactory;
 import com.kryptokrauts.aeternity.sdk.util.ByteUtils;
 import com.kryptokrauts.aeternity.sdk.util.EncodingUtils;
 import com.kryptokrauts.aeternity.sdk.util.SigningUtil;
@@ -26,31 +35,24 @@ public class TransactionServiceImpl implements TransactionService {
 
   private TransactionApi transactionApi;
 
-  private TransactionApi getTransactionApi() {
-    if (transactionApi == null) {
-      transactionApi = new TransactionApi(new TransactionApiImpl(config.getApiClient()));
+  private ChannelApi channelApi;
+
+  private ContractApi contractApi;
+
+  private TransactionFactory transactionFactory;
+
+  @Override
+  public TransactionFactory getTransactionFactory() {
+    if (transactionFactory == null) {
+      transactionFactory =
+          new TransactionFactory(getTransactionApi(), getChannelApi(), getContractApi());
     }
-    return transactionApi;
+    return transactionFactory;
   }
 
   @Override
-  public Single<UnsignedTx> createSpendTx(
-      String sender,
-      String recipient,
-      BigInteger amount,
-      String payload,
-      BigInteger fee,
-      BigInteger ttl,
-      BigInteger nonce) {
-    SpendTx spendTx = new SpendTx();
-    spendTx.setSenderId(sender);
-    spendTx.setRecipientId(recipient);
-    spendTx.setAmount(amount);
-    spendTx.setPayload(payload);
-    spendTx.setFee(fee);
-    spendTx.setTtl(ttl);
-    spendTx.setNonce(nonce);
-    return config.isNativeMode() ? Single.just(spendTxNative(spendTx)) : spendTxInternal(spendTx);
+  public Single<UnsignedTx> createUnsignedTransaction(AbstractTransaction<?> tx) {
+    return tx.createUnsignedTransaction(config.isNativeMode(), config.getMinimalGasPrice());
   }
 
   @Override
@@ -82,37 +84,6 @@ public class TransactionServiceImpl implements TransactionService {
     return tx;
   }
 
-  /** for validate native tx generation */
-  private Single<UnsignedTx> spendTxInternal(SpendTx spendTx) {
-    return getTransactionApi().rxPostSpend(spendTx);
-  }
-
-  private UnsignedTx spendTxNative(SpendTx spendTx) {
-    Bytes encodedRlp =
-        RLP.encodeList(
-            rlpWriter -> {
-              rlpWriter.writeInt(SerializationTags.OBJECT_TAG_SPEND_TRANSACTION);
-              rlpWriter.writeInt(SerializationTags.VSN);
-              byte[] senderWithTag =
-                  EncodingUtils.decodeCheckAndTag(
-                      spendTx.getSenderId(), SerializationTags.ID_TAG_ACCOUNT);
-              byte[] recipientWithTag =
-                  EncodingUtils.decodeCheckAndTag(
-                      spendTx.getRecipientId(), SerializationTags.ID_TAG_ACCOUNT);
-              rlpWriter.writeByteArray(senderWithTag);
-              rlpWriter.writeByteArray(recipientWithTag);
-              rlpWriter.writeBigInteger(spendTx.getAmount());
-              rlpWriter.writeBigInteger(spendTx.getFee());
-              rlpWriter.writeBigInteger(spendTx.getTtl());
-              rlpWriter.writeBigInteger(spendTx.getNonce());
-              rlpWriter.writeString(spendTx.getPayload());
-            });
-    UnsignedTx unsignedTx =
-        new UnsignedTx()
-            .tx(EncodingUtils.encodeCheck(encodedRlp.toArray(), ApiIdentifiers.TRANSACTION));
-    return unsignedTx;
-  }
-
   /**
    * @param sig
    * @param binaryTx
@@ -132,5 +103,26 @@ public class TransactionServiceImpl implements TransactionService {
               rlpWriter.writeByteArray(binaryTx);
             });
     return EncodingUtils.encodeCheck(encodedRlp.toArray(), ApiIdentifiers.TRANSACTION);
+  }
+
+  private TransactionApi getTransactionApi() {
+    if (transactionApi == null) {
+      transactionApi = new TransactionApi(new TransactionApiImpl(config.getApiClient()));
+    }
+    return transactionApi;
+  }
+
+  private ChannelApi getChannelApi() {
+    if (channelApi == null) {
+      channelApi = new ChannelApi(new ChannelApiImpl(config.getApiClient()));
+    }
+    return channelApi;
+  }
+
+  private ContractApi getContractApi() {
+    if (contractApi == null) {
+      contractApi = new ContractApi(new ContractApiImpl(config.getApiClient()));
+    }
+    return contractApi;
   }
 }
