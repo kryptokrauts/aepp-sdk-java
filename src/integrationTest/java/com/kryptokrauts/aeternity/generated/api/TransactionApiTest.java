@@ -66,13 +66,12 @@ public class TransactionApiTest extends BaseTest {
           BigInteger ttl = BigInteger.valueOf(20000);
           BigInteger nonce = account.getNonce().add(BigInteger.ONE);
           AbstractTransaction<?> spendTx =
-              transactionServiceDebug
+              transactionServiceNative
                   .getTransactionFactory()
                   .createSpendTransaction(
                       keyPair.getPublicKey(), recipient, amount, payload, null, ttl, nonce);
           UnsignedTx unsignedTxNative =
               transactionServiceNative.createUnsignedTransaction(spendTx).toFuture().get();
-          System.out.println("Calculated fee: " + spendTx.getFee());
           Tx signedTx =
               transactionServiceNative.signTransaction(unsignedTxNative, keyPair.getPrivateKey());
           Single<PostTxResponse> txResponse = transactionServiceNative.postTransaction(signedTx);

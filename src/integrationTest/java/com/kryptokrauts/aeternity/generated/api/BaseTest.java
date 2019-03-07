@@ -15,9 +15,7 @@ import io.vertx.core.Vertx;
 import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.RunTestOnContext;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Properties;
+import javax.naming.ConfigurationException;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.runner.RunWith;
@@ -25,9 +23,7 @@ import org.junit.runner.RunWith;
 @RunWith(VertxUnitRunner.class)
 public abstract class BaseTest {
 
-  private static final String CONFIG_PROPERTIES = "config.properties";
-
-  private static final String API_BASE_URL = "api.baseUrl";
+  private static final String AETERNITY_BASE_URL = "AETERNITY_BASE_URL";
 
   protected static final String BENEFICIARY_PRIVATE_KEY =
       "79816BBF860B95600DDFABF9D81FEE81BDB30BE823B17D80B9E48BE0A7015ADF";
@@ -45,7 +41,7 @@ public abstract class BaseTest {
   @Rule public RunTestOnContext rule = new RunTestOnContext();
 
   @Before
-  public void setupApiClient(TestContext context) {
+  public void setupApiClient(TestContext context) throws ConfigurationException {
     Vertx vertx = rule.vertx();
     keyPairService = new KeyPairServiceFactory().getService();
     accountService =
@@ -81,17 +77,10 @@ public abstract class BaseTest {
                     .compile());
   }
 
-  private String getAeternityBaseUrl() {
-    String aeternityBaseUrl = null;
-    final Properties properties = new Properties();
-    try (InputStream inputStream =
-        BaseTest.class.getClassLoader().getResourceAsStream(CONFIG_PROPERTIES)) {
-      if (inputStream == null) {
-        throw new IOException(CONFIG_PROPERTIES + " not found");
-      }
-      properties.load(inputStream);
-      aeternityBaseUrl = properties.getProperty(API_BASE_URL);
-    } catch (IOException ignored) {
+  private String getAeternityBaseUrl() throws ConfigurationException {
+    String aeternityBaseUrl = System.getenv(AETERNITY_BASE_URL);
+    if (aeternityBaseUrl == null) {
+      throw new ConfigurationException("ENV variable missing: AETERNITY_BASE_URL");
     }
     return aeternityBaseUrl;
   }
