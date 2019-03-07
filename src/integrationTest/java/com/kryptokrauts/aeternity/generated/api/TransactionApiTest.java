@@ -4,8 +4,8 @@ import com.kryptokrauts.aeternity.generated.model.Account;
 import com.kryptokrauts.aeternity.generated.model.PostTxResponse;
 import com.kryptokrauts.aeternity.generated.model.Tx;
 import com.kryptokrauts.aeternity.generated.model.UnsignedTx;
-import com.kryptokrauts.aeternity.sdk.constants.BaseConstants;
 import com.kryptokrauts.aeternity.sdk.domain.secret.impl.BaseKeyPair;
+import com.kryptokrauts.aeternity.sdk.service.transaction.type.AbstractTransaction;
 import io.reactivex.Single;
 import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
@@ -26,23 +26,17 @@ public class TransactionApiTest extends BaseTest {
     String recipient = keyPairService.generateBaseKeyPair().getPublicKey();
     BigInteger amount = BigInteger.valueOf(1000);
     String payload = "payload";
-    // TODO calculate that correctly
-    long additionalGasCostAccordingToByteSize = 50000000;
-    BigInteger fee =
-        BigInteger.valueOf(
-            (BaseConstants.BASE_GAS + additionalGasCostAccordingToByteSize)
-                * BaseConstants.ON_CHAIN_FEE_MULTIPLIER);
     BigInteger ttl = BigInteger.valueOf(100);
     BigInteger nonce = BigInteger.valueOf(5);
 
-    UnsignedTx unsignedTxNative =
+    AbstractTransaction<?> spendTx =
         transactionServiceNative
-            .createSpendTx(sender, recipient, amount, payload, fee, ttl, nonce)
-            .toFuture()
-            .get();
+            .getTransactionFactory()
+            .createSpendTransaction(sender, recipient, amount, payload, null, ttl, nonce);
+    UnsignedTx unsignedTxNative =
+        transactionServiceNative.createUnsignedTransaction(spendTx).toFuture().get();
 
-    Single<UnsignedTx> unsignedTx =
-        transactionServiceDebug.createSpendTx(sender, recipient, amount, payload, fee, ttl, nonce);
+    Single<UnsignedTx> unsignedTx = transactionServiceDebug.createUnsignedTransaction(spendTx);
     unsignedTx.subscribe(
         it -> {
           Assertions.assertEquals(it, unsignedTxNative);
@@ -69,20 +63,16 @@ public class TransactionApiTest extends BaseTest {
           String recipient = kp.getPublicKey();
           BigInteger amount = BigInteger.valueOf(1);
           String payload = "payload";
-          // TODO calculate that correctly
-          long additionalGasCostAccordingToByteSize = 50000000;
-          BigInteger fee =
-              BigInteger.valueOf(
-                  (BaseConstants.BASE_GAS + additionalGasCostAccordingToByteSize)
-                      * BaseConstants.ON_CHAIN_FEE_MULTIPLIER);
           BigInteger ttl = BigInteger.valueOf(20000);
           BigInteger nonce = account.getNonce().add(BigInteger.ONE);
+          AbstractTransaction<?> spendTx =
+              transactionServiceDebug
+                  .getTransactionFactory()
+                  .createSpendTransaction(
+                      keyPair.getPublicKey(), recipient, amount, payload, null, ttl, nonce);
           UnsignedTx unsignedTxNative =
-              transactionServiceNative
-                  .createSpendTx(
-                      keyPair.getPublicKey(), recipient, amount, payload, fee, ttl, nonce)
-                  .toFuture()
-                  .get();
+              transactionServiceNative.createUnsignedTransaction(spendTx).toFuture().get();
+          System.out.println("Calculated fee: " + spendTx.getFee());
           Tx signedTx =
               transactionServiceNative.signTransaction(unsignedTxNative, keyPair.getPrivateKey());
           Single<PostTxResponse> txResponse = transactionServiceNative.postTransaction(signedTx);
