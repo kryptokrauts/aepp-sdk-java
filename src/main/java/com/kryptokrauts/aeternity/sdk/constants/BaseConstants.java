@@ -12,8 +12,13 @@ public interface BaseConstants {
   // https://github.com/aeternity/protocol/blob/master/consensus/consensus.md#gas
   long BASE_GAS = 15000;
 
+  long GAS_PER_BYTE = 20;
+
   // https://github.com/aeternity/protocol/blob/master/consensus/consensus.md#common-fields-for-transactions
-  long ON_CHAIN_FEE_MULTIPLIER = 1000000000;
+  long MINIMAL_GAS_PRICE = 1000000000;
+
+  // average time between key-blocks in minutes
+  long KEY_BLOCK_INTERVAL = 3;
 
   String AETERNITY_MESSAGE_PREFIX = "æternity Signed Message:\n";
 
