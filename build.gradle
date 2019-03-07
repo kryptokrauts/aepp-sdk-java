@@ -127,8 +127,11 @@ task integrationTest(type: JavaExec, dependsOn: integrationTestClasses) {
             "--fail-if-no-tests"]
 }
 
+final Boolean generateSources = Boolean.parseBoolean(System.getenv("AETERNITY_GENERATE_SOURCES"))
 compileSwaggerJava {
-    dependsOn(generateApiClient)
+    if(generateSources) {
+        dependsOn(generateApiClient)
+    }
     classpath = configurations.compile
 }
 compileJava {
