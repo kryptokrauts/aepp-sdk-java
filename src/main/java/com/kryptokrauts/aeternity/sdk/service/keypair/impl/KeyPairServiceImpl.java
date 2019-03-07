@@ -40,9 +40,13 @@ import org.bouncycastle.crypto.params.Ed25519KeyGenerationParameters;
 import org.bouncycastle.crypto.params.Ed25519PrivateKeyParameters;
 import org.bouncycastle.crypto.params.Ed25519PublicKeyParameters;
 import org.bouncycastle.util.encoders.Hex;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @RequiredArgsConstructor
 public final class KeyPairServiceImpl implements KeyPairService {
+  private static final Logger _logger = LoggerFactory.getLogger(KeyPairServiceImpl.class);
+
   private static final SecureRandom secureRandom = new SecureRandom();
 
   @Nonnull private KeyPairServiceConfiguration config;
@@ -112,6 +116,10 @@ public final class KeyPairServiceImpl implements KeyPairService {
       pathToDerivedKey.addAll(Arrays.asList(new ChildNumber(0, true), new ChildNumber(0, true)));
       /** in case arguments are given - add warning */
     } else {
+      _logger.warn(
+          String.format(
+              "You are using a custom key derivation path - this will be appended to m/%sh/%sh",
+              BaseConstants.HD_CHAIN_PURPOSE, BaseConstants.HD_CHAIN_CODE_AETERNITY));
       pathToDerivedKey.addAll(Arrays.asList(derivationPath));
     }
 
