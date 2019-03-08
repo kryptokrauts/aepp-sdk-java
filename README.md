@@ -108,6 +108,27 @@ new ChainServiceFactory().getService(); // get default configured service
 new TransactionServiceFactory().getService( TransactionServiceConfiguration.configure().baseUrl( "http://localhost/v2").compile() ); //set the baseUrl to localhost
 ```
 
+Transactions of any type are created using a factory residing in the transaction service. This provides a uniform way of creating and abstracts the setting of some necessary parameters, f.e. like the fee calculation model, which must be transparent. A new transaction is created in two steps:
+
+```
+/* 
+ * Step 1: create transaction object of desired type 
+ */
+transactionService = ... 				// resolve TxService like above
+AbstractTransaction<?> spendTx =			// abstract supertype of tx
+        transactionService						
+            .getTransactionFactory()			// get the factory and create desired tx type
+            .createSpendTransaction(sender, recipient, amount, payload, null, ttl, nonce);
+
+/* 
+ * Step 2: create unsigned transaction object 
+ * especially a this point, the automated fee calculation will take place, 
+ * depending on the actual transaction type 
+ */
+UnsignedTx unsignedTxNative =
+        transactionServiceNative.createUnsignedTransaction(spendTx).toFuture().get();
+```
+
 ### Example code to generate and post a transaction
 ```java
 // secret needed to recover KeyPair and sign tx
@@ -146,8 +167,11 @@ BigInteger ttl = block.getHeight().add(BigInteger.TEN);
 // we need to increase the current account nonce by one
 BigInteger nonce = account.getNonce().add( BigInteger.ONE );
 
-// create the tx
-UnsignedTx unsignedTxNative = transactionService.createSpendTx( keyPair.getPublicKey(), toAddress, amount, payload, fee, ttl, nonce ).blockingGet();
+// create the tx object
+AbstractTransaction<?> spendTx = transactionService.getTransactionFactory().
+	createSpendTx(keyPair.getPublicKey(), toAddress, amount, payload, fee, ttl, nonce )
+// create unsigned tx                  
+UnsignedTx unsignedTxNative = transactionService.createUnsignedTransaction(spendTx).blockingGet();
 // sign the tx
 Tx signedTx = transactionService.signTransaction( unsignedTxNative, keyPair.getPrivateKey() );
 
