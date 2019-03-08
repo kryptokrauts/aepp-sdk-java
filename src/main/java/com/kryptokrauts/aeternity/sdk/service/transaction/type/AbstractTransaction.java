@@ -24,6 +24,7 @@ public abstract class AbstractTransaction<TxModel> {
 
   protected BigInteger fee;
 
+  /** fee calculation model for this transaction type, one of {@link FeeCalculationModel} */
   protected FeeCalculationModel feeCalculationModel;
 
   /**
