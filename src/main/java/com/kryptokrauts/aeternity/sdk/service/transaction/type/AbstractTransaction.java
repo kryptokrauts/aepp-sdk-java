@@ -24,6 +24,8 @@ public abstract class AbstractTransaction<TxModel> {
 
   protected BigInteger fee;
 
+  protected FeeCalculationModel feeCalculationModel;
+
   /**
    * generates a Bytes object from the attributes. this is necessary for calculating the fee based
    * on RLP encoding
@@ -31,13 +33,6 @@ public abstract class AbstractTransaction<TxModel> {
    * @return {@link Bytes}
    */
   protected abstract Bytes createRLPEncodedList();
-
-  /**
-   * returns the fee calculation model for this transaction
-   *
-   * @return one of {@link FeeCalculationModel}
-   */
-  protected abstract FeeCalculationModel getFeeCalculationModel();
 
   /**
    * this method needs to be implemented for testing purposes (non native mode)
@@ -71,11 +66,11 @@ public abstract class AbstractTransaction<TxModel> {
         Bytes encodedRLPArray = createRLPEncodedList();
         int byte_size = encodedRLPArray.bitLength() / 8;
         /** now calculate fee based on tx size */
-        fee = getFeeCalculationModel().calculateFee(byte_size, minimalGasPrice);
+        fee = feeCalculationModel.calculateFee(byte_size, minimalGasPrice);
         _logger.debug(
             String.format(
                 "Using calculation model %s the following fee was calculated %s",
-                getFeeCalculationModel().getClass().getName(), fee));
+                feeCalculationModel.getClass().getName(), fee));
       } else {
         _logger.warn(
             "You defined a custom transaction fee which might be not sufficient to execute the transaction!");
