@@ -4,7 +4,6 @@ import com.kryptokrauts.aeternity.generated.api.rxjava.TransactionApi;
 import com.kryptokrauts.aeternity.generated.model.SpendTx;
 import com.kryptokrauts.aeternity.generated.model.UnsignedTx;
 import com.kryptokrauts.aeternity.sdk.constants.SerializationTags;
-import com.kryptokrauts.aeternity.sdk.service.transaction.fee.FeeCalculationModel;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.AbstractTransaction;
 import com.kryptokrauts.aeternity.sdk.util.EncodingUtils;
 import io.reactivex.Single;
@@ -25,7 +24,6 @@ public class SpendTransaction extends AbstractTransaction<SpendTx> {
   @NonNull private String payload;
   @NonNull private BigInteger ttl;
   @NonNull private BigInteger nonce;
-  @NonNull private FeeCalculationModel feeCalculationModel;
   @NonNull private TransactionApi transactionApi;
 
   @Override
@@ -67,10 +65,5 @@ public class SpendTransaction extends AbstractTransaction<SpendTx> {
               rlpWriter.writeString(this.payload);
             });
     return encodedRlp;
-  }
-
-  @Override
-  protected FeeCalculationModel getFeeCalculationModel() {
-    return feeCalculationModel;
   }
 }

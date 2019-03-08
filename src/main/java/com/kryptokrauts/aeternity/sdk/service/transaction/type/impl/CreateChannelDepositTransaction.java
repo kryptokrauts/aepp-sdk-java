@@ -3,7 +3,6 @@ package com.kryptokrauts.aeternity.sdk.service.transaction.type.impl;
 import com.kryptokrauts.aeternity.generated.api.rxjava.ChannelApi;
 import com.kryptokrauts.aeternity.generated.model.ChannelDepositTx;
 import com.kryptokrauts.aeternity.generated.model.UnsignedTx;
-import com.kryptokrauts.aeternity.sdk.service.transaction.fee.FeeCalculationModel;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.AbstractTransaction;
 import io.reactivex.Single;
 import java.math.BigInteger;
@@ -24,7 +23,6 @@ public class CreateChannelDepositTransaction extends AbstractTransaction<Channel
   @NonNull String stateHash;
   @NonNull BigInteger round;
   @NonNull BigInteger nonce;
-  @NonNull private FeeCalculationModel feeCalculationModel;
   @NonNull private ChannelApi channelApi;
 
   @Override
@@ -53,10 +51,5 @@ public class CreateChannelDepositTransaction extends AbstractTransaction<Channel
 
     throw new UnsupportedOperationException();
     //		return encodedRlp;
-  }
-
-  @Override
-  protected FeeCalculationModel getFeeCalculationModel() {
-    return feeCalculationModel;
   }
 }
