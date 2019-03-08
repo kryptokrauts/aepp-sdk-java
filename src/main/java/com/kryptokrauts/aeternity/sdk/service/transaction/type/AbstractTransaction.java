@@ -92,7 +92,16 @@ public abstract class AbstractTransaction<TxModel> {
     return createInternal();
   }
 
+  /** @return the calculated or given fee for this transaction */
   public BigInteger getFee() {
     return fee;
+  }
+
+  /**
+   * @return the transaction model which is actually used to create the remote call to the generated
+   *     api functions (classes of package {@link com.kryptokrauts.aeternity.generated.api.rxjava})
+   */
+  public TxModel getApiModel() {
+    return toModel();
   }
 }
