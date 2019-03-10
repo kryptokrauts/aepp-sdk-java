@@ -131,7 +131,7 @@ AbstractTransaction<?> spendTx =			// abstract supertype of tx
  * depending on the actual transaction type 
  */
 UnsignedTx unsignedTx =
-        transactionServiceNative.createUnsignedTransaction(spendTx).toFuture().get();
+        transactionService.createUnsignedTransaction(spendTx).toFuture().get();
 ```
 
 ### Example code to generate and post a transaction
@@ -197,12 +197,12 @@ Tx signedTx =
 PostTxResponse txResponse = transactionService.postTransaction( signedTx ).blockingGet();
 ```
 ### Example code to generate a HD wallet
-The implementation of hd wallets is based on [bitcoinj](https://github.com/bitcoinj/bitcoinj)
+The implementation of HD wallets is based on [bitcoinj](https://github.com/bitcoinj/bitcoinj)
 
-Although possible, it's not recommended to create the hd wallet based on a user choosen list of mnemonic words, because this will lack randomicity. Additionally it's strongly recommended to set password, which additionally salts the mnemonic phrase and increases security.
+Although possible, it's not recommended to create the HD wallet based on a user choosen list of mnemonic words, because this will lack randomicity. Additionally it's strongly recommended to set password, which additionally salts the mnemonic phrase and increases security.
 All derived keys should be created with the hardened flag. Otherwise it is possible to reconstruct all descendent private and public keys from a known private key and all descendent public keys from a known public key. 
 
-```
+```java
 final KeyPairService keyPairService = new KeyPairServiceFactory().getService();
 
 // create the master
