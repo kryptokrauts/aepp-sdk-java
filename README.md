@@ -156,24 +156,37 @@ KeyBlock block = chainService.getCurrentKeyBlock().blockingGet();
 // get the current account to determine nonce which has to be increased
 Account account = accountService.getAccount( keyPair.getPublicKey() ).blockingGet();
 
-// amount to send (we need utils to calculate æternity units
+// amount to send -> (in future we will provide utils to calculate æternity units)
 BigInteger amount = BigInteger.valueOf( 1 );
 // some payload included within tx
 String payload = "works =)";
-// we need to provide a way to determine optimal fee
-BigInteger fee = BigInteger.valueOf( BaseConstants.DEFAULT_FEE );
+// self defined fee is optional. if you provide null as fee our implementation will automatically calculate the fee
+BigInteger fee = BigInteger.valueOf( <SELF_DEFINED_FEE> );
 // tx will be valid for the next ten blocks
 BigInteger ttl = block.getHeight().add(BigInteger.TEN);
 // we need to increase the current account nonce by one
 BigInteger nonce = account.getNonce().add( BigInteger.ONE );
 
-// create the tx object
-AbstractTransaction<?> spendTx = transactionService.getTransactionFactory().
-	createSpendTx(keyPair.getPublicKey(), toAddress, amount, payload, fee, ttl, nonce )
-// create unsigned tx                  
-UnsignedTx unsignedTxNative = transactionService.createUnsignedTransaction(spendTx).blockingGet();
+// create the tx (with self defined fee)
+AbstractTransaction<?> spendTxWithSelfDefinedFee =
+        transactionServiceNative
+                .getTransactionFactory()
+                .createSpendTransaction(
+                        keyPair.getPublicKey(), recipient, amount, payload, fee, ttl, nonce);
+// create the tx (with calculated fee)
+AbstractTransaction<?> spendTxWithCalculatedFee =
+        transactionServiceNative
+                .getTransactionFactory()
+                .createSpendTransaction(
+                        keyPair.getPublicKey(), recipient, amount, payload, null, ttl, nonce);
+
+// choose one of the spendTx above to create the UnsignedTx-object
+UnsignedTx unsignedTx =
+        transactionServiceNative.createUnsignedTransaction(spendTxWithCalculatedFee).toFuture().get();
+
 // sign the tx
-Tx signedTx = transactionService.signTransaction( unsignedTxNative, keyPair.getPrivateKey() );
+Tx signedTx =
+        transactionServiceNative.signTransaction(unsignedTx, keyPair.getPrivateKey());
 
 // hopefully you receive a successful txResponse
 PostTxResponse txResponse = transactionService.postTransaction( signedTx ).blockingGet();
