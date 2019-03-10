@@ -27,25 +27,6 @@ public class SpendTransaction extends AbstractTransaction<SpendTx> {
   @NonNull private TransactionApi transactionApi;
 
   @Override
-  protected Single<UnsignedTx> createInternal() {
-    return transactionApi.rxPostSpend(toModel());
-  }
-
-  @Override
-  protected SpendTx toModel() {
-    SpendTx spendTx = new SpendTx();
-    spendTx.setSenderId(sender);
-    spendTx.setRecipientId(recipient);
-    spendTx.setAmount(amount);
-    spendTx.setPayload(payload);
-    spendTx.setFee(fee);
-    spendTx.setTtl(ttl);
-    spendTx.setNonce(nonce);
-
-    return spendTx;
-  }
-
-  @Override
   protected Bytes createRLPEncodedList() {
     Bytes encodedRlp =
         RLP.encodeList(
@@ -65,5 +46,24 @@ public class SpendTransaction extends AbstractTransaction<SpendTx> {
               rlpWriter.writeString(this.payload);
             });
     return encodedRlp;
+  }
+
+  @Override
+  protected Single<UnsignedTx> createInternal() {
+    return transactionApi.rxPostSpend(toModel());
+  }
+
+  @Override
+  protected SpendTx toModel() {
+    SpendTx spendTx = new SpendTx();
+    spendTx.setSenderId(sender);
+    spendTx.setRecipientId(recipient);
+    spendTx.setAmount(amount);
+    spendTx.setPayload(payload);
+    spendTx.setFee(fee);
+    spendTx.setTtl(ttl);
+    spendTx.setNonce(nonce);
+
+    return spendTx;
   }
 }

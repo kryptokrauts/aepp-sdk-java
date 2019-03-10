@@ -6,7 +6,7 @@ import com.kryptokrauts.aeternity.generated.api.rxjava.TransactionApi;
 import com.kryptokrauts.aeternity.sdk.service.transaction.fee.FeeCalculationModel;
 import com.kryptokrauts.aeternity.sdk.service.transaction.fee.impl.BaseFeeCalculationModel;
 import com.kryptokrauts.aeternity.sdk.service.transaction.fee.impl.ContractFeeCalculationModel;
-import com.kryptokrauts.aeternity.sdk.service.transaction.type.impl.CreateChannelDepositTransaction;
+import com.kryptokrauts.aeternity.sdk.service.transaction.type.impl.ChannelDepositTransaction;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.impl.SpendTransaction;
 import java.math.BigInteger;
 import javax.annotation.Nullable;
@@ -77,7 +77,7 @@ public class TransactionFactory {
    * @param nonce
    * @return
    */
-  public CreateChannelDepositTransaction createChannelDepositTransaction(
+  public ChannelDepositTransaction createChannelDepositTransaction(
       String channelId,
       String fromId,
       BigInteger amount,
@@ -86,7 +86,7 @@ public class TransactionFactory {
       String stateHash,
       BigInteger round,
       BigInteger nonce) {
-    return CreateChannelDepositTransaction.builder()
+    return ChannelDepositTransaction.builder()
         .channelId(channelId)
         .fromId(fromId)
         .amount(amount)
