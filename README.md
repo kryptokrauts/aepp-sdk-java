@@ -125,7 +125,7 @@ AbstractTransaction<?> spendTx =			// abstract supertype of tx
  * especially a this point, the automated fee calculation will take place, 
  * depending on the actual transaction type 
  */
-UnsignedTx unsignedTxNative =
+UnsignedTx unsignedTx =
         transactionServiceNative.createUnsignedTransaction(spendTx).toFuture().get();
 ```
 
