@@ -154,47 +154,47 @@ final ChainService chainService = new ChainServiceFactory().getService(serviceCo
 // the TransactionService needs to know the network because the signature of tx is handled differently
 final TransactionService transactionService = new TransactionServiceFactory().getService(TransactionServiceConfiguration.configure().baseUrl(baseUrl).network(testnet).compile());
 
-final String toAddress = "<recipient_address>";
+final String recipient = "<recipient_address>";
 
 // get block to determine current height for calculation of TTL
 KeyBlock block = chainService.getCurrentKeyBlock().blockingGet();
 // get the current account to determine nonce which has to be increased
-Account account = accountService.getAccount( keyPair.getPublicKey() ).blockingGet();
+Account account = accountService.getAccount(keyPair.getPublicKey()).blockingGet();
 
 // amount to send -> (in future we will provide utils to calculate æternity units)
-BigInteger amount = BigInteger.valueOf( 1 );
+BigInteger amount = BigInteger.valueOf(1);
 // some payload included within tx
 String payload = "works =)";
 // self defined fee is optional. if you provide null as fee our implementation will automatically calculate the fee
-BigInteger fee = BigInteger.valueOf( <SELF_DEFINED_FEE> );
+BigInteger fee = BigInteger.valueOf(<SELF_DEFINED_FEE>);
 // tx will be valid for the next ten blocks
 BigInteger ttl = block.getHeight().add(BigInteger.TEN);
 // we need to increase the current account nonce by one
-BigInteger nonce = account.getNonce().add( BigInteger.ONE );
+BigInteger nonce = account.getNonce().add(BigInteger.ONE);
 
 // create the tx (with self defined fee)
 AbstractTransaction<?> spendTxWithSelfDefinedFee =
-        transactionServiceNative
+        transactionService
                 .getTransactionFactory()
                 .createSpendTransaction(
                         keyPair.getPublicKey(), recipient, amount, payload, fee, ttl, nonce);
 // create the tx (with calculated fee)
 AbstractTransaction<?> spendTxWithCalculatedFee =
-        transactionServiceNative
+        transactionService
                 .getTransactionFactory()
                 .createSpendTransaction(
                         keyPair.getPublicKey(), recipient, amount, payload, null, ttl, nonce);
 
 // choose one of the spendTx above to create the UnsignedTx-object
 UnsignedTx unsignedTx =
-        transactionServiceNative.createUnsignedTransaction(spendTxWithCalculatedFee).toFuture().get();
+        transactionService.createUnsignedTransaction(spendTxWithCalculatedFee).blockingGet();
 
 // sign the tx
 Tx signedTx =
-        transactionServiceNative.signTransaction(unsignedTx, keyPair.getPrivateKey());
+        transactionService.signTransaction(unsignedTx, keyPair.getPrivateKey());
 
 // hopefully you receive a successful txResponse
-PostTxResponse txResponse = transactionService.postTransaction( signedTx ).blockingGet();
+PostTxResponse txResponse = transactionService.postTransaction(signedTx).blockingGet();
 ```
 ### Example code to generate a HD wallet
 The implementation of HD wallets is based on [bitcoinj](https://github.com/bitcoinj/bitcoinj)
