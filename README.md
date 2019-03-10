@@ -20,8 +20,6 @@ A community developed Java SDK to interact with the Æternity blockchain.
 
 ## Latest stable release
 
-- [v1.0.2](https://github.com/kryptokrauts/aepp-sdk-java/releases/tag/v1.0.2)
-
 ### Download
 
  [ ![Download](https://api.bintray.com/packages/kryptokrauts/maven/aepp-sdk-java/images/download.svg) ](https://bintray.com/kryptokrauts/maven/aepp-sdk-java/_latestVersion)
@@ -40,7 +38,7 @@ A community developed Java SDK to interact with the Æternity blockchain.
 <dependency>
     <groupId>com.kryptokrauts</groupId>
     <artifactId>aepp-sdk-java</artifactId>
-    <version>1.0.2</version>
+    <version>1.1.0</version>
 </dependency>
 ...
 ```
@@ -52,7 +50,7 @@ repositories {
   jcenter()
 }
 
-compile "com.kryptokrauts:aepp-sdk-java:1.0.2"
+compile "com.kryptokrauts:aepp-sdk-java:1.1.0"
 ```
 
 ### Snapshots
@@ -82,7 +80,7 @@ Here's the [list of snapshot versions](https://oss.jfrog.org/webapp/#/artifacts/
   <dependency>
     <groupId>com.kryptokrauts</groupId>
     <artifactId>aepp-sdk-java</artifactId>
-    <version>1.0.3-SNAPSHOT</version>
+    <version>1.1.1-SNAPSHOT</version>
   </dependency>
 </dependencies>
 ...
@@ -95,8 +93,15 @@ repositories {
   maven { url "https://oss.jfrog.org/artifactory/oss-snapshot-local" }
 }
 
-compile "com.kryptokrauts:aepp-sdk-java:1.0.3-SNAPSHOT"
+compile "com.kryptokrauts:aepp-sdk-java:1.1.1-SNAPSHOT"
 ```
+
+### Release notes
+
+- [v1.1.0](docs/release-notes/RELEASE-NOTES-1.1.0.md)
+- [v1.0.2](docs/release-notes/RELEASE-NOTES-1.0.2.md)
+- [v1.0.1](docs/release-notes/RELEASE-NOTES-1.0.1.md)
+- [v1.0.0](docs/release-notes/RELEASE-NOTES-1.0.0.md)
 
 ## Documentation
 
@@ -211,12 +216,6 @@ BaseKeyPair generatedDerivedKey =
                             EncodingUtils.createBaseKeyPair(
                                 keyPairService.generateDerivedKey(master, true).toRawKeyPair());
 ```
-
-## Release notes
-
-- [v1.0.2](docs/release-notes/RELEASE-NOTES-1.0.2.md)
-- [v1.0.1](docs/release-notes/RELEASE-NOTES-1.0.1.md)
-- [v1.0.0](docs/release-notes/RELEASE-NOTES-1.0.0.md)
 
 ## License
 
