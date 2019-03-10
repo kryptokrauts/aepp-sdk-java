@@ -110,7 +110,7 @@ new TransactionServiceFactory().getService( TransactionServiceConfiguration.conf
 
 Transactions of any type are created using a factory residing in the transaction service. This provides a uniform way of creating and abstracts the setting of some necessary parameters, f.e. like the fee calculation model, which must be transparent. A new transaction is created in two steps:
 
-```
+```java
 /* 
  * Step 1: create transaction object of desired type 
  */
