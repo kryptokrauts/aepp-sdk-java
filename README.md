@@ -6,10 +6,10 @@ A community developed Java SDK to interact with the Æternity blockchain powered
 
 ## Documentation
 
-- [How to add the SDK to your project](wiki#how-to-add-the-sdk-to-your-project)
-- [Access SDK services](wiki/Documentation#access-sdk-services)
-- [Generate and post a transaction](wiki/Documentation#generate-and-post-a-transaction)
-- [Generate a HD wallet](wiki/Documentation#generate-a-hd-wallet)
+- [How to add the SDK to your project](../../wiki#how-to-add-the-sdk-to-your-project)
+- [Access SDK services](../../wiki/Documentation#access-sdk-services)
+- [Generate and post a transaction](../../wiki/Documentation#generate-and-post-a-transaction)
+- [Generate a HD wallet](../../wiki/Documentation#generate-a-hd-wallet)
 
 ## Release notes
 
