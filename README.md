@@ -1,5 +1,5 @@
 # aepp-sdk-java
-A community developed Java SDK to interact with the Æternity blockchain.
+A community developed Java SDK to interact with the Æternity blockchain powered by [kryptokrauts.com](https://kryptokrauts.com)!
 
 ## Latest release
  [ ![Download](https://api.bintray.com/packages/kryptokrauts/maven/aepp-sdk-java/images/download.svg) ](https://bintray.com/kryptokrauts/maven/aepp-sdk-java/_latestVersion)
