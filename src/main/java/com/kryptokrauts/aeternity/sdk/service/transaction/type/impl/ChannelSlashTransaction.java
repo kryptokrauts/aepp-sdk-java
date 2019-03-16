@@ -3,7 +3,9 @@ package com.kryptokrauts.aeternity.sdk.service.transaction.type.impl;
 import com.kryptokrauts.aeternity.generated.api.rxjava.ChannelApi;
 import com.kryptokrauts.aeternity.generated.model.ChannelSlashTx;
 import com.kryptokrauts.aeternity.generated.model.UnsignedTx;
+import com.kryptokrauts.aeternity.sdk.constants.SerializationTags;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.AbstractTransaction;
+import com.kryptokrauts.aeternity.sdk.util.EncodingUtils;
 import io.reactivex.Single;
 import java.math.BigInteger;
 import lombok.Getter;
@@ -26,9 +28,25 @@ public class ChannelSlashTransaction extends AbstractTransaction<ChannelSlashTx>
 
   @Override
   protected Bytes createRLPEncodedList() {
-    // TODO
-    Bytes encodedRlp = RLP.encodeList(rlpWriter -> {});
-    throw new UnsupportedOperationException();
+    Bytes encodedRlp =
+        RLP.encodeList(
+            rlpWriter -> {
+              rlpWriter.writeInt(SerializationTags.OBJECT_TAG_CHANNEL_SLASH_TRANSACTION);
+              rlpWriter.writeInt(SerializationTags.VSN);
+              byte[] channelIdWithTag =
+                  EncodingUtils.decodeCheckAndTag(this.channelId, SerializationTags.ID_TAG_CHANNEL);
+              byte[] fromIdWithTag =
+                  EncodingUtils.decodeCheckAndTag(this.fromId, SerializationTags.ID_TAG_ACCOUNT);
+              rlpWriter.writeByteArray(channelIdWithTag);
+              rlpWriter.writeByteArray(fromIdWithTag);
+              rlpWriter.writeString(this.payload);
+              rlpWriter.writeString(
+                  this.poi); // TODO inform about Proof of Inclusion and how it is handled
+              rlpWriter.writeBigInteger(this.ttl);
+              rlpWriter.writeBigInteger(this.fee);
+              rlpWriter.writeBigInteger(this.nonce);
+            });
+    return encodedRlp;
   }
 
   @Override
