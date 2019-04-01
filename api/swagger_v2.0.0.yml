@@ -3472,6 +3472,7 @@ definitions:
       - gas_price
   UnsignedTx:
     type: object
+    discriminator: tx
     properties:
       tx:
         description: Unsigned transaction object
