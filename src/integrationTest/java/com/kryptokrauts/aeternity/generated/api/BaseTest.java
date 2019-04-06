@@ -17,6 +17,7 @@ import io.vertx.ext.unit.junit.RunTestOnContext;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
 import javax.naming.ConfigurationException;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.runner.RunWith;
 
@@ -77,11 +78,23 @@ public abstract class BaseTest {
                     .compile());
   }
 
-  private String getAeternityBaseUrl() throws ConfigurationException {
+  private static String getAeternityBaseUrl() throws ConfigurationException {
     String aeternityBaseUrl = System.getenv(AETERNITY_BASE_URL);
     if (aeternityBaseUrl == null) {
       throw new ConfigurationException("ENV variable missing: AETERNITY_BASE_URL");
     }
     return aeternityBaseUrl;
+  }
+
+  @BeforeClass
+  public static void startup() throws ConfigurationException {
+    System.out.println(
+        String.format(
+            "--------------------------- %s ---------------------------\n",
+            "Using following environment"));
+    System.out.println(String.format("%s: %s", "AETERNITY_BASE_URL", getAeternityBaseUrl()));
+    System.out.println(
+        String.format(
+            "\n-----------------------------------------------------------------------------------"));
   }
 }

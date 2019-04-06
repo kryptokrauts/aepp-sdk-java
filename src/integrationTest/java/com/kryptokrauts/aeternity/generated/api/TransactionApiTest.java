@@ -1,5 +1,11 @@
 package com.kryptokrauts.aeternity.generated.api;
 
+import java.math.BigInteger;
+import java.util.concurrent.ExecutionException;
+import org.bouncycastle.crypto.CryptoException;
+import org.junit.Ignore;
+import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
 import com.kryptokrauts.aeternity.generated.model.Account;
 import com.kryptokrauts.aeternity.generated.model.PostTxResponse;
 import com.kryptokrauts.aeternity.generated.model.Tx;
@@ -9,15 +15,11 @@ import com.kryptokrauts.aeternity.sdk.service.transaction.type.AbstractTransacti
 import io.reactivex.Single;
 import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
-import java.math.BigInteger;
-import java.util.concurrent.ExecutionException;
-import org.bouncycastle.crypto.CryptoException;
-import org.junit.Test;
-import org.junit.jupiter.api.Assertions;
 
 public class TransactionApiTest extends BaseTest {
 
   @Test
+  @Ignore
   public void buildNativeTransactionTest(TestContext context)
       throws ExecutionException, InterruptedException {
     Async async = context.async();
@@ -48,6 +50,7 @@ public class TransactionApiTest extends BaseTest {
   }
 
   @Test
+  @Ignore
   public void postSpendTxTest(TestContext context)
       throws ExecutionException, InterruptedException, CryptoException {
     Async async = context.async();
@@ -86,6 +89,69 @@ public class TransactionApiTest extends BaseTest {
               });
         },
         throwable -> {
+          context.fail();
+        });
+  }
+
+  @Test
+  public void postContracTxTest(TestContext context)
+      throws ExecutionException, InterruptedException, CryptoException {
+    Async async = context.async();
+
+    BaseKeyPair keyPair = keyPairService.generateBaseKeyPairFromSecret(BENEFICIARY_PRIVATE_KEY);
+
+    String contractByteCode =
+        "cb_+QPvRgGgeN05+tJcdqKtrzpqKaGf7e7wSc3ARZ/hNSgeuHcoXLn5Avv5ASqgaPJnYzj/UIg5q6R3Se/6i+h+8oTyB/s9mZhwHNU4h8WEbWFpbrjAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAKD//////////////////////////////////////////wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAuEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA+QHLoLnJVvKLMUmp9Zh6pQXz2hsiCcxXOSNABiu2wb2fn5nqhGluaXS4YAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAP//////////////////////////////////////////7kBQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEA//////////////////////////////////////////8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA///////////////////////////////////////////uMxiAABkYgAAhJGAgIBRf7nJVvKLMUmp9Zh6pQXz2hsiCcxXOSNABiu2wb2fn5nqFGIAAMBXUIBRf2jyZ2M4/1CIOaukd0nv+ovofvKE8gf7PZmYcBzVOIfFFGIAAK9XUGABGVEAW2AAGVlgIAGQgVJgIJADYAOBUpBZYABRWVJgAFJgAPNbYACAUmAA81tZWWAgAZCBUmAgkANgABlZYCABkIFSYCCQA2ADgVKBUpBWW2AgAVFRWVCAkVBQgJBQkFZbUFCCkVBQYgAAjFaqo6ki";
+
+    String contractCallData =
+        "cb_AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACC5yVbyizFJqfWYeqUF89obIgnMVzkjQAYrtsG9n5+Z6gAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAnHQYrA==";
+
+    // get the currents accounts nonce in case a transaction is already
+    // created and increase it by one
+    Single<Account> acc = accountService.getAccount(keyPair.getPublicKey());
+    acc.subscribe(
+        account -> {
+          String ownerId = keyPair.getPublicKey();
+          BigInteger amount = BigInteger.valueOf(1);
+          BigInteger ttl = BigInteger.valueOf(20000);
+
+          BigInteger nonce = account.getNonce().add(BigInteger.ONE);
+          AbstractTransaction<?> contractTx =
+              transactionServiceNative
+                  .getTransactionFactory()
+                  .createContractCreateTransaction(
+                      1,
+                      0,
+                      contractCallData,
+                      contractByteCode,
+                      0,
+                      50,
+                      50,
+                      account.getNonce().intValue(),
+                      ownerId,
+                      0,
+                      3);
+
+          UnsignedTx unsignedTxNative =
+              transactionServiceNative.createUnsignedTransaction(contractTx).toFuture().get();
+          System.out.println(unsignedTxNative);
+          Tx signedTx =
+              transactionServiceNative.signTransaction(unsignedTxNative, keyPair.getPrivateKey());
+          System.out.println(signedTx);
+          Single<PostTxResponse> txResponse = transactionServiceNative.postTransaction(signedTx);
+          txResponse.subscribe(
+              it -> {
+                System.out.println(it.getTxHash());
+
+                async.complete();
+              },
+              throwable -> {
+                System.err.println("error ------------------------------------ " + throwable);
+                context.fail();
+              });
+        },
+        throwable -> {
+          System.err.println("error ------------------------------------ " + throwable);
           context.fail();
         });
   }

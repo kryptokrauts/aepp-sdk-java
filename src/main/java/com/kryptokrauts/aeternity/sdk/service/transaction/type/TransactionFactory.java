@@ -7,6 +7,7 @@ import com.kryptokrauts.aeternity.sdk.service.transaction.fee.FeeCalculationMode
 import com.kryptokrauts.aeternity.sdk.service.transaction.fee.impl.BaseFeeCalculationModel;
 import com.kryptokrauts.aeternity.sdk.service.transaction.fee.impl.ContractFeeCalculationModel;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.impl.CreateChannelDepositTransaction;
+import com.kryptokrauts.aeternity.sdk.service.transaction.type.impl.CreateContractTransaction;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.impl.SpendTransaction;
 import java.math.BigInteger;
 import javax.annotation.Nullable;
@@ -97,6 +98,35 @@ public class TransactionFactory {
         .nonce(nonce)
         .feeCalculationModel(baseFeeCalculationModel)
         .channelApi(channelApi)
+        .build();
+  }
+
+  public CreateContractTransaction createContractCreateTransaction(
+      Integer abiVersion,
+      Integer amount,
+      String callData,
+      String contractByteCode,
+      Integer deposit,
+      Integer gas,
+      Integer gasPrice,
+      Integer nonce,
+      String ownerId,
+      Integer ttl,
+      Integer vmVersion) {
+    return CreateContractTransaction.builder()
+        .abiVersion(abiVersion)
+        .amount(amount)
+        .callData(callData)
+        .contractByteCode(contractByteCode)
+        .deposit(deposit)
+        .gas(gas)
+        .gasPrice(gasPrice)
+        .nonce(nonce)
+        .ownerId(ownerId)
+        .ttl(ttl)
+        .vmVersion(vmVersion)
+        .feeCalculationModel(contractFeeCalculationModel)
+        .contractApi(contractApi)
         .build();
   }
 }

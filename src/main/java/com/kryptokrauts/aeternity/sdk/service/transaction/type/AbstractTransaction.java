@@ -40,7 +40,7 @@ public abstract class AbstractTransaction<TxModel> {
    *
    * @return a single-wrapped unsignedTx object
    */
-  protected abstract Single<UnsignedTx> createInternal();
+  protected abstract <T extends UnsignedTx> Single<T> createInternal();
 
   /**
    * this method needs to be implemented for testing purposes (non native mode) and returns the
