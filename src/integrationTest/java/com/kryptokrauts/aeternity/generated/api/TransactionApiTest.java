@@ -50,8 +50,7 @@ public class TransactionApiTest extends BaseTest {
   }
 
   @Test
-  @Ignore
-  public void postSpendTxTest(TestContext context)
+  public void postASpendTxTest(TestContext context)
       throws ExecutionException, InterruptedException, CryptoException {
     Async async = context.async();
 
@@ -64,10 +63,11 @@ public class TransactionApiTest extends BaseTest {
         account -> {
           BaseKeyPair kp = keyPairService.generateBaseKeyPair();
           String recipient = kp.getPublicKey();
-          BigInteger amount = BigInteger.valueOf(1);
+          BigInteger amount = new BigInteger("1000000000000000000");
           String payload = "payload";
           BigInteger ttl = BigInteger.valueOf(20000);
           BigInteger nonce = account.getNonce().add(BigInteger.ONE);
+          System.out.println("Next nonce" + nonce);
           AbstractTransaction<?> spendTx =
               transactionServiceNative
                   .getTransactionFactory()
@@ -98,7 +98,7 @@ public class TransactionApiTest extends BaseTest {
       throws ExecutionException, InterruptedException, CryptoException {
     Async async = context.async();
 
-    BaseKeyPair keyPair = keyPairService.generateBaseKeyPairFromSecret(BENEFICIARY_PRIVATE_KEY);
+    BaseKeyPair kp = keyPairService.generateBaseKeyPairFromSecret(BENEFICIARY_PRIVATE_KEY);
 
     String contractByteCode =
         "cb_+QPvRgGgeN05+tJcdqKtrzpqKaGf7e7wSc3ARZ/hNSgeuHcoXLn5Avv5ASqgaPJnYzj/UIg5q6R3Se/6i+h+8oTyB/s9mZhwHNU4h8WEbWFpbrjAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAKD//////////////////////////////////////////wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAuEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA+QHLoLnJVvKLMUmp9Zh6pQXz2hsiCcxXOSNABiu2wb2fn5nqhGluaXS4YAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAP//////////////////////////////////////////7kBQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEA//////////////////////////////////////////8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA///////////////////////////////////////////uMxiAABkYgAAhJGAgIBRf7nJVvKLMUmp9Zh6pQXz2hsiCcxXOSNABiu2wb2fn5nqFGIAAMBXUIBRf2jyZ2M4/1CIOaukd0nv+ovofvKE8gf7PZmYcBzVOIfFFGIAAK9XUGABGVEAW2AAGVlgIAGQgVJgIJADYAOBUpBZYABRWVJgAFJgAPNbYACAUmAA81tZWWAgAZCBUmAgkANgABlZYCABkIFSYCCQA2ADgVKBUpBWW2AgAVFRWVCAkVBQgJBQkFZbUFCCkVBQYgAAjFaqo6ki";
@@ -108,14 +108,15 @@ public class TransactionApiTest extends BaseTest {
 
     // get the currents accounts nonce in case a transaction is already
     // created and increase it by one
-    Single<Account> acc = accountService.getAccount(keyPair.getPublicKey());
+    Single<Account> acc = accountService.getAccount(kp.getPublicKey());
     acc.subscribe(
         account -> {
-          String ownerId = keyPair.getPublicKey();
+          String ownerId = kp.getPublicKey();
           BigInteger amount = BigInteger.valueOf(1);
           BigInteger ttl = BigInteger.valueOf(20000);
 
           BigInteger nonce = account.getNonce().add(BigInteger.ONE);
+          System.out.println("Next nonce" + nonce);
           AbstractTransaction<?> contractTx =
               transactionServiceNative
                   .getTransactionFactory()
@@ -125,18 +126,26 @@ public class TransactionApiTest extends BaseTest {
                       contractCallData,
                       contractByteCode,
                       0,
+                      500,
                       50,
-                      50,
-                      account.getNonce().intValue(),
+                      nonce.intValue(),
                       ownerId,
                       0,
                       3);
+
+          System.out.println(contractTx);
+          System.out.println(transactionServiceNative);
 
           UnsignedTx unsignedTxNative =
               transactionServiceNative.createUnsignedTransaction(contractTx).toFuture().get();
           System.out.println(unsignedTxNative);
           Tx signedTx =
-              transactionServiceNative.signTransaction(unsignedTxNative, keyPair.getPrivateKey());
+              transactionServiceNative.signTransaction(unsignedTxNative, kp.getPrivateKey());
+
+          //          signedTx.setTx(
+          //
+          // "tx_+QTiCwH4QrhAishbFS9zXWJ/oESFpT83K0q8nYJFWaQrf7vaPxGPLq9VSLktCVircLa55sx/iEwg0jWidVSea/9kGO5odG3DB7kEmfkElioBoQELtO15J/l7UeG8teE0DRIzWyorEsi8UiHWPEvLOdQeYYIi3rkD8vkD70YBoHjdOfrSXHaira86aimhn+3u8EnNwEWf4TUoHrh3KFy5+QL7+QEqoGjyZ2M4/1CIOaukd0nv+ovofvKE8gf7PZmYcBzVOIfFhG1haW64wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACg//////////////////////////////////////////8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAALhAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAPkBy6C5yVbyizFJqfWYeqUF89obIgnMVzkjQAYrtsG9n5+Z6oRpbml0uGAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD//////////////////////////////////////////+5AUAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAUAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAP//////////////////////////////////////////AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAP//////////////////////////////////////////7jMYgAAZGIAAISRgICAUX+5yVbyizFJqfWYeqUF89obIgnMVzkjQAYrtsG9n5+Z6hRiAADAV1CAUX9o8mdjOP9QiDmrpHdJ7/qL6H7yhPIH+z2ZmHAc1TiHxRRiAACvV1BgARlRAFtgABlZYCABkIFSYCCQA2ADgVKQWWAAUVlSYABSYADzW2AAgFJgAPNbWVlgIAGQgVJgIJADYAAZWWAgAZCBUmAgkANgA4FSgVKQVltgIAFRUVlQgJFQUICQUJBWW1BQgpFQUGIAAIxWgwMAAYcD5x3GeLgAAAAAgw9CQIQ7msoAuGAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAILnJVvKLMUmp9Zh6pQXz2hsiCcxXOSNABiu2wb2fn5nqAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADRRFqR");
+
           System.out.println(signedTx);
           Single<PostTxResponse> txResponse = transactionServiceNative.postTransaction(signedTx);
           txResponse.subscribe(
@@ -146,12 +155,10 @@ public class TransactionApiTest extends BaseTest {
                 async.complete();
               },
               throwable -> {
-                System.err.println("error ------------------------------------ " + throwable);
                 context.fail();
               });
         },
         throwable -> {
-          System.err.println("error ------------------------------------ " + throwable);
           context.fail();
         });
   }

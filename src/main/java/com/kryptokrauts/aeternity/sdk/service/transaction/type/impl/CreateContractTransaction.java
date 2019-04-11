@@ -10,12 +10,14 @@ import com.kryptokrauts.aeternity.sdk.util.EncodingUtils;
 import io.reactivex.Single;
 import lombok.Getter;
 import lombok.NonNull;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import net.consensys.cava.bytes.Bytes;
 import net.consensys.cava.rlp.RLP;
 
 @Getter
 @SuperBuilder
+@ToString
 public class CreateContractTransaction extends AbstractTransaction<ContractCreateTx> {
 
   @NonNull private Integer abiVersion;
@@ -66,17 +68,26 @@ public class CreateContractTransaction extends AbstractTransaction<ContractCreat
               byte[] ownerWithTag =
                   EncodingUtils.decodeCheckAndTag(this.ownerId, SerializationTags.ID_TAG_ACCOUNT);
               rlpWriter.writeByteArray(ownerWithTag);
-              rlpWriter.writeInt(this.nonce);
-              rlpWriter.writeByteArray(contractByteCode.getBytes());
-              rlpWriter.writeInt(3);
-              rlpWriter.writeBigInteger(new BigInteger("206170000000000"));
-              rlpWriter.writeInt(this.ttl);
-              rlpWriter.writeInt(deposit);
-              rlpWriter.writeInt(amount);
-              rlpWriter.writeInt(gas);
-              rlpWriter.writeInt(gasPrice);
-              rlpWriter.writeByteArray(callData.getBytes());
+
+              rlpWriter.writeBigInteger(new BigInteger(this.nonce.toString()));
+              rlpWriter.writeByteArray(EncodingUtils.decodeCheckWithIdentifier(contractByteCode));
+              //              rlpWriter.writeString(contractByteCode);
+              rlpWriter.writeBigInteger(new BigInteger("196609"));
+              rlpWriter.writeBigInteger(new BigInteger("98361000000000"));
+              rlpWriter.writeBigInteger(new BigInteger(this.ttl.toString()));
+              rlpWriter.writeBigInteger(BigInteger.ZERO);
+              rlpWriter.writeBigInteger(BigInteger.ZERO);
+              rlpWriter.writeBigInteger(new BigInteger("1000000"));
+              rlpWriter.writeBigInteger(new BigInteger("1000000000"));
+              rlpWriter.writeByteArray(EncodingUtils.decodeCheckWithIdentifier(callData));
+              //              rlpWriter.writeString(callData);
             });
     return encodedRlp;
+  }
+
+  private Bytes createContractRLP() {
+    Bytes contractRLP = RLP.encodeList(rlpWriter -> {});
+
+    return contractRLP;
   }
 }

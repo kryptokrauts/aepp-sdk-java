@@ -1,5 +1,9 @@
 package com.kryptokrauts.aeternity.sdk.service.transaction.impl;
 
+import java.math.BigInteger;
+import java.nio.charset.StandardCharsets;
+import javax.annotation.Nonnull;
+import org.bouncycastle.crypto.CryptoException;
 import com.kryptokrauts.aeternity.generated.api.ChannelApiImpl;
 import com.kryptokrauts.aeternity.generated.api.ContractApiImpl;
 import com.kryptokrauts.aeternity.generated.api.TransactionApiImpl;
@@ -20,13 +24,9 @@ import com.kryptokrauts.aeternity.sdk.util.ByteUtils;
 import com.kryptokrauts.aeternity.sdk.util.EncodingUtils;
 import com.kryptokrauts.aeternity.sdk.util.SigningUtil;
 import io.reactivex.Single;
-import java.math.BigInteger;
-import java.nio.charset.StandardCharsets;
-import javax.annotation.Nonnull;
 import lombok.RequiredArgsConstructor;
 import net.consensys.cava.bytes.Bytes;
 import net.consensys.cava.rlp.RLP;
-import org.bouncycastle.crypto.CryptoException;
 
 @RequiredArgsConstructor
 public class TransactionServiceImpl implements TransactionService {
@@ -124,5 +124,11 @@ public class TransactionServiceImpl implements TransactionService {
       contractApi = new ContractApi(new ContractApiImpl(config.getApiClient()));
     }
     return contractApi;
+  }
+
+  @Override
+  public String toString() {
+    // TODO Auto-generated method stub
+    return this.config.getNetwork().getId() + " " + this.config.isNativeMode();
   }
 }

@@ -1,5 +1,10 @@
 package com.kryptokrauts.aeternity.generated.api;
 
+import javax.naming.ConfigurationException;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Rule;
+import org.junit.runner.RunWith;
 import com.kryptokrauts.aeternity.sdk.constants.Network;
 import com.kryptokrauts.aeternity.sdk.service.ServiceConfiguration;
 import com.kryptokrauts.aeternity.sdk.service.account.AccountService;
@@ -15,11 +20,6 @@ import io.vertx.core.Vertx;
 import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.RunTestOnContext;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
-import javax.naming.ConfigurationException;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Rule;
-import org.junit.runner.RunWith;
 
 @RunWith(VertxUnitRunner.class)
 public abstract class BaseTest {
