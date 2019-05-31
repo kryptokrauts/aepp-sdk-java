@@ -3001,6 +3001,7 @@ definitions:
       - call_data
   UnsignedTx:
     type: object
+    discriminator: tx
     properties:
       tx:
         description: Unsigned transaction object

@@ -17,7 +17,6 @@ public class ChainApiTest extends BaseTest {
     Single<KeyBlock> keyBlockObservable = chainService.getCurrentKeyBlock();
     keyBlockObservable.subscribe(
         keyBlock -> {
-          System.out.println(keyBlock.toString());
           Assertions.assertTrue(keyBlock.getHeight().longValue() > 0);
           async.complete();
         },
