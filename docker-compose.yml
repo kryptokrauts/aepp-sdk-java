@@ -1,7 +1,7 @@
 version: '3'
 services:
   node:
-    image: aeternity/aeternity:v2.0.0
+    image: aeternity/aeternity:${AETERNITY_TAG}
     hostname: node
     ports:
       - "3013:3013"
@@ -16,8 +16,14 @@ services:
       - ${PWD}/docker/keys/node:/home/aeternity/node/keys
       - ${PWD}/docker/accounts_test.json:/home/aeternity/node/data/aecore/.genesis/accounts_test.json
 
+  compiler:
+    image: aeternity/aesophia_http:${SOPHIA_COMPILER_TAG}
+    hostname: sophia_compiler
+    ports:
+      - "3080:3080"
+
   proxy:
-    image: nginx:1.13.8
+    image: nginx:${NGINX_TAG}
     hostname: proxy
     ports:
       - "80:80"
