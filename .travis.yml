@@ -24,7 +24,7 @@ install:
 stages:
   - name: build
   - name: snapshot
-    if: branch = dev
+    if: (NOT type IN (pull_request)) AND (branch = dev)
   - name: release
     if: (NOT type IN (pull_request)) AND (branch = master)
 
