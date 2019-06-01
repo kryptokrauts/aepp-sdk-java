@@ -5,7 +5,7 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath "io.swagger.codegen.v3:swagger-codegen:3.0.7"
+        classpath "io.swagger.codegen.v3:swagger-codegen:3.0.8"
     }
 }
 
@@ -36,11 +36,17 @@ ext {
     bintrayKey = System.getProperty("bintray.key")
     buildNumber = System.getProperty("build.number")
 
-    aeternityVersion = "v2.0.0"
+    aeternityVersion = "v3.0.1"
+    sophiaCompilerVersion = "v3.0.0"
 
-    apiPackage   = "com.kryptokrauts.aeternity.generated.api"
-    modelPackage = "com.kryptokrauts.aeternity.generated.model"
-    swaggerFile  = "${rootDir}/api/swagger_${aeternityVersion}.yml"
+    apiPackageAeternity   = "com.kryptokrauts.aeternity.generated.api"
+    modelPackageAeternity = "com.kryptokrauts.aeternity.generated.model"
+    swaggerFileAeternity  = "${rootDir}/api/swagger_aeternity_${aeternityVersion}.yml"
+
+    apiPackageSophiaCompiler   = "com.kryptokrauts.sophia.compiler.generated.api"
+    modelPackageSophiaCompiler = "com.kryptokrauts.sophia.compiler.generated.model"
+    swaggerFileSophiaCompiler  = "${rootDir}/api/swagger_sophia_compiler_${sophiaCompilerVersion}.yml"
+
     templateDir = "${rootDir}/api/vertx-templates"
     swaggerAnnotationsVersion = "1.5.22"
     vertxVersion = "3.6.3"
@@ -63,26 +69,44 @@ import io.swagger.codegen.config.CodegenConfigurator
 def swaggerOutputDir = file("build/swagger")
 task generateApiClient {
     doLast {
-        def config = new CodegenConfigurator()
-        config.setLang("java")
-        config.setLibrary("vertx")
-        config.setGroupId("${group}")
-        config.setArtifactId("epoch-client-vertx")
-        config.setArtifactVersion("${aeternityVersion}")
-        config.setApiPackage("${apiPackage}")
-        config.setModelPackage("${modelPackage}")
-        config.setInputSpec(project.swaggerFile.toString())
-        config.setOutputDir(swaggerOutputDir.path)
-        config.setTemplateDir(project.templateDir)
-        config.setAdditionalProperties([
+        def configAeternity = new CodegenConfigurator()
+        configAeternity.setLang("java")
+        configAeternity.setLibrary("vertx")
+        configAeternity.setGroupId("${group}")
+        configAeternity.setArtifactId("aeternity-client-vertx")
+        configAeternity.setArtifactVersion("${aeternityVersion}")
+        configAeternity.setApiPackage("${apiPackageAeternity}")
+        configAeternity.setModelPackage("${modelPackageAeternity}")
+        configAeternity.setInputSpec(project.swaggerFileAeternity.toString())
+        configAeternity.setOutputDir(swaggerOutputDir.path)
+        configAeternity.setTemplateDir(project.templateDir)
+        configAeternity.setAdditionalProperties([
                 "dateLibrary"  : "java8",
                 "title"        :  rootProject.name,
                 "useTags"      : "true"
         ])
-        config.setTypeMappings([
-                "Long"  :   "java.math.BigInteger"
+        configAeternity.setTypeMappings([
+                "Integer"   :   "java.math.BigInteger"
         ])
-        new DefaultGenerator().opts(config.toClientOptInput()).generate()
+        new DefaultGenerator().opts(configAeternity.toClientOptInput()).generate()
+
+        def configSophiaCompiler = new CodegenConfigurator()
+        configSophiaCompiler.setLang("java")
+        configSophiaCompiler.setLibrary("vertx")
+        configSophiaCompiler.setGroupId("${group}")
+        configSophiaCompiler.setArtifactId("sophia-compiler-client-vertx")
+        configSophiaCompiler.setArtifactVersion("${sophiaCompilerVersion}")
+        configSophiaCompiler.setApiPackage("${apiPackageSophiaCompiler}")
+        configSophiaCompiler.setModelPackage("${modelPackageSophiaCompiler}")
+        configSophiaCompiler.setInputSpec(project.swaggerFileSophiaCompiler.toString())
+        configSophiaCompiler.setOutputDir(swaggerOutputDir.path)
+        configSophiaCompiler.setTemplateDir(project.templateDir)
+        configSophiaCompiler.setAdditionalProperties([
+                "dateLibrary"  : "java8",
+                "title"        :  rootProject.name,
+                "useTags"      : "true"
+        ])
+        new DefaultGenerator().opts(configSophiaCompiler.toClientOptInput()).generate()
     }
 }
 
