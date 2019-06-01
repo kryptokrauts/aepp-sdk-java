@@ -53,9 +53,9 @@ public abstract class BaseTest {
 		chainService = new ChainServiceFactory()
 				.getService(ServiceConfiguration.configure().baseUrl(getAeternityBaseUrl()).vertx(vertx).compile());
 		transactionServiceNative = new TransactionServiceFactory().getService(TransactionServiceConfiguration
-				.configure().baseUrl(getAeternityBaseUrl()).network(Network.TESTNET).vertx(vertx).compile());
+				.configure().baseUrl(getAeternityBaseUrl()).network(Network.DEVNET).vertx(vertx).compile());
 		transactionServiceDebug = new TransactionServiceFactory().getService(TransactionServiceConfiguration.configure()
-				.nativeMode(false).baseUrl(getAeternityBaseUrl()).network(Network.TESTNET).vertx(vertx).compile());
+				.nativeMode(false).baseUrl(getAeternityBaseUrl()).network(Network.DEVNET).vertx(vertx).compile());
 	}
 
 	private static String getAeternityBaseUrl() throws ConfigurationException {
