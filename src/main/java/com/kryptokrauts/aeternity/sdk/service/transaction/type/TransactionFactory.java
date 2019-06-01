@@ -9,6 +9,7 @@ import com.kryptokrauts.aeternity.sdk.service.transaction.fee.impl.ContractFeeCa
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.impl.CreateChannelDepositTransaction;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.impl.CreateContractTransaction;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.impl.SpendTransaction;
+import com.kryptokrauts.sophia.compiler.generated.api.rxjava.DefaultApi;
 import java.math.BigInteger;
 import javax.annotation.Nullable;
 import lombok.AllArgsConstructor;
@@ -26,6 +27,8 @@ public class TransactionFactory {
   private ChannelApi channelApi;
 
   private ContractApi contractApi;
+
+  private DefaultApi compilerApi;
 
   private static FeeCalculationModel baseFeeCalculationModel = new BaseFeeCalculationModel();
 
@@ -102,17 +105,17 @@ public class TransactionFactory {
   }
 
   public CreateContractTransaction createContractCreateTransaction(
-      Integer abiVersion,
-      Integer amount,
+      BigInteger abiVersion,
+      BigInteger amount,
       String callData,
       String contractByteCode,
-      Integer deposit,
-      Integer gas,
-      Integer gasPrice,
-      Integer nonce,
+      BigInteger deposit,
+      BigInteger gas,
+      BigInteger gasPrice,
+      BigInteger nonce,
       String ownerId,
-      Integer ttl,
-      Integer vmVersion) {
+      BigInteger ttl,
+      BigInteger vmVersion) {
     return CreateContractTransaction.builder()
         .abiVersion(abiVersion)
         .amount(amount)
@@ -127,6 +130,7 @@ public class TransactionFactory {
         .vmVersion(vmVersion)
         .feeCalculationModel(contractFeeCalculationModel)
         .contractApi(contractApi)
+        .compilerApi(compilerApi)
         .build();
   }
 }

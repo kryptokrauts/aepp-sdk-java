@@ -43,6 +43,8 @@ public class ServiceConfiguration {
 
   @Default @Nonnull protected String baseUrl = BaseConstants.DEFAULT_TESTNET_URL;
 
+  @Default @Nonnull protected String contractBaseUrl = BaseConstants.DEFAULT_TESTNET_CONTRACT_URL;
+
   /** the vertx instance */
   protected Vertx vertx;
 
@@ -62,5 +64,23 @@ public class ServiceConfiguration {
     } else
       throw new RuntimeException(
           "Cannot intantiate ApiClient due to missing params vertx and or baseUrl");
+  }
+
+  public com.kryptokrauts.sophia.compiler.generated.ApiClient getCompilerApiClient() {
+    if (vertx == null) {
+      _logger.debug("Vertx entry point not initialized, creating default");
+      vertx = Vertx.vertx();
+    }
+    if (vertx != null && contractBaseUrl != null) {
+      _logger.debug(
+          String.format("Initializing Vertx ApiClient using contractBaseUrl", contractBaseUrl));
+      return new com.kryptokrauts.sophia.compiler.generated.ApiClient(
+          vertx,
+          new JsonObject(
+              new HashMap<String, Object>(
+                  ImmutableMap.of(BaseConstants.VERTX_BASE_PATH, contractBaseUrl))));
+    } else
+      throw new RuntimeException(
+          "Cannot intantiate ApiClient due to missing params vertx and or contractBaseUrl");
   }
 }

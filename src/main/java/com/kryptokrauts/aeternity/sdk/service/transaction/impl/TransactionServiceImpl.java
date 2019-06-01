@@ -19,6 +19,8 @@ import com.kryptokrauts.aeternity.sdk.service.transaction.type.TransactionFactor
 import com.kryptokrauts.aeternity.sdk.util.ByteUtils;
 import com.kryptokrauts.aeternity.sdk.util.EncodingUtils;
 import com.kryptokrauts.aeternity.sdk.util.SigningUtil;
+import com.kryptokrauts.sophia.compiler.generated.api.DefaultApiImpl;
+import com.kryptokrauts.sophia.compiler.generated.api.rxjava.DefaultApi;
 import io.reactivex.Single;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
@@ -39,13 +41,16 @@ public class TransactionServiceImpl implements TransactionService {
 
   private ContractApi contractApi;
 
+  private DefaultApi compilerApi;
+
   private TransactionFactory transactionFactory;
 
   @Override
   public TransactionFactory getTransactionFactory() {
     if (transactionFactory == null) {
       transactionFactory =
-          new TransactionFactory(getTransactionApi(), getChannelApi(), getContractApi());
+          new TransactionFactory(
+              getTransactionApi(), getChannelApi(), getContractApi(), getCompilerApi());
     }
     return transactionFactory;
   }
@@ -124,6 +129,13 @@ public class TransactionServiceImpl implements TransactionService {
       contractApi = new ContractApi(new ContractApiImpl(config.getApiClient()));
     }
     return contractApi;
+  }
+
+  private DefaultApi getCompilerApi() {
+    if (compilerApi == null) {
+      compilerApi = new DefaultApi(new DefaultApiImpl(config.getCompilerApiClient()));
+    }
+    return compilerApi;
   }
 
   @Override

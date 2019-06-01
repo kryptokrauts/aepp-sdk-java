@@ -29,6 +29,8 @@ public abstract class BaseTest {
 
 	private static final String AETERNITY_BASE_URL = "AETERNITY_BASE_URL";
 
+	private static final String CONTRACT_BASE_URL = "CONTRACT_BASE_URL";
+
 	protected static final String BENEFICIARY_PRIVATE_KEY = "79816BBF860B95600DDFABF9D81FEE81BDB30BE823B17D80B9E48BE0A7015ADF";
 
 	protected KeyPairService keyPairService;
@@ -52,8 +54,10 @@ public abstract class BaseTest {
 				.getService(ServiceConfiguration.configure().baseUrl(getAeternityBaseUrl()).vertx(vertx).compile());
 		chainService = new ChainServiceFactory()
 				.getService(ServiceConfiguration.configure().baseUrl(getAeternityBaseUrl()).vertx(vertx).compile());
-		transactionServiceNative = new TransactionServiceFactory().getService(TransactionServiceConfiguration
-				.configure().baseUrl(getAeternityBaseUrl()).network(Network.DEVNET).vertx(vertx).compile());
+		transactionServiceNative = new TransactionServiceFactory()
+				.getService(TransactionServiceConfiguration.configure().baseUrl(getAeternityBaseUrl())
+
+						.network(Network.DEVNET).vertx(vertx).compile());
 		transactionServiceDebug = new TransactionServiceFactory().getService(TransactionServiceConfiguration.configure()
 				.nativeMode(false).baseUrl(getAeternityBaseUrl()).network(Network.DEVNET).vertx(vertx).compile());
 	}
@@ -66,11 +70,20 @@ public abstract class BaseTest {
 		return aeternityBaseUrl;
 	}
 
+	private static String getContractBaseUrl() throws ConfigurationException {
+		String contractBaseUrl = System.getenv(CONTRACT_BASE_URL);
+		if (contractBaseUrl == null) {
+			throw new ConfigurationException("ENV variable missing: CONTRACT_BASE_URL");
+		}
+		return contractBaseUrl;
+	}
+
 	@BeforeClass
 	public static void startup() throws ConfigurationException {
 		System.out.println(String.format("--------------------------- %s ---------------------------\n",
 				"Using following environment"));
 		System.out.println(String.format("%s: %s", AETERNITY_BASE_URL, getAeternityBaseUrl()));
+		System.out.println(String.format("%s: %s", CONTRACT_BASE_URL, getContractBaseUrl()));
 		System.out.println(
 				String.format("\n-----------------------------------------------------------------------------------"));
 	}

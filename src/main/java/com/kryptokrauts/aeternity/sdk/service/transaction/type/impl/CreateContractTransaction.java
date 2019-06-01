@@ -8,6 +8,7 @@ import com.kryptokrauts.aeternity.generated.model.CreateContractUnsignedTx;
 import com.kryptokrauts.aeternity.sdk.constants.SerializationTags;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.AbstractTransaction;
 import com.kryptokrauts.aeternity.sdk.util.EncodingUtils;
+import com.kryptokrauts.sophia.compiler.generated.api.rxjava.DefaultApi;
 
 import io.reactivex.Single;
 import lombok.Getter;
@@ -23,30 +24,33 @@ import net.consensys.cava.rlp.RLP;
 public class CreateContractTransaction extends AbstractTransaction<ContractCreateTx> {
 
 	@NonNull
-	private Integer abiVersion;
+	private BigInteger abiVersion;
 	@NonNull
-	private Integer amount;
+	private BigInteger amount;
 	@NonNull
 	private String callData;
 	@NonNull
 	private String contractByteCode;
 	@NonNull
-	private Integer deposit;
+	private BigInteger deposit;
 	@NonNull
-	private Integer gas;
+	private BigInteger gas;
 	@NonNull
-	private Integer gasPrice;
+	private BigInteger gasPrice;
 	@NonNull
-	private Integer nonce;
+	private BigInteger nonce;
 	@NonNull
 	private String ownerId;
 	@NonNull
-	private Integer ttl;
+	private BigInteger ttl;
 	@NonNull
-	private Integer vmVersion;
+	private BigInteger vmVersion;
 
 	@NonNull
 	private ContractApi contractApi;
+
+	@NonNull
+	private DefaultApi compilerApi;
 
 	@Override
 	protected Single<CreateContractUnsignedTx> createInternal() {
@@ -62,7 +66,7 @@ public class CreateContractTransaction extends AbstractTransaction<ContractCreat
 		contractCreateTx.setCallData(callData);
 		contractCreateTx.setCode(contractByteCode);
 		contractCreateTx.setDeposit(deposit);
-		contractCreateTx.setFee(fee.intValue());
+		contractCreateTx.setFee(fee);
 		contractCreateTx.setGas(gas);
 		contractCreateTx.setGasPrice(gasPrice);
 		contractCreateTx.setNonce(nonce);
@@ -75,18 +79,37 @@ public class CreateContractTransaction extends AbstractTransaction<ContractCreat
 
 	@Override
 	protected Bytes createRLPEncodedList() {
+
+//		Single<ByteCode> contractByteCode = this.compilerApi.rxCompileContract(
+//				new Contract().code("contract Identity =\\n  type state = ()\\n  function main(x : int) = x"));
+//
+//		contractByteCode.subscribe(bc -> {
+//			System.out.println("BC:" + bc.getBytecode());
+//		}, throwable -> {
+//			System.out.println("TH: " + throwable);
+//			throwable.printStackTrace();
+//		});
+
 		Bytes encodedRlp = RLP.encodeList(rlpWriter -> {
 			rlpWriter.writeInt(SerializationTags.OBJECT_TAG_CONTRACT_CREATE_TRANSACTION);
 			rlpWriter.writeInt(SerializationTags.VSN);
 			byte[] ownerWithTag = EncodingUtils.decodeCheckAndTag(this.ownerId, SerializationTags.ID_TAG_ACCOUNT);
 			rlpWriter.writeByteArray(ownerWithTag);
-
 			rlpWriter.writeBigInteger(new BigInteger(this.nonce.toString()));
-			rlpWriter.writeByteArray(EncodingUtils.decodeCheckWithIdentifier(contractByteCode));
-			// rlpWriter.writeString(contractByteCode);
+
+//              contractByteCode.subscribe(
+//                  bytecode -> {
+//                    System.out.println("Bytecode: " + bytecode.getBytecode());
+//                    rlpWriter.writeByteArray(
+//                        EncodingUtils.decodeCheckWithIdentifier(bytecode.getBytecode()));
+//                  },
+//                  throwable -> {
+//                    throwable.printStackTrace();
+//                  });
+			rlpWriter.writeByteArray(EncodingUtils.decodeCheckWithIdentifier(this.contractByteCode));
 			rlpWriter.writeBigInteger(new BigInteger("196609"));
-			rlpWriter.writeBigInteger(new BigInteger(String.valueOf(Integer.MAX_VALUE)));
-			rlpWriter.writeBigInteger(new BigInteger(this.ttl.toString()));
+			rlpWriter.writeBigInteger(new BigInteger("1098660000000000"));
+			rlpWriter.writeBigInteger(BigInteger.ZERO);
 			rlpWriter.writeBigInteger(BigInteger.ZERO);
 			rlpWriter.writeBigInteger(BigInteger.ZERO);
 			rlpWriter.writeBigInteger(new BigInteger("1000000"));
