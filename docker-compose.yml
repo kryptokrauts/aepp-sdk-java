@@ -2,7 +2,6 @@ version: '3'
 services:
   node:
     image: aeternity/aeternity:${AETERNITY_TAG}
-    hostname: node
     ports:
       - "3013:3013"
       - "3113:3113"
@@ -18,13 +17,14 @@ services:
 
   compiler:
     image: aeternity/aesophia_http:${SOPHIA_COMPILER_TAG}
-    hostname: sophia_compiler
     ports:
       - "3080:3080"
 
+  goggles:
+    image: kryptokrauts/aepp-goggles
+
   proxy:
     image: nginx:${NGINX_TAG}
-    hostname: proxy
     ports:
       - "80:80"
     volumes:
