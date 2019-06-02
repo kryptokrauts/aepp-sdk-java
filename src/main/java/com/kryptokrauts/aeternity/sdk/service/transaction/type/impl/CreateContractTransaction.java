@@ -110,12 +110,12 @@ public class CreateContractTransaction extends AbstractTransaction<ContractCreat
 //                  });
 			rlpWriter.writeByteArray(EncodingUtils.decodeCheckWithIdentifier(this.contractByteCode));
 			rlpWriter.writeBigInteger(calculateVersion());
-			rlpWriter.writeBigInteger(new BigInteger("99600000000001"));
+			rlpWriter.writeBigInteger(this.fee);
 			rlpWriter.writeBigInteger(BigInteger.ZERO);
 			rlpWriter.writeBigInteger(BigInteger.ZERO);
 			rlpWriter.writeBigInteger(BigInteger.ZERO);
-			rlpWriter.writeBigInteger(new BigInteger("1000"));
-			rlpWriter.writeBigInteger(new BigInteger("1000000001"));
+			rlpWriter.writeBigInteger(this.gas);
+			rlpWriter.writeBigInteger(this.gasPrice);
 			rlpWriter.writeByteArray(EncodingUtils.decodeCheckWithIdentifier(callData));
 			// rlpWriter.writeString(callData);
 		});

@@ -92,8 +92,8 @@ public class TransactionApiTest extends BaseTest {
 			System.out.println("Next nonce:			" + nonce);
 			AbstractTransaction<?> contractTx = transactionServiceNative.getTransactionFactory()
 					.createContractCreateTransaction(BigInteger.ONE, BigInteger.ZERO, contractCallData,
-							contractByteCode, BigInteger.ZERO, new BigInteger("1000"), new BigInteger("1000000"), nonce,
-							ownerId, new BigInteger("20000"), new BigInteger("4"));
+							contractByteCode, BigInteger.ZERO, new BigInteger("1000"), new BigInteger("1100000000"),
+							nonce, ownerId, new BigInteger("20000"), new BigInteger("4"));
 
 			System.out.println("ContractTx:			" + contractTx);
 			System.out.println("Native Service Params:		" + transactionServiceNative);
