@@ -1,6 +1,8 @@
 package com.kryptokrauts.aeternity.sdk.service.transaction.type.impl;
 
+import java.io.ByteArrayOutputStream;
 import java.math.BigInteger;
+import java.nio.ByteBuffer;
 
 import com.kryptokrauts.aeternity.generated.api.rxjava.ContractApi;
 import com.kryptokrauts.aeternity.generated.model.ContractCreateTx;
@@ -107,23 +109,39 @@ public class CreateContractTransaction extends AbstractTransaction<ContractCreat
 //                    throwable.printStackTrace();
 //                  });
 			rlpWriter.writeByteArray(EncodingUtils.decodeCheckWithIdentifier(this.contractByteCode));
-			rlpWriter.writeBigInteger(new BigInteger("196609"));
-			rlpWriter.writeBigInteger(new BigInteger("1098660000000000"));
+			rlpWriter.writeBigInteger(calculateVersion());
+			rlpWriter.writeBigInteger(new BigInteger("99600000000001"));
 			rlpWriter.writeBigInteger(BigInteger.ZERO);
 			rlpWriter.writeBigInteger(BigInteger.ZERO);
 			rlpWriter.writeBigInteger(BigInteger.ZERO);
-			rlpWriter.writeBigInteger(new BigInteger("1000000"));
-			rlpWriter.writeBigInteger(new BigInteger("1000000000"));
+			rlpWriter.writeBigInteger(new BigInteger("1000"));
+			rlpWriter.writeBigInteger(new BigInteger("1000000001"));
 			rlpWriter.writeByteArray(EncodingUtils.decodeCheckWithIdentifier(callData));
 			// rlpWriter.writeString(callData);
 		});
 		return encodedRlp;
 	}
 
-	private Bytes createContractRLP() {
-		Bytes contractRLP = RLP.encodeList(rlpWriter -> {
-		});
+	private BigInteger calculateVersion() {
+		try {
+			ByteBuffer vm = ByteBuffer.allocate(8);
+			vm.putInt(vmVersion.intValue());
+			vm.putInt(abiVersion.intValue());
 
-		return contractRLP;
+			ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+			outputStream.write(vm.array());
+
+			StringBuffer versionBuffer = new StringBuffer();
+
+			for (byte b : outputStream.toByteArray()) {
+				versionBuffer.append(String.format("%x", b));
+			}
+			return BigInteger.valueOf(Integer.parseInt(versionBuffer.toString(), 16));
+		} catch (Exception e) {
+			System.err.println(
+					String.format("Error occured calculating version from parameters vmVersion %s and abiVersion %s",
+							vmVersion, abiVersion));
+			return null;
+		}
 	}
 }
