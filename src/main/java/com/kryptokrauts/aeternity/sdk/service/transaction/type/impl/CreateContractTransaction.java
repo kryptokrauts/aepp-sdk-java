@@ -97,7 +97,7 @@ public class CreateContractTransaction extends AbstractTransaction<ContractCreat
 			rlpWriter.writeInt(SerializationTags.VSN);
 			byte[] ownerWithTag = EncodingUtils.decodeCheckAndTag(this.ownerId, SerializationTags.ID_TAG_ACCOUNT);
 			rlpWriter.writeByteArray(ownerWithTag);
-			rlpWriter.writeBigInteger(new BigInteger(this.nonce.toString()));
+			rlpWriter.writeBigInteger(this.nonce);
 
 //              contractByteCode.subscribe(
 //                  bytecode -> {
@@ -110,8 +110,7 @@ public class CreateContractTransaction extends AbstractTransaction<ContractCreat
 //                  });
 			rlpWriter.writeByteArray(EncodingUtils.decodeCheckWithIdentifier(this.contractByteCode));
 			rlpWriter.writeBigInteger(calculateVersion());
-			//rlpWriter.writeBigInteger(this.fee);
-			rlpWriter.writeBigInteger(new BigInteger("1098660000000000"));
+			rlpWriter.writeBigInteger(this.fee);
 			rlpWriter.writeBigInteger(this.ttl);
 			rlpWriter.writeBigInteger(this.deposit);
 			rlpWriter.writeBigInteger(this.amount);
