@@ -71,9 +71,7 @@ public abstract class BaseTest {
 
 	private static String getContractBaseUrl() throws ConfigurationException {
 		String contractBaseUrl = System.getenv(CONTRACT_BASE_URL);
-		if (contractBaseUrl == null) {
-			throw new ConfigurationException("ENV variable missing: CONTRACT_BASE_URL");
-		}
+
 		return contractBaseUrl;
 	}
 

@@ -97,7 +97,7 @@ public class CreateContractTransaction extends AbstractTransaction<ContractCreat
 			rlpWriter.writeInt(SerializationTags.VSN);
 			byte[] ownerWithTag = EncodingUtils.decodeCheckAndTag(this.ownerId, SerializationTags.ID_TAG_ACCOUNT);
 			rlpWriter.writeByteArray(ownerWithTag);
-			rlpWriter.writeBigInteger(this.nonce);
+			rlpWriter.writeInt(this.nonce.intValue());
 
 //              contractByteCode.subscribe(
 //                  bytecode -> {
@@ -108,16 +108,17 @@ public class CreateContractTransaction extends AbstractTransaction<ContractCreat
 //                  throwable -> {
 //                    throwable.printStackTrace();
 //                  });
+//			rlpWriter.writeByteArray(new byte[] { 4, 0, 1 });
 			rlpWriter.writeByteArray(EncodingUtils.decodeCheckWithIdentifier(this.contractByteCode));
 //			rlpWriter.writeBigInteger(calculateVersion());
-//			rlpWriter.writeInt(calculateVersion().intValue());
-			rlpWriter.writeByteArray(new byte[] { 4, 0, 1 });
+			rlpWriter.writeInt(calculateVersion().intValue());
+
 //			
 //			rlpWriter.writeBigInteger(this.fee);
 			rlpWriter.writeBigInteger(BigInteger.valueOf(1098660000000000l));
 			rlpWriter.writeBigInteger(this.ttl);
-			rlpWriter.writeBigInteger(this.deposit);
-			rlpWriter.writeBigInteger(this.amount);
+			rlpWriter.writeByte(this.deposit.byteValue());
+			rlpWriter.writeByte(this.amount.byteValue());
 			rlpWriter.writeBigInteger(this.gas);
 			rlpWriter.writeBigInteger(this.gasPrice);
 			rlpWriter.writeByteArray(EncodingUtils.decodeCheckWithIdentifier(this.callData));
