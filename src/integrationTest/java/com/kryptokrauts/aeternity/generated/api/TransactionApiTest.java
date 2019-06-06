@@ -157,7 +157,7 @@ public class TransactionApiTest extends BaseTest {
 	}
 
 	@Test
-
+	@Ignore
 	public void buildContractTxTestNative(TestContext context) throws ExecutionException, InterruptedException {
 		Async async = context.async();
 
