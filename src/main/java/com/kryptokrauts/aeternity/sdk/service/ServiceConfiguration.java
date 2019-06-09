@@ -55,7 +55,7 @@ public class ServiceConfiguration {
       vertx = Vertx.vertx();
     }
     if (vertx != null && baseUrl != null) {
-      _logger.debug(String.format("Initializing Vertx ApiClient using baseUrl", baseUrl));
+      _logger.debug(String.format("Initializing Vertx ApiClient using baseUrl %s", baseUrl));
       return new ApiClient(
           vertx,
           new JsonObject(
@@ -73,7 +73,8 @@ public class ServiceConfiguration {
     }
     if (vertx != null && contractBaseUrl != null) {
       _logger.debug(
-          String.format("Initializing Vertx ApiClient using contractBaseUrl", contractBaseUrl));
+          String.format(
+              "Initializing Vertx CompilerApiClient using contractBaseUrl %s", contractBaseUrl));
       return new com.kryptokrauts.sophia.compiler.generated.ApiClient(
           vertx,
           new JsonObject(
