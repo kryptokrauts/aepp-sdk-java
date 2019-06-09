@@ -61,6 +61,8 @@ ext {
     junitVersion = "5.4.2"
     junitPlatformVersion = "1.4.2"
     spectrumVersion = "1.2.0"
+    
+    slf4jVersion = "1.7.26"
 }
 
 import io.swagger.codegen.DefaultGenerator
@@ -201,6 +203,7 @@ dependencies {
     testCompile "io.vertx:vertx-unit:${vertxVersion}"
     testCompile "io.vertx:vertx-junit5:${vertxVersion}"
     testCompile "org.junit.platform:junit-platform-launcher:${junitPlatformVersion}"
+    testRuntime "org.slf4j:slf4j-simple:${slf4jVersion}"
 }
 
 test {

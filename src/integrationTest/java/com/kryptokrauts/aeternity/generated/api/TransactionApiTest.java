@@ -142,7 +142,8 @@ public class TransactionApiTest extends BaseTest {
 
 		AbstractTransaction<?> contractTx = transactionServiceNative.getTransactionFactory()
 				.createContractCreateTransaction(abiVersion, amount, TestConstants.testContractCallData,
-						TestConstants.testContractByteCode, deposit, gas, gasPrice, nonce, ownerId, ttl, vmVersion);
+						TestConstants.testContractByteCode, deposit, gas, gasPrice, nonce, ownerId, ttl, vmVersion,
+						BigInteger.valueOf(1098660000000000l));
 
 		UnsignedTx unsignedTxNative = transactionServiceNative.createUnsignedTransaction(contractTx).blockingGet();
 

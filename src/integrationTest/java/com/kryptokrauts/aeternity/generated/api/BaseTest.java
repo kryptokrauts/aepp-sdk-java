@@ -55,8 +55,11 @@ public abstract class BaseTest {
 		chainService = new ChainServiceFactory()
 				.getService(ServiceConfiguration.configure().baseUrl(getAeternityBaseUrl()).vertx(vertx).compile());
 		transactionServiceNative = new TransactionServiceFactory()
-				.getService(TransactionServiceConfiguration.configure().minimalGasPrice(1011000000l)
-						.baseUrl(getAeternityBaseUrl()).network(Network.DEVNET).vertx(vertx).compile());
+				.getService(TransactionServiceConfiguration.configure().
+				// we adapt the minimal gas price to make sure, that the create contract tx has
+				// enough aeons for the fee
+						minimalGasPrice(1011000000l).baseUrl(getAeternityBaseUrl()).network(Network.DEVNET).vertx(vertx)
+						.compile());
 		transactionServiceDebug = new TransactionServiceFactory().getService(TransactionServiceConfiguration.configure()
 				.nativeMode(false).baseUrl(getAeternityBaseUrl()).network(Network.DEVNET).vertx(vertx).compile());
 	}

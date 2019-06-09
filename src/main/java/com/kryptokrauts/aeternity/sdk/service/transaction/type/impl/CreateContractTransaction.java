@@ -82,16 +82,6 @@ public class CreateContractTransaction extends AbstractTransaction<ContractCreat
 	@Override
 	protected Bytes createRLPEncodedList() {
 
-//		Single<ByteCode> contractByteCode = this.compilerApi.rxCompileContract(
-//				new Contract().code("contract Identity =\\n  type state = ()\\n  function main(x : int) = x"));
-//
-//		contractByteCode.subscribe(bc -> {
-//			System.out.println("BC:" + bc.getBytecode());
-//		}, throwable -> {
-//			System.out.println("TH: " + throwable);
-//			throwable.printStackTrace();
-//		});
-
 		Bytes encodedRlp = RLP.encodeList(rlpWriter -> {
 			rlpWriter.writeInt(SerializationTags.OBJECT_TAG_CONTRACT_CREATE_TRANSACTION);
 			rlpWriter.writeInt(SerializationTags.VSN);
@@ -99,23 +89,10 @@ public class CreateContractTransaction extends AbstractTransaction<ContractCreat
 			rlpWriter.writeByteArray(ownerWithTag);
 			rlpWriter.writeInt(this.nonce.intValue());
 
-//              contractByteCode.subscribe(
-//                  bytecode -> {
-//                    System.out.println("Bytecode: " + bytecode.getBytecode());
-//                    rlpWriter.writeByteArray(
-//                        EncodingUtils.decodeCheckWithIdentifier(bytecode.getBytecode()));
-//                  },
-//                  throwable -> {
-//                    throwable.printStackTrace();
-//                  });
-//			rlpWriter.writeByteArray(new byte[] { 4, 0, 1 });
 			rlpWriter.writeByteArray(EncodingUtils.decodeCheckWithIdentifier(this.contractByteCode));
-//			rlpWriter.writeBigInteger(calculateVersion());
-			rlpWriter.writeInt(calculateVersion().intValue());
-
-//			
-//			rlpWriter.writeBigInteger(this.fee);
-			rlpWriter.writeBigInteger(BigInteger.valueOf(1098660000000000l));
+			rlpWriter.writeBigInteger(calculateVersion());
+			rlpWriter.writeBigInteger(this.fee);
+//			rlpWriter.writeBigInteger(BigInteger.valueOf(1098660000000000l));
 			rlpWriter.writeBigInteger(this.ttl);
 			rlpWriter.writeByte(this.deposit.byteValue());
 			rlpWriter.writeByte(this.amount.byteValue());
