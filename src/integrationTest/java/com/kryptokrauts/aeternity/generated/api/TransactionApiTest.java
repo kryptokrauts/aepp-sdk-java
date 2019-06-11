@@ -4,12 +4,8 @@ import com.kryptokrauts.aeternity.generated.model.Account;
 import com.kryptokrauts.aeternity.generated.model.PostTxResponse;
 import com.kryptokrauts.aeternity.generated.model.Tx;
 import com.kryptokrauts.aeternity.generated.model.UnsignedTx;
-import com.kryptokrauts.aeternity.sdk.constants.Network;
 import com.kryptokrauts.aeternity.sdk.constants.SerializationTags;
 import com.kryptokrauts.aeternity.sdk.domain.secret.impl.BaseKeyPair;
-import com.kryptokrauts.aeternity.sdk.service.transaction.TransactionService;
-import com.kryptokrauts.aeternity.sdk.service.transaction.TransactionServiceConfiguration;
-import com.kryptokrauts.aeternity.sdk.service.transaction.TransactionServiceFactory;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.AbstractTransaction;
 import com.kryptokrauts.aeternity.sdk.util.EncodingUtils;
 import io.reactivex.Single;
@@ -75,8 +71,7 @@ public class TransactionApiTest extends BaseTest {
    * @throws InterruptedException
    */
   @Test
-  public void buildNativeSpendTransactionTest(TestContext context)
-      throws ExecutionException, InterruptedException {
+  public void buildNativeSpendTransactionTest(TestContext context) {
     Async async = context.async();
 
     String sender = keyPairService.generateBaseKeyPair().getPublicKey();
@@ -91,7 +86,7 @@ public class TransactionApiTest extends BaseTest {
             .getTransactionFactory()
             .createSpendTransaction(sender, recipient, amount, payload, null, ttl, nonce);
     UnsignedTx unsignedTxNative =
-        transactionServiceNative.createUnsignedTransaction(spendTx).toFuture().get();
+        transactionServiceNative.createUnsignedTransaction(spendTx).blockingGet();
 
     Single<UnsignedTx> unsignedTx = transactionServiceDebug.createUnsignedTransaction(spendTx);
     unsignedTx.subscribe(
@@ -100,7 +95,7 @@ public class TransactionApiTest extends BaseTest {
           async.complete();
         },
         throwable -> {
-          throwable.printStackTrace();
+          _logger.error(TestConstants.errorOccured, throwable);
           context.fail();
         });
   }
@@ -109,13 +104,10 @@ public class TransactionApiTest extends BaseTest {
    * Use an unsigned test contract transaction, sign it and deploy it
    *
    * @param context
-   * @throws ExecutionException
-   * @throws InterruptedException
    * @throws CryptoException
    */
   @Test
-  public void deployATestContractNativeOnLocalNode(TestContext context)
-      throws ExecutionException, InterruptedException, CryptoException {
+  public void deployATestContractNativeOnLocalNode(TestContext context) throws CryptoException {
     Async async = context.async();
 
     UnsignedTx unsignedTx = new UnsignedTx();
@@ -124,7 +116,7 @@ public class TransactionApiTest extends BaseTest {
     Tx signedTxNative =
         transactionServiceNative.signTransaction(unsignedTx, baseKeyPair.getPrivateKey());
 
-    System.out.println(signedTxNative);
+    _logger.info("Native Tx (signed): " + signedTxNative.getTx());
 
     Single<PostTxResponse> txResponse = transactionServiceNative.postTransaction(signedTxNative);
     txResponse.subscribe(
@@ -134,8 +126,7 @@ public class TransactionApiTest extends BaseTest {
           async.complete();
         },
         throwable -> {
-          System.out.println("error occured:");
-          throwable.printStackTrace();
+          _logger.error(TestConstants.errorOccured, throwable);
           context.fail();
         });
   }
@@ -184,89 +175,90 @@ public class TransactionApiTest extends BaseTest {
         transactionServiceDebug.createUnsignedTransaction(contractTx);
     unsignedTxDebug.subscribe(
         it -> {
-          System.out.println("Devnet Tx:	" + TestConstants.base64TxDevnet);
-          System.out.println("Native Tx: 	" + unsignedTxNative.getTx());
-          System.out.println("Debug Tx: 	" + it.getTx());
+          _logger.info("Devnet Tx:	" + TestConstants.base64TxDevnet);
+          _logger.info("Native Tx: 	" + unsignedTxNative.getTx());
+          _logger.info("Debug Tx: 	" + it.getTx());
 
           context.assertEquals(TestConstants.base64TxDevnet, it.getTx());
           context.assertEquals(TestConstants.base64TxDevnet, unsignedTxNative.getTx());
           async.complete();
         },
         throwable -> {
-          throwable.printStackTrace();
+          _logger.error(TestConstants.errorOccured, throwable);
           context.fail();
         });
   }
 
+  //  @Test
+  //  public void deployContractNativeOnTestNetwork(TestContext context)
+  //      throws ExecutionException, InterruptedException, CryptoException {
+  //    Async async = context.async();
+  //
+  //    baseKeyPair =
+  //        keyPairService.generateBaseKeyPairFromSecret(TestConstants.testnetAccountPrivateKey);
+  //
+  //    TransactionService testnetTransactionService =
+  //        new TransactionServiceFactory()
+  //            .getService(
+  //                TransactionServiceConfiguration.configure()
+  //                    .minimalGasPrice(1011000000l)
+  //                    .baseUrl(TestConstants.testnetURL)
+  //                    .network(Network.TESTNET)
+  //                    .vertx(rule.vertx())
+  //                    .compile());
+  //
+  //    String ownerId = baseKeyPair.getPublicKey();
+  //    BigInteger abiVersion = BigInteger.ONE;
+  //    BigInteger vmVersion = BigInteger.valueOf(4);
+  //    BigInteger amount = BigInteger.ZERO;
+  //    BigInteger deposit = BigInteger.ZERO;
+  //    BigInteger ttl = BigInteger.valueOf(120000);
+  //    BigInteger gas = BigInteger.valueOf(1000);
+  //    BigInteger gasPrice = BigInteger.valueOf(1100000000);
+  //    // resolve this from https://testnet.contracts.aepps.com/
+  //    BigInteger nonce = BigInteger.valueOf(13014);
+  //
+  //    AbstractTransaction<?> contractTx =
+  //        testnetTransactionService
+  //            .getTransactionFactory()
+  //            .createContractCreateTransaction(
+  //                abiVersion,
+  //                amount,
+  //                TestConstants.testContractCallData,
+  //                TestConstants.testContractByteCode,
+  //                deposit,
+  //                gas,
+  //                gasPrice,
+  //                nonce,
+  //                ownerId,
+  //                ttl,
+  //                vmVersion);
+  //
+  //    UnsignedTx unsignedTxNative =
+  //        testnetTransactionService.createUnsignedTransaction(contractTx).blockingGet();
+  //
+  //    Tx signedTxNative =
+  //        testnetTransactionService.signTransaction(unsignedTxNative,
+  // baseKeyPair.getPrivateKey());
+  //
+  //    Single<PostTxResponse> txResponse =
+  // testnetTransactionService.postTransaction(signedTxNative);
+  //    txResponse.subscribe(
+  //        it -> {
+  //          Assertions.assertEquals(
+  //              it.getTxHash(), testnetTransactionService.computeTxHash(signedTxNative.getTx()));
+  //          async.complete();
+  //        },
+  //        throwable -> {
+  //          System.out.println("error occured deploy on testnetwork:");
+  //          throwable.printStackTrace();
+  //          /** we accept errors on testnet in case of lower ttl / nonce */
+  //          async.complete();
+  //        });
+  //  }
+
   @Test
-  public void deployContractNativeOnTestNetwork(TestContext context)
-      throws ExecutionException, InterruptedException, CryptoException {
-    Async async = context.async();
-
-    baseKeyPair =
-        keyPairService.generateBaseKeyPairFromSecret(TestConstants.testnetAccountPrivateKey);
-
-    TransactionService testnetTransactionService =
-        new TransactionServiceFactory()
-            .getService(
-                TransactionServiceConfiguration.configure()
-                    .minimalGasPrice(1011000000l)
-                    .baseUrl(TestConstants.testnetURL)
-                    .network(Network.TESTNET)
-                    .vertx(rule.vertx())
-                    .compile());
-
-    String ownerId = baseKeyPair.getPublicKey();
-    BigInteger abiVersion = BigInteger.ONE;
-    BigInteger vmVersion = BigInteger.valueOf(4);
-    BigInteger amount = BigInteger.ZERO;
-    BigInteger deposit = BigInteger.ZERO;
-    BigInteger ttl = BigInteger.valueOf(120000);
-    BigInteger gas = BigInteger.valueOf(1000);
-    BigInteger gasPrice = BigInteger.valueOf(1100000000);
-    // resolve this from https://testnet.contracts.aepps.com/
-    BigInteger nonce = BigInteger.valueOf(13014);
-
-    AbstractTransaction<?> contractTx =
-        testnetTransactionService
-            .getTransactionFactory()
-            .createContractCreateTransaction(
-                abiVersion,
-                amount,
-                TestConstants.testContractCallData,
-                TestConstants.testContractByteCode,
-                deposit,
-                gas,
-                gasPrice,
-                nonce,
-                ownerId,
-                ttl,
-                vmVersion);
-
-    UnsignedTx unsignedTxNative =
-        testnetTransactionService.createUnsignedTransaction(contractTx).blockingGet();
-
-    Tx signedTxNative =
-        testnetTransactionService.signTransaction(unsignedTxNative, baseKeyPair.getPrivateKey());
-
-    Single<PostTxResponse> txResponse = testnetTransactionService.postTransaction(signedTxNative);
-    txResponse.subscribe(
-        it -> {
-          Assertions.assertEquals(
-              it.getTxHash(), testnetTransactionService.computeTxHash(signedTxNative.getTx()));
-          async.complete();
-        },
-        throwable -> {
-          System.out.println("error occured deploy on testnetwork:");
-          throwable.printStackTrace();
-          /** we accept errors on testnet in case of lower ttl / nonce */
-          async.complete();
-        });
-  }
-
-  @Test
-  public void deployBContractNativeOnLocalNode(TestContext context)
-      throws ExecutionException, InterruptedException {
+  public void deployBContractNativeOnLocalNode(TestContext context) {
     Async async = context.async();
     Single<Account> acc = accountService.getAccount(baseKeyPair.getPublicKey());
     acc.subscribe(
@@ -310,24 +302,22 @@ public class TransactionApiTest extends BaseTest {
               it -> {
                 Assertions.assertEquals(
                     it.getTxHash(), transactionServiceNative.computeTxHash(signedTxNative.getTx()));
-                System.out.println("Tx hash on local node: " + it.getTxHash());
+                _logger.info("Tx hash on local node: " + it.getTxHash());
                 async.complete();
               },
               throwable -> {
-                System.out.println("error occured:");
-                throwable.printStackTrace();
+                _logger.error(TestConstants.errorOccured, throwable);
                 context.fail();
               });
         },
         ex -> {
-          ex.printStackTrace();
+          _logger.error(TestConstants.errorOccured, ex);
           context.fail();
         });
   }
 
   @Test
-  public void postSpendTxTest(TestContext context)
-      throws ExecutionException, InterruptedException, CryptoException {
+  public void postSpendTxTest(TestContext context) {
     Async async = context.async();
 
     BaseKeyPair keyPair = keyPairService.generateBaseKeyPairFromSecret(BENEFICIARY_PRIVATE_KEY);
@@ -350,7 +340,7 @@ public class TransactionApiTest extends BaseTest {
                   .createSpendTransaction(
                       keyPair.getPublicKey(), recipient, amount, payload, null, ttl, nonce);
           UnsignedTx unsignedTxNative =
-              transactionServiceNative.createUnsignedTransaction(spendTx).toFuture().get();
+              transactionServiceNative.createUnsignedTransaction(spendTx).blockingGet();
           Tx signedTx =
               transactionServiceNative.signTransaction(unsignedTxNative, keyPair.getPrivateKey());
 

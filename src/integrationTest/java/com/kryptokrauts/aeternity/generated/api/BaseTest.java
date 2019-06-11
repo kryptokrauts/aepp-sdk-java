@@ -20,9 +20,13 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.runner.RunWith;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @RunWith(VertxUnitRunner.class)
 public abstract class BaseTest {
+
+  protected static final Logger _logger = LoggerFactory.getLogger("IntegrationTest");
 
   private static final String AETERNITY_BASE_URL = "AETERNITY_BASE_URL";
 
@@ -102,14 +106,13 @@ public abstract class BaseTest {
 
   @BeforeClass
   public static void startup() throws ConfigurationException {
-    System.out.println(
+    _logger.info(
         String.format(
-            "--------------------------- %s ---------------------------\n",
+            "--------------------------- %s ---------------------------",
             "Using following environment"));
-    System.out.println(String.format("%s: %s", AETERNITY_BASE_URL, getAeternityBaseUrl()));
-    System.out.println(String.format("%s: %s", COMPILER_BASE_URL, getCompilerBaseUrl()));
-    System.out.println(
-        String.format(
-            "\n-----------------------------------------------------------------------------------"));
+    _logger.info(String.format("%s: %s", AETERNITY_BASE_URL, getAeternityBaseUrl()));
+    _logger.info(String.format("%s: %s", COMPILER_BASE_URL, getCompilerBaseUrl()));
+    _logger.info(
+        "-----------------------------------------------------------------------------------");
   }
 }

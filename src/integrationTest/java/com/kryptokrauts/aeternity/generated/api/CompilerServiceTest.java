@@ -43,7 +43,7 @@ public class CompilerServiceTest extends BaseTest {
           async.complete();
         },
         throwable -> {
-          throwable.printStackTrace();
+          _logger.error(TestConstants.errorOccured, throwable);
           context.fail();
         });
   }
@@ -60,7 +60,7 @@ public class CompilerServiceTest extends BaseTest {
           async.complete();
         },
         throwable -> {
-          throwable.printStackTrace();
+          _logger.error(TestConstants.errorOccured, throwable);
           context.fail();
         });
   }

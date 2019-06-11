@@ -5,26 +5,24 @@ import com.kryptokrauts.aeternity.sdk.util.EncodingUtils;
 
 public interface TestConstants {
 
+  String errorOccured = "error occured:";
+
   /** @see https://testnet.contracts.aepps.com/ */
-  public static final String testnetAccountPrivateKey =
+  String testnetAccountPrivateKey =
       "a7a695f999b1872acb13d5b63a830a8ee060ba688a478a08c6e65dfad8a01cd70bb4ed7927f97b51e1bcb5e1340d12335b2a2b12c8bc5221d63c4bcb39d41e61";
 
-  public static final String testnetURL = "https://sdk-testnet.aepps.com/v2";
+  String testnetURL = "https://sdk-testnet.aepps.com/v2";
 
-  public static final String testContractSourceCode =
+  String testContractSourceCode =
       "contract Identity =\n  type state = ()\n  function main(z : int) = z";
 
-  //	public static final String testContractSourceCode = "contract SimpleStorage =\n  record state =
-  // { data : int }\n  function init(value : int) : state = { data = value }\n  function get() : int
-  // = state.data\n  function set(value : int) = put(state{data = value})";
-
-  public static final String testContractByteCode =
+  String testContractByteCode =
       "cb_+QP1RgKgpVq1Ib2r2ug+UktHvfWSQ8P35HJQHM6qikqBu1DwgtT5Avv5ASqgaPJnYzj/UIg5q6R3Se/6i+h+8oTyB/s9mZhwHNU4h8WEbWFpbrjAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAKD//////////////////////////////////////////wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAuEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA+QHLoLnJVvKLMUmp9Zh6pQXz2hsiCcxXOSNABiu2wb2fn5nqhGluaXS4YAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAP//////////////////////////////////////////7kBQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEA//////////////////////////////////////////8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA///////////////////////////////////////////uMxiAABkYgAAhJGAgIBRf7nJVvKLMUmp9Zh6pQXz2hsiCcxXOSNABiu2wb2fn5nqFGIAAMBXUIBRf2jyZ2M4/1CIOaukd0nv+ovofvKE8gf7PZmYcBzVOIfFFGIAAK9XUGABGVEAW2AAGVlgIAGQgVJgIJADYAOBUpBZYABRWVJgAFJgAPNbYACAUmAA81tZWWAgAZCBUmAgkANgABlZYCABkIFSYCCQA2ADgVKBUpBWW2AgAVFRWVCAkVBQgJBQkFZbUFCCkVBQYgAAjFaFMy4wLjDZUhWH";
 
-  public static final String testContractCallData =
+  String testContractCallData =
       "cb_AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACC5yVbyizFJqfWYeqUF89obIgnMVzkjQAYrtsG9n5+Z6gAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAnHQYrA==";
 
-  public static final byte[] binaryTxDevnet = {
+  byte[] binaryTxDevnet = {
     (byte) 249,
     (byte) 4,
     (byte) 155,
@@ -1209,6 +1207,5 @@ public interface TestConstants {
     (byte) 0
   };
 
-  public static String base64TxDevnet =
-      "tx_" + EncodingUtils.encodeCheck(binaryTxDevnet, EncodingType.BASE64);
+  String base64TxDevnet = "tx_" + EncodingUtils.encodeCheck(binaryTxDevnet, EncodingType.BASE64);
 }

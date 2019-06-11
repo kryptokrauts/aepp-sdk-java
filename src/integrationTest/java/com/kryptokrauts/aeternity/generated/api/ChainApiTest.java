@@ -21,7 +21,7 @@ public class ChainApiTest extends BaseTest {
           async.complete();
         },
         throwable -> {
-          throwable.printStackTrace();
+          _logger.error(TestConstants.errorOccured, throwable);
           context.fail();
         });
   }
