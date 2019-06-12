@@ -94,6 +94,16 @@ public abstract class AbstractTransaction<TxModel> {
   }
 
   /**
+   * this method can be used to set a self-defined fee. otherwise the fee will automatically
+   * calculated
+   *
+   * @param fee a self-defined fee
+   */
+  public void setFee(BigInteger fee) {
+    this.fee = fee;
+  }
+
+  /**
    * @return the transaction model which is actually used to create the remote call to the generated
    *     api functions (classes of package {@link com.kryptokrauts.aeternity.generated.api.rxjava})
    */

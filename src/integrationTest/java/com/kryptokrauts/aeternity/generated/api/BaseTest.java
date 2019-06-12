@@ -69,10 +69,6 @@ public abstract class BaseTest {
         new TransactionServiceFactory()
             .getService(
                 TransactionServiceConfiguration.configure()
-                    .
-                    // we adapt the minimal gas price to make sure, that the create contract tx has
-                    // enough aeons for the fee
-                    minimalGasPrice(1011000000l)
                     .baseUrl(getAeternityBaseUrl())
                     .network(Network.DEVNET)
                     .vertx(vertx)

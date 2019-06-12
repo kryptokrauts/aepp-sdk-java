@@ -9,7 +9,7 @@ public class BaseFeeCalculationModel implements FeeCalculationModel {
   /**
    * the fee is calculated according to the following formula
    *
-   * <p>(BASE_GASE + (byte_size * GAS_PER_BYTE)) * MINIMAL_GAS_PRICE
+   * <p>(BASE_GAS + (byte_size * GAS_PER_BYTE)) * MINIMAL_GAS_PRICE
    */
   @Override
   public BigInteger calculateFee(int tx_byte_size, long minimalGasPrice) {

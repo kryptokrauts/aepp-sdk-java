@@ -4,8 +4,12 @@ import com.kryptokrauts.aeternity.generated.model.Account;
 import com.kryptokrauts.aeternity.generated.model.PostTxResponse;
 import com.kryptokrauts.aeternity.generated.model.Tx;
 import com.kryptokrauts.aeternity.generated.model.UnsignedTx;
+import com.kryptokrauts.aeternity.sdk.constants.Network;
 import com.kryptokrauts.aeternity.sdk.constants.SerializationTags;
 import com.kryptokrauts.aeternity.sdk.domain.secret.impl.BaseKeyPair;
+import com.kryptokrauts.aeternity.sdk.service.transaction.TransactionService;
+import com.kryptokrauts.aeternity.sdk.service.transaction.TransactionServiceConfiguration;
+import com.kryptokrauts.aeternity.sdk.service.transaction.TransactionServiceFactory;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.AbstractTransaction;
 import com.kryptokrauts.aeternity.sdk.util.EncodingUtils;
 import io.reactivex.Single;
@@ -18,6 +22,7 @@ import net.consensys.cava.rlp.RLP;
 import org.bouncycastle.crypto.CryptoException;
 import org.junit.Before;
 import org.junit.FixMethodOrder;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.jupiter.api.Assertions;
 import org.junit.runners.MethodSorters;
@@ -84,7 +89,7 @@ public class TransactionApiTest extends BaseTest {
     AbstractTransaction<?> spendTx =
         transactionServiceNative
             .getTransactionFactory()
-            .createSpendTransaction(sender, recipient, amount, payload, null, ttl, nonce);
+            .createSpendTransaction(sender, recipient, amount, payload, ttl, nonce);
     UnsignedTx unsignedTxNative =
         transactionServiceNative.createUnsignedTransaction(spendTx).blockingGet();
 
@@ -165,8 +170,8 @@ public class TransactionApiTest extends BaseTest {
                 nonce,
                 ownerId,
                 ttl,
-                vmVersion,
-                BigInteger.valueOf(1098660000000000l));
+                vmVersion);
+    contractTx.setFee(BigInteger.valueOf(1098660000000000l));
 
     UnsignedTx unsignedTxNative =
         transactionServiceNative.createUnsignedTransaction(contractTx).blockingGet();
@@ -189,73 +194,71 @@ public class TransactionApiTest extends BaseTest {
         });
   }
 
-  //  @Test
-  //  public void deployContractNativeOnTestNetwork(TestContext context)
-  //      throws ExecutionException, InterruptedException, CryptoException {
-  //    Async async = context.async();
-  //
-  //    baseKeyPair =
-  //        keyPairService.generateBaseKeyPairFromSecret(TestConstants.testnetAccountPrivateKey);
-  //
-  //    TransactionService testnetTransactionService =
-  //        new TransactionServiceFactory()
-  //            .getService(
-  //                TransactionServiceConfiguration.configure()
-  //                    .minimalGasPrice(1011000000l)
-  //                    .baseUrl(TestConstants.testnetURL)
-  //                    .network(Network.TESTNET)
-  //                    .vertx(rule.vertx())
-  //                    .compile());
-  //
-  //    String ownerId = baseKeyPair.getPublicKey();
-  //    BigInteger abiVersion = BigInteger.ONE;
-  //    BigInteger vmVersion = BigInteger.valueOf(4);
-  //    BigInteger amount = BigInteger.ZERO;
-  //    BigInteger deposit = BigInteger.ZERO;
-  //    BigInteger ttl = BigInteger.valueOf(120000);
-  //    BigInteger gas = BigInteger.valueOf(1000);
-  //    BigInteger gasPrice = BigInteger.valueOf(1100000000);
-  //    // resolve this from https://testnet.contracts.aepps.com/
-  //    BigInteger nonce = BigInteger.valueOf(13014);
-  //
-  //    AbstractTransaction<?> contractTx =
-  //        testnetTransactionService
-  //            .getTransactionFactory()
-  //            .createContractCreateTransaction(
-  //                abiVersion,
-  //                amount,
-  //                TestConstants.testContractCallData,
-  //                TestConstants.testContractByteCode,
-  //                deposit,
-  //                gas,
-  //                gasPrice,
-  //                nonce,
-  //                ownerId,
-  //                ttl,
-  //                vmVersion);
-  //
-  //    UnsignedTx unsignedTxNative =
-  //        testnetTransactionService.createUnsignedTransaction(contractTx).blockingGet();
-  //
-  //    Tx signedTxNative =
-  //        testnetTransactionService.signTransaction(unsignedTxNative,
-  // baseKeyPair.getPrivateKey());
-  //
-  //    Single<PostTxResponse> txResponse =
-  // testnetTransactionService.postTransaction(signedTxNative);
-  //    txResponse.subscribe(
-  //        it -> {
-  //          Assertions.assertEquals(
-  //              it.getTxHash(), testnetTransactionService.computeTxHash(signedTxNative.getTx()));
-  //          async.complete();
-  //        },
-  //        throwable -> {
-  //          System.out.println("error occured deploy on testnetwork:");
-  //          throwable.printStackTrace();
-  //          /** we accept errors on testnet in case of lower ttl / nonce */
-  //          async.complete();
-  //        });
-  //  }
+  @Test
+  @Ignore // specific testcase we don't want to run each time
+  public void deployContractNativeOnTestNetwork(TestContext context)
+      throws ExecutionException, InterruptedException, CryptoException {
+    Async async = context.async();
+
+    baseKeyPair =
+        keyPairService.generateBaseKeyPairFromSecret(TestConstants.testnetAccountPrivateKey);
+
+    TransactionService testnetTransactionService =
+        new TransactionServiceFactory()
+            .getService(
+                TransactionServiceConfiguration.configure()
+                    .baseUrl(TestConstants.testnetURL)
+                    .network(Network.TESTNET)
+                    .vertx(rule.vertx())
+                    .compile());
+
+    String ownerId = baseKeyPair.getPublicKey();
+    BigInteger abiVersion = BigInteger.ONE;
+    BigInteger vmVersion = BigInteger.valueOf(4);
+    BigInteger amount = BigInteger.ZERO;
+    BigInteger deposit = BigInteger.ZERO;
+    BigInteger ttl = BigInteger.valueOf(120000);
+    BigInteger gas = BigInteger.valueOf(1000);
+    BigInteger gasPrice = BigInteger.valueOf(1100000000);
+    // resolve this from https://testnet.contracts.aepps.com/
+    BigInteger nonce = BigInteger.valueOf(13014);
+
+    AbstractTransaction<?> contractTx =
+        testnetTransactionService
+            .getTransactionFactory()
+            .createContractCreateTransaction(
+                abiVersion,
+                amount,
+                TestConstants.testContractCallData,
+                TestConstants.testContractByteCode,
+                deposit,
+                gas,
+                gasPrice,
+                nonce,
+                ownerId,
+                ttl,
+                vmVersion);
+
+    UnsignedTx unsignedTxNative =
+        testnetTransactionService.createUnsignedTransaction(contractTx).blockingGet();
+
+    Tx signedTxNative =
+        testnetTransactionService.signTransaction(unsignedTxNative, baseKeyPair.getPrivateKey());
+
+    Single<PostTxResponse> txResponse = testnetTransactionService.postTransaction(signedTxNative);
+    txResponse.subscribe(
+        it -> {
+          Assertions.assertEquals(
+              it.getTxHash(), testnetTransactionService.computeTxHash(signedTxNative.getTx()));
+          async.complete();
+        },
+        throwable -> {
+          System.out.println("error occured deploy on testnetwork:");
+          throwable.printStackTrace();
+          /** we accept errors on testnet in case of lower ttl / nonce */
+          async.complete();
+        });
+  }
 
   @Test
   public void deployBContractNativeOnLocalNode(TestContext context) {
@@ -269,8 +272,8 @@ public class TransactionApiTest extends BaseTest {
           BigInteger amount = BigInteger.ZERO;
           BigInteger deposit = BigInteger.ZERO;
           BigInteger ttl = BigInteger.valueOf(1000000000);
-          BigInteger gas = BigInteger.valueOf(1000);
-          BigInteger gasPrice = BigInteger.valueOf(1100000000);
+          BigInteger gas = BigInteger.valueOf(4000000);
+          BigInteger gasPrice = BigInteger.valueOf(2000000000);
           BigInteger nonce = account.getNonce().add(BigInteger.ONE);
 
           AbstractTransaction<?> contractTx =
@@ -295,6 +298,7 @@ public class TransactionApiTest extends BaseTest {
           Tx signedTxNative =
               transactionServiceNative.signTransaction(
                   unsignedTxNative, baseKeyPair.getPrivateKey());
+          _logger.info("CreateContractTx hash (native signed): " + signedTxNative);
 
           Single<PostTxResponse> txResponse =
               transactionServiceNative.postTransaction(signedTxNative);
@@ -302,7 +306,7 @@ public class TransactionApiTest extends BaseTest {
               it -> {
                 Assertions.assertEquals(
                     it.getTxHash(), transactionServiceNative.computeTxHash(signedTxNative.getTx()));
-                _logger.info("Tx hash on local node: " + it.getTxHash());
+                _logger.info("CreateContractTx hash: " + it.getTxHash());
                 async.complete();
               },
               throwable -> {
@@ -338,7 +342,7 @@ public class TransactionApiTest extends BaseTest {
               transactionServiceNative
                   .getTransactionFactory()
                   .createSpendTransaction(
-                      keyPair.getPublicKey(), recipient, amount, payload, null, ttl, nonce);
+                      keyPair.getPublicKey(), recipient, amount, payload, ttl, nonce);
           UnsignedTx unsignedTxNative =
               transactionServiceNative.createUnsignedTransaction(spendTx).blockingGet();
           Tx signedTx =
@@ -347,6 +351,7 @@ public class TransactionApiTest extends BaseTest {
           Single<PostTxResponse> txResponse = transactionServiceNative.postTransaction(signedTx);
           txResponse.subscribe(
               it -> {
+                _logger.info("SpendTx hash: " + it.getTxHash());
                 Assertions.assertEquals(
                     it.getTxHash(), transactionServiceNative.computeTxHash(signedTx.getTx()));
                 async.complete();

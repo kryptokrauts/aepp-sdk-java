@@ -41,7 +41,6 @@ public class CreateContractTransaction extends AbstractTransaction<ContractCreat
 
   @Override
   protected Single<CreateContractUnsignedTx> createInternal() {
-    this.fee = new BigInteger(String.valueOf(Integer.MAX_VALUE));
     return contractApi.rxPostContractCreate(toModel());
   }
 
@@ -53,7 +52,7 @@ public class CreateContractTransaction extends AbstractTransaction<ContractCreat
     contractCreateTx.setCallData(callData);
     contractCreateTx.setCode(contractByteCode);
     contractCreateTx.setDeposit(deposit);
-    contractCreateTx.setFee(BigInteger.valueOf(1098660000000000l));
+    contractCreateTx.setFee(fee);
     contractCreateTx.setGas(gas);
     contractCreateTx.setGasPrice(gasPrice);
     contractCreateTx.setNonce(nonce);
@@ -66,7 +65,6 @@ public class CreateContractTransaction extends AbstractTransaction<ContractCreat
 
   @Override
   protected Bytes createRLPEncodedList() {
-
     Bytes encodedRlp =
         RLP.encodeList(
             rlpWriter -> {
@@ -76,13 +74,12 @@ public class CreateContractTransaction extends AbstractTransaction<ContractCreat
                   EncodingUtils.decodeCheckAndTag(this.ownerId, SerializationTags.ID_TAG_ACCOUNT);
               rlpWriter.writeByteArray(ownerWithTag);
               rlpWriter.writeInt(this.nonce.intValue());
-
               rlpWriter.writeByteArray(
                   EncodingUtils.decodeCheckWithIdentifier(this.contractByteCode));
               rlpWriter.writeBigInteger(calculateVersion());
               rlpWriter.writeBigInteger(this.fee);
-              //			rlpWriter.writeBigInteger(BigInteger.valueOf(1098660000000000l));
               rlpWriter.writeBigInteger(this.ttl);
+              // for some reason we need to use the byteValue instead of the (Big)Integer
               rlpWriter.writeByte(this.deposit.byteValue());
               rlpWriter.writeByte(this.amount.byteValue());
               rlpWriter.writeBigInteger(this.gas);
