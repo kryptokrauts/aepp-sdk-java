@@ -22,12 +22,11 @@ import com.kryptokrauts.aeternity.sdk.util.SigningUtil;
 import com.kryptokrauts.sophia.compiler.generated.api.DefaultApiImpl;
 import com.kryptokrauts.sophia.compiler.generated.api.rxjava.DefaultApi;
 import io.reactivex.Single;
-import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import javax.annotation.Nonnull;
 import lombok.RequiredArgsConstructor;
-import net.consensys.cava.bytes.Bytes;
-import net.consensys.cava.rlp.RLP;
+import org.apache.tuweni.bytes.Bytes;
+import org.apache.tuweni.rlp.RLP;
 import org.bouncycastle.crypto.CryptoException;
 
 @RequiredArgsConstructor
@@ -98,9 +97,8 @@ public class TransactionServiceImpl implements TransactionService {
     Bytes encodedRlp =
         RLP.encodeList(
             rlpWriter -> {
-              rlpWriter.writeBigInteger(
-                  BigInteger.valueOf(SerializationTags.OBJECT_TAG_SIGNED_TRANSACTION));
-              rlpWriter.writeBigInteger(BigInteger.valueOf(SerializationTags.VSN));
+              rlpWriter.writeInt(SerializationTags.OBJECT_TAG_SIGNED_TRANSACTION);
+              rlpWriter.writeInt(SerializationTags.VSN);
               rlpWriter.writeList(
                   writer -> {
                     writer.writeByteArray(sig);

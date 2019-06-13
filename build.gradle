@@ -56,7 +56,7 @@ ext {
 
     bouncycastleVersion = "1.61"
     bitcoinjCoreVersion = "0.14.7"
-    cavaVersion = "0.6.0"
+    tuweniVersion = "0.9.0.KK-SNAPSHOT"
 
     junitVersion = "5.4.2"
     junitPlatformVersion = "1.4.2"
@@ -177,8 +177,8 @@ dependencies {
     // cryptography
     compile "org.bitcoinj:bitcoinj-core:${bitcoinjCoreVersion}"
     compile "org.bouncycastle:bcprov-jdk15on:${bouncycastleVersion}"
-    compile "net.consensys.cava:cava-crypto:${cavaVersion}" 
-    compile "net.consensys.cava:cava-rlp:${cavaVersion}"
+    compile "org.apache.tuweni:tuweni-rlp:${tuweniVersion}"
+    compile "org.apache.tuweni:tuweni-crypto:${tuweniVersion}"
     compile "de.mkammerer:argon2-jvm:2.5"
 
     // needed for vertx client

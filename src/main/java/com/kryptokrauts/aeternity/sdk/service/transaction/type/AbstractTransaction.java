@@ -7,7 +7,7 @@ import com.kryptokrauts.aeternity.sdk.util.EncodingUtils;
 import io.reactivex.Single;
 import java.math.BigInteger;
 import lombok.experimental.SuperBuilder;
-import net.consensys.cava.bytes.Bytes;
+import org.apache.tuweni.bytes.Bytes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

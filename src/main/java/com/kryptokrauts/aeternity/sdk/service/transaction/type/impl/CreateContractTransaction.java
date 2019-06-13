@@ -15,8 +15,8 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
-import net.consensys.cava.bytes.Bytes;
-import net.consensys.cava.rlp.RLP;
+import org.apache.tuweni.bytes.Bytes;
+import org.apache.tuweni.rlp.RLP;
 
 @Getter
 @SuperBuilder
@@ -73,13 +73,12 @@ public class CreateContractTransaction extends AbstractTransaction<ContractCreat
               byte[] ownerWithTag =
                   EncodingUtils.decodeCheckAndTag(this.ownerId, SerializationTags.ID_TAG_ACCOUNT);
               rlpWriter.writeByteArray(ownerWithTag);
-              rlpWriter.writeInt(this.nonce.intValue());
+              rlpWriter.writeBigInteger(this.nonce);
               rlpWriter.writeByteArray(
                   EncodingUtils.decodeCheckWithIdentifier(this.contractByteCode));
               rlpWriter.writeBigInteger(calculateVersion());
               rlpWriter.writeBigInteger(this.fee);
               rlpWriter.writeBigInteger(this.ttl);
-              // for some reason we need to use the byteValue instead of the (Big)Integer
               rlpWriter.writeByte(this.deposit.byteValue());
               rlpWriter.writeByte(this.amount.byteValue());
               rlpWriter.writeBigInteger(this.gas);
