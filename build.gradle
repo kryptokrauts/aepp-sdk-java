@@ -3,6 +3,9 @@ buildscript {
         mavenLocal()
         mavenCentral()
         jcenter()
+        maven {
+            url "https://dl.bintray.com/tuweni/tuweni/"
+        }
     }
     dependencies {
         classpath "io.swagger.codegen.v3:swagger-codegen:3.0.8"
@@ -22,6 +25,9 @@ repositories {
     mavenLocal()
     mavenCentral()
     jcenter()
+    maven {
+        url "https://dl.bintray.com/tuweni/tuweni/"
+    }
 }
 
 version = (Boolean.valueOf(System.getProperty("snapshot")) ? project.version : project.version[0..4])
@@ -56,7 +62,7 @@ ext {
 
     bouncycastleVersion = "1.61"
     bitcoinjCoreVersion = "0.14.7"
-    tuweniVersion = "0.9.0.KK-SNAPSHOT"
+    tuweniVersion = "0.8.0-20190611234232"
 
     junitVersion = "5.4.2"
     junitPlatformVersion = "1.4.2"
