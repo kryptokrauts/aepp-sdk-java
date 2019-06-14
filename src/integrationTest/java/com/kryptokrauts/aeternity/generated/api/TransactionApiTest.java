@@ -38,10 +38,9 @@ public class TransactionApiTest extends BaseTest {
   }
 
   @Test
-  @Ignore // fails now as we use BigInteger again for amount and deposit
   public void decodeRLPArray() {
     RLP.decodeList(
-        Bytes.wrap(TestConstants.binaryTxDevnet),
+        Bytes.wrap(TestConstants.binaryTxDevnet),true,
         rlpReader -> {
           Assertions.assertEquals(
               SerializationTags.OBJECT_TAG_CONTRACT_CREATE_TRANSACTION, rlpReader.readInt());
