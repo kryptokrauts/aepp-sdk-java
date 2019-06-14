@@ -79,8 +79,8 @@ public class CreateContractTransaction extends AbstractTransaction<ContractCreat
               rlpWriter.writeBigInteger(calculateVersion());
               rlpWriter.writeBigInteger(this.fee);
               rlpWriter.writeBigInteger(this.ttl);
-              rlpWriter.writeByte(this.deposit.byteValue());
-              rlpWriter.writeByte(this.amount.byteValue());
+              rlpWriter.writeBigInteger(this.deposit);
+              rlpWriter.writeBigInteger(this.amount);
               rlpWriter.writeBigInteger(this.gas);
               rlpWriter.writeBigInteger(this.gasPrice);
               rlpWriter.writeByteArray(EncodingUtils.decodeCheckWithIdentifier(this.callData));
