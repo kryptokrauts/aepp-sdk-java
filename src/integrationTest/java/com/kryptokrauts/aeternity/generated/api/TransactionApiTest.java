@@ -39,8 +39,9 @@ public class TransactionApiTest extends BaseTest {
 
   @Test
   public void decodeRLPArray() {
+    Bytes value = Bytes.fromHexString(TestConstants.binaryTxDevnet);
     RLP.decodeList(
-        Bytes.wrap(TestConstants.binaryTxDevnet),true,
+        value,
         rlpReader -> {
           Assertions.assertEquals(
               SerializationTags.OBJECT_TAG_CONTRACT_CREATE_TRANSACTION, rlpReader.readInt());
@@ -262,7 +263,7 @@ public class TransactionApiTest extends BaseTest {
         });
   }
 
-  @Test // this one works with the BigInteger as long as we don't use a BigInteger.ZERO
+  @Test
   public void deployBContractNativeOnLocalNode(TestContext context) {
     Async async = context.async();
     Single<Account> acc = accountService.getAccount(baseKeyPair.getPublicKey());
@@ -293,7 +294,6 @@ public class TransactionApiTest extends BaseTest {
                       ownerId,
                       ttl,
                       vmVersion);
-          contractTx.setFee(new BigInteger("1098660000000000"));
 
           UnsignedTx unsignedTxNative =
               transactionServiceNative.createUnsignedTransaction(contractTx).blockingGet();
