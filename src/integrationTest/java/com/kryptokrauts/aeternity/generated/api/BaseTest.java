@@ -16,6 +16,7 @@ import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.RunTestOnContext;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
 import javax.naming.ConfigurationException;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
@@ -82,6 +83,18 @@ public abstract class BaseTest {
                     .network(Network.DEVNET)
                     .vertx(vertx)
                     .compile());
+  }
+
+  @After
+  public void shutdownClient(TestContext context) {
+    _logger.info("Closing vertx");
+    Vertx vertx = rule.vertx();
+    vertx.close();
+    keyPairService = null;
+    accountService = null;
+    chainService = null;
+    transactionServiceDebug = null;
+    transactionServiceNative = null;
   }
 
   private static String getAeternityBaseUrl() throws ConfigurationException {

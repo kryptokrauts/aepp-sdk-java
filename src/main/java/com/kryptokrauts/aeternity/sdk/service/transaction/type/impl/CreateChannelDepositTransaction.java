@@ -50,6 +50,6 @@ public class CreateChannelDepositTransaction extends AbstractTransaction<Channel
     Bytes encodedRlp = RLP.encodeList(rlpWriter -> {});
 
     throw new UnsupportedOperationException();
-    //		return encodedRlp;
+    // return encodedRlp;
   }
 }

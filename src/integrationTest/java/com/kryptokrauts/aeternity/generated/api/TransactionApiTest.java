@@ -54,14 +54,15 @@ public class TransactionApiTest extends BaseTest {
           Assertions.assertArrayEquals(
               EncodingUtils.decodeCheckWithIdentifier(TestConstants.testContractByteCode),
               rlpReader.readByteArray());
-          Assertions.assertEquals(262145, rlpReader.readBigInteger().intValue());
           Assertions.assertEquals(
-              BigInteger.valueOf(1098660000000000l), rlpReader.readBigInteger());
-          Assertions.assertEquals(20000, rlpReader.readBigInteger().intValue());
-          Assertions.assertEquals(0, rlpReader.readBigInteger().intValue());
-          Assertions.assertEquals(0, rlpReader.readBigInteger().intValue());
-          Assertions.assertEquals(1000, rlpReader.readBigInteger().intValue());
-          Assertions.assertEquals(1100000000, rlpReader.readBigInteger().intValue());
+              BigInteger.valueOf(262145), new BigInteger(rlpReader.readByteArray()));
+          Assertions.assertEquals(
+              BigInteger.valueOf(1098660000000000l), new BigInteger(rlpReader.readByteArray()));
+          Assertions.assertEquals(20000, new BigInteger(rlpReader.readByteArray()).intValue());
+          Assertions.assertEquals(0, new BigInteger(rlpReader.readByteArray()).intValue());
+          Assertions.assertEquals(0, new BigInteger(rlpReader.readByteArray()).intValue());
+          Assertions.assertEquals(1000, new BigInteger(rlpReader.readByteArray()).intValue());
+          Assertions.assertEquals(1100000000, new BigInteger(rlpReader.readByteArray()).intValue());
           Assertions.assertArrayEquals(
               EncodingUtils.decodeCheckWithIdentifier(TestConstants.testContractCallData),
               rlpReader.readByteArray());
@@ -104,67 +105,68 @@ public class TransactionApiTest extends BaseTest {
         });
   }
 
-    /**
-     * create an unsigned native CreateContract transaction
-     *
-     * @param context
-     */
-    @Test
-    public void buildNativeCreateContractTransactionTest(TestContext context) {
-        Async async = context.async();
+  /**
+   * create an unsigned native CreateContract transaction
+   *
+   * @param context
+   */
+  @Test
+  public void buildNativeCreateContractTransactionTest(TestContext context) {
+    Async async = context.async();
 
-        String ownerId = baseKeyPair.getPublicKey();
-        BigInteger abiVersion = BigInteger.ONE;
-        BigInteger vmVersion = BigInteger.valueOf(4);
-        BigInteger amount = BigInteger.valueOf(100);
-        BigInteger deposit = BigInteger.valueOf(100);
-        BigInteger ttl = BigInteger.valueOf(20000l);
-        BigInteger gas = BigInteger.valueOf(1000);
-        BigInteger gasPrice = BigInteger.valueOf(1100000000l);
+    String ownerId = baseKeyPair.getPublicKey();
+    BigInteger abiVersion = BigInteger.ONE;
+    BigInteger vmVersion = BigInteger.valueOf(4);
+    BigInteger amount = BigInteger.valueOf(100);
+    BigInteger deposit = BigInteger.valueOf(100);
+    BigInteger ttl = BigInteger.valueOf(20000l);
+    BigInteger gas = BigInteger.valueOf(1000);
+    BigInteger gasPrice = BigInteger.valueOf(1100000000l);
 
-        BigInteger nonce = BigInteger.ONE;
+    BigInteger nonce = BigInteger.ONE;
 
-        AbstractTransaction<?> contractTx =
-                transactionServiceNative
-                        .getTransactionFactory()
-                        .createContractCreateTransaction(
-                                abiVersion,
-                                amount,
-                                TestConstants.testContractCallData,
-                                TestConstants.testContractByteCode,
-                                deposit,
-                                gas,
-                                gasPrice,
-                                nonce,
-                                ownerId,
-                                ttl,
-                                vmVersion);
-        contractTx.setFee(BigInteger.valueOf(1098660000000000l));
+    AbstractTransaction<?> contractTx =
+        transactionServiceNative
+            .getTransactionFactory()
+            .createContractCreateTransaction(
+                abiVersion,
+                amount,
+                TestConstants.testContractCallData,
+                TestConstants.testContractByteCode,
+                deposit,
+                gas,
+                gasPrice,
+                nonce,
+                ownerId,
+                ttl,
+                vmVersion);
+    contractTx.setFee(BigInteger.valueOf(1098660000000000l));
 
-        UnsignedTx unsignedTxNative =
-                transactionServiceNative.createUnsignedTransaction(contractTx).blockingGet();
+    UnsignedTx unsignedTxNative =
+        transactionServiceNative.createUnsignedTransaction(contractTx).blockingGet();
 
-        Single<UnsignedTx> unsignedTxDebugSingle = transactionServiceDebug.createUnsignedTransaction(contractTx);
-        unsignedTxDebugSingle.subscribe(
-                it -> {
-                    Assertions.assertEquals(it.getTx(), unsignedTxNative.getTx());
-                    async.complete();
-                },
-                throwable -> {
-                    _logger.error(TestConstants.errorOccured, throwable);
-                    context.fail();
-                });
-    }
+    Single<UnsignedTx> unsignedTxDebugSingle =
+        transactionServiceDebug.createUnsignedTransaction(contractTx);
+    unsignedTxDebugSingle.subscribe(
+        it -> {
+          Assertions.assertEquals(it.getTx(), unsignedTxNative.getTx());
+          async.complete();
+        },
+        throwable -> {
+          _logger.error(TestConstants.errorOccured, throwable);
+          context.fail();
+        });
+  }
 
   /**
-   * Use an unsigned test contract transaction, sign it and deploy it
+   * Use an unsigned test contract transaction, sign it and deploy it this test will only work once
+   * due to the fixed nonce
    *
    * @param context
    * @throws CryptoException
    */
   @Test
-  @Ignore // fails for a unnkown reason -> maybe also because of the switch to BigInteger ?
-  public void deployATestContractNativeOnLocalNode(TestContext context) throws CryptoException {
+  public void aDeployTestContractNativeOnLocalNode(TestContext context) throws CryptoException {
     Async async = context.async();
 
     UnsignedTx unsignedTx = new UnsignedTx();
@@ -195,14 +197,13 @@ public class TransactionApiTest extends BaseTest {
    * @param context
    */
   @Test
-  @Ignore // fails probably due to BigInteger.ZERO
   public void checkCreateContractUnsignedTx(TestContext context) {
     Async async = context.async();
     String ownerId = baseKeyPair.getPublicKey();
     BigInteger abiVersion = BigInteger.ONE;
     BigInteger vmVersion = BigInteger.valueOf(4);
-    BigInteger amount = BigInteger.valueOf(100);
-    BigInteger deposit = BigInteger.valueOf(100);
+    BigInteger amount = BigInteger.ZERO;
+    BigInteger deposit = BigInteger.ZERO;
     BigInteger ttl = BigInteger.valueOf(20000l);
     BigInteger gas = BigInteger.valueOf(1000);
     BigInteger gasPrice = BigInteger.valueOf(1100000000l);
@@ -374,7 +375,7 @@ public class TransactionApiTest extends BaseTest {
   }
 
   @Test
-  public void postSpendTxTest(TestContext context) {
+  public void aPostSpendTxTest(TestContext context) {
     Async async = context.async();
 
     BaseKeyPair keyPair = keyPairService.generateBaseKeyPairFromSecret(BENEFICIARY_PRIVATE_KEY);

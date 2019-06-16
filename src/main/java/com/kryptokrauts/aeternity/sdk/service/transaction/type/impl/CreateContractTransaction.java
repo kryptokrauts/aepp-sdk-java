@@ -73,16 +73,16 @@ public class CreateContractTransaction extends AbstractTransaction<ContractCreat
               byte[] ownerWithTag =
                   EncodingUtils.decodeCheckAndTag(this.ownerId, SerializationTags.ID_TAG_ACCOUNT);
               rlpWriter.writeByteArray(ownerWithTag);
-              rlpWriter.writeBigInteger(this.nonce);
+              rlpWriter.writeByteArray(this.nonce.toByteArray());
               rlpWriter.writeByteArray(
                   EncodingUtils.decodeCheckWithIdentifier(this.contractByteCode));
-              rlpWriter.writeBigInteger(calculateVersion());
-              rlpWriter.writeBigInteger(this.fee);
-              rlpWriter.writeBigInteger(this.ttl);
-              rlpWriter.writeBigInteger(this.deposit);
-              rlpWriter.writeBigInteger(this.amount);
-              rlpWriter.writeBigInteger(this.gas);
-              rlpWriter.writeBigInteger(this.gasPrice);
+              rlpWriter.writeByteArray(calculateVersion().toByteArray());
+              rlpWriter.writeByteArray(this.fee.toByteArray());
+              rlpWriter.writeByteArray(this.ttl.toByteArray());
+              rlpWriter.writeByteArray(this.deposit.toByteArray());
+              rlpWriter.writeByteArray(this.amount.toByteArray());
+              rlpWriter.writeByteArray(this.gas.toByteArray());
+              rlpWriter.writeByteArray(this.gasPrice.toByteArray());
               rlpWriter.writeByteArray(EncodingUtils.decodeCheckWithIdentifier(this.callData));
             });
     return encodedRlp;

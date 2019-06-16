@@ -58,11 +58,11 @@ public class SpendTransaction extends AbstractTransaction<SpendTx> {
                   EncodingUtils.decodeCheckAndTag(this.recipient, SerializationTags.ID_TAG_ACCOUNT);
               rlpWriter.writeByteArray(senderWithTag);
               rlpWriter.writeByteArray(recipientWithTag);
-              rlpWriter.writeBigInteger(this.amount);
-              rlpWriter.writeBigInteger(this.fee);
-              rlpWriter.writeBigInteger(this.ttl);
-              rlpWriter.writeBigInteger(this.nonce);
-              rlpWriter.writeString(this.payload);
+              rlpWriter.writeByteArray(this.amount.toByteArray());
+              rlpWriter.writeByteArray(this.fee.toByteArray());
+              rlpWriter.writeByteArray(this.ttl.toByteArray());
+              rlpWriter.writeByteArray(this.nonce.toByteArray());
+              rlpWriter.writeByteArray(this.payload.getBytes());
             });
     return encodedRlp;
   }
