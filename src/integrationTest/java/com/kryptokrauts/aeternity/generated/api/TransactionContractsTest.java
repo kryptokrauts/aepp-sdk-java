@@ -231,7 +231,7 @@ public class TransactionContractsTest extends BaseTest {
                     it.getTxHash(), transactionServiceNative.computeTxHash(signedTxNative.getTx()));
                 _logger.info("CreateContractTx hash: " + it.getTxHash());
                 // wait until contract is available
-                Thread.sleep(500);
+                Thread.sleep(2000); // TODO: implement a better solution
                 Single<TxInfoObject> info =
                     transactionServiceNative.getTransactionInfoByHash(it.getTxHash());
                 info.subscribe(
@@ -304,7 +304,7 @@ public class TransactionContractsTest extends BaseTest {
                           it.getTxHash(),
                           transactionServiceNative.computeTxHash(signedTxNative.getTx()));
                       _logger.info("CreateContractTx hash: " + it.getTxHash());
-                      Thread.sleep(250);
+                      Thread.sleep(2000); // TODO: implement a better solution
                       // get the tx info object to resolve the result
                       Single<TxInfoObject> info =
                           transactionServiceNative.getTransactionInfoByHash(it.getTxHash());
