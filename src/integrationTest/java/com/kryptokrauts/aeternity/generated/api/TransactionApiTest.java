@@ -194,6 +194,9 @@ public class TransactionApiTest extends BaseTest {
    * create debug and a native unsigned transaction and compare against a given correct sample
    * unsigned transaction
    *
+   * <p>(!) this test will work only once on a fresh instance, because the sample contract tx has an
+   * encoded nonce of 1!
+   *
    * @param context
    */
   @Test
