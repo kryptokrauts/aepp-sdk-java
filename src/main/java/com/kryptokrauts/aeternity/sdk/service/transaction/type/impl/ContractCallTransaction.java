@@ -80,4 +80,14 @@ public class ContractCallTransaction extends AbstractTransaction<ContractCallTx>
             });
     return encodedRlp;
   }
+
+  /**
+   * this method can be used to set a an optional amount which is sent to the contract (refunded if
+   * the execution fails)
+   *
+   * @param optional amount
+   */
+  public void setAmount(BigInteger amount) {
+    this.amount = amount;
+  }
 }

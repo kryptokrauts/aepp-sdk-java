@@ -134,7 +134,6 @@ public class TransactionFactory {
 
   public ContractCallTransaction createContractCallTransaction(
       BigInteger abiVersion,
-      BigInteger amount,
       String callData,
       String contractId,
       BigInteger gas,
@@ -144,7 +143,7 @@ public class TransactionFactory {
       BigInteger ttl) {
     return ContractCallTransaction.builder()
         .abiVersion(abiVersion)
-        .amount(amount)
+        .amount(BigInteger.ZERO) // we provide a separate setter for the optional amount
         .callData(callData)
         .callerId(callerId)
         .contractId(contractId)

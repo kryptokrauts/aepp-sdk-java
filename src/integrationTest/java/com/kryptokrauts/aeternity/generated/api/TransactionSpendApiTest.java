@@ -20,8 +20,6 @@ public class TransactionSpendApiTest extends BaseTest {
 
   BaseKeyPair baseKeyPair;
 
-  static String localDeployedContractId;
-
   @Before
   public void initBeforeTest() {
     baseKeyPair = keyPairService.generateBaseKeyPairFromSecret(BENEFICIARY_PRIVATE_KEY);
@@ -77,7 +75,7 @@ public class TransactionSpendApiTest extends BaseTest {
           String recipient = kp.getPublicKey();
           BigInteger amount = new BigInteger("1000000000000000000");
           String payload = "payload";
-          BigInteger ttl = BigInteger.valueOf(20000);
+          BigInteger ttl = BigInteger.ZERO;
           BigInteger nonce = account.getNonce().add(BigInteger.ONE);
 
           AbstractTransaction<?> spendTx =
