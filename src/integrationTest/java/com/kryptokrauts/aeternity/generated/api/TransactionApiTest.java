@@ -73,8 +73,6 @@ public class TransactionApiTest extends BaseTest {
    * create an unsigned native spend transaction
    *
    * @param context
-   * @throws ExecutionException
-   * @throws InterruptedException
    */
   @Test
   public void buildNativeSpendTransactionTest(TestContext context) {
@@ -105,6 +103,58 @@ public class TransactionApiTest extends BaseTest {
           context.fail();
         });
   }
+
+    /**
+     * create an unsigned native CreateContract transaction
+     *
+     * @param context
+     */
+    @Test
+    public void buildNativeCreateContractTransactionTest(TestContext context) {
+        Async async = context.async();
+
+        String ownerId = baseKeyPair.getPublicKey();
+        BigInteger abiVersion = BigInteger.ONE;
+        BigInteger vmVersion = BigInteger.valueOf(4);
+        BigInteger amount = BigInteger.valueOf(100);
+        BigInteger deposit = BigInteger.valueOf(100);
+        BigInteger ttl = BigInteger.valueOf(20000l);
+        BigInteger gas = BigInteger.valueOf(1000);
+        BigInteger gasPrice = BigInteger.valueOf(1100000000l);
+
+        BigInteger nonce = BigInteger.ONE;
+
+        AbstractTransaction<?> contractTx =
+                transactionServiceNative
+                        .getTransactionFactory()
+                        .createContractCreateTransaction(
+                                abiVersion,
+                                amount,
+                                TestConstants.testContractCallData,
+                                TestConstants.testContractByteCode,
+                                deposit,
+                                gas,
+                                gasPrice,
+                                nonce,
+                                ownerId,
+                                ttl,
+                                vmVersion);
+        contractTx.setFee(BigInteger.valueOf(1098660000000000l));
+
+        UnsignedTx unsignedTxNative =
+                transactionServiceNative.createUnsignedTransaction(contractTx).blockingGet();
+
+        Single<UnsignedTx> unsignedTxDebugSingle = transactionServiceDebug.createUnsignedTransaction(contractTx);
+        unsignedTxDebugSingle.subscribe(
+                it -> {
+                    Assertions.assertEquals(it.getTx(), unsignedTxNative.getTx());
+                    async.complete();
+                },
+                throwable -> {
+                    _logger.error(TestConstants.errorOccured, throwable);
+                    context.fail();
+                });
+    }
 
   /**
    * Use an unsigned test contract transaction, sign it and deploy it
@@ -151,8 +201,8 @@ public class TransactionApiTest extends BaseTest {
     String ownerId = baseKeyPair.getPublicKey();
     BigInteger abiVersion = BigInteger.ONE;
     BigInteger vmVersion = BigInteger.valueOf(4);
-    BigInteger amount = BigInteger.ZERO;
-    BigInteger deposit = BigInteger.ZERO;
+    BigInteger amount = BigInteger.valueOf(100);
+    BigInteger deposit = BigInteger.valueOf(100);
     BigInteger ttl = BigInteger.valueOf(20000l);
     BigInteger gas = BigInteger.valueOf(1000);
     BigInteger gasPrice = BigInteger.valueOf(1100000000l);
