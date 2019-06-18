@@ -14,6 +14,7 @@ import com.kryptokrauts.aeternity.sdk.util.EncodingUtils;
 import com.kryptokrauts.sophia.compiler.generated.model.Calldata;
 import com.kryptokrauts.sophia.compiler.generated.model.SophiaJsonData;
 import io.reactivex.Single;
+import io.reactivex.observers.TestObserver;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
@@ -186,102 +187,113 @@ public class TransactionContractsTest extends BaseTest {
   @Test
   public void aDeployContractNativeOnLocalNode(TestContext context) {
     Async async = context.async();
-    Single<Account> acc = accountService.getAccount(baseKeyPair.getPublicKey());
-    acc.subscribe(
-        account -> {
-          String ownerId = baseKeyPair.getPublicKey();
-          BigInteger abiVersion = BigInteger.ONE;
-          BigInteger vmVersion = BigInteger.valueOf(4);
-          BigInteger amount = BigInteger.ZERO;
-          BigInteger deposit = BigInteger.ZERO;
-          BigInteger ttl = BigInteger.ZERO;
-          BigInteger gas = BigInteger.valueOf(1000000);
-          BigInteger gasPrice = BigInteger.valueOf(2000000000);
-          BigInteger nonce = account.getNonce().add(BigInteger.ONE);
+    rule.vertx()
+        .executeBlocking(
+            future -> {
+              try {
+                Single<Account> accountSingle =
+                    accountService.getAccount(baseKeyPair.getPublicKey());
+                TestObserver<Account> accountTestObserver = accountSingle.test();
+                accountTestObserver.awaitTerminalEvent();
+                Account account = accountTestObserver.values().get(0);
+                String ownerId = baseKeyPair.getPublicKey();
+                BigInteger abiVersion = BigInteger.ONE;
+                BigInteger vmVersion = BigInteger.valueOf(4);
+                BigInteger amount = BigInteger.ZERO;
+                BigInteger deposit = BigInteger.ZERO;
+                BigInteger ttl = BigInteger.ZERO;
+                BigInteger gas = BigInteger.valueOf(1000000);
+                BigInteger gasPrice = BigInteger.valueOf(2000000000);
+                BigInteger nonce = account.getNonce().add(BigInteger.ONE);
 
-          AbstractTransaction<?> contractTx =
-              transactionServiceNative
-                  .getTransactionFactory()
-                  .createContractCreateTransaction(
-                      abiVersion,
-                      amount,
-                      TestConstants.testContractCallData,
-                      TestConstants.testContractByteCode,
-                      deposit,
-                      gas,
-                      gasPrice,
-                      nonce,
-                      ownerId,
-                      ttl,
-                      vmVersion);
+                AbstractTransaction<?> contractTx =
+                    transactionServiceNative
+                        .getTransactionFactory()
+                        .createContractCreateTransaction(
+                            abiVersion,
+                            amount,
+                            TestConstants.testContractCallData,
+                            TestConstants.testContractByteCode,
+                            deposit,
+                            gas,
+                            gasPrice,
+                            nonce,
+                            ownerId,
+                            ttl,
+                            vmVersion);
 
-          UnsignedTx unsignedTxNative =
-              transactionServiceNative.createUnsignedTransaction(contractTx).blockingGet();
+                UnsignedTx unsignedTxNative =
+                    transactionServiceNative.createUnsignedTransaction(contractTx).blockingGet();
 
-          Tx signedTxNative =
-              transactionServiceNative.signTransaction(
-                  unsignedTxNative, baseKeyPair.getPrivateKey());
-          _logger.info("CreateContractTx hash (native signed): " + signedTxNative);
+                Tx signedTxNative =
+                    transactionServiceNative.signTransaction(
+                        unsignedTxNative, baseKeyPair.getPrivateKey());
+                _logger.info("CreateContractTx hash (native signed): " + signedTxNative);
 
-          Single<PostTxResponse> txResponse =
-              transactionServiceNative.postTransaction(signedTxNative);
-          txResponse.subscribe(
-              it -> {
-                context.assertEquals(
-                    it.getTxHash(), transactionServiceNative.computeTxHash(signedTxNative.getTx()));
-                _logger.info("CreateContractTx hash: " + it.getTxHash());
-                // wait until contract is available
-                Thread.sleep(2000); // TODO: implement a better solution
-                Single<TxInfoObject> info =
-                    transactionServiceNative.getTransactionInfoByHash(it.getTxHash());
-                info.subscribe(
-                    infoObject -> {
-                      localDeployedContractId = infoObject.getCallInfo().getContractId();
-                      async.complete();
-                    },
-                    throwable -> {
-                      context.fail();
-                    });
-              },
-              throwable -> {
-                _logger.error(TestConstants.errorOccured, throwable);
+                Single<PostTxResponse> txResponse =
+                    transactionServiceNative.postTransaction(signedTxNative);
+                TestObserver<PostTxResponse> postTxResponseTestObserver = txResponse.test();
+                postTxResponseTestObserver.awaitTerminalEvent();
+                postTxResponseTestObserver.assertNoErrors();
+                postTxResponseTestObserver.assertComplete();
+                PostTxResponse postTxResponse = postTxResponseTestObserver.values().get(0);
+
+                Single<TxInfoObject> txInfoObjectSingle =
+                    transactionServiceNative.getTransactionInfoByHash(postTxResponse.getTxHash());
+                TestObserver<TxInfoObject> txInfoObjectTestObserver = txInfoObjectSingle.test();
+                txInfoObjectTestObserver.awaitTerminalEvent();
+                txInfoObjectTestObserver.assertNoErrors();
+                txInfoObjectTestObserver.assertComplete();
+                TxInfoObject txInfoObject = txInfoObjectTestObserver.values().get(0);
+
+                _logger.info(txInfoObject.toString());
+
+                localDeployedContractId = txInfoObject.getCallInfo().getContractId();
+              } catch (Exception e) {
+                _logger.error(TestConstants.errorOccured, e);
                 context.fail();
-              });
-        },
-        ex -> {
-          _logger.error(TestConstants.errorOccured, ex);
-          context.fail();
-        });
+              }
+              future.complete();
+            },
+            success -> async.complete());
   }
 
   @Test
   public void callContractOnLocalNodeTest(TestContext context) {
     Async async = context.async();
-    Single<Account> acc = accountService.getAccount(baseKeyPair.getPublicKey());
-    acc.subscribe(
-        account -> {
-          String callerId = baseKeyPair.getPublicKey();
-          BigInteger abiVersion = BigInteger.ONE;
-          BigInteger ttl = BigInteger.ZERO;
-          BigInteger gas = BigInteger.valueOf(1579000);
-          BigInteger gasPrice = BigInteger.valueOf(1000000000);
-          BigInteger nonce = account.getNonce().add(BigInteger.ONE);
+    rule.vertx()
+        .executeBlocking(
+            future -> {
+              try {
+                Single<Account> accountSingle =
+                    accountService.getAccount(baseKeyPair.getPublicKey());
+                TestObserver<Account> accountTestObserver = accountSingle.test();
+                accountTestObserver.awaitTerminalEvent();
+                Account account = accountTestObserver.values().get(0);
+                String callerId = baseKeyPair.getPublicKey();
+                BigInteger abiVersion = BigInteger.ONE;
+                BigInteger ttl = BigInteger.ZERO;
+                BigInteger gas = BigInteger.valueOf(1579000);
+                BigInteger gasPrice = BigInteger.valueOf(1000000000);
+                BigInteger nonce = account.getNonce().add(BigInteger.ONE);
 
-          Single<Calldata> encodedCallData =
-              this.sophiaCompilerService.encodeCalldata(
-                  TestConstants.testContractSourceCode,
-                  TestConstants.testContractFunction,
-                  TestConstants.testContractFunctionParams);
+                Single<Calldata> callDataSingle =
+                    this.sophiaCompilerService.encodeCalldata(
+                        TestConstants.testContractSourceCode,
+                        TestConstants.testContractFunction,
+                        TestConstants.testContractFunctionParams);
+                TestObserver<Calldata> calldataTestObserver = callDataSingle.test();
+                calldataTestObserver.awaitTerminalEvent();
+                calldataTestObserver.assertNoErrors();
+                calldataTestObserver.assertComplete();
+                Calldata callData = calldataTestObserver.values().get(0);
 
-          // Encode the contract call
-          encodedCallData.subscribe(
-              encodedCD -> {
                 AbstractTransaction<?> contractTx =
                     transactionServiceNative
                         .getTransactionFactory()
                         .createContractCallTransaction(
                             abiVersion,
-                            encodedCD.getCalldata(),
+                            callData.getCalldata(),
                             localDeployedContractId,
                             gas,
                             gasPrice,
@@ -296,55 +308,49 @@ public class TransactionContractsTest extends BaseTest {
                         unsignedTxNative, baseKeyPair.getPrivateKey());
 
                 // post the signed contract call tx
-                Single<PostTxResponse> txResponse =
+                Single<PostTxResponse> postTxResponseSingle =
                     transactionServiceNative.postTransaction(signedTxNative);
-                txResponse.subscribe(
-                    it -> {
-                      context.assertEquals(
-                          it.getTxHash(),
-                          transactionServiceNative.computeTxHash(signedTxNative.getTx()));
-                      _logger.info("CreateContractTx hash: " + it.getTxHash());
-                      Thread.sleep(2000); // TODO: implement a better solution
-                      // get the tx info object to resolve the result
-                      Single<TxInfoObject> info =
-                          transactionServiceNative.getTransactionInfoByHash(it.getTxHash());
-                      info.subscribe(
-                          infoObject -> {
-                            // decode the result to json
-                            Single<SophiaJsonData> result =
-                                this.sophiaCompilerService.decodeCalldata(
-                                    infoObject.getCallInfo().getReturnValue(),
-                                    TestConstants.testContractFunctionSophiaType);
-                            result.subscribe(
-                                resultjson -> {
-                                  JsonObject json = JsonObject.mapFrom(resultjson.getData());
-                                  context.assertEquals(
-                                      TestConstants.testContractFuntionParam,
-                                      json.getValue("value").toString());
-                                  async.complete();
-                                },
-                                throwable -> {
-                                  context.fail();
-                                });
-                          },
-                          throwable -> {
-                            context.fail();
-                          });
-                    },
-                    throwable -> {
-                      _logger.error(TestConstants.errorOccured, throwable);
-                      context.fail();
-                    });
-              },
-              throwable -> {
-                _logger.error(TestConstants.errorOccured, throwable);
+                TestObserver<PostTxResponse> postTxResponseTestObserver =
+                    postTxResponseSingle.test();
+                postTxResponseTestObserver.awaitTerminalEvent();
+                postTxResponseTestObserver.assertNoErrors();
+                postTxResponseTestObserver.assertComplete();
+                PostTxResponse postTxResponse = postTxResponseTestObserver.values().get(0);
+                context.assertEquals(
+                    postTxResponse.getTxHash(),
+                    transactionServiceNative.computeTxHash(signedTxNative.getTx()));
+                _logger.info("CreateContractTx hash: " + postTxResponse.getTxHash());
+
+                // get the tx info object to resolve the result
+                Single<TxInfoObject> txInfoObjectSingle =
+                    transactionServiceNative.getTransactionInfoByHash(postTxResponse.getTxHash());
+                TestObserver<TxInfoObject> txInfoObjectTestObserver = txInfoObjectSingle.test();
+                txInfoObjectTestObserver.awaitTerminalEvent();
+                txInfoObjectTestObserver.assertNoErrors();
+                txInfoObjectTestObserver.assertComplete();
+                TxInfoObject txInfoObject = txInfoObjectTestObserver.values().get(0);
+
+                // decode the result to json
+                Single<SophiaJsonData> sophiaJsonDataSingle =
+                    this.sophiaCompilerService.decodeCalldata(
+                        txInfoObject.getCallInfo().getReturnValue(),
+                        TestConstants.testContractFunctionSophiaType);
+                TestObserver<SophiaJsonData> sophiaJsonDataTestObserver =
+                    sophiaJsonDataSingle.test();
+                sophiaJsonDataTestObserver.awaitTerminalEvent();
+                sophiaJsonDataTestObserver.assertNoErrors();
+                sophiaJsonDataTestObserver.assertComplete();
+                SophiaJsonData sophiaJsonData = sophiaJsonDataTestObserver.values().get(0);
+                JsonObject json = JsonObject.mapFrom(sophiaJsonData.getData());
+                context.assertEquals(
+                    TestConstants.testContractFuntionParam, json.getValue("value").toString());
+              } catch (Exception e) {
+                _logger.error(TestConstants.errorOccured, e);
                 context.fail();
-              });
-        },
-        ex -> {
-          _logger.error(TestConstants.errorOccured, ex);
-          context.fail();
-        });
+              }
+              future.complete();
+            },
+            success -> async.complete());
   }
 
   @Test
