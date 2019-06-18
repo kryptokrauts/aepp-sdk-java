@@ -6,6 +6,7 @@ import org.apache.tuweni.bytes.Bytes;
 import org.apache.tuweni.rlp.RLP;
 
 import com.kryptokrauts.aeternity.generated.api.rxjava.ContractApi;
+import com.kryptokrauts.aeternity.generated.api.rxjava.DebugApi;
 import com.kryptokrauts.aeternity.generated.model.ContractCallTx;
 import com.kryptokrauts.aeternity.generated.model.UnsignedTx;
 import com.kryptokrauts.aeternity.sdk.constants.SerializationTags;
@@ -21,7 +22,7 @@ import lombok.experimental.SuperBuilder;
 @Getter
 @SuperBuilder
 @ToString
-public class ContractCallTransaction extends AbstractTransaction<ContractCallTx> {
+public class StaticContractCallTransaction extends AbstractTransaction<ContractCallTx> {
 
 	@NonNull
 	private BigInteger abiVersion;
@@ -45,6 +46,9 @@ public class ContractCallTransaction extends AbstractTransaction<ContractCallTx>
 
 	@NonNull
 	private ContractApi contractApi;
+
+	@NonNull
+	private DebugApi debugApi;
 
 	@Override
 	protected Single<UnsignedTx> createInternal() {

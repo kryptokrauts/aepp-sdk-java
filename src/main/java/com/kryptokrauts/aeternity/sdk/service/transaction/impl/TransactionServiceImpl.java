@@ -1,10 +1,20 @@
 package com.kryptokrauts.aeternity.sdk.service.transaction.impl;
 
+import java.nio.charset.StandardCharsets;
+
+import javax.annotation.Nonnull;
+
+import org.apache.tuweni.bytes.Bytes;
+import org.apache.tuweni.rlp.RLP;
+import org.bouncycastle.crypto.CryptoException;
+
 import com.kryptokrauts.aeternity.generated.api.ChannelApiImpl;
 import com.kryptokrauts.aeternity.generated.api.ContractApiImpl;
+import com.kryptokrauts.aeternity.generated.api.DebugApiImpl;
 import com.kryptokrauts.aeternity.generated.api.TransactionApiImpl;
 import com.kryptokrauts.aeternity.generated.api.rxjava.ChannelApi;
 import com.kryptokrauts.aeternity.generated.api.rxjava.ContractApi;
+import com.kryptokrauts.aeternity.generated.api.rxjava.DebugApi;
 import com.kryptokrauts.aeternity.generated.api.rxjava.TransactionApi;
 import com.kryptokrauts.aeternity.generated.model.GenericSignedTx;
 import com.kryptokrauts.aeternity.generated.model.PostTxResponse;
@@ -22,129 +32,136 @@ import com.kryptokrauts.aeternity.sdk.util.EncodingUtils;
 import com.kryptokrauts.aeternity.sdk.util.SigningUtil;
 import com.kryptokrauts.sophia.compiler.generated.api.DefaultApiImpl;
 import com.kryptokrauts.sophia.compiler.generated.api.rxjava.DefaultApi;
+
 import io.reactivex.Single;
-import java.nio.charset.StandardCharsets;
-import javax.annotation.Nonnull;
 import lombok.RequiredArgsConstructor;
-import org.apache.tuweni.bytes.Bytes;
-import org.apache.tuweni.rlp.RLP;
-import org.bouncycastle.crypto.CryptoException;
 
 @RequiredArgsConstructor
 public class TransactionServiceImpl implements TransactionService {
 
-  @Nonnull private TransactionServiceConfiguration config;
+	@Nonnull
+	private TransactionServiceConfiguration config;
 
-  private TransactionApi transactionApi;
+	private TransactionApi transactionApi;
 
-  private ChannelApi channelApi;
+	private ChannelApi channelApi;
 
-  private ContractApi contractApi;
+	private ContractApi contractApi;
 
-  private DefaultApi compilerApi;
+	private DefaultApi compilerApi;
 
-  private TransactionFactory transactionFactory;
+	private DebugApi debugApi;
 
-  @Override
-  public TransactionFactory getTransactionFactory() {
-    if (transactionFactory == null) {
-      transactionFactory =
-          new TransactionFactory(
-              getTransactionApi(), getChannelApi(), getContractApi(), getCompilerApi());
-    }
-    return transactionFactory;
-  }
+	private TransactionFactory transactionFactory;
 
-  @Override
-  public Single<UnsignedTx> createUnsignedTransaction(AbstractTransaction<?> tx) {
-    return tx.createUnsignedTransaction(config.isNativeMode(), config.getMinimalGasPrice());
-  }
+	@Override
+	public TransactionFactory getTransactionFactory() {
+		if (transactionFactory == null) {
+			transactionFactory = new TransactionFactory(getTransactionApi(), getChannelApi(), getContractApi(),
+					getCompilerApi(), getDebugApi());
+		}
+		return transactionFactory;
+	}
 
-  @Override
-  public Single<PostTxResponse> postTransaction(Tx tx) {
-    return getTransactionApi().rxPostTransaction(tx);
-  }
+	@Override
+	public Single<UnsignedTx> createUnsignedTransaction(AbstractTransaction<?> tx) {
+		return tx.createUnsignedTransaction(config.isNativeMode(), config.getMinimalGasPrice());
+	}
 
-  @Override
-  public Single<GenericSignedTx> getTransactionByHash(String txHash) {
-    return getTransactionApi().rxGetTransactionByHash(txHash);
-  }
+	@Override
+	public Single<PostTxResponse> postTransaction(Tx tx) {
+		return getTransactionApi().rxPostTransaction(tx);
+	}
 
-  @Override
-  public Single<TxInfoObject> getTransactionInfoByHash(String txHash) {
-    return getTransactionApi().rxGetTransactionInfoByHash(txHash);
-  }
+	@Override
+	public Single<GenericSignedTx> getTransactionByHash(String txHash) {
+		return getTransactionApi().rxGetTransactionByHash(txHash);
+	}
 
-  @Override
-  public String computeTxHash(final String encodedSignedTx) {
-    byte[] signed = EncodingUtils.decodeCheckWithIdentifier(encodedSignedTx);
-    return EncodingUtils.hashEncode(signed, ApiIdentifiers.TRANSACTION_HASH);
-  }
+	@Override
+	public Single<TxInfoObject> getTransactionInfoByHash(String txHash) {
+		return getTransactionApi().rxGetTransactionInfoByHash(txHash);
+	}
 
-  @Override
-  public Tx signTransaction(final UnsignedTx unsignedTx, final String privateKey)
-      throws CryptoException {
-    byte[] networkData = config.getNetwork().getId().getBytes(StandardCharsets.UTF_8);
-    byte[] binaryTx = EncodingUtils.decodeCheckWithIdentifier(unsignedTx.getTx());
-    byte[] txAndNetwork = ByteUtils.concatenate(networkData, binaryTx);
-    byte[] sig = SigningUtil.sign(txAndNetwork, privateKey);
-    String encodedSignedTx = encodeSignedTransaction(sig, binaryTx);
-    Tx tx = new Tx();
-    tx.setTx(encodedSignedTx);
-    return tx;
-  }
+	@Override
+	public String computeTxHash(final String encodedSignedTx) {
+		byte[] signed = EncodingUtils.decodeCheckWithIdentifier(encodedSignedTx);
+		return EncodingUtils.hashEncode(signed, ApiIdentifiers.TRANSACTION_HASH);
+	}
 
-  /**
-   * @param sig
-   * @param binaryTx
-   * @return encoded transaction
-   */
-  private String encodeSignedTransaction(byte[] sig, byte[] binaryTx) {
-    Bytes encodedRlp =
-        RLP.encodeList(
-            rlpWriter -> {
-              rlpWriter.writeInt(SerializationTags.OBJECT_TAG_SIGNED_TRANSACTION);
-              rlpWriter.writeInt(SerializationTags.VSN);
-              rlpWriter.writeList(
-                  writer -> {
-                    writer.writeByteArray(sig);
-                  });
-              rlpWriter.writeByteArray(binaryTx);
-            });
-    return EncodingUtils.encodeCheck(encodedRlp.toArray(), ApiIdentifiers.TRANSACTION);
-  }
+	@Override
+	public Tx signTransaction(final UnsignedTx unsignedTx, final String privateKey) throws CryptoException {
+		byte[] networkData = config.getNetwork().getId().getBytes(StandardCharsets.UTF_8);
+		byte[] binaryTx = EncodingUtils.decodeCheckWithIdentifier(unsignedTx.getTx());
+		byte[] txAndNetwork = ByteUtils.concatenate(networkData, binaryTx);
+		byte[] sig = SigningUtil.sign(txAndNetwork, privateKey);
+		String encodedSignedTx = encodeSignedTransaction(sig, binaryTx);
+		Tx tx = new Tx();
+		tx.setTx(encodedSignedTx);
+		return tx;
+	}
 
-  private TransactionApi getTransactionApi() {
-    if (transactionApi == null) {
-      transactionApi = new TransactionApi(new TransactionApiImpl(config.getApiClient()));
-    }
-    return transactionApi;
-  }
+//	public dryRun(List<String>, String top ) {
+//		DryRunInput body = new DryRunInput();
+//		body.
+//		this.debugApi.rxDryRunTxs(body)
+//	}
 
-  private ChannelApi getChannelApi() {
-    if (channelApi == null) {
-      channelApi = new ChannelApi(new ChannelApiImpl(config.getApiClient()));
-    }
-    return channelApi;
-  }
+	/**
+	 * @param sig
+	 * @param binaryTx
+	 * @return encoded transaction
+	 */
+	private String encodeSignedTransaction(byte[] sig, byte[] binaryTx) {
+		Bytes encodedRlp = RLP.encodeList(rlpWriter -> {
+			rlpWriter.writeInt(SerializationTags.OBJECT_TAG_SIGNED_TRANSACTION);
+			rlpWriter.writeInt(SerializationTags.VSN);
+			rlpWriter.writeList(writer -> {
+				writer.writeByteArray(sig);
+			});
+			rlpWriter.writeByteArray(binaryTx);
+		});
+		return EncodingUtils.encodeCheck(encodedRlp.toArray(), ApiIdentifiers.TRANSACTION);
+	}
 
-  private ContractApi getContractApi() {
-    if (contractApi == null) {
-      contractApi = new ContractApi(new ContractApiImpl(config.getApiClient()));
-    }
-    return contractApi;
-  }
+	private TransactionApi getTransactionApi() {
+		if (transactionApi == null) {
+			transactionApi = new TransactionApi(new TransactionApiImpl(config.getApiClient()));
+		}
+		return transactionApi;
+	}
 
-  private DefaultApi getCompilerApi() {
-    if (compilerApi == null) {
-      compilerApi = new DefaultApi(new DefaultApiImpl(config.getCompilerApiClient()));
-    }
-    return compilerApi;
-  }
+	private ChannelApi getChannelApi() {
+		if (channelApi == null) {
+			channelApi = new ChannelApi(new ChannelApiImpl(config.getApiClient()));
+		}
+		return channelApi;
+	}
 
-  @Override
-  public String toString() {
-    // TODO Auto-generated method stub
-    return this.config.getNetwork().getId() + " " + this.config.isNativeMode();
-  }
+	private ContractApi getContractApi() {
+		if (contractApi == null) {
+			contractApi = new ContractApi(new ContractApiImpl(config.getApiClient()));
+		}
+		return contractApi;
+	}
+
+	private DefaultApi getCompilerApi() {
+		if (compilerApi == null) {
+			compilerApi = new DefaultApi(new DefaultApiImpl(config.getCompilerApiClient()));
+		}
+		return compilerApi;
+	}
+
+	private DebugApi getDebugApi() {
+		if (debugApi == null) {
+			debugApi = new DebugApi(new DebugApiImpl(config.getApiClient()));
+		}
+		return debugApi;
+	}
+
+	@Override
+	public String toString() {
+		// TODO Auto-generated method stub
+		return this.config.getNetwork().getId() + " " + this.config.isNativeMode();
+	}
 }
