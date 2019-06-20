@@ -1,5 +1,6 @@
 package com.kryptokrauts.aeternity.sdk.service.transaction;
 
+import com.kryptokrauts.aeternity.generated.model.DryRunResults;
 import com.kryptokrauts.aeternity.generated.model.GenericSignedTx;
 import com.kryptokrauts.aeternity.generated.model.PostTxResponse;
 import com.kryptokrauts.aeternity.generated.model.Tx;
@@ -8,6 +9,9 @@ import com.kryptokrauts.aeternity.generated.model.UnsignedTx;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.AbstractTransaction;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.TransactionFactory;
 import io.reactivex.Single;
+import java.math.BigInteger;
+import java.util.List;
+import java.util.Map;
 import org.bouncycastle.crypto.CryptoException;
 
 public interface TransactionService {
@@ -48,4 +52,18 @@ public interface TransactionService {
    * @return
    */
   Single<TxInfoObject> getTransactionInfoByHash(String txHash);
+
+  /**
+   * dry run unsigned transactions to estimate gas (!) please make sure to use implementations of
+   * {@link List} to ensure correct order of transactions called by accounts
+   *
+   * @param accounts
+   * @param block
+   * @param unsignedTransactions
+   * @return
+   */
+  Single<DryRunResults> dryRunTransactions(
+      List<Map<AccountParameter, Object>> accounts,
+      BigInteger block,
+      List<UnsignedTx> unsignedTransactions);
 }

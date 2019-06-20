@@ -1,7 +1,33 @@
 package com.kryptokrauts.aeternity.generated.api;
 
+import com.google.common.collect.ImmutableMap;
+import com.kryptokrauts.aeternity.generated.model.Account;
+import com.kryptokrauts.aeternity.generated.model.DryRunResult;
+import com.kryptokrauts.aeternity.generated.model.DryRunResults;
+import com.kryptokrauts.aeternity.generated.model.PostTxResponse;
+import com.kryptokrauts.aeternity.generated.model.Tx;
+import com.kryptokrauts.aeternity.generated.model.TxInfoObject;
+import com.kryptokrauts.aeternity.generated.model.UnsignedTx;
+import com.kryptokrauts.aeternity.sdk.constants.Network;
+import com.kryptokrauts.aeternity.sdk.constants.SerializationTags;
+import com.kryptokrauts.aeternity.sdk.domain.secret.impl.BaseKeyPair;
+import com.kryptokrauts.aeternity.sdk.service.account.AccountService;
+import com.kryptokrauts.aeternity.sdk.service.account.AccountServiceFactory;
+import com.kryptokrauts.aeternity.sdk.service.transaction.AccountParameter;
+import com.kryptokrauts.aeternity.sdk.service.transaction.TransactionService;
+import com.kryptokrauts.aeternity.sdk.service.transaction.TransactionServiceConfiguration;
+import com.kryptokrauts.aeternity.sdk.service.transaction.TransactionServiceFactory;
+import com.kryptokrauts.aeternity.sdk.service.transaction.type.AbstractTransaction;
+import com.kryptokrauts.aeternity.sdk.util.EncodingUtils;
+import com.kryptokrauts.sophia.compiler.generated.model.Calldata;
+import com.kryptokrauts.sophia.compiler.generated.model.SophiaJsonData;
+import io.reactivex.Single;
+import io.reactivex.observers.TestObserver;
+import io.vertx.core.json.JsonObject;
+import io.vertx.ext.unit.Async;
+import io.vertx.ext.unit.TestContext;
 import java.math.BigInteger;
-
+import java.util.Arrays;
 import org.apache.tuweni.bytes.Bytes;
 import org.apache.tuweni.rlp.RLP;
 import org.junit.Before;
@@ -11,31 +37,6 @@ import org.junit.Test;
 import org.junit.jupiter.api.Assertions;
 import org.junit.runners.MethodSorters;
 import org.opentest4j.AssertionFailedError;
-
-import com.kryptokrauts.aeternity.generated.model.Account;
-import com.kryptokrauts.aeternity.generated.model.PostTxResponse;
-import com.kryptokrauts.aeternity.generated.model.Tx;
-import com.kryptokrauts.aeternity.generated.model.TxInfoObject;
-import com.kryptokrauts.aeternity.generated.model.UnsignedTx;
-import com.kryptokrauts.aeternity.sdk.constants.BaseConstants;
-import com.kryptokrauts.aeternity.sdk.constants.Network;
-import com.kryptokrauts.aeternity.sdk.constants.SerializationTags;
-import com.kryptokrauts.aeternity.sdk.domain.secret.impl.BaseKeyPair;
-import com.kryptokrauts.aeternity.sdk.service.account.AccountService;
-import com.kryptokrauts.aeternity.sdk.service.account.AccountServiceFactory;
-import com.kryptokrauts.aeternity.sdk.service.transaction.TransactionService;
-import com.kryptokrauts.aeternity.sdk.service.transaction.TransactionServiceConfiguration;
-import com.kryptokrauts.aeternity.sdk.service.transaction.TransactionServiceFactory;
-import com.kryptokrauts.aeternity.sdk.service.transaction.type.AbstractTransaction;
-import com.kryptokrauts.aeternity.sdk.util.EncodingUtils;
-import com.kryptokrauts.sophia.compiler.generated.model.Calldata;
-import com.kryptokrauts.sophia.compiler.generated.model.SophiaJsonData;
-
-import io.reactivex.Single;
-import io.reactivex.observers.TestObserver;
-import io.vertx.core.json.JsonObject;
-import io.vertx.ext.unit.Async;
-import io.vertx.ext.unit.TestContext;
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class TransactionContractsTest extends BaseTest {
@@ -153,7 +154,7 @@ public class TransactionContractsTest extends BaseTest {
                 String callerId = baseKeyPair.getPublicKey();
                 BigInteger abiVersion = BigInteger.ONE;
                 BigInteger ttl = BigInteger.valueOf(20000);
-                BigInteger gas = BigInteger.valueOf(1579000);
+                BigInteger gas = BigInteger.valueOf(1000);
                 BigInteger gasPrice = BigInteger.valueOf(1000000000);
                 BigInteger nonce = account.getNonce().add(BigInteger.ONE);
                 String callContractCalldata = TestConstants.encodedServiceCall;
@@ -190,6 +191,236 @@ public class TransactionContractsTest extends BaseTest {
               future.complete();
             },
             success -> async.complete());
+  }
+
+  @Test
+  public void staticCallContractOnLocalNode(TestContext context) {
+    Async async = context.async();
+    rule.vertx()
+        .executeBlocking(
+            future -> {
+              try {
+                Single<Account> accountSingle =
+                    accountService.getAccount(baseKeyPair.getPublicKey());
+                TestObserver<Account> accountTestObserver = accountSingle.test();
+                accountTestObserver.awaitTerminalEvent();
+                Account account = accountTestObserver.values().get(0);
+                BigInteger nonce = account.getNonce().add(BigInteger.ONE);
+
+                // Compile the call contract
+                Single<Calldata> encodedCallData =
+                    this.sophiaCompilerService.encodeCalldata(
+                        TestConstants.testContractSourceCode,
+                        TestConstants.testContractFunction,
+                        TestConstants.testContractFunctionParams);
+                TestObserver<Calldata> encodedCalldataTestObserver = encodedCallData.test();
+                encodedCalldataTestObserver.awaitTerminalEvent();
+                Calldata calldata = encodedCalldataTestObserver.values().get(0);
+
+                Single<DryRunResults> dryRunResults =
+                    this.transactionServiceNative.dryRunTransactions(
+                        Arrays.asList(
+                            ImmutableMap.of(
+                                AccountParameter.PUBLIC_KEY, baseKeyPair.getPublicKey()),
+                            ImmutableMap.of(
+                                AccountParameter.PUBLIC_KEY, baseKeyPair.getPublicKey())),
+                        null,
+                        Arrays.asList(
+                            createUnsignedContractCallTx(context, nonce, calldata.getCalldata()),
+                            createUnsignedContractCallTx(
+                                context, nonce.add(BigInteger.ONE), calldata.getCalldata())));
+                TestObserver<DryRunResults> dryRunTestObserver = dryRunResults.test();
+                dryRunTestObserver.awaitTerminalEvent();
+                DryRunResults results = dryRunTestObserver.values().get(0);
+                _logger.info(results.toString());
+                for (DryRunResult result : results.getResults()) {
+                  context.assertEquals("ok", result.getResult());
+                }
+
+              } catch (Exception e) {
+                context.fail(e);
+              }
+              future.complete();
+            },
+            success -> async.complete());
+  }
+
+  @Test
+  public void staticCallContractFailOnLocalNode(TestContext context) {
+    Async async = context.async();
+    rule.vertx()
+        .executeBlocking(
+            future -> {
+              try {
+                // Compile the call contract
+                Single<Calldata> encodedCallData =
+                    this.sophiaCompilerService.encodeCalldata(
+                        TestConstants.testContractSourceCode,
+                        TestConstants.testContractFunction,
+                        TestConstants.testContractFunctionParams);
+                TestObserver<Calldata> encodedCalldataTestObserver = encodedCallData.test();
+                encodedCalldataTestObserver.awaitTerminalEvent();
+                Calldata calldata = encodedCalldataTestObserver.values().get(0);
+
+                Single<DryRunResults> dryRunResults =
+                    this.transactionServiceNative.dryRunTransactions(
+                        Arrays.asList(
+                            ImmutableMap.of(
+                                AccountParameter.PUBLIC_KEY, baseKeyPair.getPublicKey())),
+                        null,
+                        Arrays.asList(
+                            createUnsignedContractCallTx(
+                                context, BigInteger.ONE, calldata.getCalldata())));
+                TestObserver<DryRunResults> dryRunTestObserver = dryRunResults.test();
+                dryRunTestObserver.awaitTerminalEvent();
+                DryRunResults results = dryRunTestObserver.values().get(0);
+                _logger.info(results.toString());
+                for (DryRunResult result : results.getResults()) {
+                  context.assertEquals("error", result.getResult());
+                }
+
+              } catch (Exception e) {
+                context.fail(e);
+              }
+              future.complete();
+            },
+            success -> async.complete());
+  }
+
+  /**
+   * min gas is not sufficient, validate this!
+   *
+   * @param context
+   */
+  @Test
+  @Ignore
+  public void callContractAfterDryRunOnLocalNode(TestContext context) {
+    Async async = context.async();
+    rule.vertx()
+        .executeBlocking(
+            future -> {
+              try {
+                Single<Account> accountSingle =
+                    accountService.getAccount(baseKeyPair.getPublicKey());
+                TestObserver<Account> accountTestObserver = accountSingle.test();
+                accountTestObserver.awaitTerminalEvent();
+                Account account = accountTestObserver.values().get(0);
+                BigInteger nonce = account.getNonce().add(BigInteger.ONE);
+
+                // Compile the call contract
+                Single<Calldata> encodedCallData =
+                    this.sophiaCompilerService.encodeCalldata(
+                        TestConstants.testContractSourceCode,
+                        TestConstants.testContractFunction,
+                        TestConstants.testContractFunctionParams);
+                TestObserver<Calldata> encodedCalldataTestObserver = encodedCallData.test();
+                encodedCalldataTestObserver.awaitTerminalEvent();
+                Calldata calldata = encodedCalldataTestObserver.values().get(0);
+
+                Single<DryRunResults> dryRunResults =
+                    this.transactionServiceNative.dryRunTransactions(
+                        Arrays.asList(
+                            ImmutableMap.of(
+                                AccountParameter.PUBLIC_KEY, baseKeyPair.getPublicKey())),
+                        null,
+                        Arrays.asList(
+                            createUnsignedContractCallTx(context, nonce, calldata.getCalldata())));
+                TestObserver<DryRunResults> dryRunTestObserver = dryRunResults.test();
+                dryRunTestObserver.awaitTerminalEvent();
+                DryRunResults results = dryRunTestObserver.values().get(0);
+                _logger.info("callContractAfterDryRunOnLocalNode: " + results.toString());
+                for (DryRunResult result : results.getResults()) {
+                  context.assertEquals("ok", result.getResult());
+
+                  AbstractTransaction<?> contractAfterDryRunTx =
+                      transactionServiceNative
+                          .getTransactionFactory()
+                          .createContractCallTransaction(
+                              BigInteger.ONE,
+                              calldata.getCalldata(),
+                              localDeployedContractId,
+                              result.getCallObj().getGasUsed(),
+                              result.getCallObj().getGasPrice(),
+                              nonce,
+                              baseKeyPair.getPublicKey(),
+                              BigInteger.valueOf(20000l));
+
+                  UnsignedTx unsignedTxNative =
+                      transactionServiceNative
+                          .createUnsignedTransaction(contractAfterDryRunTx)
+                          .blockingGet();
+
+                  Tx signedTxNative =
+                      transactionServiceNative.signTransaction(
+                          unsignedTxNative, baseKeyPair.getPrivateKey());
+
+                  // post the signed contract call tx
+                  Single<PostTxResponse> postTxResponseSingle =
+                      transactionServiceNative.postTransaction(signedTxNative);
+                  TestObserver<PostTxResponse> postTxResponseTestObserver =
+                      postTxResponseSingle.test();
+                  postTxResponseTestObserver.awaitTerminalEvent();
+                  PostTxResponse postTxResponse = postTxResponseTestObserver.values().get(0);
+                  context.assertEquals(
+                      postTxResponse.getTxHash(),
+                      transactionServiceNative.computeTxHash(signedTxNative.getTx()));
+                  _logger.info("CreateContractTx hash: " + postTxResponse.getTxHash());
+
+                  // get the tx info object to resolve the result
+                  TxInfoObject txInfoObject = null;
+                  do {
+                    Single<TxInfoObject> txInfoObjectSingle =
+                        transactionServiceNative.getTransactionInfoByHash(
+                            postTxResponse.getTxHash());
+                    TestObserver<TxInfoObject> txInfoObjectTestObserver = txInfoObjectSingle.test();
+                    txInfoObjectTestObserver.awaitTerminalEvent();
+                    if (txInfoObjectTestObserver.errorCount() > 0) {
+                      _logger.warn("unable to receive txInfoObject. trying again in 1 second ...");
+                      Thread.sleep(1000);
+                    } else {
+                      txInfoObject = txInfoObjectTestObserver.values().get(0);
+                      _logger.info("Call contract tx object: " + txInfoObject.toString());
+                    }
+                  } while (txInfoObject == null);
+
+                  // decode the result to json
+                  Single<SophiaJsonData> sophiaJsonDataSingle =
+                      this.sophiaCompilerService.decodeCalldata(
+                          txInfoObject.getCallInfo().getReturnValue(),
+                          TestConstants.testContractFunctionSophiaType);
+                  TestObserver<SophiaJsonData> sophiaJsonDataTestObserver =
+                      sophiaJsonDataSingle.test();
+                  sophiaJsonDataTestObserver.awaitTerminalEvent();
+                  SophiaJsonData sophiaJsonData = sophiaJsonDataTestObserver.values().get(0);
+                  JsonObject json = JsonObject.mapFrom(sophiaJsonData.getData());
+                  context.assertEquals(
+                      TestConstants.testContractFuntionParam, json.getValue("value").toString());
+                }
+
+              } catch (Exception e) {
+                context.fail(e);
+              }
+              future.complete();
+            },
+            success -> async.complete());
+  }
+
+  private UnsignedTx createUnsignedContractCallTx(
+      TestContext context, BigInteger nonce, String calldata) {
+    String callerId = baseKeyPair.getPublicKey();
+    BigInteger abiVersion = BigInteger.ONE;
+    BigInteger ttl = BigInteger.ZERO;
+    BigInteger gas = BigInteger.valueOf(1579000);
+
+    AbstractTransaction<?> contractTx =
+        transactionServiceNative
+            .getTransactionFactory()
+            .createStaticContractCallTransaction(
+                abiVersion, calldata, localDeployedContractId, gas, nonce, callerId, ttl);
+
+    UnsignedTx unsignedTxNative =
+        transactionServiceNative.createUnsignedTransaction(contractTx).blockingGet();
+    return unsignedTxNative;
   }
 
   @Test
@@ -254,6 +485,11 @@ public class TransactionContractsTest extends BaseTest {
                   } else {
                     TxInfoObject txInfoObject = txInfoObjectTestObserver.values().get(0);
                     localDeployedContractId = txInfoObject.getCallInfo().getContractId();
+                    _logger.info(
+                        "Deployed contract - hash "
+                            + postTxResponse.getTxHash()
+                            + " - "
+                            + txInfoObject);
                   }
                 } while (localDeployedContractId == null);
 
@@ -277,11 +513,6 @@ public class TransactionContractsTest extends BaseTest {
                 TestObserver<Account> accountTestObserver = accountSingle.test();
                 accountTestObserver.awaitTerminalEvent();
                 Account account = accountTestObserver.values().get(0);
-                String callerId = baseKeyPair.getPublicKey();
-                BigInteger abiVersion = BigInteger.ONE;
-                BigInteger ttl = BigInteger.ZERO;
-                BigInteger gas = BigInteger.valueOf(1579000);
-                BigInteger gasPrice = BigInteger.valueOf(1000000000);
                 BigInteger nonce = account.getNonce().add(BigInteger.ONE);
 
                 Single<Calldata> callDataSingle =
@@ -293,21 +524,8 @@ public class TransactionContractsTest extends BaseTest {
                 calldataTestObserver.awaitTerminalEvent();
                 Calldata callData = calldataTestObserver.values().get(0);
 
-                AbstractTransaction<?> contractTx =
-                    transactionServiceNative
-                        .getTransactionFactory()
-                        .createContractCallTransaction(
-                            abiVersion,
-                            callData.getCalldata(),
-                            localDeployedContractId,
-                            gas,
-                            gasPrice,
-                            nonce,
-                            callerId,
-                            ttl);
-
                 UnsignedTx unsignedTxNative =
-                    transactionServiceNative.createUnsignedTransaction(contractTx).blockingGet();
+                    this.createUnsignedContractCallTx(context, nonce, callData.getCalldata());
                 Tx signedTxNative =
                     transactionServiceNative.signTransaction(
                         unsignedTxNative, baseKeyPair.getPrivateKey());
@@ -336,6 +554,7 @@ public class TransactionContractsTest extends BaseTest {
                     Thread.sleep(1000);
                   } else {
                     txInfoObject = txInfoObjectTestObserver.values().get(0);
+                    _logger.info("Call contract tx object: " + txInfoObject.toString());
                   }
                 } while (txInfoObject == null);
 
