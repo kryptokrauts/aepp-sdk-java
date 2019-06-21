@@ -1,13 +1,7 @@
 package com.kryptokrauts.aeternity.generated.api;
 
 import com.google.common.collect.ImmutableMap;
-import com.kryptokrauts.aeternity.generated.model.Account;
-import com.kryptokrauts.aeternity.generated.model.DryRunResult;
-import com.kryptokrauts.aeternity.generated.model.DryRunResults;
-import com.kryptokrauts.aeternity.generated.model.PostTxResponse;
-import com.kryptokrauts.aeternity.generated.model.Tx;
-import com.kryptokrauts.aeternity.generated.model.TxInfoObject;
-import com.kryptokrauts.aeternity.generated.model.UnsignedTx;
+import com.kryptokrauts.aeternity.generated.model.*;
 import com.kryptokrauts.aeternity.sdk.constants.Network;
 import com.kryptokrauts.aeternity.sdk.constants.SerializationTags;
 import com.kryptokrauts.aeternity.sdk.domain.secret.impl.BaseKeyPair;
@@ -26,8 +20,6 @@ import io.reactivex.observers.TestObserver;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
-import java.math.BigInteger;
-import java.util.Arrays;
 import org.apache.tuweni.bytes.Bytes;
 import org.apache.tuweni.rlp.RLP;
 import org.junit.Before;
@@ -37,6 +29,9 @@ import org.junit.Test;
 import org.junit.jupiter.api.Assertions;
 import org.junit.runners.MethodSorters;
 import org.opentest4j.AssertionFailedError;
+
+import java.math.BigInteger;
+import java.util.Arrays;
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class TransactionContractsTest extends BaseTest {
@@ -343,7 +338,7 @@ public class TransactionContractsTest extends BaseTest {
                               result.getCallObj().getGasPrice(),
                               nonce,
                               baseKeyPair.getPublicKey(),
-                              BigInteger.valueOf(20000l));
+                              BigInteger.ZERO);
 
                   UnsignedTx unsignedTxNative =
                       transactionServiceNative
