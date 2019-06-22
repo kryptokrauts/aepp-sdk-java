@@ -9,8 +9,8 @@ import java.math.BigInteger;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.experimental.SuperBuilder;
-import net.consensys.cava.bytes.Bytes;
-import net.consensys.cava.rlp.RLP;
+import org.apache.tuweni.bytes.Bytes;
+import org.apache.tuweni.rlp.RLP;
 
 @Getter
 @SuperBuilder
@@ -50,6 +50,6 @@ public class CreateChannelDepositTransaction extends AbstractTransaction<Channel
     Bytes encodedRlp = RLP.encodeList(rlpWriter -> {});
 
     throw new UnsupportedOperationException();
-    //		return encodedRlp;
+    // return encodedRlp;
   }
 }

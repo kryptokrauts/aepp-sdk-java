@@ -2,14 +2,20 @@ package com.kryptokrauts.aeternity.sdk.service.transaction.type;
 
 import com.kryptokrauts.aeternity.generated.api.rxjava.ChannelApi;
 import com.kryptokrauts.aeternity.generated.api.rxjava.ContractApi;
+import com.kryptokrauts.aeternity.generated.api.rxjava.DebugApi;
 import com.kryptokrauts.aeternity.generated.api.rxjava.TransactionApi;
+import com.kryptokrauts.aeternity.sdk.constants.BaseConstants;
 import com.kryptokrauts.aeternity.sdk.service.transaction.fee.FeeCalculationModel;
 import com.kryptokrauts.aeternity.sdk.service.transaction.fee.impl.BaseFeeCalculationModel;
-import com.kryptokrauts.aeternity.sdk.service.transaction.fee.impl.ContractFeeCalculationModel;
+import com.kryptokrauts.aeternity.sdk.service.transaction.fee.impl.ContractCallFeeCalculationModel;
+import com.kryptokrauts.aeternity.sdk.service.transaction.fee.impl.ContractCreateFeeCalculationModel;
+import com.kryptokrauts.aeternity.sdk.service.transaction.type.impl.ContractCallTransaction;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.impl.CreateChannelDepositTransaction;
+import com.kryptokrauts.aeternity.sdk.service.transaction.type.impl.CreateContractTransaction;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.impl.SpendTransaction;
+import com.kryptokrauts.aeternity.sdk.service.transaction.type.impl.StaticContractCallTransaction;
+import com.kryptokrauts.sophia.compiler.generated.api.rxjava.DefaultApi;
 import java.math.BigInteger;
-import javax.annotation.Nullable;
 import lombok.AllArgsConstructor;
 
 /**
@@ -26,10 +32,17 @@ public class TransactionFactory {
 
   private ContractApi contractApi;
 
+  private DefaultApi compilerApi;
+
+  private DebugApi debugApi;
+
   private static FeeCalculationModel baseFeeCalculationModel = new BaseFeeCalculationModel();
 
-  private static FeeCalculationModel contractFeeCalculationModel =
-      new ContractFeeCalculationModel();
+  private static FeeCalculationModel contractCreateFeeCalculationModel =
+      new ContractCreateFeeCalculationModel();
+
+  private static FeeCalculationModel contractCallFeeCalculationModel =
+      new ContractCallFeeCalculationModel();
 
   /**
    * create a SpendTransaction
@@ -38,7 +51,6 @@ public class TransactionFactory {
    * @param recipient recipient public key
    * @param amount amount
    * @param payload payload
-   * @param fee fee, if null the minimal transaction fee will be automatically calculated (default)
    * @param ttl time to live
    * @param nonce account nonce
    * @return a {@link SpendTransaction} object
@@ -48,7 +60,6 @@ public class TransactionFactory {
       String recipient,
       BigInteger amount,
       String payload,
-      @Nullable BigInteger fee,
       BigInteger ttl,
       BigInteger nonce) {
     return SpendTransaction.builder()
@@ -56,7 +67,6 @@ public class TransactionFactory {
         .recipient(recipient)
         .amount(amount)
         .payload(payload)
-        .fee(fee)
         .ttl(ttl)
         .nonce(nonce)
         .feeCalculationModel(baseFeeCalculationModel)
@@ -70,7 +80,6 @@ public class TransactionFactory {
    * @param channelId
    * @param fromId
    * @param amount
-   * @param fee fee, if null the minimal transaction fee will be automatically calculated (default)
    * @param ttl
    * @param stateHash
    * @param round
@@ -81,7 +90,6 @@ public class TransactionFactory {
       String channelId,
       String fromId,
       BigInteger amount,
-      BigInteger fee,
       BigInteger ttl,
       String stateHash,
       BigInteger round,
@@ -90,13 +98,95 @@ public class TransactionFactory {
         .channelId(channelId)
         .fromId(fromId)
         .amount(amount)
-        .fee(fee)
         .ttl(ttl)
         .stateHash(stateHash)
         .round(round)
         .nonce(nonce)
         .feeCalculationModel(baseFeeCalculationModel)
         .channelApi(channelApi)
+        .build();
+  }
+
+  public CreateContractTransaction createContractCreateTransaction(
+      BigInteger abiVersion,
+      BigInteger amount,
+      String callData,
+      String contractByteCode,
+      BigInteger deposit,
+      BigInteger gas,
+      BigInteger gasPrice,
+      BigInteger nonce,
+      String ownerId,
+      BigInteger ttl,
+      BigInteger vmVersion) {
+    return CreateContractTransaction.builder()
+        .abiVersion(abiVersion)
+        .amount(amount)
+        .callData(callData)
+        .contractByteCode(contractByteCode)
+        .deposit(deposit)
+        .gas(gas)
+        .gasPrice(gasPrice)
+        .nonce(nonce)
+        .ownerId(ownerId)
+        .ttl(ttl)
+        .vmVersion(vmVersion)
+        .feeCalculationModel(contractCreateFeeCalculationModel)
+        .contractApi(contractApi)
+        .compilerApi(compilerApi)
+        .build();
+  }
+
+  public ContractCallTransaction createContractCallTransaction(
+      BigInteger abiVersion,
+      String callData,
+      String contractId,
+      BigInteger gas,
+      BigInteger gasPrice,
+      BigInteger nonce,
+      String callerId,
+      BigInteger ttl) {
+    return ContractCallTransaction.builder()
+        .abiVersion(abiVersion)
+        .amount(BigInteger.ZERO) // we provide a separate
+        // setter for the
+        // optional amount
+        .callData(callData)
+        .callerId(callerId)
+        .contractId(contractId)
+        .gas(gas)
+        .gasPrice(gasPrice)
+        .nonce(nonce)
+        .ttl(ttl)
+        .contractApi(contractApi)
+        .feeCalculationModel(contractCallFeeCalculationModel)
+        .build();
+  }
+
+  public StaticContractCallTransaction createStaticContractCallTransaction(
+      BigInteger abiVersion,
+      String callData,
+      String contractId,
+      BigInteger gas,
+      BigInteger nonce,
+      String callerId,
+      BigInteger ttl) {
+    return StaticContractCallTransaction.builder()
+        .abiVersion(abiVersion)
+        .amount(BigInteger.ZERO) // we provide a
+        // separate
+        // setter for the
+        // optional amount
+        .callData(callData)
+        .callerId(callerId)
+        .contractId(contractId)
+        .gas(gas)
+        .gasPrice(BigInteger.valueOf(BaseConstants.MINIMAL_GAS_PRICE))
+        .nonce(nonce)
+        .ttl(ttl)
+        .contractApi(contractApi)
+        .debugApi(debugApi)
+        .feeCalculationModel(contractCallFeeCalculationModel)
         .build();
   }
 }

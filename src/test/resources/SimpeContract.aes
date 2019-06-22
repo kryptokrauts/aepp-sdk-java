@@ -1,0 +1,4 @@
+contract SimpleContract =
+    
+    public function append(x: int) : string = 
+    	String.concat("appended given argument ",Int.to_str(x))<

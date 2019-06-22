@@ -80,14 +80,14 @@
         "src_file":"src_file"
       },
       "properties":{
-        "file_system":{
+        "fileSystem":{
           "description":"An explicit file system, mapping file names to file content",
           "properties":{
 
           },
           "type":"object"
         },
-        "src_file":{
+        "srcFile":{
           "description":"Name of contract source file - only used in error messages",
           "type":"string"
         }

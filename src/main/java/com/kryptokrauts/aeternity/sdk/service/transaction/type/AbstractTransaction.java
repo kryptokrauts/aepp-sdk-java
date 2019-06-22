@@ -7,7 +7,7 @@ import com.kryptokrauts.aeternity.sdk.util.EncodingUtils;
 import io.reactivex.Single;
 import java.math.BigInteger;
 import lombok.experimental.SuperBuilder;
-import net.consensys.cava.bytes.Bytes;
+import org.apache.tuweni.bytes.Bytes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,7 +40,7 @@ public abstract class AbstractTransaction<TxModel> {
    *
    * @return a single-wrapped unsignedTx object
    */
-  protected abstract Single<UnsignedTx> createInternal();
+  protected abstract <T extends UnsignedTx> Single<T> createInternal();
 
   /**
    * this method needs to be implemented for testing purposes (non native mode) and returns the
@@ -68,7 +68,7 @@ public abstract class AbstractTransaction<TxModel> {
         int byte_size = encodedRLPArray.bitLength() / 8;
         /** now calculate fee based on tx size */
         fee = feeCalculationModel.calculateFee(byte_size, minimalGasPrice);
-        _logger.debug(
+        _logger.info(
             String.format(
                 "Using calculation model %s the following fee was calculated %s",
                 feeCalculationModel.getClass().getName(), fee));
@@ -91,6 +91,16 @@ public abstract class AbstractTransaction<TxModel> {
   /** @return the calculated or given fee for this transaction */
   public BigInteger getFee() {
     return fee;
+  }
+
+  /**
+   * this method can be used to set a self-defined fee. otherwise the fee will automatically
+   * calculated
+   *
+   * @param fee a self-defined fee
+   */
+  public void setFee(BigInteger fee) {
+    this.fee = fee;
   }
 
   /**
