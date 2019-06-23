@@ -70,11 +70,7 @@ public class TransactionServiceImpl implements TransactionService {
     if (transactionFactory == null) {
       transactionFactory =
           new TransactionFactory(
-              getTransactionApi(),
-              getChannelApi(),
-              getContractApi(),
-              getCompilerApi(),
-              getDebugApi());
+              getTransactionApi(), getChannelApi(), getContractApi(), getCompilerApi());
     }
     return transactionFactory;
   }
@@ -181,7 +177,7 @@ public class TransactionServiceImpl implements TransactionService {
     unsignedTransactions.forEach(item -> body.addTxsItem(item.getTx()));
 
     _logger.debug(String.format("Calling dry run on block %s with body %s", block, body));
-    return this.debugApi.rxDryRunTxs(body);
+    return this.getDebugApi().rxDryRunTxs(body);
   }
 
   /**
