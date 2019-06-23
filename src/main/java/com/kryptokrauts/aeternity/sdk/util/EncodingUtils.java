@@ -228,4 +228,18 @@ public final class EncodingUtils {
     String publicKey = encodeCheck(rawKeyPair.getPublicKey(), ApiIdentifiers.ACCOUNT_PUBKEY);
     return BaseKeyPair.builder().privateKey(privateKey).publicKey(publicKey).build();
   }
+
+  public static String formatSalt(final BigInteger salt) {
+    return salt.toString(16);
+  }
+
+  public static byte[] nameHash(final String name) {
+    // TODO
+    return null;
+    // https://github.com/aeternity/aepp-sdk-js/blob/master/es/tx/builder/helpers.js#L81
+    // https://github.com/aeternity/aepp-sdk-js/blob/ad490af6b0da861b7e444af258d01a6b5e343de4/es/utils/crypto.js#L123
+    // https://github.com/aeternity/aepp-sdk-js/blob/549ce864c1278ccfcbd2bd4aef2d01f13cd10158/test/unit/tx.js
+    // https://github.com/aeternity/protocol/blob/master/AENS.md#hashing
+    // https://github.com/ethereum/EIPs/blob/master/EIPS/eip-137.md#namehash-algorithm
+  }
 }

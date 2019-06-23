@@ -1,5 +1,6 @@
 package com.kryptokrauts.aeternity.sdk.util;
 
+import java.math.BigInteger;
 import java.security.SecureRandom;
 import lombok.experimental.UtilityClass;
 import org.bouncycastle.crypto.CipherParameters;
@@ -23,6 +24,11 @@ public final class CryptoUtils {
     byte[] salt = new byte[size];
     secureRandom.nextBytes(salt);
     return salt;
+  }
+
+  /** @return positive salt */
+  public static final BigInteger generateSalt() {
+    return new BigInteger(1, generateSalt(32));
   }
 
   /**

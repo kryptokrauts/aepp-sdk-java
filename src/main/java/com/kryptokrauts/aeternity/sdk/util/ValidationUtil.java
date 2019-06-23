@@ -14,6 +14,8 @@ public class ValidationUtil {
 
   public static final String MAP_MISSING_VALUE = "Map is missing value for %s";
 
+  public static final List<String> ALLOWED_NAMESPACES = Arrays.asList("test");
+
   /**
    * encapsule validation of given parameters
    *
@@ -45,6 +47,14 @@ public class ValidationUtil {
           String.format(
               "Call of function %s has missing or invalid parameters %s%s",
               methodName, parameters, causeMessage));
+    }
+  }
+
+  public static void checkNamespace(String domainName) {
+    String[] domainSplit = domainName.split("\\.");
+    boolean isValid = domainSplit.length == 2 && ALLOWED_NAMESPACES.contains(domainSplit[1]);
+    if (!isValid) {
+      throw new InvalidParameterException("Namespace not allowed / not provided.");
     }
   }
 }
