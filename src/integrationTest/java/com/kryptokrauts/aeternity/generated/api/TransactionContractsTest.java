@@ -1,7 +1,14 @@
 package com.kryptokrauts.aeternity.generated.api;
 
 import com.google.common.collect.ImmutableMap;
-import com.kryptokrauts.aeternity.generated.model.*;
+import com.kryptokrauts.aeternity.generated.model.Account;
+import com.kryptokrauts.aeternity.generated.model.DryRunResult;
+import com.kryptokrauts.aeternity.generated.model.DryRunResults;
+import com.kryptokrauts.aeternity.generated.model.PostTxResponse;
+import com.kryptokrauts.aeternity.generated.model.Tx;
+import com.kryptokrauts.aeternity.generated.model.TxInfoObject;
+import com.kryptokrauts.aeternity.generated.model.UnsignedTx;
+import com.kryptokrauts.aeternity.sdk.constants.BaseConstants;
 import com.kryptokrauts.aeternity.sdk.constants.Network;
 import com.kryptokrauts.aeternity.sdk.constants.SerializationTags;
 import com.kryptokrauts.aeternity.sdk.domain.secret.impl.BaseKeyPair;
@@ -220,9 +227,10 @@ public class TransactionContractsTest extends BaseTest {
                                 AccountParameter.PUBLIC_KEY, baseKeyPair.getPublicKey())),
                         null,
                         Arrays.asList(
-                            createUnsignedContractCallTx(context, nonce, calldata.getCalldata()),
                             createUnsignedContractCallTx(
-                                context, nonce.add(BigInteger.ONE), calldata.getCalldata())));
+                                context, nonce, calldata.getCalldata(), null),
+                            createUnsignedContractCallTx(
+                                context, nonce.add(BigInteger.ONE), calldata.getCalldata(), null)));
                 TestObserver<DryRunResults> dryRunTestObserver = dryRunResults.test();
                 dryRunTestObserver.awaitTerminalEvent();
                 DryRunResults results = dryRunTestObserver.values().get(0);
@@ -264,7 +272,7 @@ public class TransactionContractsTest extends BaseTest {
                         null,
                         Arrays.asList(
                             createUnsignedContractCallTx(
-                                context, BigInteger.ONE, calldata.getCalldata())));
+                                context, BigInteger.ONE, calldata.getCalldata(), null)));
                 TestObserver<DryRunResults> dryRunTestObserver = dryRunResults.test();
                 dryRunTestObserver.awaitTerminalEvent();
                 DryRunResults results = dryRunTestObserver.values().get(0);
@@ -287,7 +295,6 @@ public class TransactionContractsTest extends BaseTest {
    * @param context
    */
   @Test
-  @Ignore
   public void callContractAfterDryRunOnLocalNode(TestContext context) {
     Async async = context.async();
     rule.vertx()
@@ -318,7 +325,8 @@ public class TransactionContractsTest extends BaseTest {
                                 AccountParameter.PUBLIC_KEY, baseKeyPair.getPublicKey())),
                         null,
                         Arrays.asList(
-                            createUnsignedContractCallTx(context, nonce, calldata.getCalldata())));
+                            createUnsignedContractCallTx(
+                                context, nonce, calldata.getCalldata(), null)));
                 TestObserver<DryRunResults> dryRunTestObserver = dryRunResults.test();
                 dryRunTestObserver.awaitTerminalEvent();
                 DryRunResults results = dryRunTestObserver.values().get(0);
@@ -400,7 +408,7 @@ public class TransactionContractsTest extends BaseTest {
   }
 
   private UnsignedTx createUnsignedContractCallTx(
-      TestContext context, BigInteger nonce, String calldata) {
+      TestContext context, BigInteger nonce, String calldata, BigInteger gasPrice) {
     String callerId = baseKeyPair.getPublicKey();
     BigInteger abiVersion = BigInteger.ONE;
     BigInteger ttl = BigInteger.ZERO;
@@ -409,8 +417,15 @@ public class TransactionContractsTest extends BaseTest {
     AbstractTransaction<?> contractTx =
         transactionServiceNative
             .getTransactionFactory()
-            .createStaticContractCallTransaction(
-                abiVersion, calldata, localDeployedContractId, gas, nonce, callerId, ttl);
+            .createContractCallTransaction(
+                abiVersion,
+                calldata,
+                localDeployedContractId,
+                gas,
+                gasPrice != null ? gasPrice : BigInteger.valueOf(BaseConstants.MINIMAL_GAS_PRICE),
+                nonce,
+                callerId,
+                ttl);
 
     UnsignedTx unsignedTxNative =
         transactionServiceNative.createUnsignedTransaction(contractTx).blockingGet();
@@ -519,7 +534,7 @@ public class TransactionContractsTest extends BaseTest {
                 Calldata callData = calldataTestObserver.values().get(0);
 
                 UnsignedTx unsignedTxNative =
-                    this.createUnsignedContractCallTx(context, nonce, callData.getCalldata());
+                    this.createUnsignedContractCallTx(context, nonce, callData.getCalldata(), null);
                 Tx signedTxNative =
                     transactionServiceNative.signTransaction(
                         unsignedTxNative, baseKeyPair.getPrivateKey());

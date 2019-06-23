@@ -2,9 +2,7 @@ package com.kryptokrauts.aeternity.sdk.service.transaction.type;
 
 import com.kryptokrauts.aeternity.generated.api.rxjava.ChannelApi;
 import com.kryptokrauts.aeternity.generated.api.rxjava.ContractApi;
-import com.kryptokrauts.aeternity.generated.api.rxjava.DebugApi;
 import com.kryptokrauts.aeternity.generated.api.rxjava.TransactionApi;
-import com.kryptokrauts.aeternity.sdk.constants.BaseConstants;
 import com.kryptokrauts.aeternity.sdk.service.transaction.fee.FeeCalculationModel;
 import com.kryptokrauts.aeternity.sdk.service.transaction.fee.impl.BaseFeeCalculationModel;
 import com.kryptokrauts.aeternity.sdk.service.transaction.fee.impl.ContractCallFeeCalculationModel;
@@ -13,7 +11,6 @@ import com.kryptokrauts.aeternity.sdk.service.transaction.type.impl.ContractCall
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.impl.CreateChannelDepositTransaction;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.impl.CreateContractTransaction;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.impl.SpendTransaction;
-import com.kryptokrauts.aeternity.sdk.service.transaction.type.impl.StaticContractCallTransaction;
 import com.kryptokrauts.sophia.compiler.generated.api.rxjava.DefaultApi;
 import java.math.BigInteger;
 import lombok.AllArgsConstructor;
@@ -33,8 +30,6 @@ public class TransactionFactory {
   private ContractApi contractApi;
 
   private DefaultApi compilerApi;
-
-  private DebugApi debugApi;
 
   private static FeeCalculationModel baseFeeCalculationModel = new BaseFeeCalculationModel();
 
@@ -107,6 +102,22 @@ public class TransactionFactory {
         .build();
   }
 
+  /**
+   * create a contractCreate Transaction
+   *
+   * @param abiVersion
+   * @param amount
+   * @param callData
+   * @param contractByteCode
+   * @param deposit
+   * @param gas
+   * @param gasPrice
+   * @param nonce
+   * @param ownerId
+   * @param ttl
+   * @param vmVersion
+   * @return
+   */
   public CreateContractTransaction createContractCreateTransaction(
       BigInteger abiVersion,
       BigInteger amount,
@@ -137,6 +148,19 @@ public class TransactionFactory {
         .build();
   }
 
+  /**
+   * create a contractCall Transaction
+   *
+   * @param abiVersion
+   * @param callData
+   * @param contractId
+   * @param gas
+   * @param gasPrice
+   * @param nonce
+   * @param callerId
+   * @param ttl
+   * @return
+   */
   public ContractCallTransaction createContractCallTransaction(
       BigInteger abiVersion,
       String callData,
@@ -159,33 +183,6 @@ public class TransactionFactory {
         .nonce(nonce)
         .ttl(ttl)
         .contractApi(contractApi)
-        .feeCalculationModel(contractCallFeeCalculationModel)
-        .build();
-  }
-
-  public StaticContractCallTransaction createStaticContractCallTransaction(
-      BigInteger abiVersion,
-      String callData,
-      String contractId,
-      BigInteger gas,
-      BigInteger nonce,
-      String callerId,
-      BigInteger ttl) {
-    return StaticContractCallTransaction.builder()
-        .abiVersion(abiVersion)
-        .amount(BigInteger.ZERO) // we provide a
-        // separate
-        // setter for the
-        // optional amount
-        .callData(callData)
-        .callerId(callerId)
-        .contractId(contractId)
-        .gas(gas)
-        .gasPrice(BigInteger.valueOf(BaseConstants.MINIMAL_GAS_PRICE))
-        .nonce(nonce)
-        .ttl(ttl)
-        .contractApi(contractApi)
-        .debugApi(debugApi)
         .feeCalculationModel(contractCallFeeCalculationModel)
         .build();
   }

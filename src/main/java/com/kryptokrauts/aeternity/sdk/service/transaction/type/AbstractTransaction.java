@@ -8,6 +8,7 @@ import io.reactivex.Single;
 import java.math.BigInteger;
 import lombok.experimental.SuperBuilder;
 import org.apache.tuweni.bytes.Bytes;
+import org.apache.tuweni.rlp.RLPWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -109,5 +110,19 @@ public abstract class AbstractTransaction<TxModel> {
    */
   public TxModel getApiModel() {
     return toModel();
+  }
+
+  /**
+   * check if value is 0 -> if so, serialize as byte, otherwise serialize value as BigInteger
+   *
+   * @param rlpWriter
+   * @param value
+   */
+  protected void checkZeroAndWriteValue(RLPWriter rlpWriter, BigInteger value) {
+    if (BigInteger.ZERO.equals(value)) {
+      rlpWriter.writeByte((byte) 0);
+    } else {
+      rlpWriter.writeBigInteger(value);
+    }
   }
 }
