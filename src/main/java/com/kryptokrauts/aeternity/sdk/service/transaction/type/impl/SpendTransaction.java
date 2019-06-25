@@ -46,6 +46,11 @@ public class SpendTransaction extends AbstractTransaction<SpendTx> {
   }
 
   @Override
+  protected void validateInput() {
+    // nothing to validate here
+  }
+
+  @Override
   protected Bytes createRLPEncodedList() {
     Bytes encodedRlp =
         RLP.encodeList(

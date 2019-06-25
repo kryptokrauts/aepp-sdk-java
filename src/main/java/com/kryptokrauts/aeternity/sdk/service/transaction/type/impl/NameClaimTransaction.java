@@ -29,19 +29,24 @@ public class NameClaimTransaction extends AbstractTransaction<NameClaimTx> {
 
   @Override
   protected Single<UnsignedTx> createInternal() {
-    return nameServiceApi.rxPostNameClaim(getApiModel());
+    return this.nameServiceApi.rxPostNameClaim(getApiModel());
   }
 
   @Override
   protected NameClaimTx toModel() {
     NameClaimTx nameClaimTx = new NameClaimTx();
-    nameClaimTx.setAccountId(accountId);
-    nameClaimTx.setNonce(nonce);
-    nameClaimTx.setName(name);
-    nameClaimTx.setNameSalt(nameSalt);
-    nameClaimTx.setFee(fee);
-    nameClaimTx.setTtl(ttl);
+    nameClaimTx.setAccountId(this.accountId);
+    nameClaimTx.setNonce(this.nonce);
+    nameClaimTx.setName(this.name);
+    nameClaimTx.setNameSalt(this.nameSalt);
+    nameClaimTx.setFee(this.fee);
+    nameClaimTx.setTtl(this.ttl);
     return nameClaimTx;
+  }
+
+  @Override
+  protected void validateInput() {
+    // nothing to validate here
   }
 
   @Override
@@ -54,11 +59,11 @@ public class NameClaimTransaction extends AbstractTransaction<NameClaimTx> {
               byte[] accountIdWithTag =
                   EncodingUtils.decodeCheckAndTag(this.accountId, SerializationTags.ID_TAG_ACCOUNT);
               rlpWriter.writeByteArray(accountIdWithTag);
-              rlpWriter.writeByteArray(this.nonce.toByteArray());
-              rlpWriter.writeByteArray(this.name.getBytes());
-              rlpWriter.writeByteArray(this.nameSalt.toByteArray());
-              rlpWriter.writeByteArray(this.fee.toByteArray());
-              rlpWriter.writeByteArray(this.ttl.toByteArray());
+              this.checkZeroAndWriteValue(rlpWriter, this.nonce);
+              rlpWriter.writeString(this.name);
+              this.checkZeroAndWriteValue(rlpWriter, this.nameSalt);
+              this.checkZeroAndWriteValue(rlpWriter, this.fee);
+              this.checkZeroAndWriteValue(rlpWriter, this.ttl);
             });
     return encodedRlp;
   }

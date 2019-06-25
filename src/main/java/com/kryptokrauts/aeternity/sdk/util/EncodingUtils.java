@@ -12,6 +12,8 @@ import com.kryptokrauts.aeternity.sdk.domain.secret.impl.BaseKeyPair;
 import com.kryptokrauts.aeternity.sdk.domain.secret.impl.RawKeyPair;
 import com.kryptokrauts.aeternity.sdk.exception.EncodingNotSupportedException;
 import java.math.BigInteger;
+import java.net.IDN;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import lombok.experimental.UtilityClass;
 import org.bitcoinj.core.AddressFormatException;
@@ -229,17 +231,45 @@ public final class EncodingUtils {
     return BaseKeyPair.builder().privateKey(privateKey).publicKey(publicKey).build();
   }
 
-  public static String formatSalt(final BigInteger salt) {
+  public static String generateCommitmentHash(final String name, final BigInteger salt) {
+    return encodeCheck(
+        hash(
+            ByteUtils.concatenate(
+                nameHash(name), formatSalt(salt).getBytes(StandardCharsets.UTF_8))),
+        ApiIdentifiers.COMMITMENT);
+  }
+
+  private static String formatSalt(final BigInteger salt) {
     return salt.toString(16);
   }
 
-  public static byte[] nameHash(final String name) {
-    // TODO
-    return null;
-    // https://github.com/aeternity/aepp-sdk-js/blob/master/es/tx/builder/helpers.js#L81
-    // https://github.com/aeternity/aepp-sdk-js/blob/ad490af6b0da861b7e444af258d01a6b5e343de4/es/utils/crypto.js#L123
-    // https://github.com/aeternity/aepp-sdk-js/blob/549ce864c1278ccfcbd2bd4aef2d01f13cd10158/test/unit/tx.js
-    // https://github.com/aeternity/protocol/blob/master/AENS.md#hashing
-    // https://github.com/ethereum/EIPs/blob/master/EIPS/eip-137.md#namehash-algorithm
+  private static String normalize(final String domainName) {
+    return IDN.toASCII(domainName, IDN.USE_STD3_ASCII_RULES);
+  }
+
+  private static byte[] nameHash(final String domainName) {
+    String normalizedDomainName = normalize(domainName);
+    return nameHash(normalizedDomainName.split("\\."));
+  }
+
+  private static byte[] nameHash(final String[] labels) {
+    if (labels.length == 0 || labels[0].equals("")) {
+      return new byte[32];
+    } else {
+      String[] tail;
+      if (labels.length == 1) {
+        tail = new String[] {};
+      } else {
+        tail = Arrays.copyOfRange(labels, 1, labels.length);
+      }
+
+      byte[] remainderHash = nameHash(tail);
+      byte[] result = Arrays.copyOf(remainderHash, 64);
+
+      byte[] labelHash = hash(labels[0].getBytes(StandardCharsets.UTF_8));
+      System.arraycopy(labelHash, 0, result, 32, labelHash.length);
+
+      return hash(result);
+    }
   }
 }

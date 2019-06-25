@@ -56,6 +56,11 @@ public class ContractCallTransaction extends AbstractTransaction<ContractCallTx>
   }
 
   @Override
+  protected void validateInput() {
+    // nothing to validate here
+  }
+
+  @Override
   protected Bytes createRLPEncodedList() {
     Bytes encodedRlp =
         RLP.encodeList(
