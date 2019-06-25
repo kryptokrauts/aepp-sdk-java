@@ -3,10 +3,12 @@ package com.kryptokrauts.aeternity.sdk.service.transaction.impl;
 import com.kryptokrauts.aeternity.generated.api.ChannelApiImpl;
 import com.kryptokrauts.aeternity.generated.api.ContractApiImpl;
 import com.kryptokrauts.aeternity.generated.api.DebugApiImpl;
+import com.kryptokrauts.aeternity.generated.api.NameServiceApiImpl;
 import com.kryptokrauts.aeternity.generated.api.TransactionApiImpl;
 import com.kryptokrauts.aeternity.generated.api.rxjava.ChannelApi;
 import com.kryptokrauts.aeternity.generated.api.rxjava.ContractApi;
 import com.kryptokrauts.aeternity.generated.api.rxjava.DebugApi;
+import com.kryptokrauts.aeternity.generated.api.rxjava.NameServiceApi;
 import com.kryptokrauts.aeternity.generated.api.rxjava.TransactionApi;
 import com.kryptokrauts.aeternity.generated.model.DryRunAccount;
 import com.kryptokrauts.aeternity.generated.model.DryRunInput;
@@ -63,6 +65,8 @@ public class TransactionServiceImpl implements TransactionService {
 
   private DebugApi debugApi;
 
+  private NameServiceApi nameServiceApi;
+
   private TransactionFactory transactionFactory;
 
   @Override
@@ -70,7 +74,11 @@ public class TransactionServiceImpl implements TransactionService {
     if (transactionFactory == null) {
       transactionFactory =
           new TransactionFactory(
-              getTransactionApi(), getChannelApi(), getContractApi(), getCompilerApi());
+              getTransactionApi(),
+              getChannelApi(),
+              getContractApi(),
+              getNameServiceApi(),
+              getCompilerApi());
     }
     return transactionFactory;
   }
@@ -226,6 +234,13 @@ public class TransactionServiceImpl implements TransactionService {
       compilerApi = new DefaultApi(new DefaultApiImpl(config.getCompilerApiClient()));
     }
     return compilerApi;
+  }
+
+  private NameServiceApi getNameServiceApi() {
+    if (nameServiceApi == null) {
+      nameServiceApi = new NameServiceApi(new NameServiceApiImpl(config.getApiClient()));
+    }
+    return nameServiceApi;
   }
 
   private DebugApi getDebugApi() {

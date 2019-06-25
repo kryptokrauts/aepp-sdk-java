@@ -6,6 +6,7 @@ import com.kryptokrauts.aeternity.generated.model.UnsignedTx;
 import com.kryptokrauts.aeternity.sdk.constants.SerializationTags;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.AbstractTransaction;
 import com.kryptokrauts.aeternity.sdk.util.EncodingUtils;
+import com.kryptokrauts.aeternity.sdk.util.ValidationUtil;
 import io.reactivex.Single;
 import java.math.BigInteger;
 import lombok.Getter;
@@ -21,7 +22,8 @@ import org.apache.tuweni.rlp.RLP;
 public class NamePreclaimTransaction extends AbstractTransaction<NamePreclaimTx> {
 
   @NonNull private String accountId;
-  @NonNull private String commitmentId;
+  @NonNull private String name; // will be used to generate the commitmentId
+  @NonNull private BigInteger salt; // will be used to generate the commitmentId
   @NonNull private BigInteger nonce;
   @NonNull private BigInteger ttl;
   @NonNull private NameServiceApi nameServiceApi;
@@ -34,12 +36,17 @@ public class NamePreclaimTransaction extends AbstractTransaction<NamePreclaimTx>
   @Override
   protected NamePreclaimTx toModel() {
     NamePreclaimTx namePreclaimTx = new NamePreclaimTx();
-    namePreclaimTx.setAccountId(accountId);
-    namePreclaimTx.setCommitmentId(commitmentId);
-    namePreclaimTx.setFee(fee);
-    namePreclaimTx.setNonce(nonce);
-    namePreclaimTx.setTtl(ttl);
+    namePreclaimTx.setAccountId(this.accountId);
+    namePreclaimTx.setCommitmentId(EncodingUtils.generateCommitmentHash(this.name, this.salt));
+    namePreclaimTx.setFee(this.fee);
+    namePreclaimTx.setNonce(this.nonce);
+    namePreclaimTx.setTtl(this.ttl);
     return namePreclaimTx;
+  }
+
+  @Override
+  protected void validateInput() {
+    ValidationUtil.checkNamespace(this.name);
   }
 
   @Override
@@ -53,12 +60,13 @@ public class NamePreclaimTransaction extends AbstractTransaction<NamePreclaimTx>
                   EncodingUtils.decodeCheckAndTag(this.accountId, SerializationTags.ID_TAG_ACCOUNT);
               byte[] commitmentIdWithTag =
                   EncodingUtils.decodeCheckAndTag(
-                      this.commitmentId, SerializationTags.ID_TAG_COMMITMENT);
+                      EncodingUtils.generateCommitmentHash(this.name, this.salt),
+                      SerializationTags.ID_TAG_COMMITMENT);
               rlpWriter.writeByteArray(accountIdWithTag);
-              rlpWriter.writeByteArray(this.nonce.toByteArray());
+              this.checkZeroAndWriteValue(rlpWriter, this.nonce);
               rlpWriter.writeByteArray(commitmentIdWithTag);
-              rlpWriter.writeByteArray(this.fee.toByteArray());
-              rlpWriter.writeByteArray(this.ttl.toByteArray());
+              this.checkZeroAndWriteValue(rlpWriter, this.fee);
+              this.checkZeroAndWriteValue(rlpWriter, this.ttl);
             });
     return encodedRlp;
   }

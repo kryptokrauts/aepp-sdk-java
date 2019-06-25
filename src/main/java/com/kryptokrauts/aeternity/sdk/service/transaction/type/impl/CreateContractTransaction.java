@@ -64,6 +64,11 @@ public class CreateContractTransaction extends AbstractTransaction<ContractCreat
   }
 
   @Override
+  protected void validateInput() {
+    // nothing to validate here
+  }
+
+  @Override
   protected Bytes createRLPEncodedList() {
     Bytes encodedRlp =
         RLP.encodeList(

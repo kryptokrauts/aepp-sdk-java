@@ -46,6 +46,11 @@ public class CreateChannelDepositTransaction extends AbstractTransaction<Channel
   }
 
   @Override
+  protected void validateInput() {
+    // nothing to validate here
+  }
+
+  @Override
   protected Bytes createRLPEncodedList() {
     Bytes encodedRlp = RLP.encodeList(rlpWriter -> {});
 

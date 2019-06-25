@@ -2,6 +2,7 @@ package com.kryptokrauts.aeternity.sdk.service.transaction.type;
 
 import com.kryptokrauts.aeternity.generated.api.rxjava.ChannelApi;
 import com.kryptokrauts.aeternity.generated.api.rxjava.ContractApi;
+import com.kryptokrauts.aeternity.generated.api.rxjava.NameServiceApi;
 import com.kryptokrauts.aeternity.generated.api.rxjava.TransactionApi;
 import com.kryptokrauts.aeternity.sdk.service.transaction.fee.FeeCalculationModel;
 import com.kryptokrauts.aeternity.sdk.service.transaction.fee.impl.BaseFeeCalculationModel;
@@ -10,6 +11,8 @@ import com.kryptokrauts.aeternity.sdk.service.transaction.fee.impl.ContractCreat
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.impl.ContractCallTransaction;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.impl.CreateChannelDepositTransaction;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.impl.CreateContractTransaction;
+import com.kryptokrauts.aeternity.sdk.service.transaction.type.impl.NameClaimTransaction;
+import com.kryptokrauts.aeternity.sdk.service.transaction.type.impl.NamePreclaimTransaction;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.impl.SpendTransaction;
 import com.kryptokrauts.sophia.compiler.generated.api.rxjava.DefaultApi;
 import java.math.BigInteger;
@@ -28,6 +31,8 @@ public class TransactionFactory {
   private ChannelApi channelApi;
 
   private ContractApi contractApi;
+
+  private NameServiceApi nameServiceApi;
 
   private DefaultApi compilerApi;
 
@@ -184,6 +189,52 @@ public class TransactionFactory {
         .ttl(ttl)
         .contractApi(contractApi)
         .feeCalculationModel(contractCallFeeCalculationModel)
+        .build();
+  }
+
+  /**
+   * create a namePreclaimTx
+   *
+   * @param accountId
+   * @param name
+   * @param salt
+   * @param nonce
+   * @param ttl
+   * @return
+   */
+  public NamePreclaimTransaction createNamePreclaimTransaction(
+      String accountId, String name, BigInteger salt, BigInteger nonce, BigInteger ttl) {
+    return NamePreclaimTransaction.builder()
+        .accountId(accountId)
+        .name(name)
+        .salt(salt)
+        .nonce(nonce)
+        .ttl(ttl)
+        .nameServiceApi(nameServiceApi)
+        .feeCalculationModel(baseFeeCalculationModel)
+        .build();
+  }
+
+  /**
+   * create a claimTx
+   *
+   * @param accountId
+   * @param name
+   * @param nameSalt
+   * @param nonce
+   * @param ttl
+   * @return
+   */
+  public NameClaimTransaction createNameClaimTransaction(
+      String accountId, String name, BigInteger nameSalt, BigInteger nonce, BigInteger ttl) {
+    return NameClaimTransaction.builder()
+        .accountId(accountId)
+        .name(name)
+        .nameSalt(nameSalt)
+        .nonce(nonce)
+        .ttl(ttl)
+        .nameServiceApi(nameServiceApi)
+        .feeCalculationModel(baseFeeCalculationModel)
         .build();
   }
 }

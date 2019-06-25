@@ -61,6 +61,8 @@ public abstract class AbstractTransaction<TxModel> {
    * @return a single-wrapped unsignedTx object
    */
   public Single<UnsignedTx> createUnsignedTransaction(boolean nativeMode, long minimalGasPrice) {
+    /** before creating the unsigned transaction we validate the input */
+    validateInput();
     if (nativeMode) {
       /** if no fee is given - use default fee to create a tx and get its size */
       if (fee == null) {
@@ -125,4 +127,7 @@ public abstract class AbstractTransaction<TxModel> {
       rlpWriter.writeBigInteger(value);
     }
   }
+
+  /** this method can be used to perform transaction specific validations that will */
+  protected abstract void validateInput();
 }

@@ -16,6 +16,8 @@ public class ValidationUtil {
 
   public static final List<String> ALLOWED_NAMESPACES = Arrays.asList("test");
 
+  public static final int DOMAIN_NAME_MAX_LENGHT = 253;
+
   /**
    * encapsule validation of given parameters
    *
@@ -50,11 +52,19 @@ public class ValidationUtil {
     }
   }
 
+  /**
+   * validate the given domainName
+   *
+   * @param domainName
+   */
   public static void checkNamespace(String domainName) {
     String[] domainSplit = domainName.split("\\.");
     boolean isValid = domainSplit.length == 2 && ALLOWED_NAMESPACES.contains(domainSplit[1]);
     if (!isValid) {
       throw new InvalidParameterException("Namespace not allowed / not provided.");
+    } else if (domainName.length() > DOMAIN_NAME_MAX_LENGHT) {
+      throw new InvalidParameterException(
+          String.format("Domainname exceeds %s char limit.", DOMAIN_NAME_MAX_LENGHT));
     }
   }
 }
