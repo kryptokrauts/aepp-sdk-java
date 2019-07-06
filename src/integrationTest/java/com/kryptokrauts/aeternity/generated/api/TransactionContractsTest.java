@@ -21,7 +21,6 @@ import com.kryptokrauts.aeternity.sdk.service.transaction.TransactionServiceFact
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.AbstractTransaction;
 import com.kryptokrauts.aeternity.sdk.util.EncodingUtils;
 import com.kryptokrauts.sophia.compiler.generated.model.Calldata;
-import com.kryptokrauts.sophia.compiler.generated.model.SophiaJsonData;
 import io.reactivex.Single;
 import io.reactivex.observers.TestObserver;
 import io.vertx.core.json.JsonObject;
@@ -147,11 +146,7 @@ public class TransactionContractsTest extends BaseTest {
         .executeBlocking(
             future -> {
               try {
-                Single<Account> accountSingle =
-                    accountService.getAccount(baseKeyPair.getPublicKey());
-                TestObserver<Account> accountTestObserver = accountSingle.test();
-                accountTestObserver.awaitTerminalEvent();
-                Account account = accountTestObserver.values().get(0);
+                Account account = getAccount(baseKeyPair.getPublicKey());
                 String callerId = baseKeyPair.getPublicKey();
                 BigInteger abiVersion = BigInteger.ONE;
                 BigInteger ttl = BigInteger.valueOf(20000);
@@ -201,22 +196,15 @@ public class TransactionContractsTest extends BaseTest {
         .executeBlocking(
             future -> {
               try {
-                Single<Account> accountSingle =
-                    accountService.getAccount(baseKeyPair.getPublicKey());
-                TestObserver<Account> accountTestObserver = accountSingle.test();
-                accountTestObserver.awaitTerminalEvent();
-                Account account = accountTestObserver.values().get(0);
+                Account account = getAccount(baseKeyPair.getPublicKey());
                 BigInteger nonce = account.getNonce().add(BigInteger.ONE);
 
                 // Compile the call contract
-                Single<Calldata> encodedCallData =
-                    this.sophiaCompilerService.encodeCalldata(
+                Calldata calldata =
+                    encodeCalldata(
                         TestConstants.testContractSourceCode,
                         TestConstants.testContractFunction,
                         TestConstants.testContractFunctionParams);
-                TestObserver<Calldata> encodedCalldataTestObserver = encodedCallData.test();
-                encodedCalldataTestObserver.awaitTerminalEvent();
-                Calldata calldata = encodedCalldataTestObserver.values().get(0);
 
                 Single<DryRunResults> dryRunResults =
                     this.transactionServiceNative.dryRunTransactions(
@@ -255,14 +243,11 @@ public class TransactionContractsTest extends BaseTest {
             future -> {
               try {
                 // Compile the call contract
-                Single<Calldata> encodedCallData =
-                    this.sophiaCompilerService.encodeCalldata(
+                Calldata calldata =
+                    encodeCalldata(
                         TestConstants.testContractSourceCode,
                         TestConstants.testContractFunction,
                         TestConstants.testContractFunctionParams);
-                TestObserver<Calldata> encodedCalldataTestObserver = encodedCallData.test();
-                encodedCalldataTestObserver.awaitTerminalEvent();
-                Calldata calldata = encodedCalldataTestObserver.values().get(0);
 
                 Single<DryRunResults> dryRunResults =
                     this.transactionServiceNative.dryRunTransactions(
@@ -301,25 +286,18 @@ public class TransactionContractsTest extends BaseTest {
         .executeBlocking(
             future -> {
               try {
-                Single<Account> accountSingle =
-                    accountService.getAccount(baseKeyPair.getPublicKey());
-                TestObserver<Account> accountTestObserver = accountSingle.test();
-                accountTestObserver.awaitTerminalEvent();
-                Account account = accountTestObserver.values().get(0);
+                Account account = getAccount(baseKeyPair.getPublicKey());
                 BigInteger nonce = account.getNonce().add(BigInteger.ONE);
 
                 // Compile the call contract
-                Single<Calldata> encodedCallData =
-                    this.sophiaCompilerService.encodeCalldata(
+                Calldata calldata =
+                    encodeCalldata(
                         TestConstants.testContractSourceCode,
                         TestConstants.testContractFunction,
                         TestConstants.testContractFunctionParams);
-                TestObserver<Calldata> encodedCalldataTestObserver = encodedCallData.test();
-                encodedCalldataTestObserver.awaitTerminalEvent();
-                Calldata calldata = encodedCalldataTestObserver.values().get(0);
 
-                Single<DryRunResults> dryRunResults =
-                    this.transactionServiceNative.dryRunTransactions(
+                DryRunResults results =
+                    performDryRunTransactions(
                         Arrays.asList(
                             ImmutableMap.of(
                                 AccountParameter.PUBLIC_KEY, baseKeyPair.getPublicKey())),
@@ -327,9 +305,6 @@ public class TransactionContractsTest extends BaseTest {
                         Arrays.asList(
                             createUnsignedContractCallTx(
                                 context, nonce, calldata.getCalldata(), null)));
-                TestObserver<DryRunResults> dryRunTestObserver = dryRunResults.test();
-                dryRunTestObserver.awaitTerminalEvent();
-                DryRunResults results = dryRunTestObserver.values().get(0);
                 _logger.info("callContractAfterDryRunOnLocalNode: " + results.toString());
                 for (DryRunResult result : results.getResults()) {
                   context.assertEquals("ok", result.getResult());
@@ -370,31 +345,13 @@ public class TransactionContractsTest extends BaseTest {
 
                   // get the tx info object to resolve the result
                   TxInfoObject txInfoObject = null;
-                  do {
-                    Single<TxInfoObject> txInfoObjectSingle =
-                        transactionServiceNative.getTransactionInfoByHash(
-                            postTxResponse.getTxHash());
-                    TestObserver<TxInfoObject> txInfoObjectTestObserver = txInfoObjectSingle.test();
-                    txInfoObjectTestObserver.awaitTerminalEvent();
-                    if (txInfoObjectTestObserver.errorCount() > 0) {
-                      _logger.warn("unable to receive txInfoObject. trying again in 1 second ...");
-                      Thread.sleep(1000);
-                    } else {
-                      txInfoObject = txInfoObjectTestObserver.values().get(0);
-                      _logger.info("Call contract tx object: " + txInfoObject.toString());
-                    }
-                  } while (txInfoObject == null);
+                  waitForTxInfoObject(txInfoObject, postTxResponse.getTxHash());
 
                   // decode the result to json
-                  Single<SophiaJsonData> sophiaJsonDataSingle =
-                      this.sophiaCompilerService.decodeCalldata(
+                  JsonObject json =
+                      decodeCalldata(
                           txInfoObject.getCallInfo().getReturnValue(),
                           TestConstants.testContractFunctionSophiaType);
-                  TestObserver<SophiaJsonData> sophiaJsonDataTestObserver =
-                      sophiaJsonDataSingle.test();
-                  sophiaJsonDataTestObserver.awaitTerminalEvent();
-                  SophiaJsonData sophiaJsonData = sophiaJsonDataTestObserver.values().get(0);
-                  JsonObject json = JsonObject.mapFrom(sophiaJsonData.getData());
                   context.assertEquals(
                       TestConstants.testContractFuntionParam, json.getValue("value").toString());
                 }
@@ -439,11 +396,7 @@ public class TransactionContractsTest extends BaseTest {
         .executeBlocking(
             future -> {
               try {
-                Single<Account> accountSingle =
-                    accountService.getAccount(baseKeyPair.getPublicKey());
-                TestObserver<Account> accountTestObserver = accountSingle.test();
-                accountTestObserver.awaitTerminalEvent();
-                Account account = accountTestObserver.values().get(0);
+                Account account = getAccount(baseKeyPair.getPublicKey());
                 String ownerId = baseKeyPair.getPublicKey();
                 BigInteger abiVersion = BigInteger.ONE;
                 BigInteger vmVersion = BigInteger.valueOf(4);
@@ -517,11 +470,7 @@ public class TransactionContractsTest extends BaseTest {
         .executeBlocking(
             future -> {
               try {
-                Single<Account> accountSingle =
-                    accountService.getAccount(baseKeyPair.getPublicKey());
-                TestObserver<Account> accountTestObserver = accountSingle.test();
-                accountTestObserver.awaitTerminalEvent();
-                Account account = accountTestObserver.values().get(0);
+                Account account = getAccount(baseKeyPair.getPublicKey());
                 BigInteger nonce = account.getNonce().add(BigInteger.ONE);
 
                 Single<Calldata> callDataSingle =
@@ -568,15 +517,10 @@ public class TransactionContractsTest extends BaseTest {
                 } while (txInfoObject == null);
 
                 // decode the result to json
-                Single<SophiaJsonData> sophiaJsonDataSingle =
-                    this.sophiaCompilerService.decodeCalldata(
+                JsonObject json =
+                    decodeCalldata(
                         txInfoObject.getCallInfo().getReturnValue(),
                         TestConstants.testContractFunctionSophiaType);
-                TestObserver<SophiaJsonData> sophiaJsonDataTestObserver =
-                    sophiaJsonDataSingle.test();
-                sophiaJsonDataTestObserver.awaitTerminalEvent();
-                SophiaJsonData sophiaJsonData = sophiaJsonDataTestObserver.values().get(0);
-                JsonObject json = JsonObject.mapFrom(sophiaJsonData.getData());
                 context.assertEquals(
                     TestConstants.testContractFuntionParam, json.getValue("value").toString());
               } catch (Exception e) {
@@ -609,11 +553,7 @@ public class TransactionContractsTest extends BaseTest {
         .executeBlocking(
             future -> {
               try {
-                Single<Account> accountSingle =
-                    testnetAccountService.getAccount(baseKeyPair.getPublicKey());
-                TestObserver<Account> accountTestObserver = accountSingle.test();
-                accountTestObserver.awaitTerminalEvent();
-                Account account = accountTestObserver.values().get(0);
+                Account account = getAccount(baseKeyPair.getPublicKey());
                 String ownerId = baseKeyPair.getPublicKey();
                 BigInteger abiVersion = BigInteger.ONE;
                 BigInteger vmVersion = BigInteger.valueOf(4);
