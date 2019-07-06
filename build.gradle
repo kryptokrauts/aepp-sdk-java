@@ -45,13 +45,13 @@ ext {
     aeternityVersion = "v3.0.1"
     sophiaCompilerVersion = "v3.0.0"
 
-    apiPackageAeternity   = "com.kryptokrauts.aeternity.generated.api"
+    apiPackageAeternity = "com.kryptokrauts.aeternity.generated.api"
     modelPackageAeternity = "com.kryptokrauts.aeternity.generated.model"
-    swaggerFileAeternity  = "${rootDir}/api/swagger_aeternity_${aeternityVersion}.yml"
+    swaggerFileAeternity = "${rootDir}/api/swagger_aeternity_${aeternityVersion}.yml"
 
-    apiPackageSophiaCompiler   = "com.kryptokrauts.sophia.compiler.generated.api"
+    apiPackageSophiaCompiler = "com.kryptokrauts.sophia.compiler.generated.api"
     modelPackageSophiaCompiler = "com.kryptokrauts.sophia.compiler.generated.model"
-    swaggerFileSophiaCompiler  = "${rootDir}/api/swagger_sophia_compiler_${sophiaCompilerVersion}.yml"
+    swaggerFileSophiaCompiler = "${rootDir}/api/swagger_sophia_compiler_${sophiaCompilerVersion}.yml"
 
     templateDir = "${rootDir}/api/vertx-templates"
     swaggerAnnotationsVersion = "1.5.22"
@@ -67,7 +67,7 @@ ext {
     junitVersion = "5.4.2"
     junitPlatformVersion = "1.4.2"
     spectrumVersion = "1.2.0"
-    
+
     slf4jVersion = "1.7.26"
 }
 
@@ -89,12 +89,12 @@ task generateApiClient {
         configAeternity.setOutputDir(swaggerOutputDir.path)
         configAeternity.setTemplateDir(project.templateDir)
         configAeternity.setAdditionalProperties([
-                "dateLibrary"  : "java8",
-                "title"        :  rootProject.name,
-                "useTags"      : "true"
+                "dateLibrary": "java8",
+                "title"      : rootProject.name,
+                "useTags"    : "true"
         ])
         configAeternity.setTypeMappings([
-                "Integer"   :   "java.math.BigInteger"
+                "Integer": "java.math.BigInteger"
         ])
         new DefaultGenerator().opts(configAeternity.toClientOptInput()).generate()
 
@@ -110,9 +110,9 @@ task generateApiClient {
         configSophiaCompiler.setOutputDir(swaggerOutputDir.path)
         configSophiaCompiler.setTemplateDir(project.templateDir)
         configSophiaCompiler.setAdditionalProperties([
-                "dateLibrary"  : "java8",
-                "title"        :  rootProject.name,
-                "useTags"      : "true"
+                "dateLibrary": "java8",
+                "title"      : rootProject.name,
+                "useTags"    : "true"
         ])
         new DefaultGenerator().opts(configSophiaCompiler.toClientOptInput()).generate()
     }
@@ -161,7 +161,7 @@ task integrationTest(type: JavaExec, dependsOn: integrationTestClasses) {
 
 final Boolean generateSources = Boolean.parseBoolean(System.getenv("AETERNITY_GENERATE_SOURCES"))
 compileSwaggerJava {
-    if(generateSources) {
+    if (generateSources) {
         dependsOn(generateApiClient)
     }
     classpath = configurations.compile
@@ -179,7 +179,7 @@ dependencies {
     // lombok
     compileOnly "org.projectlombok:lombok:${lombokVersion}"
     annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
-    
+
     // cryptography
     compile "org.bitcoinj:bitcoinj-core:${bitcoinjCoreVersion}"
     compile "org.bouncycastle:bcprov-jdk15on:${bouncycastleVersion}"
@@ -200,7 +200,7 @@ dependencies {
     testImplementation enforcedPlatform("org.junit:junit-bom:${junitVersion}")
     testRuntime "org.junit.platform:junit-platform-console:${junitPlatformVersion}"
     testRuntime "org.junit.jupiter:junit-jupiter-engine:${junitVersion}"
-    testRuntime "org.junit.vintage:junit-vintage-engine:${junitVersion}" 
+    testRuntime "org.junit.vintage:junit-vintage-engine:${junitVersion}"
     testCompile "org.junit.jupiter:junit-jupiter-api:${junitVersion}"
     testCompile "org.junit.jupiter:junit-jupiter-params:${junitVersion}"
     testCompile "org.junit.vintage:junit-vintage-engine:${junitVersion}"
@@ -286,7 +286,7 @@ publishing {
             version project.version
             pom.withXml {
                 def root = asNode()
-                root.appendNode("description", "A community developed Java SDK to interact with the Æternity blockchain")
+                root.appendNode("description", "A community developed Java SDK to interact with the æternity blockchain")
                 root.appendNode("name", "${project.name}")
                 root.appendNode("url", "https://github.com/${organization}/${project.name}")
                 root.children().last() + pomConfig
@@ -332,14 +332,14 @@ bintray {
         userOrg = "${organization}"
         desc = "A community developed Java SDK to interact with the Æternity blockchain"
         websiteUrl = "https://github.com/${organization}/${project.name}"
-        issueTrackerUrl  = "https://github.com/${organization}/${project.name}/issues"
+        issueTrackerUrl = "https://github.com/${organization}/${project.name}/issues"
         vcsUrl = "https://github.com:${organization}/${project.name}.git"
         licenses = ["ISC"]
         labels = ["${organization}", "java", "sdk", "blockchain", "aeternity", "crypto"]
         publicDownloadNumbers = true
 
         githubRepo = "kryptokrauts/aepp-sdk-java"
-        githubReleaseNotesFile = "docs/release-notes/RELEASE-NOTES-${project.version}.md"
+        githubReleaseNotesFile = "docs/changelog.md"
 
         version {
             name = project.version
