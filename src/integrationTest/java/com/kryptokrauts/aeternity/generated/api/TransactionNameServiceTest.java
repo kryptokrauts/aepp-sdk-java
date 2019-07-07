@@ -18,6 +18,7 @@ import java.util.LinkedList;
 import java.util.Random;
 import org.junit.Before;
 import org.junit.FixMethodOrder;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
 
@@ -143,6 +144,7 @@ public class TransactionNameServiceTest extends BaseTest {
 
   /** @param context */
   @Test
+  @Ignore
   public void postUpdateTxTest(TestContext context) {
     Async async = context.async();
     BaseKeyPair keyPair =
