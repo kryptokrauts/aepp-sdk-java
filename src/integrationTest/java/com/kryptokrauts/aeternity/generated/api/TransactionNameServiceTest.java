@@ -101,13 +101,12 @@ public class TransactionNameServiceTest extends BaseTest {
 				unsignedTx = transactionServiceNative.createUnsignedTransaction(nameClaimTx).blockingGet();
 				signedTx = transactionServiceNative.signTransaction(unsignedTx, keyPair.getPrivateKey());
 				_logger.info("Signed NameClaimTx: " + signedTx.getTx());
-				postTxResponseSingle = transactionServiceNative.postTransaction(signedTx);
-				postTxResponseTestObserver = postTxResponseSingle.test();
-				postTxResponseTestObserver.awaitTerminalEvent();
-				postTxResponse = postTxResponseTestObserver.values().get(0);
+				postTxResponse = postTx(signedTx);
 				_logger.info("NameClaimTx hash: " + postTxResponse.getTxHash());
-				context.assertEquals(postTxResponse.getTxHash(),
-						transactionServiceNative.computeTxHash(signedTx.getTx()));
+//				GenericSignedTx genericSignedTx = getTxByHash(postTxResponse.getTxHash(), 10);
+//				context.assertTrue(genericSignedTx.getBlockHeight().intValue() > 0);
+//				NameClaimTxJSON typedTx = (NameClaimTxJSON) genericSignedTx.getTx();
+//				_logger.info("Successfully claimed aens " + typedTx.getName());
 
 			} catch (Exception e) {
 				context.fail(e);
