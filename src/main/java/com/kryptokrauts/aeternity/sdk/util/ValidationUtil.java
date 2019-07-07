@@ -8,11 +8,20 @@ import java.util.function.Function;
 
 public class ValidationUtil {
 
+  public static final int DOMAIN_NAME_MAX_LENGHT = 253;
+
   public static final String LIST_NOT_SAME_SIZE = "Lists don't have the same size";
 
   public static final String NO_ENTRIES = "List or map has no entries";
 
   public static final String MAP_MISSING_VALUE = "Map is missing value for %s";
+
+  public static final String NAMESPACE_INVALID = "Namespace not allowed / not provided.";
+
+  public static final String NAMESPACE_EXCEEDS_LIMIT =
+      String.format("Domainname exceeds %s char limit.", DOMAIN_NAME_MAX_LENGHT);
+
+  public static final List<String> ALLOWED_NAMESPACES = Arrays.asList("test");
 
   /**
    * encapsule validation of given parameters
@@ -46,5 +55,30 @@ public class ValidationUtil {
               "Call of function %s has missing or invalid parameters %s%s",
               methodName, parameters, causeMessage));
     }
+  }
+
+  /**
+   * validate the given domainName
+   *
+   * @param domainName
+   */
+  public static void checkNamespace(String domainName) {
+    String[] domainSplit = domainName.split("\\.");
+
+    checkParameters(
+        validate ->
+            Optional.ofNullable(
+                domainSplit.length == 2 && ALLOWED_NAMESPACES.contains(domainSplit[1])),
+        domainName,
+        "checkNamespace",
+        Arrays.asList("domainName"),
+        ValidationUtil.NAMESPACE_INVALID);
+
+    checkParameters(
+        validate -> Optional.ofNullable(domainName.length() <= DOMAIN_NAME_MAX_LENGHT),
+        domainName,
+        "checkNamespace",
+        Arrays.asList("domainName"),
+        ValidationUtil.NAMESPACE_INVALID);
   }
 }

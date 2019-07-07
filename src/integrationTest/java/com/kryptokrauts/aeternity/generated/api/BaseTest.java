@@ -1,5 +1,12 @@
 package com.kryptokrauts.aeternity.generated.api;
 
+import com.kryptokrauts.aeternity.generated.model.Account;
+import com.kryptokrauts.aeternity.generated.model.DryRunResults;
+import com.kryptokrauts.aeternity.generated.model.PostTxResponse;
+import com.kryptokrauts.aeternity.generated.model.Tx;
+import com.kryptokrauts.aeternity.generated.model.TxInfoObject;
+import com.kryptokrauts.aeternity.generated.model.UnsignedTx;
+import com.kryptokrauts.aeternity.sdk.constants.BaseConstants;
 import com.kryptokrauts.aeternity.sdk.constants.Network;
 import com.kryptokrauts.aeternity.sdk.service.ServiceConfiguration;
 import com.kryptokrauts.aeternity.sdk.service.account.AccountService;
@@ -10,13 +17,24 @@ import com.kryptokrauts.aeternity.sdk.service.compiler.CompilerService;
 import com.kryptokrauts.aeternity.sdk.service.compiler.CompilerServiceFactory;
 import com.kryptokrauts.aeternity.sdk.service.keypair.KeyPairService;
 import com.kryptokrauts.aeternity.sdk.service.keypair.KeyPairServiceFactory;
+import com.kryptokrauts.aeternity.sdk.service.transaction.AccountParameter;
 import com.kryptokrauts.aeternity.sdk.service.transaction.TransactionService;
 import com.kryptokrauts.aeternity.sdk.service.transaction.TransactionServiceConfiguration;
 import com.kryptokrauts.aeternity.sdk.service.transaction.TransactionServiceFactory;
+import com.kryptokrauts.aeternity.sdk.service.transaction.type.AbstractTransaction;
+import com.kryptokrauts.aeternity.sdk.service.transaction.type.impl.ContractCallTransaction;
+import com.kryptokrauts.sophia.compiler.generated.model.Calldata;
+import com.kryptokrauts.sophia.compiler.generated.model.SophiaJsonData;
+import io.reactivex.Single;
+import io.reactivex.observers.TestObserver;
 import io.vertx.core.Vertx;
+import io.vertx.core.json.JsonObject;
 import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.RunTestOnContext;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
+import java.math.BigInteger;
+import java.util.List;
+import java.util.Map;
 import javax.naming.ConfigurationException;
 import org.junit.After;
 import org.junit.Before;
@@ -135,5 +153,111 @@ public abstract class BaseTest {
     _logger.info(String.format("%s: %s", COMPILER_BASE_URL, getCompilerBaseUrl()));
     _logger.info(
         "-----------------------------------------------------------------------------------");
+  }
+
+  protected Account getAccount(String publicKey) {
+    Single<Account> accountSingle = accountService.getAccount(publicKey);
+    TestObserver<Account> accountTestObserver = accountSingle.test();
+    accountTestObserver.awaitTerminalEvent();
+    Account account = accountTestObserver.values().get(0);
+    return account;
+  }
+
+  protected PostTxResponse postTx(Tx signedTx) {
+    Single<PostTxResponse> postTxResponseSingle =
+        transactionServiceNative.postTransaction(signedTx);
+    TestObserver<PostTxResponse> postTxResponseTestObserver = postTxResponseSingle.test();
+    postTxResponseTestObserver.awaitTerminalEvent();
+    PostTxResponse postTxResponse = postTxResponseTestObserver.values().get(0);
+    return postTxResponse;
+  }
+
+  protected TxInfoObject waitForTxInfoObject(String txHash) throws InterruptedException {
+    boolean waiting = true;
+    TxInfoObject txInfoObject = null;
+    do {
+      Single<TxInfoObject> txInfoObjectSingle =
+          transactionServiceNative.getTransactionInfoByHash(txHash);
+      TestObserver<TxInfoObject> txInfoObjectTestObserver = txInfoObjectSingle.test();
+      txInfoObjectTestObserver.awaitTerminalEvent();
+      if (txInfoObjectTestObserver.errorCount() > 0) {
+        _logger.warn("unable to receive txInfoObject. trying again in 1 second ...");
+        Thread.sleep(1000);
+      } else {
+        txInfoObject = txInfoObjectTestObserver.values().get(0);
+        _logger.info("Call contract tx object: " + txInfoObject.toString());
+        waiting = false;
+      }
+    } while (waiting);
+    return txInfoObject;
+  }
+
+  protected Calldata encodeCalldata(
+      String contractSourceCode, String contractFunction, List<String> contractFunctionParams) {
+    Single<Calldata> callDataSingle =
+        this.sophiaCompilerService.encodeCalldata(
+            contractSourceCode, contractFunction, contractFunctionParams);
+    TestObserver<Calldata> calldataTestObserver = callDataSingle.test();
+    calldataTestObserver.awaitTerminalEvent();
+    Calldata callData = calldataTestObserver.values().get(0);
+    return callData;
+  }
+
+  protected JsonObject decodeCalldata(String encodedValue, String sophiaReturnType) {
+    // decode the result to json
+    Single<SophiaJsonData> sophiaJsonDataSingle =
+        this.sophiaCompilerService.decodeCalldata(encodedValue, sophiaReturnType);
+    TestObserver<SophiaJsonData> sophiaJsonDataTestObserver = sophiaJsonDataSingle.test();
+    sophiaJsonDataTestObserver.awaitTerminalEvent();
+    SophiaJsonData sophiaJsonData = sophiaJsonDataTestObserver.values().get(0);
+    JsonObject json = JsonObject.mapFrom(sophiaJsonData.getData());
+    return json;
+  }
+
+  protected DryRunResults performDryRunTransactions(
+      List<Map<AccountParameter, Object>> accounts,
+      BigInteger block,
+      List<UnsignedTx> unsignedTxes) {
+    Single<DryRunResults> dryRunResults =
+        this.transactionServiceNative.dryRunTransactions(accounts, block, unsignedTxes);
+    TestObserver<DryRunResults> dryRunTestObserver = dryRunResults.test();
+    dryRunTestObserver.awaitTerminalEvent();
+    DryRunResults results = dryRunTestObserver.values().get(0);
+    return results;
+  }
+
+  protected UnsignedTx createUnsignedContractCallTx(
+      String callerId,
+      BigInteger nonce,
+      String calldata,
+      BigInteger gasPrice,
+      String contractId,
+      BigInteger amount) {
+    BigInteger abiVersion = BigInteger.ONE;
+    BigInteger ttl = BigInteger.ZERO;
+    BigInteger gas = BigInteger.valueOf(1579000);
+
+    AbstractTransaction<?> contractTx =
+        transactionServiceNative
+            .getTransactionFactory()
+            .createContractCallTransaction(
+                abiVersion,
+                calldata,
+                contractId,
+                gas,
+                gasPrice != null ? gasPrice : BigInteger.valueOf(BaseConstants.MINIMAL_GAS_PRICE),
+                nonce,
+                callerId,
+                ttl);
+    if (amount != null) {
+      ((ContractCallTransaction) contractTx).setAmount(amount);
+    }
+
+    Single<UnsignedTx> unsignedTxSingle =
+        transactionServiceNative.createUnsignedTransaction(contractTx);
+    TestObserver<UnsignedTx> unsignedTxTestObserver = unsignedTxSingle.test();
+    unsignedTxTestObserver.awaitTerminalEvent();
+    UnsignedTx unsignedTx = unsignedTxTestObserver.values().get(0);
+    return unsignedTx;
   }
 }
