@@ -63,11 +63,7 @@ public class TransactionNameServiceTest extends BaseTest {
         throwable -> context.fail(throwable));
   }
 
-  /**
-   * this test succeeds but currently the NameClaimTx is not getting mined we need to figure out why
-   *
-   * @param context
-   */
+  /** @param context */
   @Test
   public void postNamePreclaimTxTest(TestContext context) {
     Async async = context.async();
@@ -124,10 +120,11 @@ public class TransactionNameServiceTest extends BaseTest {
                 _logger.info("Signed NameClaimTx: " + signedTx.getTx());
                 postTxResponse = postTx(signedTx);
                 _logger.info("NameClaimTx hash: " + postTxResponse.getTxHash());
-                //				GenericSignedTx genericSignedTx = getTxByHash(postTxResponse.getTxHash(), 10);
-                //				context.assertTrue(genericSignedTx.getBlockHeight().intValue() > 0);
-                //				NameClaimTxJSON typedTx = (NameClaimTxJSON) genericSignedTx.getTx();
-                //				_logger.info("Successfully claimed aens " + typedTx.getName());
+                // GenericSignedTx genericSignedTx = getTxByHash(postTxResponse.getTxHash(),
+                // 10);
+                // context.assertTrue(genericSignedTx.getBlockHeight().intValue() > 0);
+                // NameClaimTxJSON typedTx = (NameClaimTxJSON) genericSignedTx.getTx();
+                // _logger.info("Successfully claimed aens " + typedTx.getName());
 
               } catch (Exception e) {
                 context.fail(e);
