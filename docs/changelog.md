@@ -1,19 +1,34 @@
 # Changelog
 
-## [v1.2.0](https://github.com/kryptokrauts/aepp-sdk-java/releases/tag/v1.2.0)
+## [v1.2.0](https://github.com/kryptokrauts/aepp-sdk-java/releases/tag/v1.2.0) (DRAFT, not yet released)
 
 ### General changes
+- [#5](../../../issues/5) included a specific `com.google.guava` version (`27.0.1-jre`)
+  - maven users shouldn't need to that in their own projects anymore
 - [#24](../../../issues/24) replaced `net.consensys.cava` dependency by `org.apache.tuweni`
   - the project is now being maintained by the apache software foundation
-- [#25](../../../issues/25) upgraded SDK setup make use of æternity release 3.0.x (`Fortuna`)
-- [#27](../../../issues/27) added goggles to docker-compose setup in order to enable easy tx verification in our local setup 
+- [#25](../../../issues/25) upgraded SDK setup to make use of æternity release 3.0.1 (`Fortuna`)
+- [#27](../../../issues/27) added goggles to docker-compose setup in order to enable easy tx verification in our local setup
+- [#31](../../../issues/31) we included our `PaymentSplitter.aes` contract into the test-resources and wrote an integration test to make sure our contract functionalities work
+- [#32](../../../issues/32) we made some changes regarding our release-notes
+  - in future you will find all information in this changelog-file
+  - there won't be a specific file for a certain release anymore
+- [#35](../../../issues/35) in future you will find the SDK documentation on gitbook:
+  - https://kryptokrauts.gitbook.io/aepp-sdk-java/
+- [#36](../../../issues/35) upgraded SDK setup to make use of æternity release 3.3.0 (`Fortuna`)
+  
 
 ### New features
+- [#7](../../../issues/7) AENs support
+  - from now on it is possible to make use of the æternity naming system
+- [#10](../../../issues/10) contract support
+  - from now on it is possible to create and interact with æternity smart contracts
+  - while developing the contract support we identified some problems with the RLP encoding when trying to encode a `BigInteger.ZERO`
+     - in the past it wasn't possible to use a `TTL` with value `0` in any transaction type
+     - this is now solved :-)
 - [#28](../../../issues/28) added support for sophia compiler
   - we now provide a `CompilerServiceFactory` that allows to get an Instance of `SophiaCompilerServiceImpl`
   - this service was needed to enable creation of smart contracts with the SDK
-- [#10](../../../issues/10) contract support
-  - from now on it is possible to create and interact with æternity smart contracts
 
 ## [v1.1.0](https://github.com/kryptokrauts/aepp-sdk-java/releases/tag/v1.1.0)
 
