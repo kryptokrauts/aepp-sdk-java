@@ -196,6 +196,9 @@ dependencies {
     compile "com.fasterxml.jackson.core:jackson-databind:${jacksonVersion}"
     compile "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:${jacksonVersion}"
 
+    // guava (we explicitely use this version to avoid loading wrong transitive dependency when using our SDK with maven)
+    compile "com.google.guava:guava:27.0.1-jre"
+
     // tests
     testImplementation enforcedPlatform("org.junit:junit-bom:${junitVersion}")
     testRuntime "org.junit.platform:junit-platform-console:${junitPlatformVersion}"
@@ -330,7 +333,7 @@ bintray {
         repo = "maven"
         name = project.name
         userOrg = "${organization}"
-        desc = "A community developed Java SDK to interact with the Æternity blockchain"
+        desc = "A community developed Java SDK to interact with the æternity blockchain"
         websiteUrl = "https://github.com/${organization}/${project.name}"
         issueTrackerUrl = "https://github.com/${organization}/${project.name}/issues"
         vcsUrl = "https://github.com:${organization}/${project.name}.git"
