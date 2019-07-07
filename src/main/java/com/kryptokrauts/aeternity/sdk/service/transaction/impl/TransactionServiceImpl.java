@@ -3,17 +3,20 @@ package com.kryptokrauts.aeternity.sdk.service.transaction.impl;
 import com.kryptokrauts.aeternity.generated.api.ChannelApiImpl;
 import com.kryptokrauts.aeternity.generated.api.ContractApiImpl;
 import com.kryptokrauts.aeternity.generated.api.DebugApiImpl;
+import com.kryptokrauts.aeternity.generated.api.ExternalApiImpl;
 import com.kryptokrauts.aeternity.generated.api.NameServiceApiImpl;
 import com.kryptokrauts.aeternity.generated.api.TransactionApiImpl;
 import com.kryptokrauts.aeternity.generated.api.rxjava.ChannelApi;
 import com.kryptokrauts.aeternity.generated.api.rxjava.ContractApi;
 import com.kryptokrauts.aeternity.generated.api.rxjava.DebugApi;
+import com.kryptokrauts.aeternity.generated.api.rxjava.ExternalApi;
 import com.kryptokrauts.aeternity.generated.api.rxjava.NameServiceApi;
 import com.kryptokrauts.aeternity.generated.api.rxjava.TransactionApi;
 import com.kryptokrauts.aeternity.generated.model.DryRunAccount;
 import com.kryptokrauts.aeternity.generated.model.DryRunInput;
 import com.kryptokrauts.aeternity.generated.model.DryRunResults;
 import com.kryptokrauts.aeternity.generated.model.GenericSignedTx;
+import com.kryptokrauts.aeternity.generated.model.GenericTxs;
 import com.kryptokrauts.aeternity.generated.model.PostTxResponse;
 import com.kryptokrauts.aeternity.generated.model.Tx;
 import com.kryptokrauts.aeternity.generated.model.TxInfoObject;
@@ -66,6 +69,8 @@ public class TransactionServiceImpl implements TransactionService {
   private DebugApi debugApi;
 
   private NameServiceApi nameServiceApi;
+
+  private ExternalApi externalApi;
 
   private TransactionFactory transactionFactory;
 
@@ -188,6 +193,16 @@ public class TransactionServiceImpl implements TransactionService {
     return this.getDebugApi().rxDryRunTxs(body);
   }
 
+  public Single<GenericTxs> getMicroBlockTransactions(final String microBlockHash) {
+    ValidationUtil.checkParameters(
+        validate -> Optional.ofNullable(microBlockHash.startsWith(ApiIdentifiers.MICRO_BLOCK_HASH)),
+        microBlockHash,
+        "getMicroBlockTransactions",
+        Arrays.asList("microBlockHash", ApiIdentifiers.NAME),
+        ValidationUtil.MISSING_API_IDENTIFIER);
+    return this.externalApi.rxGetMicroBlockTransactionsByHash(microBlockHash);
+  }
+
   /**
    * @param sig
    * @param binaryTx
@@ -248,6 +263,13 @@ public class TransactionServiceImpl implements TransactionService {
       debugApi = new DebugApi(new DebugApiImpl(config.getApiClient()));
     }
     return debugApi;
+  }
+
+  private ExternalApi getExternalApi() {
+    if (externalApi == null) {
+      externalApi = new ExternalApi(new ExternalApiImpl(config.getApiClient()));
+    }
+    return externalApi;
   }
 
   @Override

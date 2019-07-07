@@ -22,7 +22,8 @@ public class TransactionSpendApiTest extends BaseTest {
 
   @Before
   public void initBeforeTest() {
-    baseKeyPair = keyPairService.generateBaseKeyPairFromSecret(BENEFICIARY_PRIVATE_KEY);
+    baseKeyPair =
+        keyPairService.generateBaseKeyPairFromSecret(TestConstants.BENEFICIARY_PRIVATE_KEY);
   }
 
   /**
@@ -64,7 +65,8 @@ public class TransactionSpendApiTest extends BaseTest {
   public void postSpendTxTest(TestContext context) {
     Async async = context.async();
 
-    BaseKeyPair keyPair = keyPairService.generateBaseKeyPairFromSecret(BENEFICIARY_PRIVATE_KEY);
+    BaseKeyPair keyPair =
+        keyPairService.generateBaseKeyPairFromSecret(TestConstants.BENEFICIARY_PRIVATE_KEY);
 
     // get the currents accounts nonce in case a transaction is already
     // created and increase it by one

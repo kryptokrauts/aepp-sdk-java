@@ -47,7 +47,8 @@ public class TransactionContractsTest extends BaseTest {
 
   @Before
   public void initBeforeTest() {
-    baseKeyPair = keyPairService.generateBaseKeyPairFromSecret(BENEFICIARY_PRIVATE_KEY);
+    baseKeyPair =
+        keyPairService.generateBaseKeyPairFromSecret(TestConstants.BENEFICIARY_PRIVATE_KEY);
   }
 
   @Test
@@ -174,14 +175,14 @@ public class TransactionContractsTest extends BaseTest {
                 _logger.info(
                     "CreateContractTx hash (native unsigned): " + unsignedTxNative.getTx());
 
-                Single<UnsignedTx> unsignedTxDebugSingle =
-                    transactionServiceDebug.createUnsignedTransaction(contractTx);
-                TestObserver<UnsignedTx> unsignedTxDebugTestObserver = unsignedTxDebugSingle.test();
-                unsignedTxDebugTestObserver.awaitTerminalEvent();
-                UnsignedTx unsignedTxDebug = unsignedTxDebugTestObserver.values().get(0);
+                UnsignedTx unsignedTxDebug =
+                    callMethodAndGetResult(
+                        () -> transactionServiceDebug.createUnsignedTransaction(contractTx),
+                        UnsignedTx.class);
                 _logger.debug("CreateContractTx hash (debug unsigned): " + unsignedTxDebug.getTx());
+
                 context.assertEquals(unsignedTxNative.getTx(), unsignedTxDebug.getTx());
-              } catch (Exception e) {
+              } catch (Throwable e) {
                 context.fail(e);
               }
               future.complete();
@@ -206,28 +207,31 @@ public class TransactionContractsTest extends BaseTest {
                         TestConstants.testContractFunction,
                         TestConstants.testContractFunctionParams);
 
-                Single<DryRunResults> dryRunResults =
-                    this.transactionServiceNative.dryRunTransactions(
-                        Arrays.asList(
-                            ImmutableMap.of(
-                                AccountParameter.PUBLIC_KEY, baseKeyPair.getPublicKey()),
-                            ImmutableMap.of(
-                                AccountParameter.PUBLIC_KEY, baseKeyPair.getPublicKey())),
-                        null,
-                        Arrays.asList(
-                            createUnsignedContractCallTx(
-                                context, nonce, calldata.getCalldata(), null),
-                            createUnsignedContractCallTx(
-                                context, nonce.add(BigInteger.ONE), calldata.getCalldata(), null)));
-                TestObserver<DryRunResults> dryRunTestObserver = dryRunResults.test();
-                dryRunTestObserver.awaitTerminalEvent();
-                DryRunResults results = dryRunTestObserver.values().get(0);
+                DryRunResults results =
+                    callMethodAndGetResult(
+                        () ->
+                            this.transactionServiceNative.dryRunTransactions(
+                                Arrays.asList(
+                                    ImmutableMap.of(
+                                        AccountParameter.PUBLIC_KEY, baseKeyPair.getPublicKey()),
+                                    ImmutableMap.of(
+                                        AccountParameter.PUBLIC_KEY, baseKeyPair.getPublicKey())),
+                                null,
+                                Arrays.asList(
+                                    createUnsignedContractCallTx(
+                                        context, nonce, calldata.getCalldata(), null),
+                                    createUnsignedContractCallTx(
+                                        context,
+                                        nonce.add(BigInteger.ONE),
+                                        calldata.getCalldata(),
+                                        null))),
+                        DryRunResults.class);
                 _logger.info(results.toString());
                 for (DryRunResult result : results.getResults()) {
                   context.assertEquals("ok", result.getResult());
                 }
 
-              } catch (Exception e) {
+              } catch (Throwable e) {
                 context.fail(e);
               }
               future.complete();
@@ -249,24 +253,24 @@ public class TransactionContractsTest extends BaseTest {
                         TestConstants.testContractFunction,
                         TestConstants.testContractFunctionParams);
 
-                Single<DryRunResults> dryRunResults =
-                    this.transactionServiceNative.dryRunTransactions(
-                        Arrays.asList(
-                            ImmutableMap.of(
-                                AccountParameter.PUBLIC_KEY, baseKeyPair.getPublicKey())),
-                        null,
-                        Arrays.asList(
-                            createUnsignedContractCallTx(
-                                context, BigInteger.ONE, calldata.getCalldata(), null)));
-                TestObserver<DryRunResults> dryRunTestObserver = dryRunResults.test();
-                dryRunTestObserver.awaitTerminalEvent();
-                DryRunResults results = dryRunTestObserver.values().get(0);
+                DryRunResults results =
+                    callMethodAndGetResult(
+                        () ->
+                            this.transactionServiceNative.dryRunTransactions(
+                                Arrays.asList(
+                                    ImmutableMap.of(
+                                        AccountParameter.PUBLIC_KEY, baseKeyPair.getPublicKey())),
+                                null,
+                                Arrays.asList(
+                                    createUnsignedContractCallTx(
+                                        context, BigInteger.ONE, calldata.getCalldata(), null))),
+                        DryRunResults.class);
                 _logger.info(results.toString());
                 for (DryRunResult result : results.getResults()) {
                   context.assertEquals("error", result.getResult());
                 }
 
-              } catch (Exception e) {
+              } catch (Throwable e) {
                 context.fail(e);
               }
               future.complete();
@@ -332,12 +336,7 @@ public class TransactionContractsTest extends BaseTest {
                           unsignedTxNative, baseKeyPair.getPrivateKey());
 
                   // post the signed contract call tx
-                  Single<PostTxResponse> postTxResponseSingle =
-                      transactionServiceNative.postTransaction(signedTxNative);
-                  TestObserver<PostTxResponse> postTxResponseTestObserver =
-                      postTxResponseSingle.test();
-                  postTxResponseTestObserver.awaitTerminalEvent();
-                  PostTxResponse postTxResponse = postTxResponseTestObserver.values().get(0);
+                  PostTxResponse postTxResponse = postTx(signedTxNative);
                   context.assertEquals(
                       postTxResponse.getTxHash(),
                       transactionServiceNative.computeTxHash(signedTxNative.getTx()));
@@ -355,7 +354,7 @@ public class TransactionContractsTest extends BaseTest {
                       TestConstants.testContractFuntionParam, json.getValue("value").toString());
                 }
 
-              } catch (Exception e) {
+              } catch (Throwable e) {
                 context.fail(e);
               }
               future.complete();
@@ -430,31 +429,16 @@ public class TransactionContractsTest extends BaseTest {
                         unsignedTxNative, baseKeyPair.getPrivateKey());
                 _logger.info("CreateContractTx hash (native signed): " + signedTxNative);
 
-                Single<PostTxResponse> txResponse =
-                    transactionServiceNative.postTransaction(signedTxNative);
-                TestObserver<PostTxResponse> postTxResponseTestObserver = txResponse.test();
-                postTxResponseTestObserver.awaitTerminalEvent();
-                PostTxResponse postTxResponse = postTxResponseTestObserver.values().get(0);
-                do {
-                  Single<TxInfoObject> txInfoObjectSingle =
-                      transactionServiceNative.getTransactionInfoByHash(postTxResponse.getTxHash());
-                  TestObserver<TxInfoObject> txInfoObjectTestObserver = txInfoObjectSingle.test();
-                  txInfoObjectTestObserver.awaitTerminalEvent();
-                  if (txInfoObjectTestObserver.errorCount() > 0) {
-                    _logger.warn("unable to receive txInfoObject. trying again in 1 second ...");
-                    Thread.sleep(1000);
-                  } else {
-                    TxInfoObject txInfoObject = txInfoObjectTestObserver.values().get(0);
-                    localDeployedContractId = txInfoObject.getCallInfo().getContractId();
-                    _logger.info(
-                        "Deployed contract - hash "
-                            + postTxResponse.getTxHash()
-                            + " - "
-                            + txInfoObject);
-                  }
-                } while (localDeployedContractId == null);
+                PostTxResponse postTxResponse = postTx(signedTxNative);
+                TxInfoObject txInfoObject = waitForTxInfoObject(postTxResponse.getTxHash());
+                localDeployedContractId = txInfoObject.getCallInfo().getContractId();
+                _logger.info(
+                    "Deployed contract - hash "
+                        + postTxResponse.getTxHash()
+                        + " - "
+                        + txInfoObject);
 
-              } catch (Exception e) {
+              } catch (Throwable e) {
                 context.fail(e);
               }
               future.complete();
@@ -488,32 +472,14 @@ public class TransactionContractsTest extends BaseTest {
                         unsignedTxNative, baseKeyPair.getPrivateKey());
 
                 // post the signed contract call tx
-                Single<PostTxResponse> postTxResponseSingle =
-                    transactionServiceNative.postTransaction(signedTxNative);
-                TestObserver<PostTxResponse> postTxResponseTestObserver =
-                    postTxResponseSingle.test();
-                postTxResponseTestObserver.awaitTerminalEvent();
-                PostTxResponse postTxResponse = postTxResponseTestObserver.values().get(0);
+                PostTxResponse postTxResponse = postTx(signedTxNative);
                 context.assertEquals(
                     postTxResponse.getTxHash(),
                     transactionServiceNative.computeTxHash(signedTxNative.getTx()));
                 _logger.info("CreateContractTx hash: " + postTxResponse.getTxHash());
 
                 // get the tx info object to resolve the result
-                TxInfoObject txInfoObject = null;
-                do {
-                  Single<TxInfoObject> txInfoObjectSingle =
-                      transactionServiceNative.getTransactionInfoByHash(postTxResponse.getTxHash());
-                  TestObserver<TxInfoObject> txInfoObjectTestObserver = txInfoObjectSingle.test();
-                  txInfoObjectTestObserver.awaitTerminalEvent();
-                  if (txInfoObjectTestObserver.errorCount() > 0) {
-                    _logger.warn("unable to receive txInfoObject. trying again in 1 second ...");
-                    Thread.sleep(1000);
-                  } else {
-                    txInfoObject = txInfoObjectTestObserver.values().get(0);
-                    _logger.info("Call contract tx object: " + txInfoObject.toString());
-                  }
-                } while (txInfoObject == null);
+                TxInfoObject txInfoObject = waitForTxInfoObject(postTxResponse.getTxHash());
 
                 // decode the result to json
                 JsonObject json =
@@ -522,7 +488,7 @@ public class TransactionContractsTest extends BaseTest {
                         TestConstants.testContractFunctionSophiaType);
                 context.assertEquals(
                     TestConstants.testContractFuntionParam, json.getValue("value").toString());
-              } catch (Exception e) {
+              } catch (Throwable e) {
                 context.fail(e);
               }
               future.complete();

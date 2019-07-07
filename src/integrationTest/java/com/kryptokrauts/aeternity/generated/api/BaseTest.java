@@ -2,6 +2,7 @@ package com.kryptokrauts.aeternity.generated.api;
 
 import com.kryptokrauts.aeternity.generated.model.Account;
 import com.kryptokrauts.aeternity.generated.model.DryRunResults;
+import com.kryptokrauts.aeternity.generated.model.GenericSignedTx;
 import com.kryptokrauts.aeternity.generated.model.PostTxResponse;
 import com.kryptokrauts.aeternity.generated.model.Tx;
 import com.kryptokrauts.aeternity.generated.model.TxInfoObject;
@@ -11,6 +12,8 @@ import com.kryptokrauts.aeternity.sdk.constants.Network;
 import com.kryptokrauts.aeternity.sdk.service.ServiceConfiguration;
 import com.kryptokrauts.aeternity.sdk.service.account.AccountService;
 import com.kryptokrauts.aeternity.sdk.service.account.AccountServiceFactory;
+import com.kryptokrauts.aeternity.sdk.service.aens.NameService;
+import com.kryptokrauts.aeternity.sdk.service.aens.NameServiceFactory;
 import com.kryptokrauts.aeternity.sdk.service.chain.ChainService;
 import com.kryptokrauts.aeternity.sdk.service.chain.ChainServiceFactory;
 import com.kryptokrauts.aeternity.sdk.service.compiler.CompilerService;
@@ -35,6 +38,7 @@ import io.vertx.ext.unit.junit.VertxUnitRunner;
 import java.math.BigInteger;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Supplier;
 import javax.naming.ConfigurationException;
 import org.junit.After;
 import org.junit.Before;
@@ -53,9 +57,6 @@ public abstract class BaseTest {
 
   private static final String COMPILER_BASE_URL = "COMPILER_BASE_URL";
 
-  protected static final String BENEFICIARY_PRIVATE_KEY =
-      "79816BBF860B95600DDFABF9D81FEE81BDB30BE823B17D80B9E48BE0A7015ADF";
-
   protected KeyPairService keyPairService;
 
   protected ChainService chainService;
@@ -67,6 +68,8 @@ public abstract class BaseTest {
   protected AccountService accountService;
 
   protected CompilerService sophiaCompilerService;
+
+  protected NameService nameService;
 
   @Rule public RunTestOnContext rule = new RunTestOnContext();
 
@@ -111,6 +114,14 @@ public abstract class BaseTest {
             .getService(
                 ServiceConfiguration.configure()
                     .contractBaseUrl(getCompilerBaseUrl())
+                    .vertx(vertx)
+                    .compile());
+
+    nameService =
+        new NameServiceFactory()
+            .getService(
+                ServiceConfiguration.configure()
+                    .baseUrl(getAeternityBaseUrl())
                     .vertx(vertx)
                     .compile());
   }
@@ -163,67 +174,51 @@ public abstract class BaseTest {
     return account;
   }
 
-  protected PostTxResponse postTx(Tx signedTx) {
-    Single<PostTxResponse> postTxResponseSingle =
-        transactionServiceNative.postTransaction(signedTx);
-    TestObserver<PostTxResponse> postTxResponseTestObserver = postTxResponseSingle.test();
-    postTxResponseTestObserver.awaitTerminalEvent();
-    PostTxResponse postTxResponse = postTxResponseTestObserver.values().get(0);
+  protected PostTxResponse postTx(Tx signedTx) throws Throwable {
+    PostTxResponse postTxResponse =
+        callMethodAndGetResult(
+            () -> transactionServiceNative.postTransaction(signedTx), PostTxResponse.class);
+    waitForTxMined(postTxResponse.getTxHash());
     return postTxResponse;
   }
 
-  protected TxInfoObject waitForTxInfoObject(String txHash) throws InterruptedException {
-    boolean waiting = true;
-    TxInfoObject txInfoObject = null;
-    do {
-      Single<TxInfoObject> txInfoObjectSingle =
-          transactionServiceNative.getTransactionInfoByHash(txHash);
-      TestObserver<TxInfoObject> txInfoObjectTestObserver = txInfoObjectSingle.test();
-      txInfoObjectTestObserver.awaitTerminalEvent();
-      if (txInfoObjectTestObserver.errorCount() > 0) {
-        _logger.warn("unable to receive txInfoObject. trying again in 1 second ...");
-        Thread.sleep(1000);
-      } else {
-        txInfoObject = txInfoObjectTestObserver.values().get(0);
-        _logger.info("Call contract tx object: " + txInfoObject.toString());
-        waiting = false;
-      }
-    } while (waiting);
-    return txInfoObject;
+  protected TxInfoObject waitForTxInfoObject(String txHash) throws Throwable {
+    return callMethodAndGetResult(
+        () -> transactionServiceNative.getTransactionInfoByHash(txHash), TxInfoObject.class);
+  }
+
+  protected GenericSignedTx waitForTxMined(String txHash) throws Throwable {
+    return callMethodAndGetResult(
+        () -> transactionServiceNative.getTransactionByHash(txHash), GenericSignedTx.class);
   }
 
   protected Calldata encodeCalldata(
-      String contractSourceCode, String contractFunction, List<String> contractFunctionParams) {
-    Single<Calldata> callDataSingle =
-        this.sophiaCompilerService.encodeCalldata(
-            contractSourceCode, contractFunction, contractFunctionParams);
-    TestObserver<Calldata> calldataTestObserver = callDataSingle.test();
-    calldataTestObserver.awaitTerminalEvent();
-    Calldata callData = calldataTestObserver.values().get(0);
-    return callData;
+      String contractSourceCode, String contractFunction, List<String> contractFunctionParams)
+      throws Throwable {
+    return callMethodAndGetResult(
+        () ->
+            this.sophiaCompilerService.encodeCalldata(
+                contractSourceCode, contractFunction, contractFunctionParams),
+        Calldata.class);
   }
 
-  protected JsonObject decodeCalldata(String encodedValue, String sophiaReturnType) {
+  protected JsonObject decodeCalldata(String encodedValue, String sophiaReturnType)
+      throws Throwable {
     // decode the result to json
-    Single<SophiaJsonData> sophiaJsonDataSingle =
-        this.sophiaCompilerService.decodeCalldata(encodedValue, sophiaReturnType);
-    TestObserver<SophiaJsonData> sophiaJsonDataTestObserver = sophiaJsonDataSingle.test();
-    sophiaJsonDataTestObserver.awaitTerminalEvent();
-    SophiaJsonData sophiaJsonData = sophiaJsonDataTestObserver.values().get(0);
-    JsonObject json = JsonObject.mapFrom(sophiaJsonData.getData());
-    return json;
+    SophiaJsonData sophiaJsonData =
+        callMethodAndGetResult(
+            () -> this.sophiaCompilerService.decodeCalldata(encodedValue, sophiaReturnType),
+            SophiaJsonData.class);
+    return JsonObject.mapFrom(sophiaJsonData.getData());
   }
 
   protected DryRunResults performDryRunTransactions(
-      List<Map<AccountParameter, Object>> accounts,
-      BigInteger block,
-      List<UnsignedTx> unsignedTxes) {
-    Single<DryRunResults> dryRunResults =
-        this.transactionServiceNative.dryRunTransactions(accounts, block, unsignedTxes);
-    TestObserver<DryRunResults> dryRunTestObserver = dryRunResults.test();
-    dryRunTestObserver.awaitTerminalEvent();
-    DryRunResults results = dryRunTestObserver.values().get(0);
-    return results;
+      List<Map<AccountParameter, Object>> accounts, BigInteger block, List<UnsignedTx> unsignedTxes)
+      throws Throwable {
+
+    return callMethodAndGetResult(
+        () -> this.transactionServiceNative.dryRunTransactions(accounts, block, unsignedTxes),
+        DryRunResults.class);
   }
 
   protected UnsignedTx createUnsignedContractCallTx(
@@ -232,7 +227,8 @@ public abstract class BaseTest {
       String calldata,
       BigInteger gasPrice,
       String contractId,
-      BigInteger amount) {
+      BigInteger amount)
+      throws Throwable {
     BigInteger abiVersion = BigInteger.ONE;
     BigInteger ttl = BigInteger.ZERO;
     BigInteger gas = BigInteger.valueOf(1579000);
@@ -253,11 +249,67 @@ public abstract class BaseTest {
       ((ContractCallTransaction) contractTx).setAmount(amount);
     }
 
-    Single<UnsignedTx> unsignedTxSingle =
-        transactionServiceNative.createUnsignedTransaction(contractTx);
-    TestObserver<UnsignedTx> unsignedTxTestObserver = unsignedTxSingle.test();
-    unsignedTxTestObserver.awaitTerminalEvent();
-    UnsignedTx unsignedTx = unsignedTxTestObserver.values().get(0);
-    return unsignedTx;
+    return callMethodAndGetResult(
+        () -> transactionServiceNative.createUnsignedTransaction(contractTx), UnsignedTx.class);
+  }
+
+  protected <T> T callMethodAndAwaitException(
+      Supplier<Single<T>> observerMethod, Class<T> exception) throws Throwable {
+    return callMethodAndGetResult(
+        TestConstants.NUM_TRIALS_DEFAULT, observerMethod, exception, true);
+  }
+
+  protected <T> T callMethodAndGetResult(Supplier<Single<T>> observerMethod, Class<T> type)
+      throws Throwable {
+    return callMethodAndGetResult(TestConstants.NUM_TRIALS_DEFAULT, observerMethod, type, false);
+  }
+
+  protected <T> T callMethodAndGetResult(
+      Integer numTrials, Supplier<Single<T>> observerMethod, Class<T> type, boolean awaitException)
+      throws Throwable {
+
+    if (numTrials == null) {
+      numTrials = TestConstants.NUM_TRIALS_DEFAULT;
+    }
+
+    int doneTrials = 1;
+    T result = null;
+
+    do {
+      Single<T> resultSingle = observerMethod.get();
+      TestObserver<T> singleTestObserver = resultSingle.test();
+      singleTestObserver.awaitTerminalEvent();
+      if (singleTestObserver.errorCount() > 0) {
+        if (awaitException) {
+          throw singleTestObserver.errors().get(0);
+        }
+        if (doneTrials == numTrials) {
+          _logger.error("Following error(s) occured while waiting for result of call, aborting");
+          for (Throwable error : singleTestObserver.errors()) {
+            _logger.error(error.toString());
+          }
+          throw new InterruptedException("Max number of function call trials exceeded, aborting");
+        }
+        _logger.warn(
+            String.format(
+                "Unable to receive object of type %s, trying again in 1 second (%s of %s)...",
+                type.getSimpleName(), doneTrials, numTrials));
+        Thread.sleep(1000);
+        doneTrials++;
+      } else {
+        if (!awaitException) {
+          result = singleTestObserver.values().get(0);
+        } else {
+          _logger.warn(
+              String.format(
+                  "Waiting for exception, trying again in 1 second (%s of %s)...",
+                  doneTrials, numTrials));
+          Thread.sleep(1000);
+          doneTrials++;
+        }
+      }
+    } while (result == null);
+
+    return result;
   }
 }

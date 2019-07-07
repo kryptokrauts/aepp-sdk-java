@@ -1,17 +1,20 @@
 package com.kryptokrauts.aeternity.generated.api;
 
+import com.kryptokrauts.aeternity.generated.ApiException;
 import com.kryptokrauts.aeternity.generated.model.Account;
+import com.kryptokrauts.aeternity.generated.model.NameEntry;
 import com.kryptokrauts.aeternity.generated.model.PostTxResponse;
 import com.kryptokrauts.aeternity.generated.model.Tx;
 import com.kryptokrauts.aeternity.generated.model.UnsignedTx;
 import com.kryptokrauts.aeternity.sdk.domain.secret.impl.BaseKeyPair;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.AbstractTransaction;
 import com.kryptokrauts.aeternity.sdk.util.CryptoUtils;
+import com.kryptokrauts.aeternity.sdk.util.EncodingUtils;
 import io.reactivex.Single;
-import io.reactivex.observers.TestObserver;
 import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
 import java.math.BigInteger;
+import java.util.LinkedList;
 import java.util.Random;
 import org.junit.Before;
 import org.junit.FixMethodOrder;
@@ -22,14 +25,15 @@ import org.junit.runners.MethodSorters;
 public class TransactionNameServiceTest extends BaseTest {
 
   BaseKeyPair baseKeyPair;
-  Random random = new Random();
+  static Random random = new Random();
 
-  String invalidDomain = "kryptokrauts" + random.nextInt();
-  String validDomain = invalidDomain + ".test";
+  static String invalidDomain = TestConstants.DOMAIN + random.nextInt();
+  static String validDomain = invalidDomain + TestConstants.NAMESPACE;
 
   @Before
   public void initBeforeTest() {
-    baseKeyPair = keyPairService.generateBaseKeyPairFromSecret(BENEFICIARY_PRIVATE_KEY);
+    baseKeyPair =
+        keyPairService.generateBaseKeyPairFromSecret(TestConstants.BENEFICIARY_PRIVATE_KEY);
   }
 
   /**
@@ -65,17 +69,17 @@ public class TransactionNameServiceTest extends BaseTest {
 
   /** @param context */
   @Test
-  public void postNamePreclaimTxTest(TestContext context) {
+  public void postNameClaimTxTest(TestContext context) {
     Async async = context.async();
-    BaseKeyPair keyPair = keyPairService.generateBaseKeyPairFromSecret(BENEFICIARY_PRIVATE_KEY);
+    BaseKeyPair keyPair =
+        keyPairService.generateBaseKeyPairFromSecret(TestConstants.BENEFICIARY_PRIVATE_KEY);
     rule.vertx()
         .executeBlocking(
             future -> {
               try {
-                Single<Account> accountSingle = accountService.getAccount(keyPair.getPublicKey());
-                TestObserver<Account> accountTestObserver = accountSingle.test();
-                accountTestObserver.awaitTerminalEvent();
-                Account account = accountTestObserver.values().get(0);
+                Account account =
+                    callMethodAndGetResult(
+                        () -> accountService.getAccount(keyPair.getPublicKey()), Account.class);
                 BigInteger salt = CryptoUtils.generateNamespaceSalt();
                 BigInteger nonce = account.getNonce().add(BigInteger.ONE);
                 BigInteger ttl = BigInteger.ZERO;
@@ -93,12 +97,7 @@ public class TransactionNameServiceTest extends BaseTest {
                     transactionServiceNative.signTransaction(unsignedTx, keyPair.getPrivateKey());
                 _logger.info("Signed NamePreclaimTx: " + signedTx.getTx());
 
-                Single<PostTxResponse> postTxResponseSingle =
-                    transactionServiceNative.postTransaction(signedTx);
-                TestObserver<PostTxResponse> postTxResponseTestObserver =
-                    postTxResponseSingle.test();
-                postTxResponseTestObserver.awaitTerminalEvent();
-                PostTxResponse postTxResponse = postTxResponseTestObserver.values().get(0);
+                PostTxResponse postTxResponse = postTx(signedTx);
                 _logger.info("NamePreclaimTx hash: " + postTxResponse.getTxHash());
                 context.assertEquals(
                     postTxResponse.getTxHash(),
@@ -113,20 +112,185 @@ public class TransactionNameServiceTest extends BaseTest {
                             salt,
                             nonce.add(BigInteger.ONE),
                             ttl);
-                unsignedTx =
+                UnsignedTx unsignedClaimTx =
                     transactionServiceNative.createUnsignedTransaction(nameClaimTx).blockingGet();
-                signedTx =
-                    transactionServiceNative.signTransaction(unsignedTx, keyPair.getPrivateKey());
-                _logger.info("Signed NameClaimTx: " + signedTx.getTx());
-                postTxResponse = postTx(signedTx);
+                Tx signedClaimTx =
+                    transactionServiceNative.signTransaction(
+                        unsignedClaimTx, keyPair.getPrivateKey());
+                _logger.info("Signed NameClaimTx: " + signedClaimTx.getTx());
+                postTxResponse = postTx(signedClaimTx);
+                _logger.info(
+                    String.format(
+                        "Using namespace %s and salt %s for committmentId %s",
+                        validDomain,
+                        salt,
+                        EncodingUtils.generateCommitmentHash(validDomain, salt)));
                 _logger.info("NameClaimTx hash: " + postTxResponse.getTxHash());
+
                 // GenericSignedTx genericSignedTx = getTxByHash(postTxResponse.getTxHash(),
                 // 10);
                 // context.assertTrue(genericSignedTx.getBlockHeight().intValue() > 0);
                 // NameClaimTxJSON typedTx = (NameClaimTxJSON) genericSignedTx.getTx();
                 // _logger.info("Successfully claimed aens " + typedTx.getName());
 
-              } catch (Exception e) {
+              } catch (Throwable e) {
+                context.fail(e);
+              }
+              future.complete();
+            },
+            success -> async.complete());
+  }
+
+  /** @param context */
+  @Test
+  public void postUpdateTxTest(TestContext context) {
+    Async async = context.async();
+    BaseKeyPair keyPair =
+        keyPairService.generateBaseKeyPairFromSecret(TestConstants.BENEFICIARY_PRIVATE_KEY);
+    rule.vertx()
+        .executeBlocking(
+            future -> {
+              try {
+                Account account =
+                    callMethodAndGetResult(
+                        () -> accountService.getAccount(keyPair.getPublicKey()), Account.class);
+                BigInteger nonce = account.getNonce().add(BigInteger.ONE);
+                BigInteger salt = CryptoUtils.generateNamespaceSalt();
+                BigInteger ttl = BigInteger.ZERO;
+                String domain = TestConstants.DOMAIN + random.nextInt() + TestConstants.NAMESPACE;
+
+                /** create a new namespace to update later */
+                AbstractTransaction<?> namePreclaimTx =
+                    transactionServiceNative
+                        .getTransactionFactory()
+                        .createNamePreclaimTransaction(
+                            keyPair.getPublicKey(), domain, salt, nonce, ttl);
+                UnsignedTx unsignedTx =
+                    transactionServiceNative
+                        .createUnsignedTransaction(namePreclaimTx)
+                        .blockingGet();
+                Tx signedTx =
+                    transactionServiceNative.signTransaction(unsignedTx, keyPair.getPrivateKey());
+                PostTxResponse postTxResponse = postTx(signedTx);
+                context.assertEquals(
+                    postTxResponse.getTxHash(),
+                    transactionServiceNative.computeTxHash(signedTx.getTx()));
+                AbstractTransaction<?> nameClaimTx =
+                    transactionServiceNative
+                        .getTransactionFactory()
+                        .createNameClaimTransaction(
+                            keyPair.getPublicKey(), domain, salt, nonce.add(BigInteger.ONE), ttl);
+                UnsignedTx unsignedClaimTx =
+                    transactionServiceNative.createUnsignedTransaction(nameClaimTx).blockingGet();
+                Tx signedClaimTx =
+                    transactionServiceNative.signTransaction(
+                        unsignedClaimTx, keyPair.getPrivateKey());
+                PostTxResponse postClaimTxResponse = postTx(signedClaimTx);
+                NameEntry nameEntry =
+                    callMethodAndGetResult(
+                        () -> this.nameService.getNameId(domain), NameEntry.class);
+                BigInteger initialTTL = nameEntry.getTtl();
+                _logger.info(
+                    String.format(
+                        "Created namespace %s with salt %s and nameEntry %s in tx %s for update test",
+                        domain, salt, nameEntry, postClaimTxResponse.getTxHash()));
+                /** finished creating namespace */
+                BigInteger nameTtl = BigInteger.valueOf(10000l);
+                BigInteger clientTtl = BigInteger.valueOf(50l);
+                account =
+                    callMethodAndGetResult(
+                        () -> accountService.getAccount(keyPair.getPublicKey()), Account.class);
+                nonce = account.getNonce().add(BigInteger.ONE);
+
+                AbstractTransaction<?> nameUpdateTx =
+                    transactionServiceNative
+                        .getTransactionFactory()
+                        .createNameUpdateTransaction(
+                            keyPair.getPublicKey(),
+                            nameEntry.getId(),
+                            nonce,
+                            ttl,
+                            clientTtl,
+                            nameTtl,
+                            new LinkedList<>());
+                UnsignedTx unsignedUpdateTx =
+                    transactionServiceNative.createUnsignedTransaction(nameUpdateTx).blockingGet();
+                Tx signedUpdateTx =
+                    transactionServiceNative.signTransaction(
+                        unsignedUpdateTx, keyPair.getPrivateKey());
+
+                PostTxResponse postUpdateTxResponse = postTx(signedUpdateTx);
+                context.assertEquals(
+                    postUpdateTxResponse.getTxHash(),
+                    transactionServiceNative.computeTxHash(signedUpdateTx.getTx()));
+
+                nameEntry =
+                    callMethodAndGetResult(
+                        () -> this.nameService.getNameId(domain), NameEntry.class);
+                _logger.info(
+                    String.format(
+                        "Updated namespace %s with salt %s and nameEntry %s in tx %s for update test",
+                        domain, salt, nameEntry, postClaimTxResponse.getTxHash()));
+
+                BigInteger updatedTTL = nameEntry.getTtl();
+                context.assertEquals(initialTTL.subtract(updatedTTL).intValue(), 10000);
+
+              } catch (Throwable e) {
+                context.fail(e);
+              }
+              future.complete();
+            },
+            success -> async.complete());
+  }
+
+  /** @param context */
+  @Test
+  public void postRevokeTxTest(TestContext context) {
+    Async async = context.async();
+    BaseKeyPair keyPair =
+        keyPairService.generateBaseKeyPairFromSecret(TestConstants.BENEFICIARY_PRIVATE_KEY);
+    rule.vertx()
+        .executeBlocking(
+            future -> {
+              try {
+                String nameId =
+                    callMethodAndGetResult(
+                            () -> this.nameService.getNameId(validDomain), NameEntry.class)
+                        .getId();
+
+                Account account =
+                    callMethodAndGetResult(
+                        () -> accountService.getAccount(keyPair.getPublicKey()), Account.class);
+                BigInteger nonce = account.getNonce().add(BigInteger.ONE);
+                BigInteger ttl = BigInteger.ZERO;
+
+                AbstractTransaction<?> nameRevokeTx =
+                    transactionServiceNative
+                        .getTransactionFactory()
+                        .createNameRevokeTransaction(keyPair.getPublicKey(), nameId, nonce, ttl);
+                UnsignedTx unsignedTx =
+                    transactionServiceNative.createUnsignedTransaction(nameRevokeTx).blockingGet();
+                Tx signedTx =
+                    transactionServiceNative.signTransaction(unsignedTx, keyPair.getPrivateKey());
+                _logger.info("Signed NameRevokeTx: " + signedTx.getTx());
+
+                PostTxResponse postTxResponse = postTx(signedTx);
+                _logger.info("NameRevokeTx hash: " + postTxResponse.getTxHash());
+                context.assertEquals(
+                    postTxResponse.getTxHash(),
+                    transactionServiceNative.computeTxHash(signedTx.getTx()));
+
+                try {
+                  callMethodAndAwaitException(
+                      () -> this.nameService.getNameId(validDomain), NameEntry.class);
+                } catch (Throwable t) {
+                  context.assertEquals(ApiException.class, t.getClass());
+                  context.assertEquals("Not Found", t.getMessage());
+                  _logger.info(
+                      String.format("Validated, that namespace %s is revoked", validDomain));
+                }
+
+              } catch (Throwable e) {
                 context.fail(e);
               }
               future.complete();

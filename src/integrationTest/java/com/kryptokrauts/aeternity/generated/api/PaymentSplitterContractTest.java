@@ -53,7 +53,7 @@ public class PaymentSplitterContractTest extends BaseTest {
 
   @Test
   public void a_a_init(TestContext context) throws IOException {
-    owner = keyPairService.generateBaseKeyPairFromSecret(BENEFICIARY_PRIVATE_KEY);
+    owner = keyPairService.generateBaseKeyPairFromSecret(TestConstants.BENEFICIARY_PRIVATE_KEY);
     final InputStream inputStream =
         Thread.currentThread()
             .getContextClassLoader()
@@ -135,36 +135,36 @@ public class PaymentSplitterContractTest extends BaseTest {
                     transactionServiceNative.createUnsignedTransaction(contractTx).blockingGet();
                 _logger.info("Unsigned Tx - hash - dryRun: " + unsignedTx.getTx());
 
-                //                DryRunResults dryRunResults =
-                //                    performDryRunTransactions(
-                //                        Arrays.asList(
-                //                            ImmutableMap.of(AccountParameter.PUBLIC_KEY,
+                // DryRunResults dryRunResults =
+                // performDryRunTransactions(
+                // Arrays.asList(
+                // ImmutableMap.of(AccountParameter.PUBLIC_KEY,
                 // owner.getPublicKey())),
-                //                        null,
-                //                        Arrays.asList(unsignedTx));
-                //                _logger.info("callContractAfterDryRunOnLocalNode: " +
+                // null,
+                // Arrays.asList(unsignedTx));
+                // _logger.info("callContractAfterDryRunOnLocalNode: " +
                 // dryRunResults.toString());
-                //                context.assertEquals(1, dryRunResults.getResults().size());
-                //                DryRunResult dryRunResult = dryRunResults.getResults().get(0);
-                //                context.assertEquals("ok", dryRunResult.getResult());
+                // context.assertEquals(1, dryRunResults.getResults().size());
+                // DryRunResult dryRunResult = dryRunResults.getResults().get(0);
+                // context.assertEquals("ok", dryRunResult.getResult());
                 //
-                //                contractTx =
-                //                    transactionServiceNative
-                //                        .getTransactionFactory()
-                //                        .createContractCreateTransaction(
-                //                            abiVersion,
-                //                            amount,
-                //                            calldata.getCalldata(),
-                //                            byteCode.getBytecode(),
-                //                            deposit,
-                //                            dryRunResult.getCallObj().getGasUsed(),
-                //                            dryRunResult.getCallObj().getGasPrice(),
-                //                            nonce,
-                //                            ownerId,
-                //                            ttl,
-                //                            vmVersion);
+                // contractTx =
+                // transactionServiceNative
+                // .getTransactionFactory()
+                // .createContractCreateTransaction(
+                // abiVersion,
+                // amount,
+                // calldata.getCalldata(),
+                // byteCode.getBytecode(),
+                // deposit,
+                // dryRunResult.getCallObj().getGasUsed(),
+                // dryRunResult.getCallObj().getGasPrice(),
+                // nonce,
+                // ownerId,
+                // ttl,
+                // vmVersion);
                 //
-                //                unsignedTx =
+                // unsignedTx =
                 //
                 // transactionServiceNative.createUnsignedTransaction(contractTx).blockingGet();
 
@@ -172,36 +172,20 @@ public class PaymentSplitterContractTest extends BaseTest {
                     transactionServiceNative.signTransaction(unsignedTx, owner.getPrivateKey());
                 _logger.info("CreateContractTx hash (native signed): " + signedTxNative);
 
-                Single<PostTxResponse> txResponse =
-                    transactionServiceNative.postTransaction(signedTxNative);
-                TestObserver<PostTxResponse> postTxResponseTestObserver = txResponse.test();
-                postTxResponseTestObserver.awaitTerminalEvent();
-                PostTxResponse postTxResponse = postTxResponseTestObserver.values().get(0);
-                do {
-                  Single<TxInfoObject> txInfoObjectSingle =
-                      transactionServiceNative.getTransactionInfoByHash(postTxResponse.getTxHash());
-                  TestObserver<TxInfoObject> txInfoObjectTestObserver = txInfoObjectSingle.test();
-                  txInfoObjectTestObserver.awaitTerminalEvent();
-                  if (txInfoObjectTestObserver.errorCount() > 0) {
-                    _logger.warn("unable to receive txInfoObject. trying again in 1 second ...");
-                    Thread.sleep(1000);
-                  } else {
-                    TxInfoObject txInfoObject = txInfoObjectTestObserver.values().get(0);
-                    localDeployedContractId = txInfoObject.getCallInfo().getContractId();
-                    _logger.info(
-                        "Deployed contract - hash "
-                            + postTxResponse.getTxHash()
-                            + " - "
-                            + txInfoObject);
-                    if ("revert".equals(txInfoObject.getCallInfo().getReturnType())) {
-                      context.fail(
-                          "transaction reverted: "
-                              + decodeCalldata(
-                                  txInfoObject.getCallInfo().getReturnValue(), "string"));
-                    }
-                  }
-                } while (localDeployedContractId == null);
-              } catch (Exception e) {
+                PostTxResponse postTxResponse = postTx(signedTxNative);
+                TxInfoObject txInfoObject = waitForTxInfoObject(postTxResponse.getTxHash());
+                localDeployedContractId = txInfoObject.getCallInfo().getContractId();
+                _logger.info(
+                    "Deployed contract - hash "
+                        + postTxResponse.getTxHash()
+                        + " - "
+                        + txInfoObject);
+                if ("revert".equals(txInfoObject.getCallInfo().getReturnType())) {
+                  context.fail(
+                      "transaction reverted: "
+                          + decodeCalldata(txInfoObject.getCallInfo().getReturnValue(), "string"));
+                }
+              } catch (Throwable e) {
                 context.fail(e);
               }
               future.complete();
@@ -224,7 +208,8 @@ public class PaymentSplitterContractTest extends BaseTest {
                   balanceRecipient1 = getAccount(initialReceiver1.getPublicKey()).getBalance();
                   balanceRecipient2 = getAccount(initialReceiver2.getPublicKey()).getBalance();
                   balanceRecipient3 = getAccount(initialReceiver3.getPublicKey()).getBalance();
-                  // if one of the accounts wasn't active we get an error and know that the accounts
+                  // if one of the accounts wasn't active we get an error and know that the
+                  // accounts
                   // don't have any balance
                 } catch (Exception e) {
                   balanceRecipient1 = BigInteger.ZERO;
@@ -286,31 +271,17 @@ public class PaymentSplitterContractTest extends BaseTest {
                 _logger.info("CreateContractTx hash: " + postTxResponse.getTxHash());
 
                 // we wait until the tx is available and the payment should have been splitted
-                boolean waiting = true;
-                do {
-                  Single<TxInfoObject> txInfoObjectSingle =
-                      transactionServiceNative.getTransactionInfoByHash(postTxResponse.getTxHash());
-                  TestObserver<TxInfoObject> txInfoObjectTestObserver = txInfoObjectSingle.test();
-                  txInfoObjectTestObserver.awaitTerminalEvent();
-                  if (txInfoObjectTestObserver.errorCount() > 0) {
-                    _logger.warn("unable to receive txInfoObject. trying again in 1 second ...");
-                    Thread.sleep(1000);
-                  } else {
-                    TxInfoObject txInfoObject = txInfoObjectTestObserver.values().get(0);
-                    _logger.info(
-                        "PayAndSplit transaction - hash "
-                            + postTxResponse.getTxHash()
-                            + " - "
-                            + txInfoObject);
-                    if ("revert".equals(txInfoObject.getCallInfo().getReturnType())) {
-                      context.fail(
-                          "transaction reverted: "
-                              + decodeCalldata(
-                                  txInfoObject.getCallInfo().getReturnValue(), "string"));
-                    }
-                    waiting = false;
-                  }
-                } while (waiting);
+                TxInfoObject txInfoObject = waitForTxInfoObject(postTxResponse.getTxHash());
+                _logger.info(
+                    "PayAndSplit transaction - hash "
+                        + postTxResponse.getTxHash()
+                        + " - "
+                        + txInfoObject);
+                if ("revert".equals(txInfoObject.getCallInfo().getReturnType())) {
+                  context.fail(
+                      "transaction reverted: "
+                          + decodeCalldata(txInfoObject.getCallInfo().getReturnValue(), "string"));
+                }
 
                 context.assertEquals(
                     balanceRecipient1.add(
@@ -325,7 +296,7 @@ public class PaymentSplitterContractTest extends BaseTest {
                         paymentValue.multiply(BigDecimal.valueOf(0.2)).toBigInteger()),
                     getAccount(initialReceiver3.getPublicKey()).getBalance());
 
-              } catch (Exception e) {
+              } catch (Throwable e) {
                 context.fail(e);
               }
               future.complete();

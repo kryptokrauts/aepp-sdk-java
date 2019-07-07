@@ -4,6 +4,7 @@ import com.kryptokrauts.aeternity.generated.api.rxjava.ChannelApi;
 import com.kryptokrauts.aeternity.generated.api.rxjava.ContractApi;
 import com.kryptokrauts.aeternity.generated.api.rxjava.NameServiceApi;
 import com.kryptokrauts.aeternity.generated.api.rxjava.TransactionApi;
+import com.kryptokrauts.aeternity.generated.model.NamePointer;
 import com.kryptokrauts.aeternity.sdk.service.transaction.fee.FeeCalculationModel;
 import com.kryptokrauts.aeternity.sdk.service.transaction.fee.impl.BaseFeeCalculationModel;
 import com.kryptokrauts.aeternity.sdk.service.transaction.fee.impl.ContractCallFeeCalculationModel;
@@ -13,9 +14,12 @@ import com.kryptokrauts.aeternity.sdk.service.transaction.type.impl.CreateChanne
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.impl.CreateContractTransaction;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.impl.NameClaimTransaction;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.impl.NamePreclaimTransaction;
+import com.kryptokrauts.aeternity.sdk.service.transaction.type.impl.NameRevokeTransaction;
+import com.kryptokrauts.aeternity.sdk.service.transaction.type.impl.NameUpdateTransaction;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.impl.SpendTransaction;
 import com.kryptokrauts.sophia.compiler.generated.api.rxjava.DefaultApi;
 import java.math.BigInteger;
+import java.util.List;
 import lombok.AllArgsConstructor;
 
 /**
@@ -210,6 +214,57 @@ public class TransactionFactory {
         .salt(salt)
         .nonce(nonce)
         .ttl(ttl)
+        .nameServiceApi(nameServiceApi)
+        .feeCalculationModel(baseFeeCalculationModel)
+        .build();
+  }
+
+  /**
+   * create a nameRevokeTx
+   *
+   * @param accountId
+   * @param nameId
+   * @param nonce
+   * @param ttl
+   * @return
+   */
+  public NameRevokeTransaction createNameRevokeTransaction(
+      String accountId, String nameId, BigInteger nonce, BigInteger ttl) {
+    return NameRevokeTransaction.builder()
+        .accountId(accountId)
+        .nameId(nameId)
+        .nonce(nonce)
+        .ttl(ttl)
+        .nameServiceApi(nameServiceApi)
+        .feeCalculationModel(baseFeeCalculationModel)
+        .build();
+  }
+
+  /**
+   * create a nameUpdateTx
+   *
+   * @param accountId
+   * @param nameId
+   * @param nonce
+   * @param ttl
+   * @return
+   */
+  public NameUpdateTransaction createNameUpdateTransaction(
+      String accountId,
+      String nameId,
+      BigInteger nonce,
+      BigInteger ttl,
+      BigInteger clientTtl,
+      BigInteger nameTtl,
+      List<NamePointer> pointers) {
+    return NameUpdateTransaction.builder()
+        .accountId(accountId)
+        .nameId(nameId)
+        .nonce(nonce)
+        .ttl(ttl)
+        .clientTtl(clientTtl)
+        .nameTtl(nameTtl)
+        .pointers(pointers)
         .nameServiceApi(nameServiceApi)
         .feeCalculationModel(baseFeeCalculationModel)
         .build();

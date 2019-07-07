@@ -18,6 +18,11 @@ public class ValidationUtil {
 
   public static final String NAMESPACE_INVALID = "Namespace not allowed / not provided.";
 
+  public static final String PARAMETER_IS_NULL = "Parameter cannot be null";
+
+  public static final String MISSING_API_IDENTIFIER =
+      "Parameter does not start with APIIdentifier %s_";
+
   public static final String NAMESPACE_EXCEEDS_LIMIT =
       String.format("Domainname exceeds %s char limit.", DOMAIN_NAME_MAX_LENGHT);
 
