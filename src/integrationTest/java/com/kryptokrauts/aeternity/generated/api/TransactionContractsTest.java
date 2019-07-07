@@ -344,8 +344,7 @@ public class TransactionContractsTest extends BaseTest {
                   _logger.info("CreateContractTx hash: " + postTxResponse.getTxHash());
 
                   // get the tx info object to resolve the result
-                  TxInfoObject txInfoObject = null;
-                  waitForTxInfoObject(txInfoObject, postTxResponse.getTxHash());
+                  TxInfoObject txInfoObject = waitForTxInfoObject(postTxResponse.getTxHash());
 
                   // decode the result to json
                   JsonObject json =

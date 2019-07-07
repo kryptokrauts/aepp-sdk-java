@@ -2,14 +2,12 @@ package com.kryptokrauts.aeternity.generated.api;
 
 import com.kryptokrauts.aeternity.generated.model.Account;
 import com.kryptokrauts.aeternity.generated.model.DryRunResults;
-import com.kryptokrauts.aeternity.generated.model.GenericSignedTx;
 import com.kryptokrauts.aeternity.generated.model.PostTxResponse;
 import com.kryptokrauts.aeternity.generated.model.Tx;
 import com.kryptokrauts.aeternity.generated.model.TxInfoObject;
 import com.kryptokrauts.aeternity.generated.model.UnsignedTx;
 import com.kryptokrauts.aeternity.sdk.constants.BaseConstants;
 import com.kryptokrauts.aeternity.sdk.constants.Network;
-import com.kryptokrauts.aeternity.sdk.exception.TransactionNotFoundException;
 import com.kryptokrauts.aeternity.sdk.service.ServiceConfiguration;
 import com.kryptokrauts.aeternity.sdk.service.account.AccountService;
 import com.kryptokrauts.aeternity.sdk.service.account.AccountServiceFactory;
@@ -174,28 +172,9 @@ public abstract class BaseTest {
     return postTxResponse;
   }
 
-  protected GenericSignedTx getTxByHash(String txHash, int numTrials)
-      throws InterruptedException, TransactionNotFoundException {
-    int trialCounter = 0;
-    do {
-      Single<GenericSignedTx> genericSignedTxSingle =
-          transactionServiceNative.getTransactionByHash(txHash);
-      TestObserver<GenericSignedTx> genericSignedTxTestObserver = genericSignedTxSingle.test();
-      genericSignedTxTestObserver.awaitTerminalEvent();
-      GenericSignedTx genericSignedTx = genericSignedTxTestObserver.values().get(0);
-      if (genericSignedTx.getBlockHeight().intValue() > 0) {
-        return genericSignedTx;
-      }
-      _logger.warn("unable to receive txInfoObject. trying again in 1 second ...");
-      Thread.sleep(1000);
-      trialCounter++;
-    } while (trialCounter < numTrials);
-    throw new TransactionNotFoundException();
-  }
-
-  protected void waitForTxInfoObject(TxInfoObject txInfoObject, String txHash)
-      throws InterruptedException {
+  protected TxInfoObject waitForTxInfoObject(String txHash) throws InterruptedException {
     boolean waiting = true;
+    TxInfoObject txInfoObject = null;
     do {
       Single<TxInfoObject> txInfoObjectSingle =
           transactionServiceNative.getTransactionInfoByHash(txHash);
@@ -210,6 +189,7 @@ public abstract class BaseTest {
         waiting = false;
       }
     } while (waiting);
+    return txInfoObject;
   }
 
   protected Calldata encodeCalldata(
