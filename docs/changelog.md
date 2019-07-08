@@ -15,7 +15,7 @@
   - there won't be a specific file for a certain release anymore
 - [#35](../../../issues/35) in future you will find the SDK documentation on gitbook:
   - https://kryptokrauts.gitbook.io/aepp-sdk-java/
-- [#36](../../../issues/35) upgraded SDK setup to make use of æternity release 3.3.0 (`Fortuna`)
+- [#36](../../../issues/36) upgraded SDK setup to make use of æternity release 3.3.0 (`Fortuna`)
   
 
 ### New features
