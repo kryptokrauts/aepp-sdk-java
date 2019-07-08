@@ -178,8 +178,7 @@ public abstract class BaseTest {
     PostTxResponse postTxResponse =
         callMethodAndGetResult(
             () -> transactionServiceNative.postTransaction(signedTx), PostTxResponse.class);
-    // TODO we need a way to ignore JsonTypeInfo for UnsignedTx
-    // waitForTxMined(postTxResponse.getTxHash());
+    waitForTxMined(postTxResponse.getTxHash());
     return postTxResponse;
   }
 
