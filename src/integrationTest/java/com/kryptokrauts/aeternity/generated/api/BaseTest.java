@@ -9,6 +9,7 @@ import com.kryptokrauts.aeternity.generated.model.TxInfoObject;
 import com.kryptokrauts.aeternity.generated.model.UnsignedTx;
 import com.kryptokrauts.aeternity.sdk.constants.BaseConstants;
 import com.kryptokrauts.aeternity.sdk.constants.Network;
+import com.kryptokrauts.aeternity.sdk.exception.AException;
 import com.kryptokrauts.aeternity.sdk.service.ServiceConfiguration;
 import com.kryptokrauts.aeternity.sdk.service.account.AccountService;
 import com.kryptokrauts.aeternity.sdk.service.account.AccountServiceFactory;
@@ -178,7 +179,13 @@ public abstract class BaseTest {
     PostTxResponse postTxResponse =
         callMethodAndGetResult(
             () -> transactionServiceNative.postTransaction(signedTx), PostTxResponse.class);
-    waitForTxMined(postTxResponse.getTxHash());
+    _logger.info("Post tx hash :" + postTxResponse.getTxHash());
+    GenericSignedTx txValue = waitForTxMined(postTxResponse.getTxHash());
+    _logger.info(
+        String.format(
+            "Transaction of type %s is mined at block %s with height %s",
+            txValue.getTx().getType(), txValue.getBlockHash(), txValue.getBlockHeight()));
+
     return postTxResponse;
   }
 
@@ -188,8 +195,32 @@ public abstract class BaseTest {
   }
 
   protected GenericSignedTx waitForTxMined(String txHash) throws Throwable {
-    return callMethodAndGetResult(
-        () -> transactionServiceNative.getTransactionByHash(txHash), GenericSignedTx.class);
+    int blockHeight = -1;
+    GenericSignedTx minedTx = null;
+    int doneTrials = 1;
+
+    while (blockHeight == -1 && doneTrials < TestConstants.NUM_TRIALS_DEFAULT) {
+      minedTx =
+          callMethodAndGetResult(
+              () -> transactionServiceNative.getTransactionByHash(txHash), GenericSignedTx.class);
+      if (minedTx.getBlockHeight().intValue() > 1) {
+        _logger.debug("Mined tx: " + minedTx);
+        blockHeight = minedTx.getBlockHeight().intValue();
+      } else {
+        _logger.warn(
+            String.format(
+                "Transaction not mined yet, trying again in 1 second (%s of %s)...",
+                doneTrials, TestConstants.NUM_TRIALS_DEFAULT));
+        Thread.sleep(1000);
+        doneTrials++;
+      }
+    }
+
+    if (blockHeight == -1) {
+      throw new AException(String.format("Transaction %s was not mined, validate test", txHash));
+    }
+
+    return minedTx;
   }
 
   protected Calldata encodeCalldata(

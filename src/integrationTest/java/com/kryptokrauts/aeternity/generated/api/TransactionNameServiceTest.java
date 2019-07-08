@@ -18,7 +18,6 @@ import java.util.LinkedList;
 import java.util.Random;
 import org.junit.Before;
 import org.junit.FixMethodOrder;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
 
@@ -144,7 +143,6 @@ public class TransactionNameServiceTest extends BaseTest {
 
   /** @param context */
   @Test
-  @Ignore
   public void postUpdateTxTest(TestContext context) {
     Async async = context.async();
     BaseKeyPair keyPair =
@@ -235,7 +233,8 @@ public class TransactionNameServiceTest extends BaseTest {
                         domain, salt, nameEntry, postClaimTxResponse.getTxHash()));
 
                 BigInteger updatedTTL = nameEntry.getTtl();
-                context.assertEquals(initialTTL.subtract(updatedTTL).intValue(), 10000);
+                // subtract 40000 because initial default ttl is 50000 and updated ttl was 10000
+                context.assertEquals(initialTTL.subtract(updatedTTL).intValue(), 40000);
 
               } catch (Throwable e) {
                 context.fail(e);
