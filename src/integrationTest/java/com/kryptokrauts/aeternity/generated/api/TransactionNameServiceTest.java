@@ -234,7 +234,14 @@ public class TransactionNameServiceTest extends BaseTest {
 
                 BigInteger updatedTTL = nameEntry.getTtl();
                 // subtract 40000 because initial default ttl is 50000 and updated ttl was 10000
-                context.assertEquals(initialTTL.subtract(updatedTTL).intValue(), 40000);
+                int diffTtl = initialTTL.subtract(updatedTTL).intValue();
+                context.assertTrue(diffTtl <= 40000);
+                if (diffTtl < 40000) {
+                  _logger.info(
+                      String.format(
+                          "Diff of Ttl is %s, this happens when meanwhile new blocks are mined",
+                          diffTtl));
+                }
 
               } catch (Throwable e) {
                 context.fail(e);
