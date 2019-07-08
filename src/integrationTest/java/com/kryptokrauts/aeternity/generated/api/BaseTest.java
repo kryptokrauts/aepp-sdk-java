@@ -9,7 +9,6 @@ import com.kryptokrauts.aeternity.generated.model.TxInfoObject;
 import com.kryptokrauts.aeternity.generated.model.UnsignedTx;
 import com.kryptokrauts.aeternity.sdk.constants.BaseConstants;
 import com.kryptokrauts.aeternity.sdk.constants.Network;
-import com.kryptokrauts.aeternity.sdk.exception.AException;
 import com.kryptokrauts.aeternity.sdk.service.ServiceConfiguration;
 import com.kryptokrauts.aeternity.sdk.service.account.AccountService;
 import com.kryptokrauts.aeternity.sdk.service.account.AccountServiceFactory;
@@ -217,7 +216,9 @@ public abstract class BaseTest {
     }
 
     if (blockHeight == -1) {
-      throw new AException(String.format("Transaction %s was not mined, validate test", txHash));
+      throw new InterruptedException(
+          String.format(
+              "Transaction %s was not mined after %s trials, aborting", txHash, doneTrials));
     }
 
     return minedTx;
