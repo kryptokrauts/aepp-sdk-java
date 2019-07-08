@@ -115,6 +115,14 @@ task generateApiClient {
                 "useTags"    : "true"
         ])
         new DefaultGenerator().opts(configSophiaCompiler.toClientOptInput()).generate()
+
+        // modify UnsignedTx
+        ant.replaceregexp(match: '^.*\\b(JsonTypeInfo|JsonSubTypes)\\b.*$', replace: '', flags: 'g', byline: true) {
+            fileset(dir: 'build/swagger/src/main/java/com/kryptokrauts/aeternity/generated/model', includes: 'UnsignedTx.java')
+        }
+        ant.replaceregexp(match: '\\}.*?\\)', replace: '', flags: 's') {
+            fileset(dir: 'build/swagger/src/main/java/com/kryptokrauts/aeternity/generated/model', includes: 'UnsignedTx.java')
+        }
     }
 }
 

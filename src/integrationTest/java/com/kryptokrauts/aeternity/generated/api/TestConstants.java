@@ -39,4 +39,13 @@ public interface TestConstants {
   String encodedServiceCallAnswer = "cb_AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACr8s/aY";
 
   String serviceCallAnswerJSON = "{type=word, value=42}";
+
+  String BENEFICIARY_PRIVATE_KEY =
+      "79816BBF860B95600DDFABF9D81FEE81BDB30BE823B17D80B9E48BE0A7015ADF";
+
+  int NUM_TRIALS_DEFAULT = 30;
+
+  public static final String DOMAIN = "kryptokrauts";
+
+  public static final String NAMESPACE = ".test";
 }
