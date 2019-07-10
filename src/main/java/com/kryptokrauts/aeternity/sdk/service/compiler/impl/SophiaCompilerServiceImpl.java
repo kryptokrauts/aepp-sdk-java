@@ -4,6 +4,7 @@ import com.kryptokrauts.aeternity.sdk.service.ServiceConfiguration;
 import com.kryptokrauts.aeternity.sdk.service.compiler.CompilerService;
 import com.kryptokrauts.sophia.compiler.generated.api.DefaultApiImpl;
 import com.kryptokrauts.sophia.compiler.generated.api.rxjava.DefaultApi;
+import com.kryptokrauts.sophia.compiler.generated.model.ACI;
 import com.kryptokrauts.sophia.compiler.generated.model.ByteCode;
 import com.kryptokrauts.sophia.compiler.generated.model.Calldata;
 import com.kryptokrauts.sophia.compiler.generated.model.CompileOpts;
@@ -51,6 +52,14 @@ public final class SophiaCompilerServiceImpl implements CompilerService {
     body.setData(calldata);
     body.setSophiaType(sophiaType);
     return this.getCompilerApi().rxDecodeData(body);
+  }
+
+  @Override
+  public Single<ACI> generateACI(String contractCode) {
+    Contract body = new Contract().code(contractCode);
+    CompileOpts compileOpts = new CompileOpts();
+    body.setOptions(compileOpts);
+    return this.getCompilerApi().rxGenerateACI(body);
   }
 
   @Override

@@ -5,8 +5,6 @@ import java.util.List;
 
 public interface TestConstants {
 
-  String errorOccured = "error occured:";
-
   /** @see https://testnet.contracts.aepps.com/ */
   String testnetAccountPrivateKey =
       "a7a695f999b1872acb13d5b63a830a8ee060ba688a478a08c6e65dfad8a01cd70bb4ed7927f97b51e1bcb5e1340d12335b2a2b12c8bc5221d63c4bcb39d41e61";
@@ -45,7 +43,10 @@ public interface TestConstants {
 
   int NUM_TRIALS_DEFAULT = 30;
 
-  public static final String DOMAIN = "kryptokrauts";
+  String DOMAIN = "kryptokrauts";
 
-  public static final String NAMESPACE = ".test";
+  String NAMESPACE = ".test";
+
+  String paymentSplitterACI =
+      "{contract={name=PaymentSplitter, type_defs=[{name=state, vars=[], typedef={record=[{name=owner, type=[address]}, {name=recipientConditions, type=[{map=[address, int]}]}]}}, {name=event, vars=[], typedef={variant=[{AddingInitialRecipients=[]}, {RecipientAdded=[address, int]}, {AddressUpdated=[address, address]}, {UpdatingAllRecipients=[]}, {PaymentReceivedAndSplitted=[address, int, int]}]}}], functions=[{name=init, arguments=[{name=recipientConditions', type=[{map=[address, int]}]}], returns={record=[{name=owner, type=[address]}, {name=recipientConditions, type=[{map=[address, int]}]}]}, stateful=true}, {name=getOwner, arguments=[], returns=address, stateful=false}, {name=getRecipientsCount, arguments=[], returns=int, stateful=false}, {name=isRecipient, arguments=[{name=who', type=[address]}], returns=bool, stateful=false}, {name=getWeight, arguments=[{name=who', type=[address]}], returns=int, stateful=false}, {name=payAndSplit, arguments=[], returns={tuple=[]}, stateful=true}, {name=transferOwnership, arguments=[{name=newOwner', type=[address]}], returns={tuple=[]}, stateful=true}, {name=updateAddress, arguments=[{name=oldAddress', type=[address]}, {name=newAddress', type=[address]}], returns={tuple=[]}, stateful=true}, {name=updateRecipientConditions, arguments=[{name=recipients', type=[{map=[address, int]}]}], returns={tuple=[]}, stateful=true}]}}";
 }

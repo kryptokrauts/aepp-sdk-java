@@ -20,8 +20,7 @@ public class ChainApiTest extends BaseTest {
           async.complete();
         },
         throwable -> {
-          _logger.error(TestConstants.errorOccured, throwable);
-          context.fail();
+          context.fail(throwable);
         });
   }
 
