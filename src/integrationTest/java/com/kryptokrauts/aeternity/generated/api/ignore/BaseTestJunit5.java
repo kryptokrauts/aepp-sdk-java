@@ -13,11 +13,15 @@ import org.junit.Ignore;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @ExtendWith(VertxExtension.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @Ignore // problems with testcontext ...
 public abstract class BaseTestJunit5 {
+
+  protected static final Logger _logger = LoggerFactory.getLogger(BaseTestJunit5.class);
 
   private static final String CONFIG_PROPERTIES = "config.properties";
   private static final String EPOCH_BASE_URL = "epoch.api.baseUrl";

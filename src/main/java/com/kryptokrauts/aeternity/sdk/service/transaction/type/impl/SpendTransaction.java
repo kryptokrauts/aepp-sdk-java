@@ -11,8 +11,8 @@ import java.math.BigInteger;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.experimental.SuperBuilder;
-import net.consensys.cava.bytes.Bytes;
-import net.consensys.cava.rlp.RLP;
+import org.apache.tuweni.bytes.Bytes;
+import org.apache.tuweni.rlp.RLP;
 
 @Getter
 @SuperBuilder
@@ -46,6 +46,11 @@ public class SpendTransaction extends AbstractTransaction<SpendTx> {
   }
 
   @Override
+  protected void validateInput() {
+    // nothing to validate here
+  }
+
+  @Override
   protected Bytes createRLPEncodedList() {
     Bytes encodedRlp =
         RLP.encodeList(
@@ -58,11 +63,11 @@ public class SpendTransaction extends AbstractTransaction<SpendTx> {
                   EncodingUtils.decodeCheckAndTag(this.recipient, SerializationTags.ID_TAG_ACCOUNT);
               rlpWriter.writeByteArray(senderWithTag);
               rlpWriter.writeByteArray(recipientWithTag);
-              rlpWriter.writeBigInteger(this.amount);
-              rlpWriter.writeBigInteger(this.fee);
-              rlpWriter.writeBigInteger(this.ttl);
-              rlpWriter.writeBigInteger(this.nonce);
-              rlpWriter.writeString(this.payload);
+              this.checkZeroAndWriteValue(rlpWriter, this.amount);
+              this.checkZeroAndWriteValue(rlpWriter, this.fee);
+              this.checkZeroAndWriteValue(rlpWriter, this.ttl);
+              this.checkZeroAndWriteValue(rlpWriter, this.nonce);
+              rlpWriter.writeByteArray(this.payload.getBytes());
             });
     return encodedRlp;
   }

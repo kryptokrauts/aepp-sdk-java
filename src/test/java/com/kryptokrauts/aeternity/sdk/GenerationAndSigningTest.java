@@ -16,6 +16,7 @@ import com.kryptokrauts.aeternity.sdk.util.EncodingType;
 import com.kryptokrauts.aeternity.sdk.util.EncodingUtils;
 import com.kryptokrauts.aeternity.sdk.util.SigningUtil;
 import java.nio.charset.StandardCharsets;
+import org.bouncycastle.pqc.math.linearalgebra.ByteUtils;
 import org.bouncycastle.util.encoders.Hex;
 
 public class GenerationAndSigningTest extends BaseTest {
@@ -357,6 +358,303 @@ public class GenerationAndSigningTest extends BaseTest {
                     EncodingUtils.encodeCheck(
                         Hex.decode(hex.substring(2)), ApiIdentifiers.ACCOUNT_PUBKEY);
                 assertEquals(fromHexAddress, address);
+              });
+          it(
+              "commitmentHash generation test",
+              () -> {
+                final String kkNamespaceCommitmentId =
+                    "cm_aJBGWWjT65JqviLSexkofr5oEAEuEySNkmghsqxNjGt2WqPW8";
+                final String generatedCommitmentId =
+                    EncodingUtils.generateCommitmentHash(BaseTest.KK_NAMESPACE, BaseTest.TEST_SALT);
+                assertEquals(kkNamespaceCommitmentId, generatedCommitmentId);
+              });
+          it(
+              "formatSalt generation test",
+              () -> {
+                final byte[] oneSalt =
+                    new byte[] {
+                      0,
+                      0,
+                      0,
+                      0,
+                      0,
+                      0,
+                      0,
+                      0,
+                      0,
+                      0,
+                      0,
+                      0,
+                      0,
+                      0,
+                      0,
+                      0,
+                      0,
+                      0,
+                      0,
+                      0,
+                      0,
+                      0,
+                      0,
+                      0,
+                      0,
+                      9,
+                      110,
+                      (byte) 178,
+                      (byte) 148,
+                      (byte) 244,
+                      (byte) 193,
+                      91
+                    };
+                final byte[] formattedSalt = EncodingUtils.formatSalt(BaseTest.TEST_SALT);
+
+                assertArrayEquals(oneSalt, formattedSalt);
+              });
+          it(
+              "nameId generation test",
+              () -> {
+                final byte[] nameId =
+                    new byte[] {
+                      (byte) 182,
+                      98,
+                      49,
+                      33,
+                      (byte) 170,
+                      (byte) 167,
+                      (byte) 215,
+                      (byte) 180,
+                      62,
+                      (byte) 190,
+                      1,
+                      (byte) 241,
+                      67,
+                      76,
+                      100,
+                      93,
+                      (byte) 243,
+                      101,
+                      (byte) 162,
+                      45,
+                      120,
+                      34,
+                      (byte) 190,
+                      119,
+                      (byte) 255,
+                      (byte) 230,
+                      114,
+                      (byte) 199,
+                      72,
+                      36,
+                      (byte) 190,
+                      (byte) 173
+                    };
+                final byte[] generatedNameId = EncodingUtils.nameId(BaseTest.KK_NAMESPACE);
+
+                assertArrayEquals(nameId, generatedNameId);
+              });
+          it(
+              "test concat nameId and salt",
+              () -> {
+                final byte[] nameIdAndSalt =
+                    new byte[] {
+                      (byte) 182,
+                      (byte) 98,
+                      (byte) 49,
+                      (byte) 33,
+                      (byte) 170,
+                      (byte) 167,
+                      (byte) 215,
+                      (byte) 180,
+                      (byte) 62,
+                      (byte) 190,
+                      (byte) 1,
+                      (byte) 241,
+                      (byte) 67,
+                      (byte) 76,
+                      (byte) 100,
+                      (byte) 93,
+                      (byte) 243,
+                      (byte) 101,
+                      (byte) 162,
+                      (byte) 45,
+                      (byte) 120,
+                      (byte) 34,
+                      (byte) 190,
+                      (byte) 119,
+                      (byte) 255,
+                      (byte) 230,
+                      (byte) 114,
+                      (byte) 199,
+                      (byte) 72,
+                      (byte) 36,
+                      (byte) 190,
+                      (byte) 173,
+                      (byte) 0,
+                      (byte) 0,
+                      (byte) 0,
+                      (byte) 0,
+                      (byte) 0,
+                      (byte) 0,
+                      (byte) 0,
+                      (byte) 0,
+                      (byte) 0,
+                      (byte) 0,
+                      (byte) 0,
+                      (byte) 0,
+                      (byte) 0,
+                      (byte) 0,
+                      (byte) 0,
+                      (byte) 0,
+                      (byte) 0,
+                      (byte) 0,
+                      (byte) 0,
+                      (byte) 0,
+                      (byte) 0,
+                      (byte) 0,
+                      (byte) 0,
+                      (byte) 0,
+                      (byte) 0,
+                      (byte) 9,
+                      (byte) 110,
+                      (byte) 178,
+                      (byte) 148,
+                      (byte) 244,
+                      (byte) 193,
+                      (byte) 91
+                    };
+                final byte[] generatedNameIdAndSalt =
+                    ByteUtils.concatenate(
+                        EncodingUtils.nameId(BaseTest.KK_NAMESPACE),
+                        EncodingUtils.formatSalt(BaseTest.TEST_SALT));
+
+                assertArrayEquals(nameIdAndSalt, generatedNameIdAndSalt);
+              });
+          it(
+              "test concat nameIdSalt and hash",
+              () -> {
+                final byte[] nameIdAndSalt =
+                    new byte[] {
+                      (byte) 75,
+                      (byte) 154,
+                      (byte) 93,
+                      (byte) 216,
+                      (byte) 161,
+                      (byte) 119,
+                      (byte) 45,
+                      (byte) 33,
+                      (byte) 221,
+                      (byte) 255,
+                      (byte) 130,
+                      (byte) 163,
+                      (byte) 136,
+                      (byte) 227,
+                      (byte) 230,
+                      (byte) 90,
+                      (byte) 156,
+                      (byte) 162,
+                      (byte) 245,
+                      (byte) 187,
+                      (byte) 57,
+                      (byte) 193,
+                      (byte) 21,
+                      (byte) 224,
+                      (byte) 40,
+                      (byte) 39,
+                      (byte) 150,
+                      (byte) 225,
+                      (byte) 117,
+                      (byte) 59,
+                      (byte) 167,
+                      (byte) 243
+                    };
+                final byte[] generatedNameIdAndSalt =
+                    EncodingUtils.hash(
+                        ByteUtils.concatenate(
+                            EncodingUtils.nameId(BaseTest.KK_NAMESPACE),
+                            EncodingUtils.formatSalt(BaseTest.TEST_SALT)));
+
+                assertArrayEquals(nameIdAndSalt, generatedNameIdAndSalt);
+              });
+          it(
+              "hash domain and namespace",
+              () -> {
+                byte[] generatedHash = EncodingUtils.hash(BaseTest.DOMAIN.getBytes());
+                byte[] kkHash =
+                    new byte[] {
+                      (byte) 226,
+                      (byte) 34,
+                      (byte) 173,
+                      (byte) 200,
+                      (byte) 83,
+                      (byte) 245,
+                      (byte) 155,
+                      (byte) 227,
+                      (byte) 178,
+                      (byte) 61,
+                      (byte) 137,
+                      (byte) 129,
+                      (byte) 46,
+                      (byte) 107,
+                      (byte) 56,
+                      (byte) 219,
+                      (byte) 48,
+                      (byte) 231,
+                      (byte) 61,
+                      (byte) 232,
+                      (byte) 212,
+                      (byte) 25,
+                      (byte) 240,
+                      (byte) 132,
+                      (byte) 173,
+                      (byte) 147,
+                      (byte) 145,
+                      (byte) 146,
+                      (byte) 118,
+                      (byte) 88,
+                      (byte) 125,
+                      (byte) 26
+                    };
+
+                assertArrayEquals(kkHash, generatedHash);
+
+                byte[] generatedNS = EncodingUtils.hash(BaseTest.NS.getBytes());
+                byte[] nsHash =
+                    new byte[] {
+                      (byte) 146,
+                      (byte) 139,
+                      (byte) 32,
+                      (byte) 54,
+                      (byte) 105,
+                      (byte) 67,
+                      (byte) 226,
+                      (byte) 175,
+                      (byte) 209,
+                      (byte) 30,
+                      (byte) 188,
+                      (byte) 14,
+                      (byte) 174,
+                      (byte) 46,
+                      (byte) 83,
+                      (byte) 169,
+                      (byte) 59,
+                      (byte) 241,
+                      (byte) 119,
+                      (byte) 164,
+                      (byte) 252,
+                      (byte) 243,
+                      (byte) 91,
+                      (byte) 204,
+                      (byte) 100,
+                      (byte) 213,
+                      (byte) 3,
+                      (byte) 112,
+                      (byte) 78,
+                      (byte) 101,
+                      (byte) 226,
+                      (byte) 2
+                    };
+
+                assertArrayEquals(nsHash, generatedNS);
               });
         });
   }

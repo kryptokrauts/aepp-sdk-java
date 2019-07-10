@@ -24,7 +24,7 @@ install:
 stages:
   - name: build
   - name: snapshot
-    if: branch = dev
+    if: (NOT type IN (pull_request)) AND (branch = dev)
   - name: release
     if: (NOT type IN (pull_request)) AND (branch = master)
 
@@ -44,7 +44,7 @@ jobs:
     # release a new stable version to bintray
     - stage: release
       script:
-       - ./gradlew bintrayUpload -x test -Dbintray.user=$BINTRAY_USER -Dbintray.key=$BINTRAY_KEY -Dbuild.number=$TRAVIS_BUILD_NUMBER
+        - ./gradlew bintrayUpload -x test -Dbintray.user=$BINTRAY_USER -Dbintray.key=$BINTRAY_KEY -Dbuild.number=$TRAVIS_BUILD_NUMBER
       before_deploy:
         - VERSION=`./gradlew -q pV`
         - TAG="v$VERSION"
@@ -55,7 +55,7 @@ jobs:
         provider: releases
         api_key:
           secure: $GITHUB_OAUTH_TOKEN
-        body: "Please take a look into the [release notes](https://github.com/kryptokrauts/aepp-sdk-java/blob/${TAG}/docs/release-notes/RELEASE-NOTES-${VERSION}.md) for more information about the recent changes."
+        body: "Please take a look into the [changelog](https://github.com/kryptokrauts/aepp-sdk-java/blob/${TAG}/docs/changelog.md) for more information about the recent changes."
         skip_cleanup: true
         file_glob: true
         file:

@@ -1,8 +1,7 @@
 version: '3'
 services:
   node:
-    image: aeternity/aeternity:v2.0.0
-    hostname: node
+    image: aeternity/aeternity:${AETERNITY_TAG}
     ports:
       - "3013:3013"
       - "3113:3113"
@@ -16,9 +15,16 @@ services:
       - ${PWD}/docker/keys/node:/home/aeternity/node/keys
       - ${PWD}/docker/accounts_test.json:/home/aeternity/node/data/aecore/.genesis/accounts_test.json
 
+  compiler:
+    image: aeternity/aesophia_http:${SOPHIA_COMPILER_TAG}
+    ports:
+      - "3080:3080"
+
+  goggles:
+    image: kryptokrauts/aepp-goggles
+
   proxy:
-    image: nginx:1.13.8
-    hostname: proxy
+    image: nginx:${NGINX_TAG}
     ports:
       - "80:80"
     volumes:

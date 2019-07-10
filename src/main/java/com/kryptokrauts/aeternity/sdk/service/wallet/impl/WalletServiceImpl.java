@@ -21,7 +21,7 @@ import java.util.Map;
 import java.util.UUID;
 import javax.annotation.Nonnull;
 import lombok.RequiredArgsConstructor;
-import net.consensys.cava.crypto.sodium.SecretBox;
+import org.apache.tuweni.crypto.sodium.SecretBox;
 import org.bouncycastle.util.encoders.Hex;
 
 @RequiredArgsConstructor
