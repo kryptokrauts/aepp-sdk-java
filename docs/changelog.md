@@ -1,6 +1,6 @@
 # Changelog
 
-## [v1.2.0](https://github.com/kryptokrauts/aepp-sdk-java/releases/tag/v1.2.0) (DRAFT, not yet released)
+## [v1.2.0](https://github.com/kryptokrauts/aepp-sdk-java/releases/tag/v1.2.0)
 
 ### General changes
 - [#5](../../../issues/5) included a specific `com.google.guava` version (`27.0.1-jre`)
@@ -15,8 +15,7 @@
   - there won't be a specific file for a certain release anymore
 - [#35](../../../issues/35) in future you will find the SDK documentation on gitbook:
   - https://kryptokrauts.gitbook.io/aepp-sdk-java/
-- [#36](../../../issues/36) upgraded SDK setup to make use of æternity release 3.3.0 (`Fortuna`)
-  
+- [#36](../../../issues/36) upgraded SDK setup to make use of æternity release 3.3.0 (`Fortuna`)  
 
 ### New features
 - [#7](../../../issues/7) AENs support
@@ -29,6 +28,7 @@
 - [#28](../../../issues/28) added support for sophia compiler
   - we now provide a `CompilerServiceFactory` that allows to get an Instance of `SophiaCompilerServiceImpl`
   - this service was needed to enable creation of smart contracts with the SDK
+- [#40](../../../issues/40) added service method to generate ACI for Smart Contracts
 
 ## [v1.1.0](https://github.com/kryptokrauts/aepp-sdk-java/releases/tag/v1.1.0)
 
