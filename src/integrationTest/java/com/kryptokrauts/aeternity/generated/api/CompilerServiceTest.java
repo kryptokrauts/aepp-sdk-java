@@ -3,6 +3,7 @@ package com.kryptokrauts.aeternity.generated.api;
 import com.kryptokrauts.aeternity.sdk.service.ServiceConfiguration;
 import com.kryptokrauts.aeternity.sdk.service.compiler.CompilerService;
 import com.kryptokrauts.aeternity.sdk.service.compiler.CompilerServiceFactory;
+import com.kryptokrauts.sophia.compiler.generated.model.ACI;
 import com.kryptokrauts.sophia.compiler.generated.model.ByteCode;
 import com.kryptokrauts.sophia.compiler.generated.model.Calldata;
 import com.kryptokrauts.sophia.compiler.generated.model.SophiaJsonData;
@@ -10,7 +11,11 @@ import io.reactivex.Single;
 import io.vertx.core.Vertx;
 import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import javax.naming.ConfigurationException;
+import org.apache.commons.io.IOUtils;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -39,12 +44,11 @@ public class CompilerServiceTest extends BaseTest {
         this.sophiaCompilerService.compile(TestConstants.testContractSourceCode, null, null);
     byteCode.subscribe(
         bc -> {
-          context.assertEquals(bc.getBytecode(), TestConstants.testContractByteCode);
+          context.assertEquals(TestConstants.testContractByteCode, bc.getBytecode());
           async.complete();
         },
         throwable -> {
-          _logger.error(TestConstants.errorOccured, throwable);
-          context.fail();
+          context.fail(throwable);
         });
   }
 
@@ -58,12 +62,11 @@ public class CompilerServiceTest extends BaseTest {
             TestConstants.testContractFunctionParams);
     calldata.subscribe(
         cd -> {
-          context.assertEquals(cd.getCalldata(), TestConstants.encodedServiceCall);
+          context.assertEquals(TestConstants.encodedServiceCall, cd.getCalldata());
           async.complete();
         },
         throwable -> {
-          _logger.error(TestConstants.errorOccured, throwable);
-          context.fail();
+          context.fail(throwable);
         });
   }
 
@@ -75,12 +78,11 @@ public class CompilerServiceTest extends BaseTest {
     callData.subscribe(
         cd -> {
           _logger.info(cd.getData().toString());
-          context.assertEquals(cd.getData().toString(), TestConstants.serviceCallAnswerJSON);
+          context.assertEquals(TestConstants.serviceCallAnswerJSON, cd.getData().toString());
           async.complete();
         },
         throwable -> {
-          _logger.error(TestConstants.errorOccured, throwable);
-          context.fail();
+          context.fail(throwable);
         });
   }
 
@@ -92,12 +94,30 @@ public class CompilerServiceTest extends BaseTest {
             TestConstants.testContractSourceCode, "init", null);
     callData.subscribe(
         cd -> {
-          context.assertEquals(cd.getCalldata(), TestConstants.testContractCallData);
+          context.assertEquals(TestConstants.testContractCallData, cd.getCalldata());
           async.complete();
         },
         throwable -> {
-          _logger.error(TestConstants.errorOccured, throwable);
-          context.fail();
+          context.fail(throwable);
+        });
+  }
+
+  @Test
+  public void testGenerateACI(TestContext context) throws IOException {
+    Async async = context.async();
+    final InputStream inputStream =
+        Thread.currentThread()
+            .getContextClassLoader()
+            .getResourceAsStream("contracts/PaymentSplitter.aes");
+    String paymentSplitterSource = IOUtils.toString(inputStream, StandardCharsets.UTF_8.toString());
+    Single<ACI> aci = this.sophiaCompilerService.generateACI(paymentSplitterSource);
+    aci.subscribe(
+        res -> {
+          context.assertEquals(TestConstants.paymentSplitterACI, res.getEncodedAci().toString());
+          async.complete();
+        },
+        throwable -> {
+          context.fail(throwable);
         });
   }
 }

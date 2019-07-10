@@ -56,8 +56,7 @@ public class TransactionSpendApiTest extends BaseTest {
           async.complete();
         },
         throwable -> {
-          _logger.error(TestConstants.errorOccured, throwable);
-          context.fail();
+          context.fail(throwable);
         });
   }
 
