@@ -9,6 +9,7 @@ import com.kryptokrauts.aeternity.sdk.service.transaction.fee.FeeCalculationMode
 import com.kryptokrauts.aeternity.sdk.service.transaction.fee.impl.BaseFeeCalculationModel;
 import com.kryptokrauts.aeternity.sdk.service.transaction.fee.impl.ContractCallFeeCalculationModel;
 import com.kryptokrauts.aeternity.sdk.service.transaction.fee.impl.ContractCreateFeeCalculationModel;
+import com.kryptokrauts.aeternity.sdk.service.transaction.type.impl.ChannelCreateTransaction;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.impl.ChannelDepositTransaction;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.impl.ContractCallTransaction;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.impl.CreateContractTransaction;
@@ -49,14 +50,14 @@ public class TransactionFactory {
       new ContractCallFeeCalculationModel();
 
   /**
-   * create a SpendTransaction
+   * create a spendTx
    *
-   * @param sender sender public key
-   * @param recipient recipient public key
-   * @param amount amount
+   * @param sender sender's public key
+   * @param recipient recipient's public key
+   * @param amount aeons to send
    * @param payload payload
    * @param ttl time to live
-   * @param nonce account nonce
+   * @param nonce signers nonce + 1
    * @return a {@link SpendTransaction} object
    */
   public SpendTransaction createSpendTransaction(
@@ -79,53 +80,20 @@ public class TransactionFactory {
   }
 
   /**
-   * creates a CreateChannelDepositTransaction
+   * create a contractCreateTx
    *
-   * @param channelId
-   * @param fromId
-   * @param amount
-   * @param ttl
-   * @param stateHash
-   * @param round
-   * @param nonce
-   * @return
-   */
-  public ChannelDepositTransaction createChannelDepositTransaction(
-      String channelId,
-      String fromId,
-      BigInteger amount,
-      BigInteger ttl,
-      String stateHash,
-      BigInteger round,
-      BigInteger nonce) {
-    return ChannelDepositTransaction.builder()
-        .channelId(channelId)
-        .fromId(fromId)
-        .amount(amount)
-        .ttl(ttl)
-        .stateHash(stateHash)
-        .round(round)
-        .nonce(nonce)
-        .feeCalculationModel(baseFeeCalculationModel)
-        .channelApi(channelApi)
-        .build();
-  }
-
-  /**
-   * create a contractCreate Transaction
-   *
-   * @param abiVersion
-   * @param amount
-   * @param callData
-   * @param contractByteCode
+   * @param abiVersion version of the ABI
+   * @param amount aeons to transfer to the contract
+   * @param callData api encoded compiled AEVM calldata for the code
+   * @param contractByteCode api encoded compiled AEVM bytecode
    * @param deposit
-   * @param gas
-   * @param gasPrice
-   * @param nonce
-   * @param ownerId
+   * @param gas gas for the initial call
+   * @param gasPrice gas price for the call
+   * @param nonce signers nonce + 1
+   * @param ownerId the public key of the owner/creator that signs the transaction
    * @param ttl
-   * @param vmVersion
-   * @return
+   * @param vmVersion version of the AEVM
+   * @return a {@link CreateContractTransaction} object
    */
   public CreateContractTransaction createContractCreateTransaction(
       BigInteger abiVersion,
@@ -158,17 +126,17 @@ public class TransactionFactory {
   }
 
   /**
-   * create a contractCall Transaction
+   * create a contractCallTx
    *
-   * @param abiVersion
-   * @param callData
-   * @param contractId
-   * @param gas
-   * @param gasPrice
-   * @param nonce
-   * @param callerId
+   * @param abiVersion version of the ABI
+   * @param callData api encoded compiled AEVM calldata for the code
+   * @param contractId address of the contract
+   * @param gas gas for the call
+   * @param gasPrice gas price for the call
+   * @param nonce signers nonce + 1
+   * @param callerId the public key of the caller that signs the transaction
    * @param ttl
-   * @return
+   * @return a {@link ContractCallTransaction} object
    */
   public ContractCallTransaction createContractCallTransaction(
       BigInteger abiVersion,
@@ -200,11 +168,11 @@ public class TransactionFactory {
    * create a namePreclaimTx
    *
    * @param accountId
-   * @param name
-   * @param salt
-   * @param nonce
+   * @param name the domain to preclaim
+   * @param salt a random salt that is later necessary to claim the name
+   * @param nonce signers nonce + 1
    * @param ttl
-   * @return
+   * @return a {@link NamePreclaimTransaction} object
    */
   public NamePreclaimTransaction createNamePreclaimTransaction(
       String accountId, String name, BigInteger salt, BigInteger nonce, BigInteger ttl) {
@@ -220,19 +188,21 @@ public class TransactionFactory {
   }
 
   /**
-   * create a nameRevokeTx
+   * create a nameClaimTx
    *
    * @param accountId
-   * @param nameId
-   * @param nonce
+   * @param name the domain to claim
+   * @param nameSalt the salt provided on the preclaim transaction
+   * @param nonce signers nonce + 1
    * @param ttl
-   * @return
+   * @return a {@link NameClaimTransaction} object
    */
-  public NameRevokeTransaction createNameRevokeTransaction(
-      String accountId, String nameId, BigInteger nonce, BigInteger ttl) {
-    return NameRevokeTransaction.builder()
+  public NameClaimTransaction createNameClaimTransaction(
+      String accountId, String name, BigInteger nameSalt, BigInteger nonce, BigInteger ttl) {
+    return NameClaimTransaction.builder()
         .accountId(accountId)
-        .nameId(nameId)
+        .name(name)
+        .nameSalt(nameSalt)
         .nonce(nonce)
         .ttl(ttl)
         .nameServiceApi(nameServiceApi)
@@ -244,9 +214,12 @@ public class TransactionFactory {
    * create a nameUpdateTx
    *
    * @param accountId
-   * @param nameId
-   * @param nonce
+   * @param nameId the domain to update
+   * @param nonce signers nonce + 1
    * @param ttl
+   * @param clientTtl
+   * @param nameTtl
+   * @param pointers
    * @return
    */
   public NameUpdateTransaction createNameUpdateTransaction(
@@ -271,25 +244,93 @@ public class TransactionFactory {
   }
 
   /**
-   * create a claimTx
+   * create a nameRevokeTx
    *
    * @param accountId
-   * @param name
-   * @param nameSalt
-   * @param nonce
+   * @param nameId the domain to revoke
+   * @param nonce signers nonce + 1
    * @param ttl
    * @return
    */
-  public NameClaimTransaction createNameClaimTransaction(
-      String accountId, String name, BigInteger nameSalt, BigInteger nonce, BigInteger ttl) {
-    return NameClaimTransaction.builder()
+  public NameRevokeTransaction createNameRevokeTransaction(
+      String accountId, String nameId, BigInteger nonce, BigInteger ttl) {
+    return NameRevokeTransaction.builder()
         .accountId(accountId)
-        .name(name)
-        .nameSalt(nameSalt)
+        .nameId(nameId)
         .nonce(nonce)
         .ttl(ttl)
         .nameServiceApi(nameServiceApi)
         .feeCalculationModel(baseFeeCalculationModel)
+        .build();
+  }
+
+  /**
+   * @param initiator initiator's public key
+   * @param initiatorAmount amount of tokens the initiator has committed to the channel
+   * @param responder responder's public key
+   * @param responderAmount amount of tokens the responder has committed to the channel
+   * @param channelReserve the minimum amount both peers need to maintain
+   * @param lockPeriod amount of blocks for disputing a solo close
+   * @param ttl minimum block height to include the channel_create_tx
+   * @param stateHash TODO
+   * @param nonce initiators nonce + 1
+   * @return a {@link ChannelCreateTransaction} object
+   */
+  public ChannelCreateTransaction createChannelCreateTransaction(
+      String initiator,
+      BigInteger initiatorAmount,
+      String responder,
+      BigInteger responderAmount,
+      BigInteger channelReserve,
+      BigInteger lockPeriod,
+      BigInteger ttl,
+      String stateHash,
+      BigInteger nonce) {
+    return ChannelCreateTransaction.builder()
+        .initiator(initiator)
+        .initiatorAmount(initiatorAmount)
+        .responder(responder)
+        .responderAmount(responderAmount)
+        .channelReserve(channelReserve)
+        .lockPeriod(lockPeriod)
+        .ttl(ttl)
+        .stateHash(stateHash)
+        .nonce(nonce)
+        .channelApi(channelApi)
+        .feeCalculationModel(baseFeeCalculationModel)
+        .build();
+  }
+
+  /**
+   * creates a ChannelDepositTransaction
+   *
+   * @param channelId the id of the channel
+   * @param fromId sender's public key
+   * @param amount aeons to deposit
+   * @param ttl
+   * @param stateHash TODO
+   * @param round
+   * @param nonce signers nonce + 1
+   * @return a {@link ChannelDepositTransaction} object
+   */
+  public ChannelDepositTransaction createChannelDepositTransaction(
+      String channelId,
+      String fromId,
+      BigInteger amount,
+      BigInteger ttl,
+      String stateHash,
+      BigInteger round,
+      BigInteger nonce) {
+    return ChannelDepositTransaction.builder()
+        .channelId(channelId)
+        .fromId(fromId)
+        .amount(amount)
+        .ttl(ttl)
+        .stateHash(stateHash)
+        .round(round)
+        .nonce(nonce)
+        .feeCalculationModel(baseFeeCalculationModel)
+        .channelApi(channelApi)
         .build();
   }
 }
