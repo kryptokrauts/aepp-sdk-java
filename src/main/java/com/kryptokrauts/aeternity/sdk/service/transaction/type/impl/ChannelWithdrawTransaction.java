@@ -11,21 +11,45 @@ import java.math.BigInteger;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.experimental.SuperBuilder;
-import net.consensys.cava.bytes.Bytes;
-import net.consensys.cava.rlp.RLP;
+import org.apache.tuweni.bytes.Bytes;
+import org.apache.tuweni.rlp.RLP;
 
 @Getter
 @SuperBuilder
 public class ChannelWithdrawTransaction extends AbstractTransaction<ChannelWithdrawTx> {
 
-  @NonNull String channelId;
-  @NonNull String toId;
-  @NonNull BigInteger amount;
-  @NonNull BigInteger ttl;
-  @NonNull String stateHash;
-  @NonNull BigInteger round;
-  @NonNull BigInteger nonce;
+  @NonNull private String channelId;
+  @NonNull private String toId;
+  @NonNull private BigInteger amount;
+  @NonNull private BigInteger ttl;
+  @NonNull private String stateHash;
+  @NonNull private BigInteger round;
+  @NonNull private BigInteger nonce;
   @NonNull private ChannelApi channelApi;
+
+  @Override
+  protected Single<UnsignedTx> createInternal() {
+    return channelApi.rxPostChannelWithdraw(toModel());
+  }
+
+  @Override
+  protected ChannelWithdrawTx toModel() {
+    ChannelWithdrawTx channelWithdrawTx = new ChannelWithdrawTx();
+    channelWithdrawTx.setChannelId(channelId);
+    channelWithdrawTx.setToId(toId);
+    channelWithdrawTx.setAmount(amount);
+    channelWithdrawTx.setFee(fee);
+    channelWithdrawTx.setTtl(ttl);
+    channelWithdrawTx.setStateHash(stateHash);
+    channelWithdrawTx.setRound(round);
+    channelWithdrawTx.setNonce(nonce);
+    return channelWithdrawTx;
+  }
+
+  @Override
+  protected void validateInput() {
+    // nothing to validate here
+  }
 
   @Override
   protected Bytes createRLPEncodedList() {
@@ -48,24 +72,5 @@ public class ChannelWithdrawTransaction extends AbstractTransaction<ChannelWithd
               rlpWriter.writeBigInteger(this.nonce);
             });
     return encodedRlp;
-  }
-
-  @Override
-  protected Single<UnsignedTx> createInternal() {
-    return channelApi.rxPostChannelWithdraw(toModel());
-  }
-
-  @Override
-  protected ChannelWithdrawTx toModel() {
-    ChannelWithdrawTx channelWithdrawTx = new ChannelWithdrawTx();
-    channelWithdrawTx.setChannelId(channelId);
-    channelWithdrawTx.setToId(toId);
-    channelWithdrawTx.setAmount(amount);
-    channelWithdrawTx.setFee(fee);
-    channelWithdrawTx.setTtl(ttl);
-    channelWithdrawTx.setStateHash(stateHash);
-    channelWithdrawTx.setRound(round);
-    channelWithdrawTx.setNonce(nonce);
-    return channelWithdrawTx;
   }
 }

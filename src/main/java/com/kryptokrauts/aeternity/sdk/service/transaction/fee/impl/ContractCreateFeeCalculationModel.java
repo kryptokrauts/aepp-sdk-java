@@ -4,12 +4,12 @@ import com.kryptokrauts.aeternity.sdk.constants.BaseConstants;
 import com.kryptokrauts.aeternity.sdk.service.transaction.fee.FeeCalculationModel;
 import java.math.BigInteger;
 
-public class ContractFeeCalculationModel implements FeeCalculationModel {
+public class ContractCreateFeeCalculationModel implements FeeCalculationModel {
 
   /**
    * the fee is calculated according to the following formula
    *
-   * <p>(BASE_GASE*5 + (byte_size * GAS_PER_BYTE)) * MINIMAL_GAS_PRICE
+   * <p>(BASE_GAS * 5 + (byte_size * GAS_PER_BYTE)) * MINIMAL_GAS_PRICE
    */
   @Override
   public BigInteger calculateFee(int tx_byte_size, long minimalGasPrice) {

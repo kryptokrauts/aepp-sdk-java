@@ -11,44 +11,21 @@ import java.math.BigInteger;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.experimental.SuperBuilder;
-import net.consensys.cava.bytes.Bytes;
-import net.consensys.cava.rlp.RLP;
+import org.apache.tuweni.bytes.Bytes;
+import org.apache.tuweni.rlp.RLP;
 
 @Getter
 @SuperBuilder
 public class ChannelDepositTransaction extends AbstractTransaction<ChannelDepositTx> {
 
-  @NonNull String channelId;
-  @NonNull String fromId;
-  @NonNull BigInteger amount;
-  @NonNull BigInteger ttl;
-  @NonNull String stateHash;
-  @NonNull BigInteger round;
-  @NonNull BigInteger nonce;
+  @NonNull private String channelId;
+  @NonNull private String fromId;
+  @NonNull private BigInteger amount;
+  @NonNull private BigInteger ttl;
+  @NonNull private String stateHash;
+  @NonNull private BigInteger round;
+  @NonNull private BigInteger nonce;
   @NonNull private ChannelApi channelApi;
-
-  @Override
-  protected Bytes createRLPEncodedList() {
-    Bytes encodedRlp =
-        RLP.encodeList(
-            rlpWriter -> {
-              rlpWriter.writeInt(SerializationTags.OBJECT_TAG_CHANNEL_DEPOSIT_TRANSACTION);
-              rlpWriter.writeInt(SerializationTags.VSN);
-              byte[] channelIdWithTag =
-                  EncodingUtils.decodeCheckAndTag(this.channelId, SerializationTags.ID_TAG_CHANNEL);
-              byte[] fromIdWithTag =
-                  EncodingUtils.decodeCheckAndTag(this.fromId, SerializationTags.ID_TAG_ACCOUNT);
-              rlpWriter.writeByteArray(channelIdWithTag);
-              rlpWriter.writeByteArray(fromIdWithTag);
-              rlpWriter.writeBigInteger(this.amount);
-              rlpWriter.writeBigInteger(this.ttl);
-              rlpWriter.writeBigInteger(this.fee);
-              rlpWriter.writeString(this.stateHash);
-              rlpWriter.writeBigInteger(this.round);
-              rlpWriter.writeBigInteger(this.nonce);
-            });
-    return encodedRlp;
-  }
 
   @Override
   protected Single<UnsignedTx> createInternal() {
@@ -68,5 +45,33 @@ public class ChannelDepositTransaction extends AbstractTransaction<ChannelDeposi
     channelDepositTx.setNonce(nonce);
 
     return channelDepositTx;
+  }
+
+  @Override
+  protected void validateInput() {
+    // nothing to validate here
+  }
+
+  @Override
+  protected Bytes createRLPEncodedList() {
+    Bytes encodedRlp =
+        RLP.encodeList(
+            rlpWriter -> {
+              rlpWriter.writeInt(SerializationTags.OBJECT_TAG_CHANNEL_DEPOSIT_TRANSACTION);
+              rlpWriter.writeInt(SerializationTags.VSN);
+              byte[] channelIdWithTag =
+                  EncodingUtils.decodeCheckAndTag(this.channelId, SerializationTags.ID_TAG_CHANNEL);
+              byte[] fromIdWithTag =
+                  EncodingUtils.decodeCheckAndTag(this.fromId, SerializationTags.ID_TAG_ACCOUNT);
+              rlpWriter.writeByteArray(channelIdWithTag);
+              rlpWriter.writeByteArray(fromIdWithTag);
+              this.checkZeroAndWriteValue(rlpWriter, this.amount);
+              this.checkZeroAndWriteValue(rlpWriter, this.ttl);
+              this.checkZeroAndWriteValue(rlpWriter, this.fee);
+              rlpWriter.writeString(this.stateHash);
+              this.checkZeroAndWriteValue(rlpWriter, this.round);
+              this.checkZeroAndWriteValue(rlpWriter, this.nonce);
+            });
+    return encodedRlp;
   }
 }

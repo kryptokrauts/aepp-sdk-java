@@ -10,16 +10,29 @@ import io.reactivex.Single;
 import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
 import java.math.BigInteger;
-import java.util.concurrent.ExecutionException;
-import org.bouncycastle.crypto.CryptoException;
+import org.junit.Before;
+import org.junit.FixMethodOrder;
 import org.junit.Test;
-import org.junit.jupiter.api.Assertions;
+import org.junit.runners.MethodSorters;
 
-public class TransactionApiTest extends BaseTest {
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
+public class TransactionSpendApiTest extends BaseTest {
 
+  BaseKeyPair baseKeyPair;
+
+  @Before
+  public void initBeforeTest() {
+    baseKeyPair =
+        keyPairService.generateBaseKeyPairFromSecret(TestConstants.BENEFICIARY_PRIVATE_KEY);
+  }
+
+  /**
+   * create an unsigned native spend transaction
+   *
+   * @param context
+   */
   @Test
-  public void buildNativeTransactionTest(TestContext context)
-      throws ExecutionException, InterruptedException {
+  public void buildNativeSpendTransactionTest(TestContext context) {
     Async async = context.async();
 
     String sender = keyPairService.generateBaseKeyPair().getPublicKey();
@@ -32,27 +45,27 @@ public class TransactionApiTest extends BaseTest {
     AbstractTransaction<?> spendTx =
         transactionServiceNative
             .getTransactionFactory()
-            .createSpendTransaction(sender, recipient, amount, payload, null, ttl, nonce);
+            .createSpendTransaction(sender, recipient, amount, payload, ttl, nonce);
     UnsignedTx unsignedTxNative =
-        transactionServiceNative.createUnsignedTransaction(spendTx).toFuture().get();
+        transactionServiceNative.createUnsignedTransaction(spendTx).blockingGet();
 
     Single<UnsignedTx> unsignedTx = transactionServiceDebug.createUnsignedTransaction(spendTx);
     unsignedTx.subscribe(
         it -> {
-          Assertions.assertEquals(it, unsignedTxNative);
+          context.assertEquals(it, unsignedTxNative);
           async.complete();
         },
         throwable -> {
-          context.fail();
+          context.fail(throwable);
         });
   }
 
   @Test
-  public void postSpendTxTest(TestContext context)
-      throws ExecutionException, InterruptedException, CryptoException {
+  public void postSpendTxTest(TestContext context) {
     Async async = context.async();
 
-    BaseKeyPair keyPair = keyPairService.generateBaseKeyPairFromSecret(BENEFICIARY_PRIVATE_KEY);
+    BaseKeyPair keyPair =
+        keyPairService.generateBaseKeyPairFromSecret(TestConstants.BENEFICIARY_PRIVATE_KEY);
 
     // get the currents accounts nonce in case a transaction is already
     // created and increase it by one
@@ -61,23 +74,26 @@ public class TransactionApiTest extends BaseTest {
         account -> {
           BaseKeyPair kp = keyPairService.generateBaseKeyPair();
           String recipient = kp.getPublicKey();
-          BigInteger amount = BigInteger.valueOf(1);
+          BigInteger amount = new BigInteger("1000000000000000000");
           String payload = "payload";
-          BigInteger ttl = BigInteger.valueOf(20000);
+          BigInteger ttl = BigInteger.ZERO;
           BigInteger nonce = account.getNonce().add(BigInteger.ONE);
+
           AbstractTransaction<?> spendTx =
               transactionServiceNative
                   .getTransactionFactory()
                   .createSpendTransaction(
-                      keyPair.getPublicKey(), recipient, amount, payload, null, ttl, nonce);
+                      keyPair.getPublicKey(), recipient, amount, payload, ttl, nonce);
           UnsignedTx unsignedTxNative =
-              transactionServiceNative.createUnsignedTransaction(spendTx).toFuture().get();
+              transactionServiceNative.createUnsignedTransaction(spendTx).blockingGet();
           Tx signedTx =
               transactionServiceNative.signTransaction(unsignedTxNative, keyPair.getPrivateKey());
+
           Single<PostTxResponse> txResponse = transactionServiceNative.postTransaction(signedTx);
           txResponse.subscribe(
               it -> {
-                Assertions.assertEquals(
+                _logger.info("SpendTx hash: " + it.getTxHash());
+                context.assertEquals(
                     it.getTxHash(), transactionServiceNative.computeTxHash(signedTx.getTx()));
                 async.complete();
               },

@@ -7,21 +7,35 @@ http:
     listen_address: 0.0.0.0
     debug_endpoints: true
 
+websocket:
+  channel:
+    listen_address: 0.0.0.0
+    port: 3014
+
 keys:
   peer_password: "top secret"
   dir: ./keys
 
 chain:
   persist: true
+  hard_forks:
+    "1": 0
+    "2": 2
+    "3": 4
 
 mining:
-  beneficiary: "ak_twR4h7dEcUtc2iSEDv8kB7UFJJDGiEDQCXr85C3fYF8FdVdyo"
-  beneficiary_reward_delay: 2
   autostart: true
+  beneficiary: "ak_twR4h7dEcUtc2iSEDv8kB7UFJJDGiEDQCXr85C3fYF8FdVdyo"
+  expected_mine_rate: 4000
+  micro_block_cycle: 1000
   cuckoo:
-    edge_bits: 15
-    miners:
-      - executable: mean15-generic
+    miner:
+      executable: mean15-generic
+      extra_args: ""
+      edge_bits: 15
 
 fork_management:
   network_id: ae_devnet
+
+logging:
+  level: debug

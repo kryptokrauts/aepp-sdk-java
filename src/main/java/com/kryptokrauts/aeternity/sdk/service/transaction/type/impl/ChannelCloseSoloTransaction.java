@@ -11,43 +11,20 @@ import java.math.BigInteger;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.experimental.SuperBuilder;
-import net.consensys.cava.bytes.Bytes;
-import net.consensys.cava.rlp.RLP;
+import org.apache.tuweni.bytes.Bytes;
+import org.apache.tuweni.rlp.RLP;
 
 @Getter
 @SuperBuilder
 public class ChannelCloseSoloTransaction extends AbstractTransaction<ChannelCloseSoloTx> {
 
-  @NonNull String channelId;
-  @NonNull String fromId;
-  @NonNull String payload;
-  @NonNull String poi;
-  @NonNull BigInteger ttl;
-  @NonNull BigInteger nonce;
+  @NonNull private String channelId;
+  @NonNull private String fromId;
+  @NonNull private String payload;
+  @NonNull private String poi;
+  @NonNull private BigInteger ttl;
+  @NonNull private BigInteger nonce;
   @NonNull private ChannelApi channelApi;
-
-  @Override
-  protected Bytes createRLPEncodedList() {
-    Bytes encodedRlp =
-        RLP.encodeList(
-            rlpWriter -> {
-              rlpWriter.writeInt(SerializationTags.OBJECT_TAG_CHANNEL_CLOSE_SOLO_TRANSACTION);
-              rlpWriter.writeInt(SerializationTags.VSN);
-              byte[] channelIdWithTag =
-                  EncodingUtils.decodeCheckAndTag(this.channelId, SerializationTags.ID_TAG_CHANNEL);
-              byte[] fromIdWithTag =
-                  EncodingUtils.decodeCheckAndTag(this.fromId, SerializationTags.ID_TAG_ACCOUNT);
-              rlpWriter.writeByteArray(channelIdWithTag);
-              rlpWriter.writeByteArray(fromIdWithTag);
-              rlpWriter.writeString(this.payload);
-              rlpWriter.writeString(
-                  this.poi); // TODO inform about Proof of Inclusion and how it is handled
-              rlpWriter.writeBigInteger(this.ttl);
-              rlpWriter.writeBigInteger(this.fee);
-              rlpWriter.writeBigInteger(this.nonce);
-            });
-    return encodedRlp;
-  }
 
   @Override
   protected Single<UnsignedTx> createInternal() {
@@ -65,5 +42,33 @@ public class ChannelCloseSoloTransaction extends AbstractTransaction<ChannelClos
     channelCloseSoloTx.setTtl(ttl);
     channelCloseSoloTx.setNonce(nonce);
     return channelCloseSoloTx;
+  }
+
+  @Override
+  protected void validateInput() {
+    // nothing to validate here
+  }
+
+  @Override
+  protected Bytes createRLPEncodedList() {
+    Bytes encodedRlp =
+        RLP.encodeList(
+            rlpWriter -> {
+              rlpWriter.writeInt(SerializationTags.OBJECT_TAG_CHANNEL_CLOSE_SOLO_TRANSACTION);
+              rlpWriter.writeInt(SerializationTags.VSN);
+              byte[] channelIdWithTag =
+                  EncodingUtils.decodeCheckAndTag(this.channelId, SerializationTags.ID_TAG_CHANNEL);
+              byte[] fromIdWithTag =
+                  EncodingUtils.decodeCheckAndTag(this.fromId, SerializationTags.ID_TAG_ACCOUNT);
+              rlpWriter.writeByteArray(channelIdWithTag);
+              rlpWriter.writeByteArray(fromIdWithTag);
+              rlpWriter.writeString(this.payload);
+              rlpWriter.writeString(
+                  this.poi); // TODO inform about Proof of Inclusion and how it is handled
+              this.checkZeroAndWriteValue(rlpWriter, this.ttl);
+              this.checkZeroAndWriteValue(rlpWriter, this.fee);
+              this.checkZeroAndWriteValue(rlpWriter, this.nonce);
+            });
+    return encodedRlp;
   }
 }

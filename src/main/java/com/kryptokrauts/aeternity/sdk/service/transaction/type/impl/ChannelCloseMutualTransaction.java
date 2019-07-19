@@ -11,42 +11,20 @@ import java.math.BigInteger;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.experimental.SuperBuilder;
-import net.consensys.cava.bytes.Bytes;
-import net.consensys.cava.rlp.RLP;
+import org.apache.tuweni.bytes.Bytes;
+import org.apache.tuweni.rlp.RLP;
 
 @Getter
 @SuperBuilder
 public class ChannelCloseMutualTransaction extends AbstractTransaction<ChannelCloseMutualTx> {
 
-  @NonNull String channelId;
-  @NonNull String fromId;
-  @NonNull BigInteger initiatorAmountFinal;
-  @NonNull BigInteger responderAmountFinal;
-  @NonNull BigInteger ttl;
-  @NonNull BigInteger nonce;
+  @NonNull private String channelId;
+  @NonNull private String fromId;
+  @NonNull private BigInteger initiatorAmountFinal;
+  @NonNull private BigInteger responderAmountFinal;
+  @NonNull private BigInteger ttl;
+  @NonNull private BigInteger nonce;
   @NonNull private ChannelApi channelApi;
-
-  @Override
-  protected Bytes createRLPEncodedList() {
-    Bytes encodedRlp =
-        RLP.encodeList(
-            rlpWriter -> {
-              rlpWriter.writeInt(SerializationTags.OBJECT_TAG_CHANNEL_CLOSE_MUTUAL_TRANSACTION);
-              rlpWriter.writeInt(SerializationTags.VSN);
-              byte[] channelIdWithTag =
-                  EncodingUtils.decodeCheckAndTag(this.channelId, SerializationTags.ID_TAG_CHANNEL);
-              byte[] fromIdWithTag =
-                  EncodingUtils.decodeCheckAndTag(this.fromId, SerializationTags.ID_TAG_ACCOUNT);
-              rlpWriter.writeByteArray(channelIdWithTag);
-              rlpWriter.writeByteArray(fromIdWithTag);
-              rlpWriter.writeBigInteger(this.initiatorAmountFinal);
-              rlpWriter.writeBigInteger(this.responderAmountFinal);
-              rlpWriter.writeBigInteger(this.ttl);
-              rlpWriter.writeBigInteger(this.fee);
-              rlpWriter.writeBigInteger(this.nonce);
-            });
-    return encodedRlp;
-  }
 
   @Override
   protected Single<UnsignedTx> createInternal() {
@@ -64,5 +42,32 @@ public class ChannelCloseMutualTransaction extends AbstractTransaction<ChannelCl
     channelCloseMutualTx.setTtl(ttl);
     channelCloseMutualTx.setNonce(nonce);
     return channelCloseMutualTx;
+  }
+
+  @Override
+  protected void validateInput() {
+    // nothing to validate here
+  }
+
+  @Override
+  protected Bytes createRLPEncodedList() {
+    Bytes encodedRlp =
+        RLP.encodeList(
+            rlpWriter -> {
+              rlpWriter.writeInt(SerializationTags.OBJECT_TAG_CHANNEL_CLOSE_MUTUAL_TRANSACTION);
+              rlpWriter.writeInt(SerializationTags.VSN);
+              byte[] channelIdWithTag =
+                  EncodingUtils.decodeCheckAndTag(this.channelId, SerializationTags.ID_TAG_CHANNEL);
+              byte[] fromIdWithTag =
+                  EncodingUtils.decodeCheckAndTag(this.fromId, SerializationTags.ID_TAG_ACCOUNT);
+              rlpWriter.writeByteArray(channelIdWithTag);
+              rlpWriter.writeByteArray(fromIdWithTag);
+              this.checkZeroAndWriteValue(rlpWriter, this.initiatorAmountFinal);
+              this.checkZeroAndWriteValue(rlpWriter, this.responderAmountFinal);
+              this.checkZeroAndWriteValue(rlpWriter, this.ttl);
+              this.checkZeroAndWriteValue(rlpWriter, this.fee);
+              this.checkZeroAndWriteValue(rlpWriter, this.nonce);
+            });
+    return encodedRlp;
   }
 }
