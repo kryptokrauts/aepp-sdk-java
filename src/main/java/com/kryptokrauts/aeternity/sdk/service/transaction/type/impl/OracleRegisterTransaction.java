@@ -29,7 +29,7 @@ public class OracleRegisterTransaction extends AbstractTransaction<OracleRegiste
   @NonNull private String queryFormat;
   @NonNull private String responseFormat;
   @NonNull private BigInteger ttl;
-  @NonNull private OracleApi oracleApi;
+  private OracleApi oracleApi;
 
   @Override
   protected Single<UnsignedTx> createInternal() {
@@ -76,6 +76,7 @@ public class OracleRegisterTransaction extends AbstractTransaction<OracleRegiste
                   break;
                 case BLOCK:
                   this.checkZeroAndWriteValue(rlpWriter, BigInteger.ONE);
+                  break;
               }
               this.checkZeroAndWriteValue(rlpWriter, this.oracleTtl.getValue());
               this.checkZeroAndWriteValue(rlpWriter, this.fee);

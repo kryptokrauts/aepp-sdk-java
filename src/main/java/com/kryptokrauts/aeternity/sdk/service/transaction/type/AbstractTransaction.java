@@ -70,7 +70,7 @@ public abstract class AbstractTransaction<TxModel> {
         Bytes encodedRLPArray = createRLPEncodedList();
         int byte_size = encodedRLPArray.bitLength() / 8;
         /** now calculate fee based on tx size */
-        fee = feeCalculationModel.calculateFee(byte_size, minimalGasPrice);
+        fee = feeCalculationModel.calculateFee(byte_size, minimalGasPrice, this);
         _logger.info(
             String.format(
                 "Using calculation model %s the following fee was calculated %s",
