@@ -1,5 +1,7 @@
 package com.kryptokrauts.aeternity.generated.api;
 
+import com.kryptokrauts.aeternity.generated.model.Tx;
+import com.kryptokrauts.aeternity.generated.model.UnsignedTx;
 import com.kryptokrauts.aeternity.sdk.domain.secret.impl.BaseKeyPair;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.impl.ChannelCreateTransaction;
 import com.kryptokrauts.aeternity.sdk.util.UnitConversionUtil;
@@ -57,20 +59,28 @@ public class TransactionChannelsTest extends BaseTest {
         .executeBlocking(
             future -> {
               try {
+                BigInteger amount = UnitConversionUtil.toAettos("2", Unit.AE).toBigInteger();
                 BigInteger nonce = getAccount(initiator.getPublicKey()).getNonce();
                 ChannelCreateTransaction channelCreateTransaction =
                     transactionServiceNative
                         .getTransactionFactory()
                         .createChannelCreateTransaction(
                             initiator.getPublicKey(),
-                            BigInteger.ZERO,
+                            amount,
                             responder.getPublicKey(),
-                            BigInteger.ZERO,
+                            amount,
                             BigInteger.ZERO,
                             BigInteger.ZERO,
                             BigInteger.ZERO,
                             "",
                             nonce);
+                UnsignedTx unsignedTx =
+                    transactionServiceNative
+                        .createUnsignedTransaction(channelCreateTransaction)
+                        .blockingGet();
+                Tx signedTx =
+                    transactionServiceNative.signTransaction(unsignedTx, initiator.getPrivateKey());
+                transactionServiceNative.postTransaction(signedTx);
               } catch (Throwable e) {
                 context.fail(e);
               }

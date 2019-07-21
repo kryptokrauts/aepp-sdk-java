@@ -52,12 +52,12 @@ public class TransactionFactory {
   /**
    * create a spendTx
    *
-   * @param sender sender's public key
-   * @param recipient recipient's public key
-   * @param amount aeons to send
-   * @param payload payload
-   * @param ttl time to live
-   * @param nonce signers nonce + 1
+   * @param sender senders public key
+   * @param recipient recipients public key
+   * @param amount ættos to send
+   * @param payload payload / message
+   * @param ttl time to live (maximum height of a block to include the tx)
+   * @param nonce senders nonce + 1
    * @return a {@link SpendTransaction} object
    */
   public SpendTransaction createSpendTransaction(
@@ -83,15 +83,23 @@ public class TransactionFactory {
    * create a contractCreateTx
    *
    * @param abiVersion version of the ABI
-   * @param amount aeons to transfer to the contract
-   * @param callData api encoded compiled AEVM calldata for the code
-   * @param contractByteCode api encoded compiled AEVM bytecode
-   * @param deposit
-   * @param gas gas for the initial call
-   * @param gasPrice gas price for the call
-   * @param nonce signers nonce + 1
+   * @param amount ættos to transfer to the contract (optional)
+   * @param callData api encoded compiled AEVM calldata for the code (init/main-function that will
+   *     be called when contract is being deployed). can be obtained using {@link
+   *     com.kryptokrauts.aeternity.sdk.service.compiler.CompilerService}
+   * @param contractByteCode api encoded compiled AEVM bytecode. can be obtained using {@link
+   *     com.kryptokrauts.aeternity.sdk.service.compiler.CompilerService}
+   * @param deposit ættos that will be locked by the contract. currently unused, but future versions
+   *     of the protocol will probably allow a contract deactivation where the deposit amount is
+   *     then being released (optional)
+   * @param gas gas for the initial call. from protocol version 4.0.0 (Fortuna major release) this
+   *     can be obtained using dryRun functionality available in {@link
+   *     com.kryptokrauts.aeternity.sdk.service.transaction.TransactionService}
+   * @param gasPrice gas price for the call. must be at least the minimum gas price to follow
+   *     consensus. see {@link com.kryptokrauts.aeternity.sdk.constants.BaseConstants}
+   * @param nonce owners nonce + 1
    * @param ownerId the public key of the owner/creator that signs the transaction
-   * @param ttl
+   * @param ttl time to live (time to live (maximum height of a block to include the tx))
    * @param vmVersion version of the AEVM
    * @return a {@link CreateContractTransaction} object
    */
@@ -128,14 +136,22 @@ public class TransactionFactory {
   /**
    * create a contractCallTx
    *
+   * <p>for static-calls (read-only) the dryRun-functionality in {@link
+   * com.kryptokrauts.aeternity.sdk.service.transaction.TransactionService} can be used and the
+   * transaction doesn't have to be submitted.
+   *
    * @param abiVersion version of the ABI
-   * @param callData api encoded compiled AEVM calldata for the code
+   * @param callData api encoded compiled AEVM calldata for the code (function that will be called
+   *     within the tx). can be obtained using {@link
+   *     com.kryptokrauts.aeternity.sdk.service.compiler.CompilerService}
    * @param contractId address of the contract
-   * @param gas gas for the call
-   * @param gasPrice gas price for the call
-   * @param nonce signers nonce + 1
+   * @param gas gas for the function call. this can be obtained using dryRun functionality available
+   *     in {@link com.kryptokrauts.aeternity.sdk.service.transaction.TransactionService}
+   * @param gasPrice gas price for the call. must be at least the minimum gas price to follow
+   *     consensus. see {@link com.kryptokrauts.aeternity.sdk.constants.BaseConstants}
+   * @param nonce callers nonce + 1
    * @param callerId the public key of the caller that signs the transaction
-   * @param ttl
+   * @param ttl time to live (maximum height of a block to include the tx)
    * @return a {@link ContractCallTransaction} object
    */
   public ContractCallTransaction createContractCallTransaction(
@@ -167,11 +183,11 @@ public class TransactionFactory {
   /**
    * create a namePreclaimTx
    *
-   * @param accountId
+   * @param accountId senders public key
    * @param name the domain to preclaim
    * @param salt a random salt that is later necessary to claim the name
-   * @param nonce signers nonce + 1
-   * @param ttl
+   * @param nonce senders nonce + 1
+   * @param ttl time to live (maximum height of a block to include the tx)
    * @return a {@link NamePreclaimTransaction} object
    */
   public NamePreclaimTransaction createNamePreclaimTransaction(
@@ -190,11 +206,13 @@ public class TransactionFactory {
   /**
    * create a nameClaimTx
    *
-   * @param accountId
+   * <p>by default the domain will be claimed for 50000 blocks
+   *
+   * @param accountId senders public key
    * @param name the domain to claim
    * @param nameSalt the salt provided on the preclaim transaction
-   * @param nonce signers nonce + 1
-   * @param ttl
+   * @param nonce senders nonce + 1
+   * @param ttl time to live (maximum height of a block to include the tx)
    * @return a {@link NameClaimTransaction} object
    */
   public NameClaimTransaction createNameClaimTransaction(
@@ -213,14 +231,17 @@ public class TransactionFactory {
   /**
    * create a nameUpdateTx
    *
-   * @param accountId
+   * @param accountId senders public key
    * @param nameId the domain to update
-   * @param nonce signers nonce + 1
-   * @param ttl
-   * @param clientTtl
-   * @param nameTtl
-   * @param pointers
-   * @return
+   * @param nonce senders nonce + 1
+   * @param ttl time to live (maximum height of a block to include the tx)
+   * @param clientTtl optional indicator for the clients until the requested domain-data can be
+   *     cached locally
+   * @param nameTtl new time to live (in blocks) for the domain (will be added to block-height the
+   *     tx is included in)
+   * @param pointers list of pointers to addresses of different types (account, oracle, contract,
+   *     ...)
+   * @return a {@link NameUpdateTransaction} object
    */
   public NameUpdateTransaction createNameUpdateTransaction(
       String accountId,
@@ -246,11 +267,11 @@ public class TransactionFactory {
   /**
    * create a nameRevokeTx
    *
-   * @param accountId
+   * @param accountId senders public key
    * @param nameId the domain to revoke
-   * @param nonce signers nonce + 1
-   * @param ttl
-   * @return
+   * @param nonce senders nonce + 1
+   * @param ttl time to live (maximum height of a block to include the tx)
+   * @return a {@link NameRevokeTransaction} object
    */
   public NameRevokeTransaction createNameRevokeTransaction(
       String accountId, String nameId, BigInteger nonce, BigInteger ttl) {
@@ -265,13 +286,13 @@ public class TransactionFactory {
   }
 
   /**
-   * @param initiator initiator's public key
+   * @param initiator initiators public key
    * @param initiatorAmount amount of tokens the initiator has committed to the channel
-   * @param responder responder's public key
+   * @param responder responders public key
    * @param responderAmount amount of tokens the responder has committed to the channel
    * @param channelReserve the minimum amount both peers need to maintain
    * @param lockPeriod amount of blocks for disputing a solo close
-   * @param ttl minimum block height to include the channel_create_tx
+   * @param ttl time to live (maximum height of a block to include the tx)
    * @param stateHash TODO
    * @param nonce initiators nonce + 1
    * @return a {@link ChannelCreateTransaction} object
@@ -305,12 +326,12 @@ public class TransactionFactory {
    * creates a ChannelDepositTransaction
    *
    * @param channelId the id of the channel
-   * @param fromId sender's public key
-   * @param amount aeons to deposit
-   * @param ttl
+   * @param fromId senders public key
+   * @param amount ættos to deposit
+   * @param ttl time to live (maximum height of a block to include the tx)
    * @param stateHash TODO
-   * @param round
-   * @param nonce signers nonce + 1
+   * @param round TODO currentRound vs nextRound?
+   * @param nonce senders nonce + 1
    * @return a {@link ChannelDepositTransaction} object
    */
   public ChannelDepositTransaction createChannelDepositTransaction(
