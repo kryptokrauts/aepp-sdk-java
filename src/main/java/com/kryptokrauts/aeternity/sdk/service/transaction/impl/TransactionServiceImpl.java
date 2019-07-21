@@ -5,12 +5,14 @@ import com.kryptokrauts.aeternity.generated.api.ContractApiImpl;
 import com.kryptokrauts.aeternity.generated.api.DebugApiImpl;
 import com.kryptokrauts.aeternity.generated.api.ExternalApiImpl;
 import com.kryptokrauts.aeternity.generated.api.NameServiceApiImpl;
+import com.kryptokrauts.aeternity.generated.api.OracleApiImpl;
 import com.kryptokrauts.aeternity.generated.api.TransactionApiImpl;
 import com.kryptokrauts.aeternity.generated.api.rxjava.ChannelApi;
 import com.kryptokrauts.aeternity.generated.api.rxjava.ContractApi;
 import com.kryptokrauts.aeternity.generated.api.rxjava.DebugApi;
 import com.kryptokrauts.aeternity.generated.api.rxjava.ExternalApi;
 import com.kryptokrauts.aeternity.generated.api.rxjava.NameServiceApi;
+import com.kryptokrauts.aeternity.generated.api.rxjava.OracleApi;
 import com.kryptokrauts.aeternity.generated.api.rxjava.TransactionApi;
 import com.kryptokrauts.aeternity.generated.model.DryRunAccount;
 import com.kryptokrauts.aeternity.generated.model.DryRunInput;
@@ -70,6 +72,8 @@ public class TransactionServiceImpl implements TransactionService {
 
   private NameServiceApi nameServiceApi;
 
+  private OracleApi oracleApi;
+
   private ExternalApi externalApi;
 
   private TransactionFactory transactionFactory;
@@ -83,6 +87,7 @@ public class TransactionServiceImpl implements TransactionService {
               getChannelApi(),
               getContractApi(),
               getNameServiceApi(),
+              getOracleApi(),
               getCompilerApi());
     }
     return transactionFactory;
@@ -256,6 +261,13 @@ public class TransactionServiceImpl implements TransactionService {
       nameServiceApi = new NameServiceApi(new NameServiceApiImpl(config.getApiClient()));
     }
     return nameServiceApi;
+  }
+
+  private OracleApi getOracleApi() {
+    if (oracleApi == null) {
+      oracleApi = new OracleApi(new OracleApiImpl(config.getApiClient()));
+    }
+    return oracleApi;
   }
 
   private DebugApi getDebugApi() {

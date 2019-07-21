@@ -3,6 +3,7 @@ package com.kryptokrauts.aeternity.sdk.service.transaction.type;
 import com.kryptokrauts.aeternity.generated.api.rxjava.ChannelApi;
 import com.kryptokrauts.aeternity.generated.api.rxjava.ContractApi;
 import com.kryptokrauts.aeternity.generated.api.rxjava.NameServiceApi;
+import com.kryptokrauts.aeternity.generated.api.rxjava.OracleApi;
 import com.kryptokrauts.aeternity.generated.api.rxjava.TransactionApi;
 import com.kryptokrauts.aeternity.generated.model.NamePointer;
 import com.kryptokrauts.aeternity.sdk.service.transaction.fee.FeeCalculationModel;
@@ -38,6 +39,8 @@ public class TransactionFactory {
   private ContractApi contractApi;
 
   private NameServiceApi nameServiceApi;
+
+  private OracleApi oracleApi;
 
   private DefaultApi compilerApi;
 
