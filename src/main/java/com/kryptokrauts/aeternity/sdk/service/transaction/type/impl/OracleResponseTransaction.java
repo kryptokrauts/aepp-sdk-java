@@ -1,7 +1,7 @@
 package com.kryptokrauts.aeternity.sdk.service.transaction.type.impl;
 
 import com.kryptokrauts.aeternity.generated.api.rxjava.OracleApi;
-import com.kryptokrauts.aeternity.generated.model.OracleRespondTx;
+import com.kryptokrauts.aeternity.generated.model.OracleResponseTx;
 import com.kryptokrauts.aeternity.generated.model.RelativeTTL;
 import com.kryptokrauts.aeternity.generated.model.UnsignedTx;
 import com.kryptokrauts.aeternity.sdk.constants.SerializationTags;
@@ -19,7 +19,7 @@ import org.apache.tuweni.rlp.RLP;
 @Getter
 @SuperBuilder
 @ToString
-public class OracleResponseTransaction extends AbstractTransaction<OracleRespondTx> {
+public class OracleResponseTransaction extends AbstractTransaction<OracleResponseTx> {
 
   @NonNull private String senderId;
   @NonNull private String oracleId;
@@ -29,7 +29,7 @@ public class OracleResponseTransaction extends AbstractTransaction<OracleRespond
   @NonNull private RelativeTTL responseTtl;
   @NonNull private String responseFormat;
   @NonNull private BigInteger ttl;
-  @NonNull private OracleApi oracleApi;
+  private OracleApi oracleApi;
 
   @Override
   protected Single<UnsignedTx> createInternal() {
@@ -37,16 +37,16 @@ public class OracleResponseTransaction extends AbstractTransaction<OracleRespond
   }
 
   @Override
-  protected OracleRespondTx toModel() {
-    OracleRespondTx oracleRespondTx = new OracleRespondTx();
-    oracleRespondTx.fee(this.fee);
-    oracleRespondTx.nonce(this.nonce);
-    oracleRespondTx.oracleId(this.oracleId);
-    oracleRespondTx.queryId(this.queryId);
-    oracleRespondTx.response(this.response);
-    oracleRespondTx.responseTtl(this.responseTtl);
-    oracleRespondTx.ttl(this.ttl);
-    return oracleRespondTx;
+  protected OracleResponseTx toModel() {
+    OracleResponseTx oracleResponseTx = new OracleResponseTx();
+    oracleResponseTx.fee(this.fee);
+    oracleResponseTx.nonce(this.nonce);
+    oracleResponseTx.oracleId(this.oracleId);
+    oracleResponseTx.queryId(this.queryId);
+    oracleResponseTx.response(this.response);
+    oracleResponseTx.responseTtl(this.responseTtl);
+    oracleResponseTx.ttl(this.ttl);
+    return oracleResponseTx;
   }
 
   @Override
@@ -65,7 +65,7 @@ public class OracleResponseTransaction extends AbstractTransaction<OracleRespond
                   EncodingUtils.decodeCheckAndTag(this.oracleId, SerializationTags.ID_TAG_ORACLE);
               rlpWriter.writeByteArray(oracleIdWithTag);
               this.checkZeroAndWriteValue(rlpWriter, this.nonce);
-              rlpWriter.writeByteArray(EncodingUtils.decodeCheckWithIdentifier(this.oracleId));
+              rlpWriter.writeByteArray(EncodingUtils.decodeCheckWithIdentifier(this.queryId));
               rlpWriter.writeByteArray(this.response.getBytes());
               switch (this.responseTtl.getType()) {
                 case DELTA:

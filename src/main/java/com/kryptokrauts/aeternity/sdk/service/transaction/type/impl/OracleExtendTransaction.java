@@ -25,7 +25,7 @@ public class OracleExtendTransaction extends AbstractTransaction<OracleExtendTx>
   @NonNull private String oracleId;
   @NonNull private RelativeTTL oracleRelativeTtl;
   @NonNull private BigInteger ttl;
-  @NonNull private OracleApi oracleApi;
+  private OracleApi oracleApi;
 
   @Override
   protected Single<UnsignedTx> createInternal() {

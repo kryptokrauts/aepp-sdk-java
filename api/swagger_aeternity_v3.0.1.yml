@@ -1119,7 +1119,7 @@ paths:
           name: body
           required: true
           schema:
-            $ref: '#/definitions/OracleRespondTx'
+            $ref: '#/definitions/OracleResponseTx'
       responses:
         '200':
           description: Successful operation
@@ -2050,7 +2050,7 @@ definitions:
       - response_ttl
       - fee
       - sender_id
-  OracleRespondTx:
+  OracleResponseTx:
     type: object
     allOf:
       - $ref: '#/definitions/GenericTx'

@@ -263,7 +263,7 @@ public class TransactionServiceImpl implements TransactionService {
     return nameServiceApi;
   }
 
-  private OracleApi getOracleApi() {
+  public OracleApi getOracleApi() {
     if (oracleApi == null) {
       oracleApi = new OracleApi(new OracleApiImpl(config.getApiClient()));
     }

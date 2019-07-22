@@ -30,7 +30,7 @@ public class OracleQueryTransaction extends AbstractTransaction<OracleQueryTx> {
   @NonNull private TTL queryTtl;
   @NonNull private RelativeTTL responseTtl;
   @NonNull private BigInteger ttl;
-  @NonNull private OracleApi oracleApi;
+  private OracleApi oracleApi;
 
   @Override
   protected Single<UnsignedTx> createInternal() {

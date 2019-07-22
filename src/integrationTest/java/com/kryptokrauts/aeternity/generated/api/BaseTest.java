@@ -51,7 +51,8 @@ import org.slf4j.LoggerFactory;
 @RunWith(VertxUnitRunner.class)
 public abstract class BaseTest {
 
-  protected static final Logger _logger = LoggerFactory.getLogger("IntegrationTest");
+  protected static final Logger _logger =
+      LoggerFactory.getLogger("com.kryptokrauts.IntegrationTest");
 
   private static final String AETERNITY_BASE_URL = "AETERNITY_BASE_URL";
 
