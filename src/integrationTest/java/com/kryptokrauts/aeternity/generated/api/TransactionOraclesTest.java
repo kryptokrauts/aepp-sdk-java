@@ -1,6 +1,6 @@
 package com.kryptokrauts.aeternity.generated.api;
 
-import com.kryptokrauts.aeternity.generated.model.OracleQueries;
+import com.kryptokrauts.aeternity.generated.model.OracleQuery;
 import com.kryptokrauts.aeternity.generated.model.PostTxResponse;
 import com.kryptokrauts.aeternity.generated.model.RelativeTTL;
 import com.kryptokrauts.aeternity.generated.model.TTL;
@@ -13,6 +13,7 @@ import com.kryptokrauts.aeternity.sdk.service.transaction.type.impl.OracleQueryT
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.impl.OracleRegisterTransaction;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.impl.OracleResponseTransaction;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.impl.SpendTransaction;
+import com.kryptokrauts.aeternity.sdk.util.EncodingUtils;
 import com.kryptokrauts.aeternity.sdk.util.UnitConversionUtil;
 import com.kryptokrauts.aeternity.sdk.util.UnitConversionUtil.Unit;
 import io.vertx.ext.unit.Async;
@@ -157,14 +158,17 @@ public class TransactionOraclesTest extends BaseTest {
                     transactionServiceNative.postTransaction(signedTx).blockingGet();
                 _logger.info("OracleQueryTx-Hash: " + postTxResponse.getTxHash());
                 waitForTxMined(postTxResponse.getTxHash());
-                OracleQueries oracleQueries =
-                    transactionServiceNative
-                        .getOracleApi()
-                        .rxGetOracleQueriesByPubkey(
-                            oracleAccount.getPublicKey().replace("ak_", "ok_"), null, null, null)
+                queryId =
+                    EncodingUtils.queryId(
+                        queryAccount.getPublicKey(),
+                        nonce.add(BigInteger.ONE),
+                        oracleAccount.getPublicKey().replace("ak_", "ok_"));
+                OracleQuery oracleQuery =
+                    oracleService
+                        .getOracleQueryByPubkeyAndQueryId(
+                            oracleAccount.getPublicKey().replace("ak_", "ok_"), queryId)
                         .blockingGet();
-                _logger.debug(oracleQueries.toString());
-                queryId = oracleQueries.getOracleQueries().get(0).getId();
+                _logger.debug(oracleQuery.toString());
               } catch (Throwable e) {
                 context.fail(e);
               }

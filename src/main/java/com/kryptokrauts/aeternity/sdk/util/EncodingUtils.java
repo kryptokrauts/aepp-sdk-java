@@ -232,26 +232,8 @@ public final class EncodingUtils {
 
   public static String generateCommitmentHash(final String name, final BigInteger salt) {
     return encodeCheck(
-        hash(ByteUtils.concatenate(nameId(name), formatSalt(salt))), ApiIdentifiers.COMMITMENT);
-  }
-
-  /**
-   * if salt is not 32 byte array, copy salt at the end of the buffer
-   *
-   * @param salt
-   * @return
-   */
-  public static byte[] formatSalt(final BigInteger salt) {
-    byte[] array = salt.toByteArray();
-    if (array.length < 32) {
-      byte[] buffer = new byte[32];
-      for (int i = array.length - 1; i > -1; i--) {
-        buffer[32 - (array.length - i)] = array[i];
-      }
-      return buffer;
-    } else {
-      return array;
-    }
+        hash(ByteUtils.concatenate(nameId(name), ByteUtils.leftPad(32, salt.toByteArray()))),
+        ApiIdentifiers.COMMITMENT);
   }
 
   public static String normalize(final String domainName) {
@@ -270,5 +252,20 @@ public final class EncodingUtils {
       buffer = hash(ByteUtils.concatenate(buffer, hash(labels[i].getBytes())));
     }
     return buffer;
+  }
+
+  /**
+   * @param senderId senders public key
+   * @param nonce senders nonce
+   * @param oracleId oracleId
+   * @return queryId
+   */
+  public static String queryId(String senderId, BigInteger nonce, String oracleId) {
+    return hashEncode(
+        ByteUtils.concatenate(
+            decodeCheckWithIdentifier(senderId),
+            ByteUtils.leftPad(32, nonce.toByteArray()),
+            decodeCheckWithIdentifier(oracleId)),
+        ApiIdentifiers.ORACLE_QUERY_ID);
   }
 }

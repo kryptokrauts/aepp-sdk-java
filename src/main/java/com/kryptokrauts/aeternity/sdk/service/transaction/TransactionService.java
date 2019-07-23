@@ -1,6 +1,5 @@
 package com.kryptokrauts.aeternity.sdk.service.transaction;
 
-import com.kryptokrauts.aeternity.generated.api.rxjava.OracleApi;
 import com.kryptokrauts.aeternity.generated.model.DryRunResults;
 import com.kryptokrauts.aeternity.generated.model.GenericSignedTx;
 import com.kryptokrauts.aeternity.generated.model.PostTxResponse;
@@ -67,6 +66,4 @@ public interface TransactionService {
       List<Map<AccountParameter, Object>> accounts,
       BigInteger block,
       List<UnsignedTx> unsignedTransactions);
-
-  OracleApi getOracleApi();
 }

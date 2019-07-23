@@ -20,6 +20,8 @@ import com.kryptokrauts.aeternity.sdk.service.compiler.CompilerService;
 import com.kryptokrauts.aeternity.sdk.service.compiler.CompilerServiceFactory;
 import com.kryptokrauts.aeternity.sdk.service.keypair.KeyPairService;
 import com.kryptokrauts.aeternity.sdk.service.keypair.KeyPairServiceFactory;
+import com.kryptokrauts.aeternity.sdk.service.oracle.OracleService;
+import com.kryptokrauts.aeternity.sdk.service.oracle.OracleServiceFactory;
 import com.kryptokrauts.aeternity.sdk.service.transaction.AccountParameter;
 import com.kryptokrauts.aeternity.sdk.service.transaction.TransactionService;
 import com.kryptokrauts.aeternity.sdk.service.transaction.TransactionServiceConfiguration;
@@ -71,6 +73,8 @@ public abstract class BaseTest {
   protected CompilerService sophiaCompilerService;
 
   protected NameService nameService;
+
+  protected OracleService oracleService;
 
   @Rule public RunTestOnContext rule = new RunTestOnContext();
 
@@ -125,6 +129,14 @@ public abstract class BaseTest {
                     .baseUrl(getAeternityBaseUrl())
                     .vertx(vertx)
                     .compile());
+
+    oracleService =
+        new OracleServiceFactory()
+            .getService(
+                ServiceConfiguration.configure()
+                    .baseUrl(getAeternityBaseUrl())
+                    .vertx(vertx)
+                    .compile());
   }
 
   @After
@@ -137,6 +149,9 @@ public abstract class BaseTest {
     chainService = null;
     transactionServiceDebug = null;
     transactionServiceNative = null;
+    sophiaCompilerService = null;
+    oracleService = null;
+    nameService = null;
   }
 
   private static String getAeternityBaseUrl() throws ConfigurationException {
