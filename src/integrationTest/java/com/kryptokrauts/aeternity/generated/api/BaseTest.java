@@ -1,6 +1,20 @@
 package com.kryptokrauts.aeternity.generated.api;
 
-import com.kryptokrauts.aeternity.generated.model.Account;
+import java.math.BigInteger;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Supplier;
+
+import javax.naming.ConfigurationException;
+
+import org.junit.After;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Rule;
+import org.junit.runner.RunWith;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.kryptokrauts.aeternity.generated.model.DryRunResults;
 import com.kryptokrauts.aeternity.generated.model.GenericSignedTx;
 import com.kryptokrauts.aeternity.generated.model.PostTxResponse;
@@ -9,6 +23,7 @@ import com.kryptokrauts.aeternity.generated.model.TxInfoObject;
 import com.kryptokrauts.aeternity.generated.model.UnsignedTx;
 import com.kryptokrauts.aeternity.sdk.constants.BaseConstants;
 import com.kryptokrauts.aeternity.sdk.constants.Network;
+import com.kryptokrauts.aeternity.sdk.domain.secret.impl.BaseKeyPair;
 import com.kryptokrauts.aeternity.sdk.service.ServiceConfiguration;
 import com.kryptokrauts.aeternity.sdk.service.account.AccountService;
 import com.kryptokrauts.aeternity.sdk.service.account.AccountServiceFactory;
@@ -18,6 +33,7 @@ import com.kryptokrauts.aeternity.sdk.service.chain.ChainService;
 import com.kryptokrauts.aeternity.sdk.service.chain.ChainServiceFactory;
 import com.kryptokrauts.aeternity.sdk.service.compiler.CompilerService;
 import com.kryptokrauts.aeternity.sdk.service.compiler.CompilerServiceFactory;
+import com.kryptokrauts.aeternity.sdk.service.domain.AccountResult;
 import com.kryptokrauts.aeternity.sdk.service.keypair.KeyPairService;
 import com.kryptokrauts.aeternity.sdk.service.keypair.KeyPairServiceFactory;
 import com.kryptokrauts.aeternity.sdk.service.oracle.OracleService;
@@ -30,6 +46,7 @@ import com.kryptokrauts.aeternity.sdk.service.transaction.type.AbstractTransacti
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.impl.ContractCallTransaction;
 import com.kryptokrauts.sophia.compiler.generated.model.Calldata;
 import com.kryptokrauts.sophia.compiler.generated.model.SophiaJsonData;
+
 import io.reactivex.Single;
 import io.reactivex.observers.TestObserver;
 import io.vertx.core.Vertx;
@@ -37,327 +54,244 @@ import io.vertx.core.json.JsonObject;
 import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.RunTestOnContext;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
-import java.math.BigInteger;
-import java.util.List;
-import java.util.Map;
-import java.util.function.Supplier;
-import javax.naming.ConfigurationException;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Rule;
-import org.junit.runner.RunWith;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 @RunWith(VertxUnitRunner.class)
 public abstract class BaseTest {
 
-  protected static final Logger _logger =
-      LoggerFactory.getLogger("com.kryptokrauts.IntegrationTest");
+	protected static final Logger _logger = LoggerFactory.getLogger("com.kryptokrauts.IntegrationTest");
 
-  private static final String AETERNITY_BASE_URL = "AETERNITY_BASE_URL";
+	private static final String AETERNITY_BASE_URL = "AETERNITY_BASE_URL";
 
-  private static final String COMPILER_BASE_URL = "COMPILER_BASE_URL";
+	private static final String COMPILER_BASE_URL = "COMPILER_BASE_URL";
 
-  protected KeyPairService keyPairService;
+	protected KeyPairService keyPairService;
 
-  protected ChainService chainService;
+	protected ChainService chainService;
 
-  protected TransactionService transactionServiceNative;
+	protected TransactionService transactionServiceNative;
 
-  protected TransactionService transactionServiceDebug;
+	protected TransactionService transactionServiceDebug;
 
-  protected AccountService accountService;
+	protected AccountService accountService;
 
-  protected CompilerService sophiaCompilerService;
+	protected CompilerService sophiaCompilerService;
 
-  protected NameService nameService;
+	protected NameService nameService;
 
-  protected OracleService oracleService;
+	protected OracleService oracleService;
 
-  @Rule public RunTestOnContext rule = new RunTestOnContext();
+	BaseKeyPair baseKeyPair;
 
-  @Before
-  public void setupApiClient(TestContext context) throws ConfigurationException {
-    Vertx vertx = rule.vertx();
-    keyPairService = new KeyPairServiceFactory().getService();
-    accountService =
-        new AccountServiceFactory()
-            .getService(
-                ServiceConfiguration.configure()
-                    .baseUrl(getAeternityBaseUrl())
-                    .vertx(vertx)
-                    .compile());
-    chainService =
-        new ChainServiceFactory()
-            .getService(
-                ServiceConfiguration.configure()
-                    .baseUrl(getAeternityBaseUrl())
-                    .vertx(vertx)
-                    .compile());
-    transactionServiceNative =
-        new TransactionServiceFactory()
-            .getService(
-                TransactionServiceConfiguration.configure()
-                    .baseUrl(getAeternityBaseUrl())
-                    .network(Network.DEVNET)
-                    .vertx(vertx)
-                    .compile());
-    transactionServiceDebug =
-        new TransactionServiceFactory()
-            .getService(
-                TransactionServiceConfiguration.configure()
-                    .nativeMode(false)
-                    .baseUrl(getAeternityBaseUrl())
-                    .network(Network.DEVNET)
-                    .vertx(vertx)
-                    .compile());
+	@Rule
+	public RunTestOnContext rule = new RunTestOnContext();
 
-    sophiaCompilerService =
-        new CompilerServiceFactory()
-            .getService(
-                ServiceConfiguration.configure()
-                    .contractBaseUrl(getCompilerBaseUrl())
-                    .vertx(vertx)
-                    .compile());
+	@Before
+	public void setupApiClient(TestContext context) throws ConfigurationException {
+		Vertx vertx = rule.vertx();
+		keyPairService = new KeyPairServiceFactory().getService();
+		accountService = new AccountServiceFactory()
+				.getService(ServiceConfiguration.configure().baseUrl(getAeternityBaseUrl()).vertx(vertx).compile());
+		chainService = new ChainServiceFactory()
+				.getService(ServiceConfiguration.configure().baseUrl(getAeternityBaseUrl()).vertx(vertx).compile());
+		transactionServiceNative = new TransactionServiceFactory().getService(TransactionServiceConfiguration
+				.configure().baseUrl(getAeternityBaseUrl()).network(Network.DEVNET).vertx(vertx).compile());
+		transactionServiceDebug = new TransactionServiceFactory().getService(TransactionServiceConfiguration.configure()
+				.nativeMode(false).baseUrl(getAeternityBaseUrl()).network(Network.DEVNET).vertx(vertx).compile());
 
-    nameService =
-        new NameServiceFactory()
-            .getService(
-                ServiceConfiguration.configure()
-                    .baseUrl(getAeternityBaseUrl())
-                    .vertx(vertx)
-                    .compile());
+		sophiaCompilerService = new CompilerServiceFactory().getService(
+				ServiceConfiguration.configure().contractBaseUrl(getCompilerBaseUrl()).vertx(vertx).compile());
 
-    oracleService =
-        new OracleServiceFactory()
-            .getService(
-                ServiceConfiguration.configure()
-                    .baseUrl(getAeternityBaseUrl())
-                    .vertx(vertx)
-                    .compile());
-  }
+		nameService = new NameServiceFactory()
+				.getService(ServiceConfiguration.configure().baseUrl(getAeternityBaseUrl()).vertx(vertx).compile());
 
-  @After
-  public void shutdownClient(TestContext context) {
-    _logger.info("Closing vertx");
-    Vertx vertx = rule.vertx();
-    vertx.close();
-    keyPairService = null;
-    accountService = null;
-    chainService = null;
-    transactionServiceDebug = null;
-    transactionServiceNative = null;
-    sophiaCompilerService = null;
-    oracleService = null;
-    nameService = null;
-  }
+		oracleService = new OracleServiceFactory()
+				.getService(ServiceConfiguration.configure().baseUrl(getAeternityBaseUrl()).vertx(vertx).compile());
 
-  private static String getAeternityBaseUrl() throws ConfigurationException {
-    String aeternityBaseUrl = System.getenv(AETERNITY_BASE_URL);
-    if (aeternityBaseUrl == null) {
-      throw new ConfigurationException("ENV variable missing: AETERNITY_BASE_URL");
-    }
-    return aeternityBaseUrl;
-  }
+		baseKeyPair = keyPairService.generateBaseKeyPairFromSecret(TestConstants.BENEFICIARY_PRIVATE_KEY);
 
-  protected static String getCompilerBaseUrl() throws ConfigurationException {
-    String compilerBaseUrl = System.getenv(COMPILER_BASE_URL);
-    if (compilerBaseUrl == null) {
-      throw new ConfigurationException("ENV variable missing: COMPILER_BASE_URL");
-    }
-    return compilerBaseUrl;
-  }
+	}
 
-  @BeforeClass
-  public static void startup() throws ConfigurationException {
-    _logger.info(
-        String.format(
-            "--------------------------- %s ---------------------------",
-            "Using following environment"));
-    _logger.info(String.format("%s: %s", AETERNITY_BASE_URL, getAeternityBaseUrl()));
-    _logger.info(String.format("%s: %s", COMPILER_BASE_URL, getCompilerBaseUrl()));
-    _logger.info(
-        "-----------------------------------------------------------------------------------");
-  }
+	@After
+	public void shutdownClient(TestContext context) {
+		_logger.info("Closing vertx");
+		Vertx vertx = rule.vertx();
+		vertx.close();
+		keyPairService = null;
+		accountService = null;
+		chainService = null;
+		transactionServiceDebug = null;
+		transactionServiceNative = null;
+		sophiaCompilerService = null;
+		oracleService = null;
+		nameService = null;
+	}
 
-  protected Account getAccount(String publicKey) {
-    Single<Account> accountSingle = accountService.getAccount(publicKey);
-    TestObserver<Account> accountTestObserver = accountSingle.test();
-    accountTestObserver.awaitTerminalEvent();
-    Account account = accountTestObserver.values().get(0);
-    return account;
-  }
+	private static String getAeternityBaseUrl() throws ConfigurationException {
+		String aeternityBaseUrl = System.getenv(AETERNITY_BASE_URL);
+		if (aeternityBaseUrl == null) {
+			throw new ConfigurationException("ENV variable missing: AETERNITY_BASE_URL");
+		}
+		return aeternityBaseUrl;
+	}
 
-  protected PostTxResponse postTx(Tx signedTx) throws Throwable {
-    PostTxResponse postTxResponse =
-        callMethodAndGetResult(
-            () -> transactionServiceNative.postTransaction(signedTx), PostTxResponse.class);
-    _logger.info("Post tx hash :" + postTxResponse.getTxHash());
-    GenericSignedTx txValue = waitForTxMined(postTxResponse.getTxHash());
-    _logger.info(
-        String.format(
-            "Transaction of type %s is mined at block %s with height %s",
-            txValue.getTx().getType(), txValue.getBlockHash(), txValue.getBlockHeight()));
+	protected static String getCompilerBaseUrl() throws ConfigurationException {
+		String compilerBaseUrl = System.getenv(COMPILER_BASE_URL);
+		if (compilerBaseUrl == null) {
+			throw new ConfigurationException("ENV variable missing: COMPILER_BASE_URL");
+		}
+		return compilerBaseUrl;
+	}
 
-    return postTxResponse;
-  }
+	@BeforeClass
+	public static void startup() throws ConfigurationException {
+		_logger.info(String.format("--------------------------- %s ---------------------------",
+				"Using following environment"));
+		_logger.info(String.format("%s: %s", AETERNITY_BASE_URL, getAeternityBaseUrl()));
+		_logger.info(String.format("%s: %s", COMPILER_BASE_URL, getCompilerBaseUrl()));
+		_logger.info("-----------------------------------------------------------------------------------");
+	}
 
-  protected TxInfoObject waitForTxInfoObject(String txHash) throws Throwable {
-    return callMethodAndGetResult(
-        () -> transactionServiceNative.getTransactionInfoByHash(txHash), TxInfoObject.class);
-  }
+	protected AccountResult getAccount(String publicKey) {
+		Single<AccountResult> accountSingle = accountService.asyncGetAccount(publicKey);
+		TestObserver<AccountResult> accountTestObserver = accountSingle.test();
+		accountTestObserver.awaitTerminalEvent();
+		AccountResult account = accountTestObserver.values().get(0);
+		return account;
+	}
 
-  protected GenericSignedTx waitForTxMined(String txHash) throws Throwable {
-    int blockHeight = -1;
-    GenericSignedTx minedTx = null;
-    int doneTrials = 1;
+	protected PostTxResponse postTx(Tx signedTx) throws Throwable {
+		PostTxResponse postTxResponse = callMethodAndGetResult(() -> transactionServiceNative.postTransaction(signedTx),
+				PostTxResponse.class);
+		_logger.info("Post tx hash :" + postTxResponse.getTxHash());
+		GenericSignedTx txValue = waitForTxMined(postTxResponse.getTxHash());
+		_logger.info(String.format("Transaction of type %s is mined at block %s with height %s",
+				txValue.getTx().getType(), txValue.getBlockHash(), txValue.getBlockHeight()));
 
-    while (blockHeight == -1 && doneTrials < TestConstants.NUM_TRIALS_DEFAULT) {
-      minedTx =
-          callMethodAndGetResult(
-              () -> transactionServiceNative.getTransactionByHash(txHash), GenericSignedTx.class);
-      if (minedTx.getBlockHeight().intValue() > 1) {
-        _logger.debug("Mined tx: " + minedTx);
-        blockHeight = minedTx.getBlockHeight().intValue();
-      } else {
-        _logger.warn(
-            String.format(
-                "Transaction not mined yet, trying again in 1 second (%s of %s)...",
-                doneTrials, TestConstants.NUM_TRIALS_DEFAULT));
-        Thread.sleep(1000);
-        doneTrials++;
-      }
-    }
+		return postTxResponse;
+	}
 
-    if (blockHeight == -1) {
-      throw new InterruptedException(
-          String.format(
-              "Transaction %s was not mined after %s trials, aborting", txHash, doneTrials));
-    }
+	protected TxInfoObject waitForTxInfoObject(String txHash) throws Throwable {
+		return callMethodAndGetResult(() -> transactionServiceNative.getTransactionInfoByHash(txHash),
+				TxInfoObject.class);
+	}
 
-    return minedTx;
-  }
+	protected GenericSignedTx waitForTxMined(String txHash) throws Throwable {
+		int blockHeight = -1;
+		GenericSignedTx minedTx = null;
+		int doneTrials = 1;
 
-  protected Calldata encodeCalldata(
-      String contractSourceCode, String contractFunction, List<String> contractFunctionParams)
-      throws Throwable {
-    return callMethodAndGetResult(
-        () ->
-            this.sophiaCompilerService.encodeCalldata(
-                contractSourceCode, contractFunction, contractFunctionParams),
-        Calldata.class);
-  }
+		while (blockHeight == -1 && doneTrials < TestConstants.NUM_TRIALS_DEFAULT) {
+			minedTx = callMethodAndGetResult(() -> transactionServiceNative.getTransactionByHash(txHash),
+					GenericSignedTx.class);
+			if (minedTx.getBlockHeight().intValue() > 1) {
+				_logger.debug("Mined tx: " + minedTx);
+				blockHeight = minedTx.getBlockHeight().intValue();
+			} else {
+				_logger.warn(String.format("Transaction not mined yet, trying again in 1 second (%s of %s)...",
+						doneTrials, TestConstants.NUM_TRIALS_DEFAULT));
+				Thread.sleep(1000);
+				doneTrials++;
+			}
+		}
 
-  protected JsonObject decodeCalldata(String encodedValue, String sophiaReturnType)
-      throws Throwable {
-    // decode the result to json
-    SophiaJsonData sophiaJsonData =
-        callMethodAndGetResult(
-            () -> this.sophiaCompilerService.decodeCalldata(encodedValue, sophiaReturnType),
-            SophiaJsonData.class);
-    return JsonObject.mapFrom(sophiaJsonData.getData());
-  }
+		if (blockHeight == -1) {
+			throw new InterruptedException(
+					String.format("Transaction %s was not mined after %s trials, aborting", txHash, doneTrials));
+		}
 
-  protected DryRunResults performDryRunTransactions(
-      List<Map<AccountParameter, Object>> accounts, BigInteger block, List<UnsignedTx> unsignedTxes)
-      throws Throwable {
+		return minedTx;
+	}
 
-    return callMethodAndGetResult(
-        () -> this.transactionServiceNative.dryRunTransactions(accounts, block, unsignedTxes),
-        DryRunResults.class);
-  }
+	protected Calldata encodeCalldata(String contractSourceCode, String contractFunction,
+			List<String> contractFunctionParams) throws Throwable {
+		return callMethodAndGetResult(() -> this.sophiaCompilerService.encodeCalldata(contractSourceCode,
+				contractFunction, contractFunctionParams), Calldata.class);
+	}
 
-  protected UnsignedTx createUnsignedContractCallTx(
-      String callerId,
-      BigInteger nonce,
-      String calldata,
-      BigInteger gasPrice,
-      String contractId,
-      BigInteger amount)
-      throws Throwable {
-    BigInteger abiVersion = BigInteger.ONE;
-    BigInteger ttl = BigInteger.ZERO;
-    BigInteger gas = BigInteger.valueOf(1579000);
+	protected JsonObject decodeCalldata(String encodedValue, String sophiaReturnType) throws Throwable {
+		// decode the result to json
+		SophiaJsonData sophiaJsonData = callMethodAndGetResult(
+				() -> this.sophiaCompilerService.decodeCalldata(encodedValue, sophiaReturnType), SophiaJsonData.class);
+		return JsonObject.mapFrom(sophiaJsonData.getData());
+	}
 
-    AbstractTransaction<?> contractTx =
-        transactionServiceNative
-            .getTransactionFactory()
-            .createContractCallTransaction(
-                abiVersion,
-                calldata,
-                contractId,
-                gas,
-                gasPrice != null ? gasPrice : BigInteger.valueOf(BaseConstants.MINIMAL_GAS_PRICE),
-                nonce,
-                callerId,
-                ttl);
-    if (amount != null) {
-      ((ContractCallTransaction) contractTx).setAmount(amount);
-    }
+	protected DryRunResults performDryRunTransactions(List<Map<AccountParameter, Object>> accounts, BigInteger block,
+			List<UnsignedTx> unsignedTxes) throws Throwable {
 
-    return callMethodAndGetResult(
-        () -> transactionServiceNative.createUnsignedTransaction(contractTx), UnsignedTx.class);
-  }
+		return callMethodAndGetResult(
+				() -> this.transactionServiceNative.dryRunTransactions(accounts, block, unsignedTxes),
+				DryRunResults.class);
+	}
 
-  protected <T> T callMethodAndAwaitException(
-      Supplier<Single<T>> observerMethod, Class<T> exception) throws Throwable {
-    return callMethodAndGetResult(
-        TestConstants.NUM_TRIALS_DEFAULT, observerMethod, exception, true);
-  }
+	protected UnsignedTx createUnsignedContractCallTx(String callerId, BigInteger nonce, String calldata,
+			BigInteger gasPrice, String contractId, BigInteger amount) throws Throwable {
+		BigInteger abiVersion = BigInteger.ONE;
+		BigInteger ttl = BigInteger.ZERO;
+		BigInteger gas = BigInteger.valueOf(1579000);
 
-  protected <T> T callMethodAndGetResult(Supplier<Single<T>> observerMethod, Class<T> type)
-      throws Throwable {
-    return callMethodAndGetResult(TestConstants.NUM_TRIALS_DEFAULT, observerMethod, type, false);
-  }
+		AbstractTransaction<?> contractTx = transactionServiceNative.getTransactionFactory()
+				.createContractCallTransaction(abiVersion, calldata, contractId, gas,
+						gasPrice != null ? gasPrice : BigInteger.valueOf(BaseConstants.MINIMAL_GAS_PRICE), nonce,
+						callerId, ttl);
+		if (amount != null) {
+			((ContractCallTransaction) contractTx).setAmount(amount);
+		}
 
-  protected <T> T callMethodAndGetResult(
-      Integer numTrials, Supplier<Single<T>> observerMethod, Class<T> type, boolean awaitException)
-      throws Throwable {
+		return callMethodAndGetResult(() -> transactionServiceNative.createUnsignedTransaction(contractTx),
+				UnsignedTx.class);
+	}
 
-    if (numTrials == null) {
-      numTrials = TestConstants.NUM_TRIALS_DEFAULT;
-    }
+	protected <T> T callMethodAndAwaitException(Supplier<Single<T>> observerMethod, Class<T> exception)
+			throws Throwable {
+		return callMethodAndGetResult(TestConstants.NUM_TRIALS_DEFAULT, observerMethod, exception, true);
+	}
 
-    int doneTrials = 1;
-    T result = null;
+	protected <T> T callMethodAndGetResult(Supplier<Single<T>> observerMethod, Class<T> type) throws Throwable {
+		return callMethodAndGetResult(TestConstants.NUM_TRIALS_DEFAULT, observerMethod, type, false);
+	}
 
-    do {
-      Single<T> resultSingle = observerMethod.get();
-      TestObserver<T> singleTestObserver = resultSingle.test();
-      singleTestObserver.awaitTerminalEvent();
-      if (singleTestObserver.errorCount() > 0) {
-        if (awaitException) {
-          throw singleTestObserver.errors().get(0);
-        }
-        if (doneTrials == numTrials) {
-          _logger.error("Following error(s) occured while waiting for result of call, aborting");
-          for (Throwable error : singleTestObserver.errors()) {
-            _logger.error(error.toString());
-          }
-          throw new InterruptedException("Max number of function call trials exceeded, aborting");
-        }
-        _logger.warn(
-            String.format(
-                "Unable to receive object of type %s, trying again in 1 second (%s of %s)...",
-                type.getSimpleName(), doneTrials, numTrials));
-        Thread.sleep(1000);
-        doneTrials++;
-      } else {
-        if (!awaitException) {
-          result = singleTestObserver.values().get(0);
-        } else {
-          _logger.warn(
-              String.format(
-                  "Waiting for exception, trying again in 1 second (%s of %s)...",
-                  doneTrials, numTrials));
-          Thread.sleep(1000);
-          doneTrials++;
-        }
-      }
-    } while (result == null);
+	protected <T> T callMethodAndGetResult(Integer numTrials, Supplier<Single<T>> observerMethod, Class<T> type,
+			boolean awaitException) throws Throwable {
 
-    return result;
-  }
+		if (numTrials == null) {
+			numTrials = TestConstants.NUM_TRIALS_DEFAULT;
+		}
+
+		int doneTrials = 1;
+		T result = null;
+
+		do {
+			Single<T> resultSingle = observerMethod.get();
+			TestObserver<T> singleTestObserver = resultSingle.test();
+			singleTestObserver.awaitTerminalEvent();
+			if (singleTestObserver.errorCount() > 0) {
+				if (awaitException) {
+					throw singleTestObserver.errors().get(0);
+				}
+				if (doneTrials == numTrials) {
+					_logger.error("Following error(s) occured while waiting for result of call, aborting");
+					for (Throwable error : singleTestObserver.errors()) {
+						_logger.error(error.toString());
+					}
+					throw new InterruptedException("Max number of function call trials exceeded, aborting");
+				}
+				_logger.warn(
+						String.format("Unable to receive object of type %s, trying again in 1 second (%s of %s)...",
+								type.getSimpleName(), doneTrials, numTrials));
+				Thread.sleep(1000);
+				doneTrials++;
+			} else {
+				if (!awaitException) {
+					result = singleTestObserver.values().get(0);
+				} else {
+					_logger.warn(String.format("Waiting for exception, trying again in 1 second (%s of %s)...",
+							doneTrials, numTrials));
+					Thread.sleep(1000);
+					doneTrials++;
+				}
+			}
+		} while (result == null);
+
+		return result;
+	}
 }
