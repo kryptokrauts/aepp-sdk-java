@@ -3,7 +3,7 @@ package com.kryptokrauts.aeternity.generated.api;
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.kryptokrauts.aeternity.sdk.service.domain.AccountResult;
+import com.kryptokrauts.aeternity.sdk.service.account.domain.AccountResult;
 
 import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;

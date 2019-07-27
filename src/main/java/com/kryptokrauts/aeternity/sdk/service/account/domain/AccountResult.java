@@ -1,8 +1,9 @@
-package com.kryptokrauts.aeternity.sdk.service.domain;
+package com.kryptokrauts.aeternity.sdk.service.account.domain;
 
 import java.math.BigInteger;
 
 import com.kryptokrauts.aeternity.generated.model.Account;
+import com.kryptokrauts.aeternity.sdk.service.domain.GenericServiceResultObject;
 
 import lombok.Getter;
 import lombok.experimental.SuperBuilder;

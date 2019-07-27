@@ -26,7 +26,7 @@ import com.kryptokrauts.aeternity.sdk.constants.SerializationTags;
 import com.kryptokrauts.aeternity.sdk.domain.secret.impl.BaseKeyPair;
 import com.kryptokrauts.aeternity.sdk.service.account.AccountService;
 import com.kryptokrauts.aeternity.sdk.service.account.AccountServiceFactory;
-import com.kryptokrauts.aeternity.sdk.service.domain.AccountResult;
+import com.kryptokrauts.aeternity.sdk.service.account.domain.AccountResult;
 import com.kryptokrauts.aeternity.sdk.service.transaction.AccountParameter;
 import com.kryptokrauts.aeternity.sdk.service.transaction.TransactionService;
 import com.kryptokrauts.aeternity.sdk.service.transaction.TransactionServiceConfiguration;

@@ -6,7 +6,7 @@ import com.kryptokrauts.aeternity.generated.api.AccountApiImpl;
 import com.kryptokrauts.aeternity.generated.api.rxjava.AccountApi;
 import com.kryptokrauts.aeternity.sdk.service.ServiceConfiguration;
 import com.kryptokrauts.aeternity.sdk.service.account.AccountService;
-import com.kryptokrauts.aeternity.sdk.service.domain.AccountResult;
+import com.kryptokrauts.aeternity.sdk.service.account.domain.AccountResult;
 
 import io.reactivex.Single;
 import lombok.RequiredArgsConstructor;
