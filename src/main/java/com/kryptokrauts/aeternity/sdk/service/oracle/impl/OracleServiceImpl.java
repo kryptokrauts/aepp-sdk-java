@@ -4,6 +4,7 @@ import com.kryptokrauts.aeternity.generated.api.OracleApiImpl;
 import com.kryptokrauts.aeternity.generated.api.rxjava.OracleApi;
 import com.kryptokrauts.aeternity.generated.model.OracleQueries;
 import com.kryptokrauts.aeternity.generated.model.OracleQuery;
+import com.kryptokrauts.aeternity.generated.model.RegisteredOracle;
 import com.kryptokrauts.aeternity.sdk.service.ServiceConfiguration;
 import com.kryptokrauts.aeternity.sdk.service.oracle.OracleService;
 import io.reactivex.Single;
@@ -26,7 +27,12 @@ public class OracleServiceImpl implements OracleService {
   }
 
   @Override
-  public Single<OracleQueries> getOracleQueriesByPublicKey(
+  public Single<RegisteredOracle> getRegisteredOracle(String publicKey) {
+    return getOracleApi().rxGetOracleByPubkey(publicKey);
+  }
+
+  @Override
+  public Single<OracleQueries> getOracleQueries(
       String pubkey, Optional<String> from, Optional<BigInteger> limit, Optional<String> type) {
     return getOracleApi()
         .rxGetOracleQueriesByPubkey(
@@ -34,7 +40,7 @@ public class OracleServiceImpl implements OracleService {
   }
 
   @Override
-  public Single<OracleQuery> getOracleQueryByPubkeyAndQueryId(String pubkey, String queryId) {
+  public Single<OracleQuery> getOracleQuery(String pubkey, String queryId) {
     return getOracleApi().rxGetOracleQueryByPubkeyAndQueryId(pubkey, queryId);
   }
 }

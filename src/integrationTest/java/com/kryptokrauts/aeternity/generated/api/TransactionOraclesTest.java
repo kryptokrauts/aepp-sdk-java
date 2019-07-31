@@ -2,6 +2,7 @@ package com.kryptokrauts.aeternity.generated.api;
 
 import com.kryptokrauts.aeternity.generated.model.OracleQuery;
 import com.kryptokrauts.aeternity.generated.model.PostTxResponse;
+import com.kryptokrauts.aeternity.generated.model.RegisteredOracle;
 import com.kryptokrauts.aeternity.generated.model.RelativeTTL;
 import com.kryptokrauts.aeternity.generated.model.TTL;
 import com.kryptokrauts.aeternity.generated.model.TTL.TypeEnum;
@@ -9,6 +10,7 @@ import com.kryptokrauts.aeternity.generated.model.Tx;
 import com.kryptokrauts.aeternity.generated.model.UnsignedTx;
 import com.kryptokrauts.aeternity.sdk.domain.secret.impl.BaseKeyPair;
 import com.kryptokrauts.aeternity.sdk.service.transaction.fee.impl.OracleFeeCalculationModel;
+import com.kryptokrauts.aeternity.sdk.service.transaction.type.impl.OracleExtendTransaction;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.impl.OracleQueryTransaction;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.impl.OracleRegisterTransaction;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.impl.OracleResponseTransaction;
@@ -29,13 +31,18 @@ public class TransactionOraclesTest extends BaseTest {
   static BaseKeyPair queryAccount;
   static BaseKeyPair oracleAccount;
 
+  static String oracleId;
   static String queryId;
+
+  static BigInteger initialOracleTtl;
 
   @Test
   public void aGenerateKeyPairAndFundOracleAccount(TestContext context) {
     queryAccount =
         keyPairService.generateBaseKeyPairFromSecret(TestConstants.BENEFICIARY_PRIVATE_KEY);
     oracleAccount = keyPairService.generateBaseKeyPair();
+
+    oracleId = oracleAccount.getPublicKey().replace("ak_", "ok_");
 
     Async async = context.async();
     rule.vertx()
@@ -72,29 +79,28 @@ public class TransactionOraclesTest extends BaseTest {
   }
 
   @Test
-  public void bRegisterOracleTest(TestContext context) {
+  public void bOracleRegisterTest(TestContext context) {
     Async async = context.async();
     rule.vertx()
         .executeBlocking(
             future -> {
               try {
                 BigInteger nonce = getAccount(oracleAccount.getPublicKey()).getNonce();
+                BigInteger currentHeight =
+                    chainService.getCurrentKeyBlock().blockingGet().getHeight();
+                initialOracleTtl = currentHeight.add(BigInteger.valueOf(5000));
                 TTL oracleTtl = new TTL();
-                oracleTtl.setType(TypeEnum.DELTA);
-                oracleTtl.setValue(BigInteger.valueOf(800));
+                oracleTtl.setType(TypeEnum.BLOCK);
+                oracleTtl.setValue(initialOracleTtl);
                 OracleRegisterTransaction oracleRegisterTransaction =
                     OracleRegisterTransaction.builder()
                         .accountId(oracleAccount.getPublicKey())
-                        /*
-                         * TODO when using ABI version 1 we get an error 'cannot be applied due to
-                         * an error bad_query_format'
-                         */
                         .abiVersion(BigInteger.ZERO)
                         .nonce(nonce.add(BigInteger.ONE))
                         .oracleTtl(oracleTtl)
                         .queryFee(BigInteger.valueOf(100)) // 100 ættos
-                        .queryFormat("query Specification") // TODO spec for ABI version 1
-                        .responseFormat("response Specification") // TODO spec for ABI version 1
+                        .queryFormat("string")
+                        .responseFormat("string")
                         .ttl(BigInteger.ZERO)
                         .feeCalculationModel(new OracleFeeCalculationModel())
                         .build();
@@ -120,7 +126,7 @@ public class TransactionOraclesTest extends BaseTest {
   }
 
   @Test
-  public void cQueryOracleTest(TestContext context) {
+  public void cOracleQueryTest(TestContext context) {
     Async async = context.async();
     rule.vertx()
         .executeBlocking(
@@ -136,7 +142,7 @@ public class TransactionOraclesTest extends BaseTest {
                 OracleQueryTransaction oracleQueryTransaction =
                     OracleQueryTransaction.builder()
                         .senderId(queryAccount.getPublicKey())
-                        .oracleId(oracleAccount.getPublicKey().replace("ak_", "ok_"))
+                        .oracleId(oracleId)
                         .nonce(nonce.add(BigInteger.ONE))
                         .query("Am I stupid?")
                         .queryFee(BigInteger.valueOf(100)) // 100 ættos
@@ -160,14 +166,9 @@ public class TransactionOraclesTest extends BaseTest {
                 waitForTxMined(postTxResponse.getTxHash());
                 queryId =
                     EncodingUtils.queryId(
-                        queryAccount.getPublicKey(),
-                        nonce.add(BigInteger.ONE),
-                        oracleAccount.getPublicKey().replace("ak_", "ok_"));
+                        queryAccount.getPublicKey(), nonce.add(BigInteger.ONE), oracleId);
                 OracleQuery oracleQuery =
-                    oracleService
-                        .getOracleQueryByPubkeyAndQueryId(
-                            oracleAccount.getPublicKey().replace("ak_", "ok_"), queryId)
-                        .blockingGet();
+                    oracleService.getOracleQuery(oracleId, queryId).blockingGet();
                 _logger.debug(oracleQuery.toString());
               } catch (Throwable e) {
                 context.fail(e);
@@ -178,7 +179,7 @@ public class TransactionOraclesTest extends BaseTest {
   }
 
   @Test
-  public void dQueryResponseTest(TestContext context) {
+  public void dOracleResponseTest(TestContext context) {
     Async async = context.async();
     rule.vertx()
         .executeBlocking(
@@ -213,6 +214,51 @@ public class TransactionOraclesTest extends BaseTest {
                     transactionServiceNative.postTransaction(signedTx).blockingGet();
                 _logger.info("OracleResponseTx-Hash: " + postTxResponse.getTxHash());
                 waitForTxMined(postTxResponse.getTxHash());
+              } catch (Throwable e) {
+                context.fail(e);
+              }
+              future.complete();
+            },
+            success -> async.complete());
+  }
+
+  @Test
+  public void eOracleExtendTest(TestContext context) {
+    Async async = context.async();
+    rule.vertx()
+        .executeBlocking(
+            future -> {
+              try {
+                BigInteger additionalTtl = BigInteger.valueOf(100);
+                BigInteger nonce = getAccount(oracleAccount.getPublicKey()).getNonce();
+                RelativeTTL relativeTTL = new RelativeTTL();
+                relativeTTL.setType(RelativeTTL.TypeEnum.DELTA);
+                relativeTTL.setValue(additionalTtl);
+                OracleExtendTransaction oracleExtendTransaction =
+                    OracleExtendTransaction.builder()
+                        .nonce(nonce.add(BigInteger.ONE))
+                        .oracleId(oracleId)
+                        .oracleRelativeTtl(relativeTTL)
+                        .ttl(BigInteger.ZERO)
+                        .feeCalculationModel(new OracleFeeCalculationModel())
+                        .build();
+                UnsignedTx unsignedTx =
+                    transactionServiceNative
+                        .createUnsignedTransaction(oracleExtendTransaction)
+                        .blockingGet();
+                Tx signedTx =
+                    transactionServiceNative.signTransaction(
+                        unsignedTx, oracleAccount.getPrivateKey());
+                _logger.info("SignedTx: " + signedTx.getTx());
+                PostTxResponse postTxResponse =
+                    transactionServiceNative.postTransaction(signedTx).blockingGet();
+                _logger.info("OracleExtendTx-Hash: " + postTxResponse.getTxHash());
+                waitForTxMined(postTxResponse.getTxHash());
+                RegisteredOracle registeredOracle =
+                    oracleService.getRegisteredOracle(oracleId).blockingGet();
+                context.assertEquals(
+                    initialOracleTtl.add(additionalTtl), registeredOracle.getTtl());
+                _logger.info(registeredOracle.toString());
               } catch (Throwable e) {
                 context.fail(e);
               }
