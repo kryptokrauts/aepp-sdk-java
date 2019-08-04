@@ -21,7 +21,7 @@ services:
       - "3080:3080"
 
   goggles:
-    image: kryptokrauts/aepp-goggles
+    image: marc0olo/aepp-goggles
 
   proxy:
     image: nginx:${NGINX_TAG}
