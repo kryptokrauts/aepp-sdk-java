@@ -42,16 +42,13 @@ ext {
     bintrayKey = System.getProperty("bintray.key")
     buildNumber = System.getProperty("build.number")
 
-    aeternityVersion = "v3.0.1"
-    sophiaCompilerVersion = "v3.0.0"
-
     apiPackageAeternity = "com.kryptokrauts.aeternity.generated.api"
     modelPackageAeternity = "com.kryptokrauts.aeternity.generated.model"
-    swaggerFileAeternity = "${rootDir}/api/swagger_aeternity_${aeternityVersion}.yml"
+    swaggerFileAeternity = "${rootDir}/api/swagger_aeternity.yml"
 
     apiPackageSophiaCompiler = "com.kryptokrauts.sophia.compiler.generated.api"
     modelPackageSophiaCompiler = "com.kryptokrauts.sophia.compiler.generated.model"
-    swaggerFileSophiaCompiler = "${rootDir}/api/swagger_sophia_compiler_${sophiaCompilerVersion}.yml"
+    swaggerFileSophiaCompiler = "${rootDir}/api/swagger_sophia_compiler.yml"
 
     templateDir = "${rootDir}/api/vertx-templates"
     swaggerAnnotationsVersion = "1.5.22"
@@ -82,7 +79,6 @@ task generateApiClient {
         configAeternity.setLibrary("vertx")
         configAeternity.setGroupId("${group}")
         configAeternity.setArtifactId("aeternity-client-vertx")
-        configAeternity.setArtifactVersion("${aeternityVersion}")
         configAeternity.setApiPackage("${apiPackageAeternity}")
         configAeternity.setModelPackage("${modelPackageAeternity}")
         configAeternity.setInputSpec(project.swaggerFileAeternity.toString())
@@ -103,7 +99,6 @@ task generateApiClient {
         configSophiaCompiler.setLibrary("vertx")
         configSophiaCompiler.setGroupId("${group}")
         configSophiaCompiler.setArtifactId("sophia-compiler-client-vertx")
-        configSophiaCompiler.setArtifactVersion("${sophiaCompilerVersion}")
         configSophiaCompiler.setApiPackage("${apiPackageSophiaCompiler}")
         configSophiaCompiler.setModelPackage("${modelPackageSophiaCompiler}")
         configSophiaCompiler.setInputSpec(project.swaggerFileSophiaCompiler.toString())

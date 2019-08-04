@@ -13,7 +13,7 @@ import com.kryptokrauts.aeternity.sdk.service.transaction.fee.impl.OracleFeeCalc
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.impl.OracleExtendTransaction;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.impl.OracleQueryTransaction;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.impl.OracleRegisterTransaction;
-import com.kryptokrauts.aeternity.sdk.service.transaction.type.impl.OracleResponseTransaction;
+import com.kryptokrauts.aeternity.sdk.service.transaction.type.impl.OracleRespondTransaction;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.impl.SpendTransaction;
 import com.kryptokrauts.aeternity.sdk.util.EncodingUtils;
 import com.kryptokrauts.aeternity.sdk.util.UnitConversionUtil;
@@ -179,7 +179,7 @@ public class TransactionOraclesTest extends BaseTest {
   }
 
   @Test
-  public void dOracleResponseTest(TestContext context) {
+  public void dOracleRespondTest(TestContext context) {
     Async async = context.async();
     rule.vertx()
         .executeBlocking(
@@ -189,8 +189,8 @@ public class TransactionOraclesTest extends BaseTest {
                 RelativeTTL responseTtl = new RelativeTTL();
                 responseTtl.setType(RelativeTTL.TypeEnum.DELTA);
                 responseTtl.setValue(BigInteger.valueOf(100));
-                OracleResponseTransaction oracleResponseTransaction =
-                    OracleResponseTransaction.builder()
+                OracleRespondTransaction oracleRespondTransaction =
+                    OracleRespondTransaction.builder()
                         .senderId(oracleAccount.getPublicKey())
                         .oracleId(oracleAccount.getPublicKey().replace("ak_", "ok_"))
                         .queryId(queryId)
@@ -204,7 +204,7 @@ public class TransactionOraclesTest extends BaseTest {
 
                 UnsignedTx unsignedTx =
                     transactionServiceNative
-                        .createUnsignedTransaction(oracleResponseTransaction)
+                        .createUnsignedTransaction(oracleRespondTransaction)
                         .blockingGet();
                 Tx signedTx =
                     transactionServiceNative.signTransaction(

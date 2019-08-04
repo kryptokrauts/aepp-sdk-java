@@ -6,7 +6,7 @@ import com.kryptokrauts.aeternity.sdk.service.transaction.type.AbstractTransacti
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.impl.OracleExtendTransaction;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.impl.OracleQueryTransaction;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.impl.OracleRegisterTransaction;
-import com.kryptokrauts.aeternity.sdk.service.transaction.type.impl.OracleResponseTransaction;
+import com.kryptokrauts.aeternity.sdk.service.transaction.type.impl.OracleRespondTransaction;
 import java.math.BigInteger;
 
 public class OracleFeeCalculationModel implements FeeCalculationModel {
@@ -28,9 +28,9 @@ public class OracleFeeCalculationModel implements FeeCalculationModel {
           ((OracleExtendTransaction) transaction).getOracleRelativeTtl().getValue().longValue();
     } else if (transaction instanceof OracleQueryTransaction) {
       relativeTtl = ((OracleQueryTransaction) transaction).getQueryTtl().getValue().longValue();
-    } else if (transaction instanceof OracleResponseTransaction) {
+    } else if (transaction instanceof OracleRespondTransaction) {
       relativeTtl =
-          ((OracleResponseTransaction) transaction).getResponseTtl().getValue().longValue();
+          ((OracleRespondTransaction) transaction).getResponseTtl().getValue().longValue();
     } else {
       throw new UnsupportedOperationException(
           String.format(

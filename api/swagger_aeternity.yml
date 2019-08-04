@@ -1,7 +1,7 @@
 swagger: '2.0'
 info:
   description: 'This is the [Aeternity](https://www.aeternity.com/) node API.'
-  version: 3.0.1
+  version: 4.1.0
   title: Aeternity node
   termsOfService: 'https://www.aeternity.com/terms/'
   contact:
@@ -1119,7 +1119,7 @@ paths:
           name: body
           required: true
           schema:
-            $ref: '#/definitions/OracleResponseTx'
+            $ref: '#/definitions/OracleRespondTx'
       responses:
         '200':
           description: Successful operation
@@ -2050,7 +2050,7 @@ definitions:
       - response_ttl
       - fee
       - sender_id
-  OracleResponseTx:
+  OracleRespondTx:
     type: object
     allOf:
       - $ref: '#/definitions/GenericTx'
@@ -2322,6 +2322,10 @@ definitions:
           state_hash:
             description: 'Root hash of the channel''s internal state tree'
             $ref: '#/definitions/EncodedHash'
+          delegate_ids:
+            type: array
+            items:
+              $ref: '#/definitions/EncodedPubkey'
     required:
       - initiator_id
       - initiator_amount
@@ -2605,6 +2609,12 @@ definitions:
         $ref: '#/definitions/UInt32'
       network_id:
         type: string
+      peer_pubkey:
+        $ref: '#/definitions/EncodedPubkey'
+      top_key_block_hash:
+        $ref: '#/definitions/EncodedHash'
+      top_block_height:
+        $ref: '#/definitions/UInt64'
     required:
       - genesis_key_block_hash
       - solutions
@@ -2617,6 +2627,9 @@ definitions:
       - peer_count
       - pending_transactions_count
       - network_id
+      - peer_pubkey
+      - top_key_block_hash
+      - top_block_height
   Protocol:
     type: object
     properties:

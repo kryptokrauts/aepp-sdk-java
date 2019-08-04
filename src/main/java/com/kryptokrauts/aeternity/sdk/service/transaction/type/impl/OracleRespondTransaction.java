@@ -1,7 +1,7 @@
 package com.kryptokrauts.aeternity.sdk.service.transaction.type.impl;
 
 import com.kryptokrauts.aeternity.generated.api.rxjava.OracleApi;
-import com.kryptokrauts.aeternity.generated.model.OracleResponseTx;
+import com.kryptokrauts.aeternity.generated.model.OracleRespondTx;
 import com.kryptokrauts.aeternity.generated.model.RelativeTTL;
 import com.kryptokrauts.aeternity.generated.model.UnsignedTx;
 import com.kryptokrauts.aeternity.sdk.constants.SerializationTags;
@@ -19,7 +19,7 @@ import org.apache.tuweni.rlp.RLP;
 @Getter
 @SuperBuilder
 @ToString
-public class OracleResponseTransaction extends AbstractTransaction<OracleResponseTx> {
+public class OracleRespondTransaction extends AbstractTransaction<OracleRespondTx> {
 
   @NonNull private String senderId;
   @NonNull private String oracleId;
@@ -37,16 +37,16 @@ public class OracleResponseTransaction extends AbstractTransaction<OracleRespons
   }
 
   @Override
-  protected OracleResponseTx toModel() {
-    OracleResponseTx oracleResponseTx = new OracleResponseTx();
-    oracleResponseTx.fee(this.fee);
-    oracleResponseTx.nonce(this.nonce);
-    oracleResponseTx.oracleId(this.oracleId);
-    oracleResponseTx.queryId(this.queryId);
-    oracleResponseTx.response(this.response);
-    oracleResponseTx.responseTtl(this.responseTtl);
-    oracleResponseTx.ttl(this.ttl);
-    return oracleResponseTx;
+  protected OracleRespondTx toModel() {
+    OracleRespondTx oracleRespondTx = new OracleRespondTx();
+    oracleRespondTx.fee(this.fee);
+    oracleRespondTx.nonce(this.nonce);
+    oracleRespondTx.oracleId(this.oracleId);
+    oracleRespondTx.queryId(this.queryId);
+    oracleRespondTx.response(this.response);
+    oracleRespondTx.responseTtl(this.responseTtl);
+    oracleRespondTx.ttl(this.ttl);
+    return oracleRespondTx;
   }
 
   @Override

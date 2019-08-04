@@ -9,7 +9,6 @@ import com.kryptokrauts.aeternity.generated.model.TxInfoObject;
 import com.kryptokrauts.aeternity.generated.model.UnsignedTx;
 import com.kryptokrauts.aeternity.sdk.constants.BaseConstants;
 import com.kryptokrauts.aeternity.sdk.constants.Network;
-import com.kryptokrauts.aeternity.sdk.constants.SerializationTags;
 import com.kryptokrauts.aeternity.sdk.domain.secret.impl.BaseKeyPair;
 import com.kryptokrauts.aeternity.sdk.service.account.AccountService;
 import com.kryptokrauts.aeternity.sdk.service.account.AccountServiceFactory;
@@ -19,7 +18,6 @@ import com.kryptokrauts.aeternity.sdk.service.transaction.TransactionService;
 import com.kryptokrauts.aeternity.sdk.service.transaction.TransactionServiceConfiguration;
 import com.kryptokrauts.aeternity.sdk.service.transaction.TransactionServiceFactory;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.AbstractTransaction;
-import com.kryptokrauts.aeternity.sdk.util.EncodingUtils;
 import com.kryptokrauts.sophia.compiler.generated.model.Calldata;
 import io.reactivex.Single;
 import io.reactivex.observers.TestObserver;
@@ -28,15 +26,11 @@ import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
 import java.math.BigInteger;
 import java.util.Arrays;
-import org.apache.tuweni.bytes.Bytes;
-import org.apache.tuweni.rlp.RLP;
 import org.junit.Before;
 import org.junit.FixMethodOrder;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.junit.jupiter.api.Assertions;
 import org.junit.runners.MethodSorters;
-import org.opentest4j.AssertionFailedError;
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class TransactionContractsTest extends BaseTest {
@@ -49,45 +43,6 @@ public class TransactionContractsTest extends BaseTest {
   public void initBeforeTest() {
     baseKeyPair =
         keyPairService.generateBaseKeyPairFromSecret(TestConstants.BENEFICIARY_PRIVATE_KEY);
-  }
-
-  @Test
-  public void decodeRLPArrayTest(TestContext context) {
-    try {
-      Bytes value = Bytes.fromHexString(TestConstants.binaryTxDevnet);
-      RLP.decodeList(
-          value,
-          rlpReader -> {
-            Assertions.assertEquals(
-                SerializationTags.OBJECT_TAG_CONTRACT_CREATE_TRANSACTION, rlpReader.readInt());
-            Assertions.assertEquals(SerializationTags.VSN, rlpReader.readInt());
-            Assertions.assertArrayEquals(
-                rlpReader.readByteArray(),
-                EncodingUtils.decodeCheckAndTag(
-                    baseKeyPair.getPublicKey(), SerializationTags.ID_TAG_ACCOUNT));
-            Assertions.assertEquals(BigInteger.ONE, rlpReader.readBigInteger());
-            Assertions.assertArrayEquals(
-                EncodingUtils.decodeCheckWithIdentifier(TestConstants.testContractByteCode),
-                rlpReader.readByteArray());
-            Assertions.assertEquals(
-                BigInteger.valueOf(262145), new BigInteger(rlpReader.readByteArray()));
-            Assertions.assertEquals(
-                BigInteger.valueOf(1098660000000000l), new BigInteger(rlpReader.readByteArray()));
-            Assertions.assertEquals(20000, new BigInteger(rlpReader.readByteArray()).intValue());
-            Assertions.assertEquals(0, new BigInteger(rlpReader.readByteArray()).intValue());
-            Assertions.assertEquals(0, new BigInteger(rlpReader.readByteArray()).intValue());
-            Assertions.assertEquals(1000, new BigInteger(rlpReader.readByteArray()).intValue());
-            Assertions.assertEquals(
-                1100000000, new BigInteger(rlpReader.readByteArray()).intValue());
-            Assertions.assertArrayEquals(
-                EncodingUtils.decodeCheckWithIdentifier(TestConstants.testContractCallData),
-                rlpReader.readByteArray());
-            return "Validation successful";
-          });
-    } catch (AssertionFailedError afe) {
-      _logger.error("Error decoding RLP array");
-      context.fail(afe);
-    }
   }
 
   /**
