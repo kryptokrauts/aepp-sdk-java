@@ -44,6 +44,7 @@ public class CompilerServiceTest extends BaseTest {
         this.sophiaCompilerService.compile(TestConstants.testContractSourceCode, null, null);
     byteCode.subscribe(
         bc -> {
+          _logger.info(bc.getBytecode());
           context.assertEquals(TestConstants.testContractByteCode, bc.getBytecode());
           async.complete();
         },
@@ -113,6 +114,7 @@ public class CompilerServiceTest extends BaseTest {
     Single<ACI> aci = this.sophiaCompilerService.generateACI(paymentSplitterSource);
     aci.subscribe(
         res -> {
+          _logger.info(res.getEncodedAci().toString());
           context.assertEquals(TestConstants.paymentSplitterACI, res.getEncodedAci().toString());
           async.complete();
         },

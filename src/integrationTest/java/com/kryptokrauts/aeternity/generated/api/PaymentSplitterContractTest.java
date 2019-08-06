@@ -136,38 +136,35 @@ public class PaymentSplitterContractTest extends BaseTest {
                     transactionServiceNative.createUnsignedTransaction(contractTx).blockingGet();
                 _logger.info("Unsigned Tx - hash - dryRun: " + unsignedTx.getTx());
 
-                // DryRunResults dryRunResults =
-                // performDryRunTransactions(
-                // Arrays.asList(
-                // ImmutableMap.of(AccountParameter.PUBLIC_KEY,
-                // owner.getPublicKey())),
-                // null,
-                // Arrays.asList(unsignedTx));
-                // _logger.info("callContractAfterDryRunOnLocalNode: " +
-                // dryRunResults.toString());
-                // context.assertEquals(1, dryRunResults.getResults().size());
-                // DryRunResult dryRunResult = dryRunResults.getResults().get(0);
-                // context.assertEquals("ok", dryRunResult.getResult());
-                //
-                // contractTx =
-                // transactionServiceNative
-                // .getTransactionFactory()
-                // .createContractCreateTransaction(
-                // abiVersion,
-                // amount,
-                // calldata.getCalldata(),
-                // byteCode.getBytecode(),
-                // deposit,
-                // dryRunResult.getCallObj().getGasUsed(),
-                // dryRunResult.getCallObj().getGasPrice(),
-                // nonce,
-                // ownerId,
-                // ttl,
-                // vmVersion);
-                //
-                // unsignedTx =
-                //
-                // transactionServiceNative.createUnsignedTransaction(contractTx).blockingGet();
+                DryRunResults dryRunResults =
+                    performDryRunTransactions(
+                        Arrays.asList(
+                            ImmutableMap.of(AccountParameter.PUBLIC_KEY, owner.getPublicKey())),
+                        null,
+                        Arrays.asList(unsignedTx));
+                _logger.info("callContractAfterDryRunOnLocalNode: " + dryRunResults.toString());
+                context.assertEquals(1, dryRunResults.getResults().size());
+                DryRunResult dryRunResult = dryRunResults.getResults().get(0);
+                context.assertEquals("ok", dryRunResult.getResult());
+
+                contractTx =
+                    transactionServiceNative
+                        .getTransactionFactory()
+                        .createContractCreateTransaction(
+                            abiVersion,
+                            amount,
+                            calldata.getCalldata(),
+                            byteCode.getBytecode(),
+                            deposit,
+                            dryRunResult.getCallObj().getGasUsed(),
+                            dryRunResult.getCallObj().getGasPrice(),
+                            nonce,
+                            ownerId,
+                            ttl,
+                            vmVersion);
+
+                unsignedTx =
+                    transactionServiceNative.createUnsignedTransaction(contractTx).blockingGet();
 
                 Tx signedTxNative =
                     transactionServiceNative.signTransaction(unsignedTx, owner.getPrivateKey());

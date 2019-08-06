@@ -80,14 +80,14 @@
         "src_file":"src_file"
       },
       "properties":{
-        "fileSystem":{
+        "file_system":{
           "description":"An explicit file system, mapping file names to file content",
           "properties":{
 
           },
           "type":"object"
         },
-        "srcFile":{
+        "src_file":{
           "description":"Name of contract source file - only used in error messages",
           "type":"string"
         }
@@ -268,6 +268,42 @@
       ],
       "type":"object"
     },
+    "SophiaCallResult":{
+
+    },
+    "SophiaCallResultInput":{
+      "example":{
+        "call-result":"call-result",
+        "call-value":"call-value",
+        "function":"function",
+        "source":"source"
+      },
+      "properties":{
+        "call-result":{
+          "description":"Call result type (ok | revert | error)",
+          "type":"string"
+        },
+        "call-value":{
+          "description":"Call result value (ABI encoded data or error string)",
+          "type":"string"
+        },
+        "function":{
+          "description":"Name of the called function",
+          "type":"string"
+        },
+        "source":{
+          "description":"(Possibly partial) Sophia contract code/interface",
+          "type":"string"
+        }
+      },
+      "required":[
+        "call-result",
+        "call-value",
+        "function",
+        "source"
+      ],
+      "type":"object"
+    },
     "SophiaJsonData":{
       "example":{
         "data":"{}"
@@ -293,7 +329,7 @@
     "description":"This is the [Aeternity](https://www.aeternity.com/) compiler API.",
     "termsOfService":"https://www.aeternity.com/terms/",
     "title":"Aeternity node",
-    "version":"3.0.0"
+    "version":"3.2.0"
   },
   "paths":{
     "/aci":{
@@ -322,6 +358,12 @@
             "description":"ACI for contract",
             "schema":{
               "$ref":"#/definitions/ACI"
+            }
+          },
+          "400":{
+            "description":"Invalid input",
+            "schema":{
+              "$ref":"#/definitions/Error"
             }
           },
           "403":{
@@ -413,8 +455,57 @@
               "$ref":"#/definitions/ByteCode"
             }
           },
+          "400":{
+            "description":"Invalid data",
+            "schema":{
+              "$ref":"#/definitions/Error"
+            }
+          },
           "403":{
             "description":"Invalid contract",
+            "schema":{
+              "$ref":"#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/decode-call-result":{
+      "post":{
+        "consumes":[
+          "application/json"
+        ],
+        "description":"Decode the result of contract call",
+        "operationId":"DecodeCallResult",
+        "parameters":[
+        {
+          "description":"Binary data in Sophia ABI format",
+          "in":"body",
+          "name":"body",
+          "required":true,
+          "schema":{
+            "$ref":"#/definitions/SophiaCallResultInput"
+          }
+        }
+        ],
+        "produces":[
+          "application/json"
+        ],
+        "responses":{
+          "200":{
+            "description":"Json encoded data",
+            "schema":{
+              "$ref":"#/definitions/SophiaCallResult"
+            }
+          },
+          "400":{
+            "description":"Invalid data",
+            "schema":{
+              "$ref":"#/definitions/Error"
+            }
+          },
+          "403":{
+            "description":"Invalid data",
             "schema":{
               "$ref":"#/definitions/Error"
             }
@@ -448,6 +539,12 @@
             "description":"Binary encoded calldata",
             "schema":{
               "$ref":"#/definitions/DecodedCalldata"
+            }
+          },
+          "400":{
+            "description":"Invalid data",
+            "schema":{
+              "$ref":"#/definitions/Error"
             }
           },
           "403":{
@@ -487,8 +584,14 @@
               "$ref":"#/definitions/DecodedCalldata"
             }
           },
+          "400":{
+            "description":"Invalid data",
+            "schema":{
+              "$ref":"#/definitions/Error"
+            }
+          },
           "403":{
-            "description":"Invalid contract",
+            "description":"Invalid data",
             "schema":{
               "$ref":"#/definitions/Error"
             }
@@ -529,6 +632,12 @@
             "schema":{
               "$ref":"#/definitions/Error"
             }
+          },
+          "403":{
+            "description":"Invalid data",
+            "schema":{
+              "$ref":"#/definitions/Error"
+            }
           }
         }
       }
@@ -559,6 +668,12 @@
             "description":"Binary encoded calldata",
             "schema":{
               "$ref":"#/definitions/Calldata"
+            }
+          },
+          "400":{
+            "description":"Invalid data",
+            "schema":{
+              "$ref":"#/definitions/Error"
             }
           },
           "403":{

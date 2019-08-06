@@ -200,7 +200,7 @@ public abstract class BaseTest {
     PostTxResponse postTxResponse =
         callMethodAndGetResult(
             () -> transactionServiceNative.postTransaction(signedTx), PostTxResponse.class);
-    _logger.info("Post tx hash :" + postTxResponse.getTxHash());
+    _logger.info("PostTx hash: " + postTxResponse.getTxHash());
     GenericSignedTx txValue = waitForTxMined(postTxResponse.getTxHash());
     _logger.info(
         String.format(
