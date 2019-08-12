@@ -66,4 +66,6 @@ public interface TransactionService {
       List<Map<AccountParameter, Object>> accounts,
       BigInteger block,
       List<UnsignedTx> unsignedTransactions);
+
+  AbstractTransaction<?> decodeTransaction(String encodedSignedTx);
 }

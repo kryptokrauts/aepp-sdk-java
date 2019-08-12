@@ -8,6 +8,7 @@ import com.kryptokrauts.aeternity.sdk.service.transaction.type.AbstractTransacti
 import com.kryptokrauts.aeternity.sdk.util.EncodingUtils;
 import io.reactivex.Single;
 import java.math.BigInteger;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.experimental.SuperBuilder;
@@ -16,15 +17,16 @@ import org.apache.tuweni.rlp.RLP;
 
 @Getter
 @SuperBuilder
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class SpendTransaction extends AbstractTransaction<SpendTx> {
 
-  @NonNull private String sender;
-  @NonNull private String recipient;
-  @NonNull private BigInteger amount;
-  @NonNull private String payload;
-  @NonNull private BigInteger ttl;
-  @NonNull private BigInteger nonce;
-  @NonNull private TransactionApi transactionApi;
+  @EqualsAndHashCode.Include @NonNull private String sender;
+  @EqualsAndHashCode.Include @NonNull private String recipient;
+  @EqualsAndHashCode.Include @NonNull private BigInteger amount;
+  @EqualsAndHashCode.Include @NonNull private String payload;
+  @EqualsAndHashCode.Include @NonNull private BigInteger ttl;
+  @EqualsAndHashCode.Include @NonNull private BigInteger nonce;
+  private TransactionApi transactionApi;
 
   @Override
   protected Single<UnsignedTx> createInternal() {

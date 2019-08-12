@@ -89,6 +89,9 @@ public class TransactionSpendApiTest extends BaseTest {
           Tx signedTx =
               transactionServiceNative.signTransaction(unsignedTxNative, keyPair.getPrivateKey());
 
+          context.assertEquals(
+              spendTx, transactionServiceNative.decodeTransaction(signedTx.getTx()));
+
           Single<PostTxResponse> txResponse = transactionServiceNative.postTransaction(signedTx);
           txResponse.subscribe(
               it -> {

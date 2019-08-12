@@ -6,6 +6,7 @@ import com.kryptokrauts.aeternity.sdk.service.transaction.fee.FeeCalculationMode
 import com.kryptokrauts.aeternity.sdk.util.EncodingUtils;
 import io.reactivex.Single;
 import java.math.BigInteger;
+import lombok.EqualsAndHashCode;
 import lombok.experimental.SuperBuilder;
 import org.apache.tuweni.bytes.Bytes;
 import org.apache.tuweni.rlp.RLPWriter;
@@ -23,7 +24,7 @@ public abstract class AbstractTransaction<TxModel> {
 
   private static final Logger _logger = LoggerFactory.getLogger(AbstractTransaction.class);
 
-  protected BigInteger fee;
+  @EqualsAndHashCode.Include protected BigInteger fee;
 
   /** fee calculation model for this transaction type, one of {@link FeeCalculationModel} */
   protected FeeCalculationModel feeCalculationModel;

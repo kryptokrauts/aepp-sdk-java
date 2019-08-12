@@ -30,6 +30,7 @@ import com.kryptokrauts.aeternity.sdk.service.transaction.TransactionService;
 import com.kryptokrauts.aeternity.sdk.service.transaction.TransactionServiceConfiguration;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.AbstractTransaction;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.TransactionFactory;
+import com.kryptokrauts.aeternity.sdk.service.transaction.type.impl.SpendTransaction;
 import com.kryptokrauts.aeternity.sdk.util.ByteUtils;
 import com.kryptokrauts.aeternity.sdk.util.EncodingUtils;
 import com.kryptokrauts.aeternity.sdk.util.SigningUtil;
@@ -226,6 +227,76 @@ public class TransactionServiceImpl implements TransactionService {
               rlpWriter.writeByteArray(binaryTx);
             });
     return EncodingUtils.encodeCheck(encodedRlp.toArray(), ApiIdentifiers.TRANSACTION);
+  }
+
+  @Override
+  public AbstractTransaction<?> decodeTransaction(String encodedSignedTx) {
+    _logger.debug("-------- decodeTransaction --------");
+    byte[] encodedRlpByteArray = EncodingUtils.decodeCheckWithIdentifier(encodedSignedTx);
+    Bytes encodedRlp = Bytes.wrap(encodedRlpByteArray);
+    byte[] binaryTx =
+        RLP.decodeList(
+            encodedRlp,
+            rlpReader -> {
+              _logger.debug(String.format("Serialization Object-Tag: %s", rlpReader.readInt()));
+              _logger.debug(String.format("VSN (RLP Version): %s", rlpReader.readInt()));
+              rlpReader.readList(
+                  reader -> {
+                    int count = 0;
+                    while (!reader.isComplete()) {
+                      reader.readByteArray();
+                      count++;
+                      _logger.debug(String.format("Signatures: %s", count));
+                    }
+                    return null;
+                  });
+              return rlpReader.readByteArray();
+            });
+    return decodeTransactionType(binaryTx);
+  }
+
+  private AbstractTransaction<?> decodeTransactionType(byte[] binaryTx) {
+    Bytes encodedRlp = Bytes.wrap(binaryTx);
+    return RLP.decodeList(
+        encodedRlp,
+        rlpReader -> {
+          AbstractTransaction<?> tx = null;
+          int objectTag = rlpReader.readInt();
+          switch (objectTag) {
+            case SerializationTags.OBJECT_TAG_SPEND_TRANSACTION:
+              rlpReader.readInt(); // VSN not needed for creating the TxModel
+              byte[] senderWithTag = rlpReader.readByteArray();
+              byte[] recipientWithTag = rlpReader.readByteArray();
+              String sender =
+                  EncodingUtils.encodeCheck(
+                      Arrays.copyOfRange(senderWithTag, 1, senderWithTag.length),
+                      ApiIdentifiers.ACCOUNT_PUBKEY);
+              String recipient =
+                  EncodingUtils.encodeCheck(
+                      Arrays.copyOfRange(recipientWithTag, 1, recipientWithTag.length),
+                      ApiIdentifiers.ACCOUNT_PUBKEY);
+              BigInteger amount = rlpReader.readBigInteger(true);
+              BigInteger fee = rlpReader.readBigInteger(true);
+              BigInteger ttl = rlpReader.readBigInteger(true);
+              BigInteger nonce = rlpReader.readBigInteger(true);
+              String payload = new String(rlpReader.readByteArray());
+              tx =
+                  SpendTransaction.builder()
+                      .sender(sender)
+                      .recipient(recipient)
+                      .amount(amount)
+                      .payload(payload)
+                      .ttl(ttl)
+                      .nonce(nonce)
+                      .build();
+              tx.setFee(fee);
+              break;
+            default:
+              throw new IllegalArgumentException(
+                  String.format("Serialization Object-Tag '%s' is not supported.", objectTag));
+          }
+          return tx;
+        });
   }
 
   private TransactionApi getTransactionApi() {
