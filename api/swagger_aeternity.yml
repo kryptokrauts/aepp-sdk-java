@@ -193,6 +193,7 @@ paths:
   /key-blocks:
     post:
       tags:
+        - external
         - internal
         - chain
       operationId: PostKeyBlock
@@ -950,6 +951,7 @@ paths:
   /debug/contracts/create:
     post:
       tags:
+        - external
         - internal
         - contract
         - debug
@@ -981,6 +983,7 @@ paths:
   /debug/contracts/call:
     post:
       tags:
+        - external
         - internal
         - contract
         - debug
@@ -1012,6 +1015,7 @@ paths:
   /debug/oracles/register:
     post:
       tags:
+        - external
         - internal
         - oracle
         - debug
@@ -1043,6 +1047,7 @@ paths:
   /debug/oracles/extend:
     post:
       tags:
+        - external
         - internal
         - oracle
         - debug
@@ -1074,6 +1079,7 @@ paths:
   /debug/oracles/query:
     post:
       tags:
+        - external
         - internal
         - oracle
         - debug
@@ -1105,6 +1111,7 @@ paths:
   /debug/oracles/respond:
     post:
       tags:
+        - external
         - internal
         - oracle
         - debug
@@ -1136,6 +1143,7 @@ paths:
   /debug/names/preclaim:
     post:
       tags:
+        - external
         - internal
         - name_service
         - debug
@@ -1165,6 +1173,7 @@ paths:
   /debug/names/claim:
     post:
       tags:
+        - external
         - internal
         - name_service
         - debug
@@ -1194,6 +1203,7 @@ paths:
   /debug/names/update:
     post:
       tags:
+        - external
         - internal
         - name_service
         - debug
@@ -1223,6 +1233,7 @@ paths:
   /debug/names/transfer:
     post:
       tags:
+        - external
         - internal
         - name_service
         - debug
@@ -1252,6 +1263,7 @@ paths:
   /debug/names/revoke:
     post:
       tags:
+        - external
         - internal
         - name_service
         - debug
@@ -1281,6 +1293,7 @@ paths:
   /debug/transactions/spend:
     post:
       tags:
+        - external
         - internal
         - transaction
         - debug
@@ -1313,6 +1326,7 @@ paths:
   /debug/channels/create:
     post:
       tags:
+        - external
         - internal
         - channel
         - debug
@@ -1342,6 +1356,7 @@ paths:
   /debug/channels/deposit:
     post:
       tags:
+        - external
         - internal
         - channel
         - debug
@@ -1367,6 +1382,7 @@ paths:
   /debug/channels/withdraw:
     post:
       tags:
+        - external
         - internal
         - channel
         - debug
@@ -1392,6 +1408,7 @@ paths:
   /debug/channels/snapshot/solo:
     post:
       tags:
+        - external
         - internal
         - channel
         - debug
@@ -1417,6 +1434,7 @@ paths:
   /debug/channels/close/mutual:
     post:
       tags:
+        - external
         - internal
         - channel
         - debug
@@ -1442,6 +1460,7 @@ paths:
   /debug/channels/close/solo:
     post:
       tags:
+        - external
         - internal
         - channel
         - debug
@@ -1467,6 +1486,7 @@ paths:
   /debug/channels/slash:
     post:
       tags:
+        - external
         - internal
         - channel
         - debug
@@ -1492,6 +1512,7 @@ paths:
   /debug/channels/settle:
     post:
       tags:
+        - external
         - internal
         - channel
         - debug
@@ -1517,6 +1538,7 @@ paths:
   /debug/transactions/pending:
     get:
       tags:
+        - external
         - internal
         - transaction
         - debug
@@ -1532,6 +1554,7 @@ paths:
   /debug/names/commitment-id:
     get:
       tags:
+        - external
         - internal
         - name_service
         - debug
@@ -1558,6 +1581,7 @@ paths:
   /debug/accounts/beneficiary:
     get:
       tags:
+        - external
         - internal
         - node_info
         - debug
@@ -1577,6 +1601,7 @@ paths:
   /debug/accounts/node:
     get:
       tags:
+        - external
         - internal
         - node_info
         - debug
@@ -1596,6 +1621,7 @@ paths:
   /debug/peers:
     get:
       tags:
+        - external
         - internal
         - node_info
         - debug
@@ -1615,6 +1641,7 @@ paths:
   /debug/transactions/dry-run:
     post:
       tags:
+        - external
         - internal
         - debug
       operationId: 'DryRunTxs'
@@ -1642,6 +1669,7 @@ paths:
   /debug/token-supply/height/{height}:
     get:
       tags:
+        - external
         - internal
         - debug
       operationId: GetTokenSupplyByHeight
