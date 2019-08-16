@@ -16,20 +16,7 @@ import org.bouncycastle.crypto.CryptoException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.kryptokrauts.aeternity.generated.api.ChannelApiImpl;
-import com.kryptokrauts.aeternity.generated.api.ContractApiImpl;
-import com.kryptokrauts.aeternity.generated.api.DebugApiImpl;
-import com.kryptokrauts.aeternity.generated.api.ExternalApiImpl;
-import com.kryptokrauts.aeternity.generated.api.NameServiceApiImpl;
-import com.kryptokrauts.aeternity.generated.api.OracleApiImpl;
-import com.kryptokrauts.aeternity.generated.api.TransactionApiImpl;
-import com.kryptokrauts.aeternity.generated.api.rxjava.ChannelApi;
-import com.kryptokrauts.aeternity.generated.api.rxjava.ContractApi;
-import com.kryptokrauts.aeternity.generated.api.rxjava.DebugApi;
 import com.kryptokrauts.aeternity.generated.api.rxjava.ExternalApi;
-import com.kryptokrauts.aeternity.generated.api.rxjava.NameServiceApi;
-import com.kryptokrauts.aeternity.generated.api.rxjava.OracleApi;
-import com.kryptokrauts.aeternity.generated.api.rxjava.TransactionApi;
 import com.kryptokrauts.aeternity.generated.model.DryRunAccount;
 import com.kryptokrauts.aeternity.generated.model.DryRunInput;
 import com.kryptokrauts.aeternity.generated.model.DryRunResults;
@@ -41,17 +28,14 @@ import com.kryptokrauts.aeternity.generated.model.TxInfoObject;
 import com.kryptokrauts.aeternity.generated.model.UnsignedTx;
 import com.kryptokrauts.aeternity.sdk.constants.ApiIdentifiers;
 import com.kryptokrauts.aeternity.sdk.constants.SerializationTags;
+import com.kryptokrauts.aeternity.sdk.service.aeternity.AeternityServiceConfiguration;
 import com.kryptokrauts.aeternity.sdk.service.transaction.AccountParameter;
 import com.kryptokrauts.aeternity.sdk.service.transaction.TransactionService;
-import com.kryptokrauts.aeternity.sdk.service.transaction.TransactionServiceConfiguration;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.AbstractTransaction;
-import com.kryptokrauts.aeternity.sdk.service.transaction.type.TransactionFactory;
 import com.kryptokrauts.aeternity.sdk.util.ByteUtils;
 import com.kryptokrauts.aeternity.sdk.util.EncodingUtils;
 import com.kryptokrauts.aeternity.sdk.util.SigningUtil;
 import com.kryptokrauts.aeternity.sdk.util.ValidationUtil;
-import com.kryptokrauts.sophia.compiler.generated.api.DefaultApiImpl;
-import com.kryptokrauts.sophia.compiler.generated.api.rxjava.DefaultApi;
 
 import io.reactivex.Single;
 import lombok.NonNull;
@@ -63,58 +47,42 @@ public class TransactionServiceImpl implements TransactionService {
 	protected static final Logger _logger = LoggerFactory.getLogger(TransactionServiceImpl.class);
 
 	@Nonnull
-	private TransactionServiceConfiguration config;
+	private AeternityServiceConfiguration config;
 
-	private TransactionApi transactionApi;
-
-	private ChannelApi channelApi;
-
-	private ContractApi contractApi;
-
-	private DefaultApi compilerApi;
-
-	private DebugApi debugApi;
-
-	private NameServiceApi nameServiceApi;
-
-	private OracleApi oracleApi;
-
+	@Nonnull
 	private ExternalApi externalApi;
 
-	private TransactionFactory transactionFactory;
-
 	@Override
-	public TransactionFactory getTransactionFactory() {
-		if (transactionFactory == null) {
-			transactionFactory = new TransactionFactory(getTransactionApi(), getChannelApi(), getContractApi(),
-					getNameServiceApi(), getOracleApi(), getCompilerApi());
-		}
-		return transactionFactory;
-	}
-
-	@Override
-	public Single<UnsignedTx> createUnsignedTransaction(AbstractTransaction<?, ?> tx) {
+	public Single<UnsignedTx> createUnsignedTransaction(AbstractTransaction<?> tx) {
 		return tx.createUnsignedTransaction(config.isNativeMode(), config.getMinimalGasPrice());
 	}
 
 	@Override
 	public Single<PostTxResponse> postTransaction(Tx tx) {
-		return getTransactionApi().rxPostTransaction(tx);
+		return externalApi.rxPostTransaction(tx);
+	}
+
+	@Override
+	public Single<PostTxResponse> postTransaction(AbstractTransaction<?> tx) throws CryptoException {
+		return externalApi.rxPostTransaction(signTransaction(createUnsignedTransaction(tx).blockingGet(),
+				this.config.getBaseKeyPair().getPrivateKey()));
 	}
 
 	@Override
 	public Single<GenericSignedTx> getTransactionByHash(String txHash) {
-		return getTransactionApi().rxGetTransactionByHash(txHash);
+		return externalApi.rxGetTransactionByHash(txHash);
 	}
 
 	@Override
 	public Single<TxInfoObject> getTransactionInfoByHash(String txHash) {
-		return getTransactionApi().rxGetTransactionInfoByHash(txHash);
+		return externalApi.rxGetTransactionInfoByHash(txHash);
 	}
 
 	@Override
-	public String computeTxHash(final String encodedSignedTx) {
-		byte[] signed = EncodingUtils.decodeCheckWithIdentifier(encodedSignedTx);
+	public String computeTxHash(final AbstractTransaction<?> tx) throws CryptoException {
+		byte[] signed = EncodingUtils
+				.decodeCheckWithIdentifier(signTransaction(createUnsignedTransaction(tx).blockingGet(),
+						this.config.getBaseKeyPair().getPrivateKey()).getTx());
 		return EncodingUtils.hashEncode(signed, ApiIdentifiers.TRANSACTION_HASH);
 	}
 
@@ -172,15 +140,21 @@ public class TransactionServiceImpl implements TransactionService {
 		unsignedTransactions.forEach(item -> body.addTxsItem(item.getTx()));
 
 		_logger.debug(String.format("Calling dry run on block %s with body %s", block, body));
-		return this.getDebugApi().rxDryRunTxs(body);
+		return this.externalApi.rxDryRunTxs(body);
 	}
 
+	/**
+	 * @TODO auslagern in INFO Service
+	 * @param microBlockHash
+	 * @return
+	 */
 	public Single<GenericTxs> getMicroBlockTransactions(final String microBlockHash) {
 		ValidationUtil.checkParameters(
 				validate -> Optional.ofNullable(microBlockHash.startsWith(ApiIdentifiers.MICRO_BLOCK_HASH)),
 				microBlockHash, "getMicroBlockTransactions", Arrays.asList("microBlockHash", ApiIdentifiers.NAME),
 				ValidationUtil.MISSING_API_IDENTIFIER);
-		return this.externalApi.rxGetMicroBlockTransactionsByHash(microBlockHash);
+//		return this.getExternalApi().rxGetMicroBlockTransactionsByHash(microBlockHash);
+		return null;
 	}
 
 	/**
@@ -198,62 +172,6 @@ public class TransactionServiceImpl implements TransactionService {
 			rlpWriter.writeByteArray(binaryTx);
 		});
 		return EncodingUtils.encodeCheck(encodedRlp.toArray(), ApiIdentifiers.TRANSACTION);
-	}
-
-	private TransactionApi getTransactionApi() {
-		if (transactionApi == null) {
-			transactionApi = new TransactionApi(new TransactionApiImpl(config.getApiClient()));
-		}
-		return transactionApi;
-	}
-
-	private ChannelApi getChannelApi() {
-		if (channelApi == null) {
-			channelApi = new ChannelApi(new ChannelApiImpl(config.getApiClient()));
-		}
-		return channelApi;
-	}
-
-	private ContractApi getContractApi() {
-		if (contractApi == null) {
-			contractApi = new ContractApi(new ContractApiImpl(config.getApiClient()));
-		}
-		return contractApi;
-	}
-
-	private DefaultApi getCompilerApi() {
-		if (compilerApi == null) {
-			compilerApi = new DefaultApi(new DefaultApiImpl(config.getCompilerApiClient()));
-		}
-		return compilerApi;
-	}
-
-	private NameServiceApi getNameServiceApi() {
-		if (nameServiceApi == null) {
-			nameServiceApi = new NameServiceApi(new NameServiceApiImpl(config.getApiClient()));
-		}
-		return nameServiceApi;
-	}
-
-	private OracleApi getOracleApi() {
-		if (oracleApi == null) {
-			oracleApi = new OracleApi(new OracleApiImpl(config.getApiClient()));
-		}
-		return oracleApi;
-	}
-
-	private DebugApi getDebugApi() {
-		if (debugApi == null) {
-			debugApi = new DebugApi(new DebugApiImpl(config.getApiClient()));
-		}
-		return debugApi;
-	}
-
-	private ExternalApi getExternalApi() {
-		if (externalApi == null) {
-			externalApi = new ExternalApi(new ExternalApiImpl(config.getApiClient()));
-		}
-		return externalApi;
 	}
 
 	@Override

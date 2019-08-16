@@ -21,7 +21,7 @@ import org.apache.tuweni.rlp.RLP;
 @Getter
 @SuperBuilder
 @ToString
-public class CreateContractTransaction extends AbstractTransaction<ContractCreateTx> {
+public class ContractCreateTransaction extends AbstractTransaction<ContractCreateTx> {
 
   @NonNull private BigInteger abiVersion;
   @NonNull private BigInteger amount;

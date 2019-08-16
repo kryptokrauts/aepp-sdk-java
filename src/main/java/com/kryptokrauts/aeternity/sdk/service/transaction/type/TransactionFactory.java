@@ -3,11 +3,7 @@ package com.kryptokrauts.aeternity.sdk.service.transaction.type;
 import java.math.BigInteger;
 import java.util.List;
 
-import com.kryptokrauts.aeternity.generated.api.rxjava.ChannelApi;
-import com.kryptokrauts.aeternity.generated.api.rxjava.ContractApi;
-import com.kryptokrauts.aeternity.generated.api.rxjava.NameServiceApi;
-import com.kryptokrauts.aeternity.generated.api.rxjava.OracleApi;
-import com.kryptokrauts.aeternity.generated.api.rxjava.TransactionApi;
+import com.kryptokrauts.aeternity.generated.api.rxjava.ExternalApi;
 import com.kryptokrauts.aeternity.generated.model.NamePointer;
 import com.kryptokrauts.aeternity.sdk.service.transaction.fee.FeeCalculationModel;
 import com.kryptokrauts.aeternity.sdk.service.transaction.fee.impl.BaseFeeCalculationModel;
@@ -16,13 +12,13 @@ import com.kryptokrauts.aeternity.sdk.service.transaction.fee.impl.ContractCreat
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.impl.ChannelCreateTransaction;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.impl.ChannelDepositTransaction;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.impl.ContractCallTransaction;
-import com.kryptokrauts.aeternity.sdk.service.transaction.type.impl.CreateContractTransaction;
+import com.kryptokrauts.aeternity.sdk.service.transaction.type.impl.ContractCreateTransaction;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.impl.NameClaimTransaction;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.impl.NamePreclaimTransaction;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.impl.NameRevokeTransaction;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.impl.NameUpdateTransaction;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.impl.SpendTransaction;
-import com.kryptokrauts.sophia.compiler.generated.api.rxjava.DefaultApi;
+import com.kryptokrauts.aeternity.sdk.service.transaction.type.model.SpendTransactionModel;
 
 import lombok.AllArgsConstructor;
 
@@ -34,17 +30,7 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 public class TransactionFactory {
 
-	private TransactionApi transactionApi;
-
-	private ChannelApi channelApi;
-
-	private ContractApi contractApi;
-
-	private NameServiceApi nameServiceApi;
-
-	private OracleApi oracleApi;
-
-	private DefaultApi compilerApi;
+	private ExternalApi externalApi;
 
 	private static FeeCalculationModel baseFeeCalculationModel = new BaseFeeCalculationModel();
 
@@ -55,18 +41,13 @@ public class TransactionFactory {
 	/**
 	 * create a spendTx
 	 *
-	 * @param sender    senders public key
-	 * @param recipient recipients public key
-	 * @param amount    ættos to send
-	 * @param payload   payload / message
-	 * @param ttl       time to live (maximum height of a block to include the tx)
-	 * @param nonce     senders nonce + 1
+	 * 
 	 * @return a {@link SpendTransaction} object
 	 */
-	public SpendTransaction createSpendTransaction() {
+	public SpendTransaction createSpendTransaction(SpendTransactionModel model) {
 
-		return SpendTransaction.builder().transactionApi(transactionApi).feeCalculationModel(baseFeeCalculationModel)
-				.build();
+		return SpendTransaction.builder().model(model).externalApi(externalApi)
+				.feeCalculationModel(baseFeeCalculationModel).build();
 //		return SpendTransaction.builder().sender(sender).recipient(recipient).amount(amount).payload(payload).ttl(ttl)
 //				.nonce(nonce).feeCalculationModel(baseFeeCalculationModel).transactionApi(transactionApi).build();
 	}
@@ -100,9 +81,9 @@ public class TransactionFactory {
 	 * @param ttl              time to live (time to live (maximum height of a block
 	 *                         to include the tx))
 	 * @param vmVersion        version of the AEVM
-	 * @return a {@link CreateContractTransaction} object
+	 * @return a {@link ContractCreateTransaction} object
 	 */
-	public CreateContractTransaction createContractCreateTransaction(BigInteger abiVersion, BigInteger amount,
+	public ContractCreateTransaction createContractCreateTransaction(BigInteger abiVersion, BigInteger amount,
 			String callData, String contractByteCode, BigInteger deposit, BigInteger gas, BigInteger gasPrice,
 			BigInteger nonce, String ownerId, BigInteger ttl, BigInteger vmVersion) {
 //		return CreateContractTransaction.builder().abiVersion(abiVersion).amount(amount).callData(callData)

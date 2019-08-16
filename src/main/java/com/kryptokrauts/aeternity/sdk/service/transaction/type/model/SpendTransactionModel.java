@@ -8,8 +8,19 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.experimental.SuperBuilder;
 
+/**
+ * this class describes the input values of a spend transaction
+ *
+ * @param sender    senders public key
+ * @param recipient recipients public key
+ * @param amount    ættos to send
+ * @param payload   payload / message
+ * @param ttl       time to live (maximum height of a block to include the tx)
+ * @param nonce     senders nonce + 1
+ * 
+ */
 @Getter
-@SuperBuilder(builderMethodName = "setParameters", buildMethodName = "wrap")
+@SuperBuilder(builderMethodName = "setParameters", buildMethodName = "wrap", toBuilder = true)
 public class SpendTransactionModel extends AbstractTransactionModel<SpendTx> {
 	@NonNull
 	private String sender;
@@ -39,7 +50,7 @@ public class SpendTransactionModel extends AbstractTransactionModel<SpendTx> {
 	}
 
 	@Override
-	protected void validateInput() {
+	public void validateInput() {
 		// nothing to validate here
 	}
 }

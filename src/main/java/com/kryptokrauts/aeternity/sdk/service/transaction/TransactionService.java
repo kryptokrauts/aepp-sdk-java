@@ -13,7 +13,6 @@ import com.kryptokrauts.aeternity.generated.model.Tx;
 import com.kryptokrauts.aeternity.generated.model.TxInfoObject;
 import com.kryptokrauts.aeternity.generated.model.UnsignedTx;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.AbstractTransaction;
-import com.kryptokrauts.aeternity.sdk.service.transaction.type.TransactionFactory;
 
 import io.reactivex.Single;
 
@@ -22,12 +21,6 @@ public interface TransactionService {
 	Single<PostTxResponse> postTransaction(Tx tx);
 
 	Single<GenericSignedTx> getTransactionByHash(String txHash);
-
-	/**
-	 * @param encodedSignedTx an encoded signed transaction
-	 * @return the hash from a signed and encoded transaction
-	 */
-	String computeTxHash(String encodedSignedTx);
 
 	/**
 	 * @param unsignedTx
@@ -44,9 +37,7 @@ public interface TransactionService {
 	 * @param tx transaction typed model, one of {link AbstractTransaction}
 	 * @return a single-wrapped unsignedTx object
 	 */
-	Single<UnsignedTx> createUnsignedTransaction(AbstractTransaction<?, ?> tx);
-
-	TransactionFactory getTransactionFactory();
+	Single<UnsignedTx> createUnsignedTransaction(AbstractTransaction<?> tx);
 
 	/**
 	 * gets the information object for a tx hash
@@ -68,4 +59,13 @@ public interface TransactionService {
 	 */
 	Single<DryRunResults> dryRunTransactions(List<Map<AccountParameter, Object>> accounts, BigInteger block,
 			List<UnsignedTx> unsignedTransactions);
+
+	Single<PostTxResponse> postTransaction(AbstractTransaction<?> tx) throws CryptoException;
+
+	/**
+	 * @param transaction object
+	 * @return the hash from a signed and encoded transaction
+	 */
+	String computeTxHash(AbstractTransaction<?> tx) throws CryptoException;
+
 }
