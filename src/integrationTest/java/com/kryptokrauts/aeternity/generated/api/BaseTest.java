@@ -31,7 +31,7 @@ import com.kryptokrauts.aeternity.sdk.service.aens.NameService;
 import com.kryptokrauts.aeternity.sdk.service.aens.NameServiceFactory;
 import com.kryptokrauts.aeternity.sdk.service.aeternity.AeternityServiceConfiguration;
 import com.kryptokrauts.aeternity.sdk.service.aeternity.AeternityServiceFactory;
-import com.kryptokrauts.aeternity.sdk.service.aeternity.impl.AeternityService;
+import com.kryptokrauts.aeternity.sdk.service.aeternity.impl.AeternityServiceImpl;
 import com.kryptokrauts.aeternity.sdk.service.chain.ChainService;
 import com.kryptokrauts.aeternity.sdk.service.chain.ChainServiceFactory;
 import com.kryptokrauts.aeternity.sdk.service.compiler.CompilerService;
@@ -80,9 +80,9 @@ public abstract class BaseTest {
 
 	protected OracleService oracleService;
 
-	protected AeternityService aeternityServiceNative;
+	protected AeternityServiceImpl aeternityServiceNative;
 
-	protected com.kryptokrauts.aeternity.sdk.service.aeternity.impl.AeternityService aeternityServiceDebug;
+	protected com.kryptokrauts.aeternity.sdk.service.aeternity.impl.AeternityServiceImpl aeternityServiceDebug;
 
 	BaseKeyPair baseKeyPair;
 
