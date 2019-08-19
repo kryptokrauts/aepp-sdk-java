@@ -5,9 +5,10 @@ import com.kryptokrauts.aeternity.generated.api.rxjava.ExternalApi;
 import com.kryptokrauts.aeternity.sdk.service.account.AccountService;
 import com.kryptokrauts.aeternity.sdk.service.account.impl.AccountServiceImpl;
 import com.kryptokrauts.aeternity.sdk.service.aeternity.AeternityServiceConfiguration;
+import com.kryptokrauts.aeternity.sdk.service.compiler.CompilerService;
+import com.kryptokrauts.aeternity.sdk.service.compiler.impl.SophiaCompilerServiceImpl;
 import com.kryptokrauts.aeternity.sdk.service.transaction.TransactionService;
 import com.kryptokrauts.aeternity.sdk.service.transaction.impl.TransactionServiceImpl;
-import com.kryptokrauts.aeternity.sdk.service.transaction.type.TransactionFactory;
 import com.kryptokrauts.sophia.compiler.generated.api.DefaultApiImpl;
 import com.kryptokrauts.sophia.compiler.generated.api.rxjava.DefaultApi;
 
@@ -22,26 +23,18 @@ public class AeternityService {
 
 	private DefaultApi compilerApi;
 
-	private TransactionFactory transactionFactory;
-
 	public TransactionService transactions;
 
 	public AccountService accounts;
+
+	public CompilerService compiler;
 
 	public AeternityService(AeternityServiceConfiguration config) {
 		this.config = config;
 		this.externalApi = new ExternalApi(new ExternalApiImpl(config.getApiClient()));
 		this.compilerApi = new DefaultApi(new DefaultApiImpl(config.getCompilerApiClient()));
-		transactionFactory = new TransactionFactory(this.externalApi);
-		transactions = new TransactionServiceImpl(this.config, this.externalApi);
-		accounts = new AccountServiceImpl(this.config, this.externalApi);
-	}
-
-//	public TransactionService transactions() {
-//		return transactionService;
-//	}
-
-	public TransactionFactory models() {
-		return this.transactionFactory;
+		this.transactions = new TransactionServiceImpl(this.config, this.externalApi, this.compilerApi);
+		this.accounts = new AccountServiceImpl(this.config, this.externalApi);
+		this.compiler = new SophiaCompilerServiceImpl(this.config);
 	}
 }

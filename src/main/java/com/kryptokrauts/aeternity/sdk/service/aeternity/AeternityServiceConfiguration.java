@@ -2,7 +2,6 @@ package com.kryptokrauts.aeternity.sdk.service.aeternity;
 
 import com.kryptokrauts.aeternity.sdk.constants.BaseConstants;
 import com.kryptokrauts.aeternity.sdk.constants.Network;
-import com.kryptokrauts.aeternity.sdk.domain.secret.impl.BaseKeyPair;
 import com.kryptokrauts.aeternity.sdk.service.ServiceConfiguration;
 
 import lombok.Builder.Default;
@@ -21,6 +20,4 @@ public class AeternityServiceConfiguration extends ServiceConfiguration {
 
 	@Default
 	private long minimalGasPrice = BaseConstants.MINIMAL_GAS_PRICE;
-
-	private BaseKeyPair baseKeyPair;
 }

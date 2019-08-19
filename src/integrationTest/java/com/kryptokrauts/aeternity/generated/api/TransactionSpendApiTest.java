@@ -1,6 +1,7 @@
 package com.kryptokrauts.aeternity.generated.api;
 
 import java.math.BigInteger;
+import java.util.Optional;
 
 import org.bouncycastle.crypto.CryptoException;
 import org.junit.FixMethodOrder;
@@ -69,7 +70,7 @@ public class TransactionSpendApiTest extends BaseTest {
 
 		// get the currents accounts nonce in case a transaction is already
 		// created and increase it by one
-		Single<AccountResult> acc = this.aeternityServiceNative.accounts.asyncGetAccount(keyPair.getPublicKey());
+		Single<AccountResult> acc = this.aeternityServiceNative.accounts.asyncGetAccount(Optional.empty());
 		acc.subscribe(account -> {
 			BaseKeyPair kp = keyPairService.generateBaseKeyPair();
 			String recipient = kp.getPublicKey();
@@ -103,7 +104,7 @@ public class TransactionSpendApiTest extends BaseTest {
 	public void postSpendSelfSignTxTestWithModel(TestContext context) throws CryptoException {
 		Async async = context.async();
 
-		AccountResult acc = this.aeternityServiceNative.accounts.blockingGetAccount(baseKeyPair.getPublicKey());
+		AccountResult acc = this.aeternityServiceNative.accounts.blockingGetAccount(Optional.empty());
 
 		BaseKeyPair recipient = keyPairService.generateBaseKeyPair();
 

@@ -1,5 +1,7 @@
 package com.kryptokrauts.aeternity.sdk.service.account.impl;
 
+import java.util.Optional;
+
 import javax.annotation.Nonnull;
 
 import com.kryptokrauts.aeternity.generated.api.rxjava.ExternalApi;
@@ -20,12 +22,14 @@ public final class AccountServiceImpl implements AccountService {
 	private ExternalApi externalApi;
 
 	@Override
-	public AccountResult blockingGetAccount(final String base58PublicKey) {
-		return AccountResult.builder().build().blockingGet(externalApi.rxGetAccountByPubkey(base58PublicKey));
+	public AccountResult blockingGetAccount(final Optional<String> base58PublicKey) {
+		return AccountResult.builder().build().blockingGet(
+				externalApi.rxGetAccountByPubkey(base58PublicKey.orElse(config.getBaseKeyPair().getPublicKey())));
 	}
 
 	@Override
-	public Single<AccountResult> asyncGetAccount(final String base58PublicKey) {
-		return AccountResult.builder().build().asyncGet(externalApi.rxGetAccountByPubkey(base58PublicKey));
+	public Single<AccountResult> asyncGetAccount(final Optional<String> base58PublicKey) {
+		return AccountResult.builder().build().asyncGet(
+				externalApi.rxGetAccountByPubkey(base58PublicKey.orElse(config.getBaseKeyPair().getPublicKey())));
 	}
 }

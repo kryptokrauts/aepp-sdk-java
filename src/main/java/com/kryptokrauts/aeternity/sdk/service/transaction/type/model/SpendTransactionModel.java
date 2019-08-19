@@ -5,6 +5,7 @@ import java.math.BigInteger;
 import com.kryptokrauts.aeternity.generated.api.rxjava.ExternalApi;
 import com.kryptokrauts.aeternity.generated.model.SpendTx;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.impl.SpendTransaction;
+import com.kryptokrauts.sophia.compiler.generated.api.rxjava.DefaultApi;
 
 import lombok.Getter;
 import lombok.NonNull;
@@ -57,7 +58,7 @@ public class SpendTransactionModel extends AbstractTransactionModel<SpendTx> {
 	}
 
 	@Override
-	public SpendTransaction buildTransaction(ExternalApi externalApi) {
+	public SpendTransaction buildTransaction(ExternalApi externalApi, DefaultApi compilerApi) {
 		return SpendTransaction.builder().externalApi(externalApi).model(this).build();
 	}
 }

@@ -36,6 +36,7 @@ import com.kryptokrauts.aeternity.sdk.util.ByteUtils;
 import com.kryptokrauts.aeternity.sdk.util.EncodingUtils;
 import com.kryptokrauts.aeternity.sdk.util.SigningUtil;
 import com.kryptokrauts.aeternity.sdk.util.ValidationUtil;
+import com.kryptokrauts.sophia.compiler.generated.api.rxjava.DefaultApi;
 
 import io.reactivex.Single;
 import lombok.NonNull;
@@ -52,9 +53,12 @@ public class TransactionServiceImpl implements TransactionService {
 	@Nonnull
 	private ExternalApi externalApi;
 
+	@Nonnull
+	private DefaultApi compilerApi;
+
 	@Override
 	public Single<UnsignedTx> createUnsignedTransaction(AbstractTransactionModel<?> tx) {
-		return tx.buildTransaction(externalApi).createUnsignedTransaction(config.isNativeMode(),
+		return tx.buildTransaction(externalApi, compilerApi).createUnsignedTransaction(config.isNativeMode(),
 				config.getMinimalGasPrice());
 	}
 

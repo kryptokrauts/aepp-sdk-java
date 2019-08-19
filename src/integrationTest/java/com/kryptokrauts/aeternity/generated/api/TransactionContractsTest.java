@@ -1,5 +1,13 @@
 package com.kryptokrauts.aeternity.generated.api;
 
+import java.math.BigInteger;
+
+import org.junit.Before;
+import org.junit.FixMethodOrder;
+import org.junit.Ignore;
+import org.junit.Test;
+import org.junit.runners.MethodSorters;
+
 import com.google.common.collect.ImmutableMap;
 import com.kryptokrauts.aeternity.generated.model.DryRunResult;
 import com.kryptokrauts.aeternity.generated.model.DryRunResults;
@@ -7,520 +15,366 @@ import com.kryptokrauts.aeternity.generated.model.PostTxResponse;
 import com.kryptokrauts.aeternity.generated.model.Tx;
 import com.kryptokrauts.aeternity.generated.model.TxInfoObject;
 import com.kryptokrauts.aeternity.generated.model.UnsignedTx;
-import com.kryptokrauts.aeternity.sdk.constants.BaseConstants;
-import com.kryptokrauts.aeternity.sdk.constants.Network;
 import com.kryptokrauts.aeternity.sdk.domain.secret.impl.BaseKeyPair;
 import com.kryptokrauts.aeternity.sdk.service.account.AccountService;
-import com.kryptokrauts.aeternity.sdk.service.account.AccountServiceFactory;
 import com.kryptokrauts.aeternity.sdk.service.account.domain.AccountResult;
 import com.kryptokrauts.aeternity.sdk.service.transaction.AccountParameter;
-import com.kryptokrauts.aeternity.sdk.service.transaction.TransactionService;
-import com.kryptokrauts.aeternity.sdk.service.transaction.TransactionServiceConfiguration;
-import com.kryptokrauts.aeternity.sdk.service.transaction.TransactionServiceFactory;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.AbstractTransaction;
+import com.kryptokrauts.aeternity.sdk.service.transaction.type.model.ContractCreateTransactionModel;
 import com.kryptokrauts.sophia.compiler.generated.model.Calldata;
+
 import io.reactivex.Single;
-import io.reactivex.observers.TestObserver;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
-import java.math.BigInteger;
-import java.util.Arrays;
-import org.junit.Before;
-import org.junit.FixMethodOrder;
-import org.junit.Ignore;
-import org.junit.Test;
-import org.junit.runners.MethodSorters;
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class TransactionContractsTest extends BaseTest {
 
-  BaseKeyPair baseKeyPair;
+	BaseKeyPair baseKeyPair;
 
-  static String localDeployedContractId;
+	static String localDeployedContractId;
 
-  @Before
-  public void initBeforeTest() {
-    baseKeyPair =
-        keyPairService.generateBaseKeyPairFromSecret(TestConstants.BENEFICIARY_PRIVATE_KEY);
-  }
+	@Before
+	public void initBeforeTest() {
+		baseKeyPair = keyPairService.generateBaseKeyPairFromSecret(TestConstants.BENEFICIARY_PRIVATE_KEY);
+	}
 
-  /**
-   * create an unsigned native CreateContract transaction
-   *
-   * @param context
-   */
-  @Test
-  public void buildCreateContractTransactionTest(TestContext context) {
-    Async async = context.async();
+	/**
+	 * create an unsigned native CreateContract transaction
+	 *
+	 * @param context
+	 */
+	@Test
+	public void buildCreateContractTransactionTest(TestContext context) {
+		Async async = context.async();
 
-    String ownerId = baseKeyPair.getPublicKey();
-    BigInteger abiVersion = BigInteger.ONE;
-    BigInteger vmVersion = BigInteger.valueOf(4);
-    BigInteger amount = BigInteger.valueOf(100);
-    BigInteger deposit = BigInteger.valueOf(100);
-    BigInteger ttl = BigInteger.valueOf(20000l);
-    BigInteger gas = BigInteger.valueOf(1000);
-    BigInteger gasPrice = BigInteger.valueOf(1100000000l);
+		String ownerId = baseKeyPair.getPublicKey();
+		BigInteger abiVersion = BigInteger.ONE;
+		BigInteger vmVersion = BigInteger.valueOf(4);
+		BigInteger amount = BigInteger.valueOf(100);
+		BigInteger deposit = BigInteger.valueOf(100);
+		BigInteger ttl = BigInteger.valueOf(20000l);
+		BigInteger gas = BigInteger.valueOf(1000);
+		BigInteger gasPrice = BigInteger.valueOf(1100000000l);
+		BigInteger nonce = BigInteger.ONE;
+		BigInteger fee = BigInteger.valueOf(1098660000000000l);
 
-    BigInteger nonce = BigInteger.ONE;
+		ContractCreateTransactionModel contractTx = ContractCreateTransactionModel.builder().abiVersion(abiVersion)
+				.amount(amount).callData(TestConstants.testContractCallData)
+				.contractByteCode(TestConstants.testContractByteCode).deposit(deposit).fee(fee).gas(gas)
+				.gasPrice(gasPrice).nonce(nonce).ownerId(ownerId).ttl(ttl).vmVersion(vmVersion).build();
 
-    AbstractTransaction<?> contractTx =
-        transactionServiceNative
-            .getTransactionFactory()
-            .createContractCreateTransaction(
-                abiVersion,
-                amount,
-                TestConstants.testContractCallData,
-                TestConstants.testContractByteCode,
-                deposit,
-                gas,
-                gasPrice,
-                nonce,
-                ownerId,
-                ttl,
-                vmVersion);
-    contractTx.setFee(BigInteger.valueOf(1098660000000000l));
+		UnsignedTx unsignedTxNative = aeternityServiceNative.transactions.createUnsignedTransaction(contractTx)
+				.blockingGet();
 
-    UnsignedTx unsignedTxNative =
-        transactionServiceNative.createUnsignedTransaction(contractTx).blockingGet();
+		Single<UnsignedTx> unsignedTxDebugSingle = aeternityServiceDebug.transactions
+				.createUnsignedTransaction(contractTx);
+		unsignedTxDebugSingle.subscribe(it -> {
+			context.assertEquals(it.getTx(), unsignedTxNative.getTx());
+			async.complete();
+		}, throwable -> context.fail(throwable));
+	}
 
-    Single<UnsignedTx> unsignedTxDebugSingle =
-        transactionServiceDebug.createUnsignedTransaction(contractTx);
-    unsignedTxDebugSingle.subscribe(
-        it -> {
-          context.assertEquals(it.getTx(), unsignedTxNative.getTx());
-          async.complete();
-        },
-        throwable -> context.fail(throwable));
-  }
+	@Test
+	public void buildCallContractTransactionTest(TestContext context) {
+		Async async = context.async();
+		rule.vertx().executeBlocking(future -> {
+			try {
+				AccountResult account = getAccount(baseKeyPair.getPublicKey());
+				String callerId = baseKeyPair.getPublicKey();
+				BigInteger abiVersion = BigInteger.ONE;
+				BigInteger ttl = BigInteger.valueOf(20000);
+				BigInteger gas = BigInteger.valueOf(1000);
+				BigInteger gasPrice = BigInteger.valueOf(1000000000);
+				BigInteger nonce = account.getNonce().add(BigInteger.ONE);
+				String callContractCalldata = TestConstants.encodedServiceCall;
 
-  @Test
-  public void buildCallContractTransactionTest(TestContext context) {
-    Async async = context.async();
-    rule.vertx()
-        .executeBlocking(
-            future -> {
-              try {
-                AccountResult account = getAccount(baseKeyPair.getPublicKey());
-                String callerId = baseKeyPair.getPublicKey();
-                BigInteger abiVersion = BigInteger.ONE;
-                BigInteger ttl = BigInteger.valueOf(20000);
-                BigInteger gas = BigInteger.valueOf(1000);
-                BigInteger gasPrice = BigInteger.valueOf(1000000000);
-                BigInteger nonce = account.getNonce().add(BigInteger.ONE);
-                String callContractCalldata = TestConstants.encodedServiceCall;
+				AbstractTransaction<?> contractTx = transactionServiceNative.getTransactionFactory()
+						.createContractCallTransaction(abiVersion, callContractCalldata, localDeployedContractId, gas,
+								gasPrice, nonce, callerId, ttl);
+				contractTx.setFee(BigInteger.valueOf(1454500000000000l));
 
-                AbstractTransaction<?> contractTx =
-                    transactionServiceNative
-                        .getTransactionFactory()
-                        .createContractCallTransaction(
-                            abiVersion,
-                            callContractCalldata,
-                            localDeployedContractId,
-                            gas,
-                            gasPrice,
-                            nonce,
-                            callerId,
-                            ttl);
-                contractTx.setFee(BigInteger.valueOf(1454500000000000l));
+				UnsignedTx unsignedTxNative = transactionServiceNative.createUnsignedTransaction(contractTx)
+						.blockingGet();
+				_logger.info("CreateContractTx hash (native unsigned): " + unsignedTxNative.getTx());
 
-                UnsignedTx unsignedTxNative =
-                    transactionServiceNative.createUnsignedTransaction(contractTx).blockingGet();
-                _logger.info(
-                    "CreateContractTx hash (native unsigned): " + unsignedTxNative.getTx());
+				UnsignedTx unsignedTxDebug = callMethodAndGetResult(
+						() -> transactionServiceDebug.createUnsignedTransaction(contractTx), UnsignedTx.class);
+				_logger.debug("CreateContractTx hash (debug unsigned): " + unsignedTxDebug.getTx());
 
-                UnsignedTx unsignedTxDebug =
-                    callMethodAndGetResult(
-                        () -> transactionServiceDebug.createUnsignedTransaction(contractTx),
-                        UnsignedTx.class);
-                _logger.debug("CreateContractTx hash (debug unsigned): " + unsignedTxDebug.getTx());
+				context.assertEquals(unsignedTxNative.getTx(), unsignedTxDebug.getTx());
+			} catch (Throwable e) {
+				context.fail(e);
+			}
+			future.complete();
+		}, success -> async.complete());
+	}
 
-                context.assertEquals(unsignedTxNative.getTx(), unsignedTxDebug.getTx());
-              } catch (Throwable e) {
-                context.fail(e);
-              }
-              future.complete();
-            },
-            success -> async.complete());
-  }
+	@Test
+	@Ignore
+	public void staticCallContractOnLocalNode(TestContext context) {
+		Async async = context.async();
+		rule.vertx().executeBlocking(future -> {
+			try {
+				AccountResult account = getAccount(baseKeyPair.getPublicKey());
+				BigInteger nonce = account.getNonce().add(BigInteger.ONE);
 
-  @Test
-  public void staticCallContractOnLocalNode(TestContext context) {
-    Async async = context.async();
-    rule.vertx()
-        .executeBlocking(
-            future -> {
-              try {
-                AccountResult account = getAccount(baseKeyPair.getPublicKey());
-                BigInteger nonce = account.getNonce().add(BigInteger.ONE);
+				// Compile the call contract
+				Calldata calldata = encodeCalldata(TestConstants.testContractSourceCode,
+						TestConstants.testContractFunction, TestConstants.testContractFunctionParams);
 
-                // Compile the call contract
-                Calldata calldata =
-                    encodeCalldata(
-                        TestConstants.testContractSourceCode,
-                        TestConstants.testContractFunction,
-                        TestConstants.testContractFunctionParams);
+				DryRunResults results = callMethodAndGetResult(() -> this.transactionServiceNative.dryRunTransactions(
+						Arrays.asList(ImmutableMap.of(AccountParameter.PUBLIC_KEY, baseKeyPair.getPublicKey()),
+								ImmutableMap.of(AccountParameter.PUBLIC_KEY, baseKeyPair.getPublicKey())),
+						null,
+						Arrays.asList(createUnsignedContractCallTx(context, nonce, calldata.getCalldata(), null),
+								createUnsignedContractCallTx(context, nonce.add(BigInteger.ONE), calldata.getCalldata(),
+										null))),
+						DryRunResults.class);
+				_logger.info(results.toString());
+				for (DryRunResult result : results.getResults()) {
+					context.assertEquals("ok", result.getResult());
+				}
 
-                DryRunResults results =
-                    callMethodAndGetResult(
-                        () ->
-                            this.transactionServiceNative.dryRunTransactions(
-                                Arrays.asList(
-                                    ImmutableMap.of(
-                                        AccountParameter.PUBLIC_KEY, baseKeyPair.getPublicKey()),
-                                    ImmutableMap.of(
-                                        AccountParameter.PUBLIC_KEY, baseKeyPair.getPublicKey())),
-                                null,
-                                Arrays.asList(
-                                    createUnsignedContractCallTx(
-                                        context, nonce, calldata.getCalldata(), null),
-                                    createUnsignedContractCallTx(
-                                        context,
-                                        nonce.add(BigInteger.ONE),
-                                        calldata.getCalldata(),
-                                        null))),
-                        DryRunResults.class);
-                _logger.info(results.toString());
-                for (DryRunResult result : results.getResults()) {
-                  context.assertEquals("ok", result.getResult());
-                }
+			} catch (Throwable e) {
+				context.fail(e);
+			}
+			future.complete();
+		}, success -> async.complete());
+	}
 
-              } catch (Throwable e) {
-                context.fail(e);
-              }
-              future.complete();
-            },
-            success -> async.complete());
-  }
+	@Test
+	@Ignore
+	public void staticCallContractFailOnLocalNode(TestContext context) {
+		Async async = context.async();
+		rule.vertx().executeBlocking(future -> {
+			try {
+				// Compile the call contract
+				Calldata calldata = encodeCalldata(TestConstants.testContractSourceCode,
+						TestConstants.testContractFunction, TestConstants.testContractFunctionParams);
 
-  @Test
-  public void staticCallContractFailOnLocalNode(TestContext context) {
-    Async async = context.async();
-    rule.vertx()
-        .executeBlocking(
-            future -> {
-              try {
-                // Compile the call contract
-                Calldata calldata =
-                    encodeCalldata(
-                        TestConstants.testContractSourceCode,
-                        TestConstants.testContractFunction,
-                        TestConstants.testContractFunctionParams);
+				DryRunResults results = callMethodAndGetResult(() -> this.transactionServiceNative.dryRunTransactions(
+						Arrays.asList(ImmutableMap.of(AccountParameter.PUBLIC_KEY, baseKeyPair.getPublicKey())), null,
+						Arrays.asList(
+								createUnsignedContractCallTx(context, BigInteger.ONE, calldata.getCalldata(), null))),
+						DryRunResults.class);
+				_logger.info(results.toString());
+				for (DryRunResult result : results.getResults()) {
+					context.assertEquals("error", result.getResult());
+				}
 
-                DryRunResults results =
-                    callMethodAndGetResult(
-                        () ->
-                            this.transactionServiceNative.dryRunTransactions(
-                                Arrays.asList(
-                                    ImmutableMap.of(
-                                        AccountParameter.PUBLIC_KEY, baseKeyPair.getPublicKey())),
-                                null,
-                                Arrays.asList(
-                                    createUnsignedContractCallTx(
-                                        context, BigInteger.ONE, calldata.getCalldata(), null))),
-                        DryRunResults.class);
-                _logger.info(results.toString());
-                for (DryRunResult result : results.getResults()) {
-                  context.assertEquals("error", result.getResult());
-                }
+			} catch (Throwable e) {
+				context.fail(e);
+			}
+			future.complete();
+		}, success -> async.complete());
+	}
 
-              } catch (Throwable e) {
-                context.fail(e);
-              }
-              future.complete();
-            },
-            success -> async.complete());
-  }
+	/**
+	 * min gas is not sufficient, validate this!
+	 *
+	 * @param context
+	 */
+	@Test
+	@Ignore
+	public void callContractAfterDryRunOnLocalNode(TestContext context) {
+		Async async = context.async();
+		rule.vertx().executeBlocking(future -> {
+			try {
+				AccountResult account = getAccount(baseKeyPair.getPublicKey());
+				BigInteger nonce = account.getNonce().add(BigInteger.ONE);
 
-  /**
-   * min gas is not sufficient, validate this!
-   *
-   * @param context
-   */
-  @Test
-  public void callContractAfterDryRunOnLocalNode(TestContext context) {
-    Async async = context.async();
-    rule.vertx()
-        .executeBlocking(
-            future -> {
-              try {
-                AccountResult account = getAccount(baseKeyPair.getPublicKey());
-                BigInteger nonce = account.getNonce().add(BigInteger.ONE);
+				// Compile the call contract
+				Calldata calldata = encodeCalldata(TestConstants.testContractSourceCode,
+						TestConstants.testContractFunction, TestConstants.testContractFunctionParams);
 
-                // Compile the call contract
-                Calldata calldata =
-                    encodeCalldata(
-                        TestConstants.testContractSourceCode,
-                        TestConstants.testContractFunction,
-                        TestConstants.testContractFunctionParams);
+				DryRunResults results = performDryRunTransactions(
+						Arrays.asList(ImmutableMap.of(AccountParameter.PUBLIC_KEY, baseKeyPair.getPublicKey())), null,
+						Arrays.asList(createUnsignedContractCallTx(context, nonce, calldata.getCalldata(), null)));
+				_logger.info("callContractAfterDryRunOnLocalNode: " + results.toString());
+				for (DryRunResult result : results.getResults()) {
+					context.assertEquals("ok", result.getResult());
 
-                DryRunResults results =
-                    performDryRunTransactions(
-                        Arrays.asList(
-                            ImmutableMap.of(
-                                AccountParameter.PUBLIC_KEY, baseKeyPair.getPublicKey())),
-                        null,
-                        Arrays.asList(
-                            createUnsignedContractCallTx(
-                                context, nonce, calldata.getCalldata(), null)));
-                _logger.info("callContractAfterDryRunOnLocalNode: " + results.toString());
-                for (DryRunResult result : results.getResults()) {
-                  context.assertEquals("ok", result.getResult());
+					AbstractTransaction<?> contractAfterDryRunTx = transactionServiceNative.getTransactionFactory()
+							.createContractCallTransaction(BigInteger.ONE, calldata.getCalldata(),
+									localDeployedContractId, result.getCallObj().getGasUsed(),
+									result.getCallObj().getGasPrice(), nonce, baseKeyPair.getPublicKey(),
+									BigInteger.ZERO);
 
-                  AbstractTransaction<?> contractAfterDryRunTx =
-                      transactionServiceNative
-                          .getTransactionFactory()
-                          .createContractCallTransaction(
-                              BigInteger.ONE,
-                              calldata.getCalldata(),
-                              localDeployedContractId,
-                              result.getCallObj().getGasUsed(),
-                              result.getCallObj().getGasPrice(),
-                              nonce,
-                              baseKeyPair.getPublicKey(),
-                              BigInteger.ZERO);
+					UnsignedTx unsignedTxNative = transactionServiceNative
+							.createUnsignedTransaction(contractAfterDryRunTx).blockingGet();
 
-                  UnsignedTx unsignedTxNative =
-                      transactionServiceNative
-                          .createUnsignedTransaction(contractAfterDryRunTx)
-                          .blockingGet();
+					Tx signedTxNative = transactionServiceNative.signTransaction(unsignedTxNative,
+							baseKeyPair.getPrivateKey());
 
-                  Tx signedTxNative =
-                      transactionServiceNative.signTransaction(
-                          unsignedTxNative, baseKeyPair.getPrivateKey());
+					// post the signed contract call tx
+					PostTxResponse postTxResponse = postTx(signedTxNative);
+					context.assertEquals(postTxResponse.getTxHash(),
+							transactionServiceNative.computeTxHash(signedTxNative.getTx()));
+					_logger.info("CreateContractTx hash: " + postTxResponse.getTxHash());
 
-                  // post the signed contract call tx
-                  PostTxResponse postTxResponse = postTx(signedTxNative);
-                  context.assertEquals(
-                      postTxResponse.getTxHash(),
-                      transactionServiceNative.computeTxHash(signedTxNative.getTx()));
-                  _logger.info("CreateContractTx hash: " + postTxResponse.getTxHash());
+					// get the tx info object to resolve the result
+					TxInfoObject txInfoObject = waitForTxInfoObject(postTxResponse.getTxHash());
 
-                  // get the tx info object to resolve the result
-                  TxInfoObject txInfoObject = waitForTxInfoObject(postTxResponse.getTxHash());
+					// decode the result to json
+					JsonObject json = decodeCalldata(txInfoObject.getCallInfo().getReturnValue(),
+							TestConstants.testContractFunctionSophiaType);
+					context.assertEquals(TestConstants.testContractFuntionParam, json.getValue("value").toString());
+				}
 
-                  // decode the result to json
-                  JsonObject json =
-                      decodeCalldata(
-                          txInfoObject.getCallInfo().getReturnValue(),
-                          TestConstants.testContractFunctionSophiaType);
-                  context.assertEquals(
-                      TestConstants.testContractFuntionParam, json.getValue("value").toString());
-                }
+			} catch (Throwable e) {
+				context.fail(e);
+			}
+			future.complete();
+		}, success -> async.complete());
+	}
 
-              } catch (Throwable e) {
-                context.fail(e);
-              }
-              future.complete();
-            },
-            success -> async.complete());
-  }
+	private UnsignedTx createUnsignedContractCallTx(TestContext context, BigInteger nonce, String calldata,
+			BigInteger gasPrice) {
+//		String callerId = baseKeyPair.getPublicKey();
+//		BigInteger abiVersion = BigInteger.ONE;
+//		BigInteger ttl = BigInteger.ZERO;
+//		BigInteger gas = BigInteger.valueOf(1579000);
+//
+//		AbstractTransaction<?> contractTx = transactionServiceNative.getTransactionFactory()
+//				.createContractCallTransaction(abiVersion, calldata, localDeployedContractId, gas,
+//						gasPrice != null ? gasPrice : BigInteger.valueOf(BaseConstants.MINIMAL_GAS_PRICE), nonce,
+//						callerId, ttl);
+//
+//		UnsignedTx unsignedTxNative = transactionServiceNative.createUnsignedTransaction(contractTx).blockingGet();
+//		return unsignedTxNative;
+		return null;
+	}
 
-  private UnsignedTx createUnsignedContractCallTx(
-      TestContext context, BigInteger nonce, String calldata, BigInteger gasPrice) {
-    String callerId = baseKeyPair.getPublicKey();
-    BigInteger abiVersion = BigInteger.ONE;
-    BigInteger ttl = BigInteger.ZERO;
-    BigInteger gas = BigInteger.valueOf(1579000);
+	@Test
+	@Ignore
+	public void aDeployContractNativeOnLocalNode(TestContext context) {
+		Async async = context.async();
+		rule.vertx().executeBlocking(future -> {
+			try {
+				AccountResult account = getAccount(baseKeyPair.getPublicKey());
+				String ownerId = baseKeyPair.getPublicKey();
+				BigInteger abiVersion = BigInteger.ONE;
+				BigInteger vmVersion = BigInteger.valueOf(4);
+				BigInteger amount = BigInteger.ZERO;
+				BigInteger deposit = BigInteger.ZERO;
+				BigInteger ttl = BigInteger.ZERO;
+				BigInteger gas = BigInteger.valueOf(1000000);
+				BigInteger gasPrice = BigInteger.valueOf(2000000000);
+				BigInteger nonce = account.getNonce().add(BigInteger.ONE);
 
-    AbstractTransaction<?> contractTx =
-        transactionServiceNative
-            .getTransactionFactory()
-            .createContractCallTransaction(
-                abiVersion,
-                calldata,
-                localDeployedContractId,
-                gas,
-                gasPrice != null ? gasPrice : BigInteger.valueOf(BaseConstants.MINIMAL_GAS_PRICE),
-                nonce,
-                callerId,
-                ttl);
+				AbstractTransaction<?> contractTx = transactionServiceNative.getTransactionFactory()
+						.createContractCreateTransaction(abiVersion, amount, TestConstants.testContractCallData,
+								TestConstants.testContractByteCode, deposit, gas, gasPrice, nonce, ownerId, ttl,
+								vmVersion);
 
-    UnsignedTx unsignedTxNative =
-        transactionServiceNative.createUnsignedTransaction(contractTx).blockingGet();
-    return unsignedTxNative;
-  }
+				UnsignedTx unsignedTxNative = transactionServiceNative.createUnsignedTransaction(contractTx)
+						.blockingGet();
 
-  @Test
-  public void aDeployContractNativeOnLocalNode(TestContext context) {
-    Async async = context.async();
-    rule.vertx()
-        .executeBlocking(
-            future -> {
-              try {
-                AccountResult account = getAccount(baseKeyPair.getPublicKey());
-                String ownerId = baseKeyPair.getPublicKey();
-                BigInteger abiVersion = BigInteger.ONE;
-                BigInteger vmVersion = BigInteger.valueOf(4);
-                BigInteger amount = BigInteger.ZERO;
-                BigInteger deposit = BigInteger.ZERO;
-                BigInteger ttl = BigInteger.ZERO;
-                BigInteger gas = BigInteger.valueOf(1000000);
-                BigInteger gasPrice = BigInteger.valueOf(2000000000);
-                BigInteger nonce = account.getNonce().add(BigInteger.ONE);
+				Tx signedTxNative = transactionServiceNative.signTransaction(unsignedTxNative,
+						baseKeyPair.getPrivateKey());
+				_logger.info("CreateContractTx hash (native signed): " + signedTxNative);
 
-                AbstractTransaction<?> contractTx =
-                    transactionServiceNative
-                        .getTransactionFactory()
-                        .createContractCreateTransaction(
-                            abiVersion,
-                            amount,
-                            TestConstants.testContractCallData,
-                            TestConstants.testContractByteCode,
-                            deposit,
-                            gas,
-                            gasPrice,
-                            nonce,
-                            ownerId,
-                            ttl,
-                            vmVersion);
+				PostTxResponse postTxResponse = postTx(signedTxNative);
+				TxInfoObject txInfoObject = waitForTxInfoObject(postTxResponse.getTxHash());
+				localDeployedContractId = txInfoObject.getCallInfo().getContractId();
+				_logger.info("Deployed contract - hash " + postTxResponse.getTxHash() + " - " + txInfoObject);
 
-                UnsignedTx unsignedTxNative =
-                    transactionServiceNative.createUnsignedTransaction(contractTx).blockingGet();
+			} catch (Throwable e) {
+				context.fail(e);
+			}
+			future.complete();
+		}, success -> async.complete());
+	}
 
-                Tx signedTxNative =
-                    transactionServiceNative.signTransaction(
-                        unsignedTxNative, baseKeyPair.getPrivateKey());
-                _logger.info("CreateContractTx hash (native signed): " + signedTxNative);
+	@Test
+	@Ignore
+	public void callContractOnLocalNodeTest(TestContext context) {
+		Async async = context.async();
+		rule.vertx().executeBlocking(future -> {
+			try {
+				AccountResult account = getAccount(baseKeyPair.getPublicKey());
+				BigInteger nonce = account.getNonce().add(BigInteger.ONE);
 
-                PostTxResponse postTxResponse = postTx(signedTxNative);
-                TxInfoObject txInfoObject = waitForTxInfoObject(postTxResponse.getTxHash());
-                localDeployedContractId = txInfoObject.getCallInfo().getContractId();
-                _logger.info(
-                    "Deployed contract - hash "
-                        + postTxResponse.getTxHash()
-                        + " - "
-                        + txInfoObject);
+				Single<Calldata> callDataSingle = this.sophiaCompilerService.encodeCalldata(
+						TestConstants.testContractSourceCode, TestConstants.testContractFunction,
+						TestConstants.testContractFunctionParams);
+				TestObserver<Calldata> calldataTestObserver = callDataSingle.test();
+				calldataTestObserver.awaitTerminalEvent();
+				Calldata callData = calldataTestObserver.values().get(0);
 
-              } catch (Throwable e) {
-                context.fail(e);
-              }
-              future.complete();
-            },
-            success -> async.complete());
-  }
+				UnsignedTx unsignedTxNative = this.createUnsignedContractCallTx(context, nonce, callData.getCalldata(),
+						null);
+				Tx signedTxNative = transactionServiceNative.signTransaction(unsignedTxNative,
+						baseKeyPair.getPrivateKey());
 
-  @Test
-  public void callContractOnLocalNodeTest(TestContext context) {
-    Async async = context.async();
-    rule.vertx()
-        .executeBlocking(
-            future -> {
-              try {
-                AccountResult account = getAccount(baseKeyPair.getPublicKey());
-                BigInteger nonce = account.getNonce().add(BigInteger.ONE);
+				// post the signed contract call tx
+				PostTxResponse postTxResponse = postTx(signedTxNative);
+				context.assertEquals(postTxResponse.getTxHash(),
+						transactionServiceNative.computeTxHash(signedTxNative.getTx()));
+				_logger.info("CreateContractTx hash: " + postTxResponse.getTxHash());
 
-                Single<Calldata> callDataSingle =
-                    this.sophiaCompilerService.encodeCalldata(
-                        TestConstants.testContractSourceCode,
-                        TestConstants.testContractFunction,
-                        TestConstants.testContractFunctionParams);
-                TestObserver<Calldata> calldataTestObserver = callDataSingle.test();
-                calldataTestObserver.awaitTerminalEvent();
-                Calldata callData = calldataTestObserver.values().get(0);
+				// get the tx info object to resolve the result
+				TxInfoObject txInfoObject = waitForTxInfoObject(postTxResponse.getTxHash());
 
-                UnsignedTx unsignedTxNative =
-                    this.createUnsignedContractCallTx(context, nonce, callData.getCalldata(), null);
-                Tx signedTxNative =
-                    transactionServiceNative.signTransaction(
-                        unsignedTxNative, baseKeyPair.getPrivateKey());
+				// decode the result to json
+				JsonObject json = decodeCalldata(txInfoObject.getCallInfo().getReturnValue(),
+						TestConstants.testContractFunctionSophiaType);
+				context.assertEquals(TestConstants.testContractFuntionParam, json.getValue("value").toString());
+			} catch (Throwable e) {
+				context.fail(e);
+			}
+			future.complete();
+		}, success -> async.complete());
+	}
 
-                // post the signed contract call tx
-                PostTxResponse postTxResponse = postTx(signedTxNative);
-                context.assertEquals(
-                    postTxResponse.getTxHash(),
-                    transactionServiceNative.computeTxHash(signedTxNative.getTx()));
-                _logger.info("CreateContractTx hash: " + postTxResponse.getTxHash());
+	@Test
+	@Ignore // specific testcase we don't want to run each time
+	public void deployContractNativeOnTestNetworkTest(TestContext context) {
+		Async async = context.async();
 
-                // get the tx info object to resolve the result
-                TxInfoObject txInfoObject = waitForTxInfoObject(postTxResponse.getTxHash());
+		baseKeyPair = keyPairService.generateBaseKeyPairFromSecret(TestConstants.testnetAccountPrivateKey);
 
-                // decode the result to json
-                JsonObject json =
-                    decodeCalldata(
-                        txInfoObject.getCallInfo().getReturnValue(),
-                        TestConstants.testContractFunctionSophiaType);
-                context.assertEquals(
-                    TestConstants.testContractFuntionParam, json.getValue("value").toString());
-              } catch (Throwable e) {
-                context.fail(e);
-              }
-              future.complete();
-            },
-            success -> async.complete());
-  }
+		AccountService testnetAccountService = new AccountServiceFactory().getService();
+		TransactionService testnetTransactionService = new TransactionServiceFactory()
+				.getService(TransactionServiceConfiguration.configure().baseUrl(TestConstants.testnetURL)
+						.network(Network.TESTNET).vertx(rule.vertx()).compile());
 
-  @Test
-  @Ignore // specific testcase we don't want to run each time
-  public void deployContractNativeOnTestNetworkTest(TestContext context) {
-    Async async = context.async();
+		rule.vertx().executeBlocking(future -> {
+			try {
+				AccountResult account = getAccount(baseKeyPair.getPublicKey());
+				String ownerId = baseKeyPair.getPublicKey();
+				BigInteger abiVersion = BigInteger.ONE;
+				BigInteger vmVersion = BigInteger.valueOf(4);
+				BigInteger amount = BigInteger.ZERO;
+				BigInteger deposit = BigInteger.ZERO;
+				BigInteger ttl = BigInteger.ZERO;
+				BigInteger gas = BigInteger.valueOf(1000);
+				BigInteger gasPrice = BigInteger.valueOf(1100000000);
+				BigInteger nonce = account.getNonce().add(BigInteger.ONE);
 
-    baseKeyPair =
-        keyPairService.generateBaseKeyPairFromSecret(TestConstants.testnetAccountPrivateKey);
+				AbstractTransaction<?> contractTx = testnetTransactionService.getTransactionFactory()
+						.createContractCreateTransaction(abiVersion, amount, TestConstants.testContractCallData,
+								TestConstants.testContractByteCode, deposit, gas, gasPrice, nonce, ownerId, ttl,
+								vmVersion);
 
-    AccountService testnetAccountService = new AccountServiceFactory().getService();
-    TransactionService testnetTransactionService =
-        new TransactionServiceFactory()
-            .getService(
-                TransactionServiceConfiguration.configure()
-                    .baseUrl(TestConstants.testnetURL)
-                    .network(Network.TESTNET)
-                    .vertx(rule.vertx())
-                    .compile());
+				UnsignedTx unsignedTxNative = testnetTransactionService.createUnsignedTransaction(contractTx)
+						.blockingGet();
 
-    rule.vertx()
-        .executeBlocking(
-            future -> {
-              try {
-                AccountResult account = getAccount(baseKeyPair.getPublicKey());
-                String ownerId = baseKeyPair.getPublicKey();
-                BigInteger abiVersion = BigInteger.ONE;
-                BigInteger vmVersion = BigInteger.valueOf(4);
-                BigInteger amount = BigInteger.ZERO;
-                BigInteger deposit = BigInteger.ZERO;
-                BigInteger ttl = BigInteger.ZERO;
-                BigInteger gas = BigInteger.valueOf(1000);
-                BigInteger gasPrice = BigInteger.valueOf(1100000000);
-                BigInteger nonce = account.getNonce().add(BigInteger.ONE);
+				Tx signedTxNative = testnetTransactionService.signTransaction(unsignedTxNative,
+						baseKeyPair.getPrivateKey());
 
-                AbstractTransaction<?> contractTx =
-                    testnetTransactionService
-                        .getTransactionFactory()
-                        .createContractCreateTransaction(
-                            abiVersion,
-                            amount,
-                            TestConstants.testContractCallData,
-                            TestConstants.testContractByteCode,
-                            deposit,
-                            gas,
-                            gasPrice,
-                            nonce,
-                            ownerId,
-                            ttl,
-                            vmVersion);
-
-                UnsignedTx unsignedTxNative =
-                    testnetTransactionService.createUnsignedTransaction(contractTx).blockingGet();
-
-                Tx signedTxNative =
-                    testnetTransactionService.signTransaction(
-                        unsignedTxNative, baseKeyPair.getPrivateKey());
-
-                Single<PostTxResponse> postTxResponseSingle =
-                    testnetTransactionService.postTransaction(signedTxNative);
-                TestObserver<PostTxResponse> postTxResponseTestObserver =
-                    postTxResponseSingle.test();
-                postTxResponseTestObserver.awaitTerminalEvent();
-                PostTxResponse postTxResponse = postTxResponseTestObserver.values().get(0);
-                context.assertEquals(
-                    postTxResponse.getTxHash(),
-                    testnetTransactionService.computeTxHash(signedTxNative.getTx()));
-              } catch (Exception e) {
-                context.fail(e);
-              }
-              future.complete();
-            },
-            success -> async.complete());
-  }
+				Single<PostTxResponse> postTxResponseSingle = testnetTransactionService.postTransaction(signedTxNative);
+				TestObserver<PostTxResponse> postTxResponseTestObserver = postTxResponseSingle.test();
+				postTxResponseTestObserver.awaitTerminalEvent();
+				PostTxResponse postTxResponse = postTxResponseTestObserver.values().get(0);
+				context.assertEquals(postTxResponse.getTxHash(),
+						testnetTransactionService.computeTxHash(signedTxNative.getTx()));
+			} catch (Exception e) {
+				context.fail(e);
+			}
+			future.complete();
+		}, success -> async.complete());
+	}
 }

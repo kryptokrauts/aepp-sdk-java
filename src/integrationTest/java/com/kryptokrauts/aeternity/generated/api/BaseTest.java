@@ -3,6 +3,7 @@ package com.kryptokrauts.aeternity.generated.api;
 import java.math.BigInteger;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Supplier;
 
 import javax.naming.ConfigurationException;
@@ -33,8 +34,6 @@ import com.kryptokrauts.aeternity.sdk.service.aeternity.AeternityServiceFactory;
 import com.kryptokrauts.aeternity.sdk.service.aeternity.impl.AeternityService;
 import com.kryptokrauts.aeternity.sdk.service.chain.ChainService;
 import com.kryptokrauts.aeternity.sdk.service.chain.ChainServiceFactory;
-import com.kryptokrauts.aeternity.sdk.service.compiler.CompilerService;
-import com.kryptokrauts.aeternity.sdk.service.compiler.CompilerServiceFactory;
 import com.kryptokrauts.aeternity.sdk.service.keypair.KeyPairService;
 import com.kryptokrauts.aeternity.sdk.service.keypair.KeyPairServiceFactory;
 import com.kryptokrauts.aeternity.sdk.service.oracle.OracleService;
@@ -71,7 +70,7 @@ public abstract class BaseTest {
 
 	protected AccountService accountService;
 
-	protected CompilerService sophiaCompilerService;
+//	protected CompilerService sophiaCompilerService;
 
 	protected NameService nameService;
 
@@ -90,7 +89,7 @@ public abstract class BaseTest {
 	public void setupApiClient(TestContext context) throws ConfigurationException {
 		Vertx vertx = rule.vertx();
 		keyPairService = new KeyPairServiceFactory().getService();
-		accountService = null;// new AccountServiceFactory()
+//		accountService = null;// new AccountServiceFactory()
 //				.getService(ServiceConfiguration.configure().baseUrl(getAeternityBaseUrl()).vertx(vertx).compile());
 		chainService = new ChainServiceFactory()
 				.getService(ServiceConfiguration.configure().baseUrl(getAeternityBaseUrl()).vertx(vertx).compile());
@@ -100,8 +99,8 @@ public abstract class BaseTest {
 										// TransactionServiceFactory().getService(TransactionServiceConfiguration.configure()
 //				.nativeMode(false).baseUrl(getAeternityBaseUrl()).network(Network.DEVNET).vertx(vertx).compile());
 
-		sophiaCompilerService = new CompilerServiceFactory().getService(
-				ServiceConfiguration.configure().contractBaseUrl(getCompilerBaseUrl()).vertx(vertx).compile());
+//		sophiaCompilerService = new CompilerServiceFactory().getService(
+//				ServiceConfiguration.configure().contractBaseUrl(getCompilerBaseUrl()).vertx(vertx).compile());
 
 		nameService = new NameServiceFactory()
 				.getService(ServiceConfiguration.configure().baseUrl(getAeternityBaseUrl()).vertx(vertx).compile());
@@ -129,7 +128,7 @@ public abstract class BaseTest {
 		chainService = null;
 		transactionServiceDebug = null;
 		transactionServiceNative = null;
-		sophiaCompilerService = null;
+//		sophiaCompilerService = null;
 		oracleService = null;
 		nameService = null;
 	}
@@ -160,7 +159,7 @@ public abstract class BaseTest {
 	}
 
 	protected AccountResult getAccount(String publicKey) {
-		Single<AccountResult> accountSingle = accountService.asyncGetAccount(publicKey);
+		Single<AccountResult> accountSingle = aeternityServiceNative.accounts.asyncGetAccount(Optional.of(publicKey));
 		TestObserver<AccountResult> accountTestObserver = accountSingle.test();
 		accountTestObserver.awaitTerminalEvent();
 		AccountResult account = accountTestObserver.values().get(0);
@@ -212,14 +211,15 @@ public abstract class BaseTest {
 
 	protected Calldata encodeCalldata(String contractSourceCode, String contractFunction,
 			List<String> contractFunctionParams) throws Throwable {
-		return callMethodAndGetResult(() -> this.sophiaCompilerService.encodeCalldata(contractSourceCode,
+		return callMethodAndGetResult(() -> this.aeternityServiceNative.compiler.encodeCalldata(contractSourceCode,
 				contractFunction, contractFunctionParams), Calldata.class);
 	}
 
 	protected JsonObject decodeCalldata(String encodedValue, String sophiaReturnType) throws Throwable {
 		// decode the result to json
 		SophiaJsonData sophiaJsonData = callMethodAndGetResult(
-				() -> this.sophiaCompilerService.decodeCalldata(encodedValue, sophiaReturnType), SophiaJsonData.class);
+				() -> this.aeternityServiceNative.compiler.decodeCalldata(encodedValue, sophiaReturnType),
+				SophiaJsonData.class);
 		return JsonObject.mapFrom(sophiaJsonData.getData());
 	}
 
@@ -231,13 +231,17 @@ public abstract class BaseTest {
 				DryRunResults.class);
 	}
 
+	/**
+	 * @TODO FIX
+	 * 
+	 */
 	protected UnsignedTx createUnsignedContractCallTx(String callerId, BigInteger nonce, String calldata,
 			BigInteger gasPrice, String contractId, BigInteger amount) throws Throwable {
 		BigInteger abiVersion = BigInteger.ONE;
 		BigInteger ttl = BigInteger.ZERO;
 		BigInteger gas = BigInteger.valueOf(1579000);
 
-//		AbstractTransaction<?> contractTx = aeternityServiceDebug.models().createContractCallTransaction(abiVersion,
+//		AbstractTransaction<?> contractTx = aeternityServiceNative.compiler.createContractCallTransaction(abiVersion,
 //				calldata, contractId, gas,
 //				gasPrice != null ? gasPrice : BigInteger.valueOf(BaseConstants.MINIMAL_GAS_PRICE), nonce, callerId,
 //				ttl);

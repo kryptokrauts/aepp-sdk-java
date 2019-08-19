@@ -4,6 +4,7 @@ import java.math.BigInteger;
 
 import com.kryptokrauts.aeternity.generated.api.rxjava.ExternalApi;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.AbstractTransaction;
+import com.kryptokrauts.sophia.compiler.generated.api.rxjava.DefaultApi;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -32,5 +33,5 @@ public abstract class AbstractTransactionModel<GeneratedTxModel> {
 	 */
 	public abstract void validateInput();
 
-	public abstract AbstractTransaction<?> buildTransaction(ExternalApi externalApi);
+	public abstract AbstractTransaction<?> buildTransaction(ExternalApi externalApi, DefaultApi compilerApi);
 }
