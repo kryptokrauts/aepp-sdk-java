@@ -21,7 +21,6 @@ import com.kryptokrauts.aeternity.generated.model.PostTxResponse;
 import com.kryptokrauts.aeternity.generated.model.Tx;
 import com.kryptokrauts.aeternity.generated.model.TxInfoObject;
 import com.kryptokrauts.aeternity.generated.model.UnsignedTx;
-import com.kryptokrauts.aeternity.sdk.constants.BaseConstants;
 import com.kryptokrauts.aeternity.sdk.constants.Network;
 import com.kryptokrauts.aeternity.sdk.domain.secret.impl.BaseKeyPair;
 import com.kryptokrauts.aeternity.sdk.service.ServiceConfiguration;
@@ -42,8 +41,6 @@ import com.kryptokrauts.aeternity.sdk.service.oracle.OracleService;
 import com.kryptokrauts.aeternity.sdk.service.oracle.OracleServiceFactory;
 import com.kryptokrauts.aeternity.sdk.service.transaction.AccountParameter;
 import com.kryptokrauts.aeternity.sdk.service.transaction.TransactionService;
-import com.kryptokrauts.aeternity.sdk.service.transaction.type.AbstractTransaction;
-import com.kryptokrauts.aeternity.sdk.service.transaction.type.impl.ContractCallTransaction;
 import com.kryptokrauts.sophia.compiler.generated.model.Calldata;
 import com.kryptokrauts.sophia.compiler.generated.model.SophiaJsonData;
 
@@ -240,16 +237,17 @@ public abstract class BaseTest {
 		BigInteger ttl = BigInteger.ZERO;
 		BigInteger gas = BigInteger.valueOf(1579000);
 
-		AbstractTransaction<?> contractTx = aeternityServiceDebug.models().createContractCallTransaction(abiVersion,
-				calldata, contractId, gas,
-				gasPrice != null ? gasPrice : BigInteger.valueOf(BaseConstants.MINIMAL_GAS_PRICE), nonce, callerId,
-				ttl);
-		if (amount != null) {
-			((ContractCallTransaction) contractTx).setAmount(amount);
-		}
-
-		return callMethodAndGetResult(() -> transactionServiceNative.createUnsignedTransaction(contractTx),
-				UnsignedTx.class);
+//		AbstractTransaction<?> contractTx = aeternityServiceDebug.models().createContractCallTransaction(abiVersion,
+//				calldata, contractId, gas,
+//				gasPrice != null ? gasPrice : BigInteger.valueOf(BaseConstants.MINIMAL_GAS_PRICE), nonce, callerId,
+//				ttl);
+//		if (amount != null) {
+//			((ContractCallTransaction) contractTx).setAmount(amount);
+//		}
+//
+//		return callMethodAndGetResult(() -> aeternityServiceNative.createUnsignedTransaction(contractTx),
+//				UnsignedTx.class);
+		return null;
 	}
 
 	protected <T> T callMethodAndAwaitException(Supplier<Single<T>> observerMethod, Class<T> exception)

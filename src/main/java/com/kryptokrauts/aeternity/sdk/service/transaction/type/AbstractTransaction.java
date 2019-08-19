@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import com.kryptokrauts.aeternity.generated.model.UnsignedTx;
 import com.kryptokrauts.aeternity.sdk.constants.ApiIdentifiers;
 import com.kryptokrauts.aeternity.sdk.service.transaction.fee.FeeCalculationModel;
+import com.kryptokrauts.aeternity.sdk.service.transaction.fee.impl.BaseFeeCalculationModel;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.model.AbstractTransactionModel;
 import com.kryptokrauts.aeternity.sdk.util.EncodingUtils;
 
@@ -24,7 +25,7 @@ import lombok.experimental.SuperBuilder;
  *
  * @param <TxModel>
  */
-@SuperBuilder(toBuilder = true)
+@SuperBuilder
 public abstract class AbstractTransaction<TxModel extends AbstractTransactionModel<?>> {
 
 	private static final Logger _logger = LoggerFactory.getLogger(AbstractTransaction.class);
@@ -36,7 +37,9 @@ public abstract class AbstractTransaction<TxModel extends AbstractTransactionMod
 	 * fee calculation model for this transaction type, one of
 	 * {@link FeeCalculationModel}
 	 */
-	protected FeeCalculationModel feeCalculationModel;
+	private FeeCalculationModel getFeeCalculationModel() {
+		return new BaseFeeCalculationModel();
+	}
 
 	/**
 	 * generates a Bytes object from the attributes. this is necessary for
@@ -74,9 +77,9 @@ public abstract class AbstractTransaction<TxModel extends AbstractTransactionMod
 				Bytes encodedRLPArray = createRLPEncodedList();
 				int byte_size = encodedRLPArray.bitLength() / 8;
 				/** now calculate fee based on tx size */
-				model.setFee(feeCalculationModel.calculateFee(byte_size, minimalGasPrice, this));
+				model.setFee(getFeeCalculationModel().calculateFee(byte_size, minimalGasPrice, this));
 				_logger.info(String.format("Using calculation model %s the following fee was calculated %s",
-						feeCalculationModel.getClass().getName(), model.getFee()));
+						getFeeCalculationModel().getClass().getName(), model.getFee()));
 			} else {
 				_logger.warn(
 						"You defined a custom transaction fee which might be not sufficient to execute the transaction!");
@@ -104,7 +107,4 @@ public abstract class AbstractTransaction<TxModel extends AbstractTransactionMod
 			rlpWriter.writeBigInteger(value);
 		}
 	}
-
-//	public abstract <Builder extends AbstractTransactionModelBuilder<?, ?, ?>> Builder setParameters();
-
 }

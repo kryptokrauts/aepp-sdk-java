@@ -31,7 +31,7 @@ import com.kryptokrauts.aeternity.sdk.constants.SerializationTags;
 import com.kryptokrauts.aeternity.sdk.service.aeternity.AeternityServiceConfiguration;
 import com.kryptokrauts.aeternity.sdk.service.transaction.AccountParameter;
 import com.kryptokrauts.aeternity.sdk.service.transaction.TransactionService;
-import com.kryptokrauts.aeternity.sdk.service.transaction.type.AbstractTransaction;
+import com.kryptokrauts.aeternity.sdk.service.transaction.type.model.AbstractTransactionModel;
 import com.kryptokrauts.aeternity.sdk.util.ByteUtils;
 import com.kryptokrauts.aeternity.sdk.util.EncodingUtils;
 import com.kryptokrauts.aeternity.sdk.util.SigningUtil;
@@ -53,8 +53,9 @@ public class TransactionServiceImpl implements TransactionService {
 	private ExternalApi externalApi;
 
 	@Override
-	public Single<UnsignedTx> createUnsignedTransaction(AbstractTransaction<?> tx) {
-		return tx.createUnsignedTransaction(config.isNativeMode(), config.getMinimalGasPrice());
+	public Single<UnsignedTx> createUnsignedTransaction(AbstractTransactionModel<?> tx) {
+		return tx.buildTransaction(externalApi).createUnsignedTransaction(config.isNativeMode(),
+				config.getMinimalGasPrice());
 	}
 
 	@Override
@@ -63,7 +64,7 @@ public class TransactionServiceImpl implements TransactionService {
 	}
 
 	@Override
-	public Single<PostTxResponse> postTransaction(AbstractTransaction<?> tx) throws CryptoException {
+	public Single<PostTxResponse> postTransaction(AbstractTransactionModel<?> tx) throws CryptoException {
 		return externalApi.rxPostTransaction(signTransaction(createUnsignedTransaction(tx).blockingGet(),
 				this.config.getBaseKeyPair().getPrivateKey()));
 	}
@@ -79,7 +80,7 @@ public class TransactionServiceImpl implements TransactionService {
 	}
 
 	@Override
-	public String computeTxHash(final AbstractTransaction<?> tx) throws CryptoException {
+	public String computeTxHash(final AbstractTransactionModel<?> tx) throws CryptoException {
 		byte[] signed = EncodingUtils
 				.decodeCheckWithIdentifier(signTransaction(createUnsignedTransaction(tx).blockingGet(),
 						this.config.getBaseKeyPair().getPrivateKey()).getTx());

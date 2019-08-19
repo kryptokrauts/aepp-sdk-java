@@ -14,7 +14,7 @@ import io.reactivex.Single;
 import lombok.NonNull;
 import lombok.experimental.SuperBuilder;
 
-@SuperBuilder(toBuilder = true)
+@SuperBuilder
 public class SpendTransaction extends AbstractTransaction<SpendTransactionModel> {
 
 	@NonNull

@@ -12,7 +12,7 @@ import com.kryptokrauts.aeternity.generated.model.PostTxResponse;
 import com.kryptokrauts.aeternity.generated.model.Tx;
 import com.kryptokrauts.aeternity.generated.model.TxInfoObject;
 import com.kryptokrauts.aeternity.generated.model.UnsignedTx;
-import com.kryptokrauts.aeternity.sdk.service.transaction.type.AbstractTransaction;
+import com.kryptokrauts.aeternity.sdk.service.transaction.type.model.AbstractTransactionModel;
 
 import io.reactivex.Single;
 
@@ -37,7 +37,7 @@ public interface TransactionService {
 	 * @param tx transaction typed model, one of {link AbstractTransaction}
 	 * @return a single-wrapped unsignedTx object
 	 */
-	Single<UnsignedTx> createUnsignedTransaction(AbstractTransaction<?> tx);
+	Single<UnsignedTx> createUnsignedTransaction(AbstractTransactionModel<?> tx);
 
 	/**
 	 * gets the information object for a tx hash
@@ -60,12 +60,12 @@ public interface TransactionService {
 	Single<DryRunResults> dryRunTransactions(List<Map<AccountParameter, Object>> accounts, BigInteger block,
 			List<UnsignedTx> unsignedTransactions);
 
-	Single<PostTxResponse> postTransaction(AbstractTransaction<?> tx) throws CryptoException;
+	Single<PostTxResponse> postTransaction(AbstractTransactionModel<?> tx) throws CryptoException;
 
 	/**
 	 * @param transaction object
 	 * @return the hash from a signed and encoded transaction
 	 */
-	String computeTxHash(AbstractTransaction<?> tx) throws CryptoException;
+	String computeTxHash(AbstractTransactionModel<?> tx) throws CryptoException;
 
 }

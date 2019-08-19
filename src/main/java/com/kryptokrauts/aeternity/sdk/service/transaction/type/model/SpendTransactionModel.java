@@ -2,7 +2,9 @@ package com.kryptokrauts.aeternity.sdk.service.transaction.type.model;
 
 import java.math.BigInteger;
 
+import com.kryptokrauts.aeternity.generated.api.rxjava.ExternalApi;
 import com.kryptokrauts.aeternity.generated.model.SpendTx;
+import com.kryptokrauts.aeternity.sdk.service.transaction.type.impl.SpendTransaction;
 
 import lombok.Getter;
 import lombok.NonNull;
@@ -20,7 +22,7 @@ import lombok.experimental.SuperBuilder;
  * 
  */
 @Getter
-@SuperBuilder(builderMethodName = "setParameters", buildMethodName = "wrap", toBuilder = true)
+@SuperBuilder
 public class SpendTransactionModel extends AbstractTransactionModel<SpendTx> {
 	@NonNull
 	private String sender;
@@ -52,5 +54,10 @@ public class SpendTransactionModel extends AbstractTransactionModel<SpendTx> {
 	@Override
 	public void validateInput() {
 		// nothing to validate here
+	}
+
+	@Override
+	public SpendTransaction buildTransaction(ExternalApi externalApi) {
+		return SpendTransaction.builder().externalApi(externalApi).model(this).build();
 	}
 }

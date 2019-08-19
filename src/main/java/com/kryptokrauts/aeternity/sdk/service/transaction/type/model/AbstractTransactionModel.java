@@ -2,13 +2,16 @@ package com.kryptokrauts.aeternity.sdk.service.transaction.type.model;
 
 import java.math.BigInteger;
 
+import com.kryptokrauts.aeternity.generated.api.rxjava.ExternalApi;
+import com.kryptokrauts.aeternity.sdk.service.transaction.type.AbstractTransaction;
+
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
 @Getter
 @Setter
-@SuperBuilder(builderMethodName = "setParameters", buildMethodName = "wrap", toBuilder = true)
+@SuperBuilder
 public abstract class AbstractTransactionModel<GeneratedTxModel> {
 
 	/**
@@ -28,4 +31,6 @@ public abstract class AbstractTransactionModel<GeneratedTxModel> {
 	 * this method can be used to perform transaction specific validations that will
 	 */
 	public abstract void validateInput();
+
+	public abstract AbstractTransaction<?> buildTransaction(ExternalApi externalApi);
 }

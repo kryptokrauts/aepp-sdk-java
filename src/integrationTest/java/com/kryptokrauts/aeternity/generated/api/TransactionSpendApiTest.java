@@ -12,8 +12,6 @@ import com.kryptokrauts.aeternity.generated.model.Tx;
 import com.kryptokrauts.aeternity.generated.model.UnsignedTx;
 import com.kryptokrauts.aeternity.sdk.domain.secret.impl.BaseKeyPair;
 import com.kryptokrauts.aeternity.sdk.service.account.domain.AccountResult;
-import com.kryptokrauts.aeternity.sdk.service.transaction.type.AbstractTransaction;
-import com.kryptokrauts.aeternity.sdk.service.transaction.type.impl.SpendTransaction;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.model.SpendTransactionModel;
 
 import io.reactivex.Single;
@@ -48,10 +46,9 @@ public class TransactionSpendApiTest extends BaseTest {
 
 		// sender, recipient, amount, payload, ttl, nonce
 
-		SpendTransactionModel model = SpendTransactionModel.setParameters().sender(sender).recipient(recipient)
-				.amount(amount).payload(payload).ttl(ttl).nonce(nonce).wrap();
+		SpendTransactionModel spendTx = SpendTransactionModel.builder().sender(sender).recipient(recipient)
+				.amount(amount).payload(payload).ttl(ttl).nonce(nonce).build();
 
-		SpendTransaction spendTx = aeternityServiceNative.models().createSpendTransaction(model);
 		UnsignedTx unsignedTxNative = aeternityServiceNative.transactions.createUnsignedTransaction(spendTx)
 				.blockingGet();
 
@@ -81,15 +78,9 @@ public class TransactionSpendApiTest extends BaseTest {
 			BigInteger ttl = BigInteger.ZERO;
 			BigInteger nonce = account.getNonce().add(BigInteger.ONE);
 
-			/**
-			 * models als eigene klasse -> beschaffung über service quatsch ab hier dritter
-			 * test - zusammenfassen, keypair für sign aus der config
-			 * 
-			 */
-			SpendTransactionModel model = SpendTransactionModel.setParameters().sender(account.getPublicKey())
-					.recipient(recipient).amount(amount).payload(payload).ttl(ttl).nonce(nonce).wrap();
+			SpendTransactionModel spendTx = SpendTransactionModel.builder().sender(account.getPublicKey())
+					.recipient(recipient).amount(amount).payload(payload).ttl(ttl).nonce(nonce).build();
 
-			AbstractTransaction<?> spendTx = aeternityServiceNative.models().createSpendTransaction(model);
 			UnsignedTx unsignedTxNative = aeternityServiceNative.transactions.createUnsignedTransaction(spendTx)
 					.blockingGet();
 			Tx signedTx = aeternityServiceNative.transactions.signTransaction(unsignedTxNative,
@@ -116,10 +107,9 @@ public class TransactionSpendApiTest extends BaseTest {
 
 		BaseKeyPair recipient = keyPairService.generateBaseKeyPair();
 
-		SpendTransaction spendTx = aeternityServiceNative.models()
-				.createSpendTransaction(SpendTransactionModel.setParameters().sender(acc.getPublicKey())
-						.recipient(recipient.getPublicKey()).amount(new BigInteger("1000000000000000000"))
-						.payload("donation").ttl(BigInteger.ZERO).nonce(acc.getNonce().add(BigInteger.ONE)).wrap());
+		SpendTransactionModel spendTx = SpendTransactionModel.builder().sender(acc.getPublicKey())
+				.recipient(recipient.getPublicKey()).amount(new BigInteger("1000000000000000000")).payload("donation")
+				.ttl(BigInteger.ZERO).nonce(acc.getNonce().add(BigInteger.ONE)).build();
 
 		Single<PostTxResponse> txResponse = aeternityServiceNative.transactions.postTransaction(spendTx);
 

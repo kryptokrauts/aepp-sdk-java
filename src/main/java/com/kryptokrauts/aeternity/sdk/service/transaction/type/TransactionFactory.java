@@ -46,8 +46,7 @@ public class TransactionFactory {
 	 */
 	public SpendTransaction createSpendTransaction(SpendTransactionModel model) {
 
-		return SpendTransaction.builder().model(model).externalApi(externalApi)
-				.feeCalculationModel(baseFeeCalculationModel).build();
+		return SpendTransaction.builder().model(model).externalApi(externalApi).build();
 //		return SpendTransaction.builder().sender(sender).recipient(recipient).amount(amount).payload(payload).ttl(ttl)
 //				.nonce(nonce).feeCalculationModel(baseFeeCalculationModel).transactionApi(transactionApi).build();
 	}
