@@ -1,7 +1,7 @@
 package com.kryptokrauts.aeternity.sdk.service.aeternity;
 
 import com.kryptokrauts.aeternity.sdk.service.AbstractServiceFactory;
-import com.kryptokrauts.aeternity.sdk.service.aeternity.impl.AeternityServiceImpl;
+import com.kryptokrauts.aeternity.sdk.service.aeternity.impl.AeternityService;
 
 public class AeternityServiceFactory extends AbstractServiceFactory<AeternityService, AeternityServiceConfiguration> {
 
@@ -12,7 +12,7 @@ public class AeternityServiceFactory extends AbstractServiceFactory<AeternitySer
 
 	@Override
 	protected AeternityService getServiceWithConfig(AeternityServiceConfiguration config) {
-		return new AeternityServiceImpl(config);
+		return new AeternityService(config);
 	}
 
 }

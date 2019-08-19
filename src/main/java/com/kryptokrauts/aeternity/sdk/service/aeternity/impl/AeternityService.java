@@ -4,7 +4,6 @@ import com.kryptokrauts.aeternity.generated.api.ExternalApiImpl;
 import com.kryptokrauts.aeternity.generated.api.rxjava.ExternalApi;
 import com.kryptokrauts.aeternity.sdk.service.account.AccountService;
 import com.kryptokrauts.aeternity.sdk.service.account.impl.AccountServiceImpl;
-import com.kryptokrauts.aeternity.sdk.service.aeternity.AeternityService;
 import com.kryptokrauts.aeternity.sdk.service.aeternity.AeternityServiceConfiguration;
 import com.kryptokrauts.aeternity.sdk.service.transaction.TransactionService;
 import com.kryptokrauts.aeternity.sdk.service.transaction.impl.TransactionServiceImpl;
@@ -14,7 +13,7 @@ import com.kryptokrauts.sophia.compiler.generated.api.rxjava.DefaultApi;
 
 import lombok.NonNull;
 
-public class AeternityServiceImpl implements AeternityService {
+public class AeternityService {
 
 	@NonNull
 	protected AeternityServiceConfiguration config;
@@ -29,7 +28,7 @@ public class AeternityServiceImpl implements AeternityService {
 
 	public AccountService accounts;
 
-	public AeternityServiceImpl(AeternityServiceConfiguration config) {
+	public AeternityService(AeternityServiceConfiguration config) {
 		this.config = config;
 		this.externalApi = new ExternalApi(new ExternalApiImpl(config.getApiClient()));
 		this.compilerApi = new DefaultApi(new DefaultApiImpl(config.getCompilerApiClient()));
