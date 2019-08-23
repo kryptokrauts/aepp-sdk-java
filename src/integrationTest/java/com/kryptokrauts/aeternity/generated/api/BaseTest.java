@@ -54,6 +54,8 @@ import io.vertx.ext.unit.junit.VertxUnitRunner;
 @RunWith(VertxUnitRunner.class)
 public abstract class BaseTest {
 
+	protected static final long TEST_CASE_TIMEOUT_MILLIS = 5000l;
+
 	protected static final Logger _logger = LoggerFactory.getLogger("com.kryptokrauts.IntegrationTest");
 
 	private static final String AETERNITY_BASE_URL = "AETERNITY_BASE_URL";
@@ -158,10 +160,14 @@ public abstract class BaseTest {
 		_logger.info("-----------------------------------------------------------------------------------");
 	}
 
-	protected AccountResult getAccount(String publicKey) {
-		Single<AccountResult> accountSingle = aeternityServiceNative.accounts.asyncGetAccount(Optional.of(publicKey));
+	protected AccountResult getAccount(String publicKey, TestContext context) {
+		Single<AccountResult> accountSingle = aeternityServiceNative.accounts
+				.asyncGetAccount(Optional.ofNullable(publicKey));
 		TestObserver<AccountResult> accountTestObserver = accountSingle.test();
 		accountTestObserver.awaitTerminalEvent();
+		if (accountTestObserver.errorCount() > 0) {
+			context.fail("Failed due to Exception " + accountTestObserver.errors().get(0));
+		}
 		AccountResult account = accountTestObserver.values().get(0);
 		return account;
 	}
