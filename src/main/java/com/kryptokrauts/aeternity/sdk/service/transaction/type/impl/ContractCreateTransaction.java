@@ -13,20 +13,18 @@ import com.kryptokrauts.aeternity.sdk.constants.SerializationTags;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.AbstractTransaction;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.model.ContractCreateTransactionModel;
 import com.kryptokrauts.aeternity.sdk.util.EncodingUtils;
-import com.kryptokrauts.sophia.compiler.generated.api.rxjava.DefaultApi;
 
 import io.reactivex.Single;
 import lombok.NonNull;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
 @SuperBuilder
+@ToString
 public class ContractCreateTransaction extends AbstractTransaction<ContractCreateTransactionModel> {
 
 	@NonNull
 	private ExternalApi externalApi;
-
-	@NonNull
-	private DefaultApi compilerApi;
 
 	@Override
 	protected Single<CreateContractUnsignedTx> createInternal() {

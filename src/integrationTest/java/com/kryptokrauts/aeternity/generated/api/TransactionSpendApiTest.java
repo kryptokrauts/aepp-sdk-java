@@ -21,13 +21,6 @@ import io.vertx.ext.unit.TestContext;
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class TransactionSpendApiTest extends BaseTest {
-//
-//	BaseKeyPair baseKeyPair;
-//
-//	@Before
-//	public void initBeforeTest() {
-//		baseKeyPair = keyPairService.generateBaseKeyPairFromSecret(TestConstants.BENEFICIARY_PRIVATE_KEY);
-//	}
 
 	/**
 	 * create an unsigned native spend transaction

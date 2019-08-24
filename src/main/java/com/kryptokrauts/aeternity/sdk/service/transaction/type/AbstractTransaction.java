@@ -107,4 +107,8 @@ public abstract class AbstractTransaction<TxModel extends AbstractTransactionMod
 			rlpWriter.writeBigInteger(value);
 		}
 	}
+
+	public TxModel getModel() {
+		return model;
+	}
 }

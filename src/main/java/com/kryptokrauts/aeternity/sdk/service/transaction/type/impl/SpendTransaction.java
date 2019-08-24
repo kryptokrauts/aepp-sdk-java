@@ -12,9 +12,11 @@ import com.kryptokrauts.aeternity.sdk.util.EncodingUtils;
 
 import io.reactivex.Single;
 import lombok.NonNull;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
 @SuperBuilder
+@ToString
 public class SpendTransaction extends AbstractTransaction<SpendTransactionModel> {
 
 	@NonNull

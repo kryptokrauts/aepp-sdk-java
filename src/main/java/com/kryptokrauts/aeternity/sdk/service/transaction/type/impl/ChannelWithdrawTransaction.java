@@ -1,76 +1,49 @@
 package com.kryptokrauts.aeternity.sdk.service.transaction.type.impl;
 
-import com.kryptokrauts.aeternity.generated.api.rxjava.ChannelApi;
-import com.kryptokrauts.aeternity.generated.model.ChannelWithdrawTx;
-import com.kryptokrauts.aeternity.generated.model.UnsignedTx;
-import com.kryptokrauts.aeternity.sdk.constants.SerializationTags;
-import com.kryptokrauts.aeternity.sdk.service.transaction.type.AbstractTransaction;
-import com.kryptokrauts.aeternity.sdk.util.EncodingUtils;
-import io.reactivex.Single;
-import java.math.BigInteger;
-import lombok.Getter;
-import lombok.NonNull;
-import lombok.experimental.SuperBuilder;
 import org.apache.tuweni.bytes.Bytes;
 import org.apache.tuweni.rlp.RLP;
 
-@Getter
+import com.kryptokrauts.aeternity.generated.api.rxjava.ExternalApi;
+import com.kryptokrauts.aeternity.generated.model.UnsignedTx;
+import com.kryptokrauts.aeternity.sdk.constants.SerializationTags;
+import com.kryptokrauts.aeternity.sdk.service.transaction.type.AbstractTransaction;
+import com.kryptokrauts.aeternity.sdk.service.transaction.type.model.ChannelWithdrawTransactionModel;
+import com.kryptokrauts.aeternity.sdk.util.EncodingUtils;
+
+import io.reactivex.Single;
+import lombok.NonNull;
+import lombok.ToString;
+import lombok.experimental.SuperBuilder;
+
 @SuperBuilder
-public class ChannelWithdrawTransaction extends AbstractTransaction<ChannelWithdrawTx> {
+@ToString
+public class ChannelWithdrawTransaction extends AbstractTransaction<ChannelWithdrawTransactionModel> {
 
-  @NonNull private String channelId;
-  @NonNull private String toId;
-  @NonNull private BigInteger amount;
-  @NonNull private BigInteger ttl;
-  @NonNull private String stateHash;
-  @NonNull private BigInteger round;
-  @NonNull private BigInteger nonce;
-  @NonNull private ChannelApi channelApi;
+	@NonNull
+	private ExternalApi externalApi;
 
-  @Override
-  protected Single<UnsignedTx> createInternal() {
-    return channelApi.rxPostChannelWithdraw(toModel());
-  }
+	@Override
+	protected Single<UnsignedTx> createInternal() {
+		return externalApi.rxPostChannelWithdraw(model.toApiModel());
+	}
 
-  @Override
-  protected ChannelWithdrawTx toModel() {
-    ChannelWithdrawTx channelWithdrawTx = new ChannelWithdrawTx();
-    channelWithdrawTx.setChannelId(channelId);
-    channelWithdrawTx.setToId(toId);
-    channelWithdrawTx.setAmount(amount);
-    channelWithdrawTx.setFee(fee);
-    channelWithdrawTx.setTtl(ttl);
-    channelWithdrawTx.setStateHash(stateHash);
-    channelWithdrawTx.setRound(round);
-    channelWithdrawTx.setNonce(nonce);
-    return channelWithdrawTx;
-  }
-
-  @Override
-  protected void validateInput() {
-    // nothing to validate here
-  }
-
-  @Override
-  protected Bytes createRLPEncodedList() {
-    Bytes encodedRlp =
-        RLP.encodeList(
-            rlpWriter -> {
-              rlpWriter.writeInt(SerializationTags.OBJECT_TAG_CHANNEL_WITHDRAW_TRANSACTION);
-              rlpWriter.writeInt(SerializationTags.VSN);
-              byte[] channelIdWithTag =
-                  EncodingUtils.decodeCheckAndTag(this.channelId, SerializationTags.ID_TAG_CHANNEL);
-              byte[] toIdWithTag =
-                  EncodingUtils.decodeCheckAndTag(this.toId, SerializationTags.ID_TAG_ACCOUNT);
-              rlpWriter.writeByteArray(channelIdWithTag);
-              rlpWriter.writeByteArray(toIdWithTag);
-              rlpWriter.writeBigInteger(this.amount);
-              rlpWriter.writeBigInteger(this.ttl);
-              rlpWriter.writeBigInteger(this.fee);
-              rlpWriter.writeString(this.stateHash);
-              rlpWriter.writeBigInteger(this.round);
-              rlpWriter.writeBigInteger(this.nonce);
-            });
-    return encodedRlp;
-  }
+	@Override
+	protected Bytes createRLPEncodedList() {
+		Bytes encodedRlp = RLP.encodeList(rlpWriter -> {
+			rlpWriter.writeInt(SerializationTags.OBJECT_TAG_CHANNEL_WITHDRAW_TRANSACTION);
+			rlpWriter.writeInt(SerializationTags.VSN);
+			byte[] channelIdWithTag = EncodingUtils.decodeCheckAndTag(model.getChannelId(),
+					SerializationTags.ID_TAG_CHANNEL);
+			byte[] toIdWithTag = EncodingUtils.decodeCheckAndTag(model.getToId(), SerializationTags.ID_TAG_ACCOUNT);
+			rlpWriter.writeByteArray(channelIdWithTag);
+			rlpWriter.writeByteArray(toIdWithTag);
+			rlpWriter.writeBigInteger(model.getAmount());
+			rlpWriter.writeBigInteger(model.getTtl());
+			rlpWriter.writeBigInteger(model.getFee());
+			rlpWriter.writeString(model.getStateHash());
+			rlpWriter.writeBigInteger(model.getRound());
+			rlpWriter.writeBigInteger(model.getNonce());
+		});
+		return encodedRlp;
+	}
 }

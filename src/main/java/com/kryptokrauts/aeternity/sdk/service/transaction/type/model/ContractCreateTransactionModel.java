@@ -66,8 +66,7 @@ public class ContractCreateTransactionModel extends AbstractTransactionModel<Con
 
 	@Override
 	public AbstractTransaction<?> buildTransaction(ExternalApi externalApi, DefaultApi compilerApi) {
-		return ContractCreateTransaction.builder().externalApi(externalApi).compilerApi(compilerApi).model(this)
-				.build();
+		return ContractCreateTransaction.builder().externalApi(externalApi).model(this).build();
 	}
 
 }
