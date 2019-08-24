@@ -7,10 +7,8 @@ import java.util.Map;
 import org.bouncycastle.crypto.CryptoException;
 
 import com.kryptokrauts.aeternity.generated.model.DryRunResults;
-import com.kryptokrauts.aeternity.generated.model.GenericSignedTx;
 import com.kryptokrauts.aeternity.generated.model.PostTxResponse;
 import com.kryptokrauts.aeternity.generated.model.Tx;
-import com.kryptokrauts.aeternity.generated.model.TxInfoObject;
 import com.kryptokrauts.aeternity.generated.model.UnsignedTx;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.model.AbstractTransactionModel;
 
@@ -19,8 +17,6 @@ import io.reactivex.Single;
 public interface TransactionService {
 
 	Single<PostTxResponse> postTransaction(Tx tx);
-
-	Single<GenericSignedTx> getTransactionByHash(String txHash);
 
 	/**
 	 * @param unsignedTx
@@ -38,14 +34,6 @@ public interface TransactionService {
 	 * @return a single-wrapped unsignedTx object
 	 */
 	Single<UnsignedTx> createUnsignedTransaction(AbstractTransactionModel<?> tx);
-
-	/**
-	 * gets the information object for a tx hash
-	 *
-	 * @param txHash
-	 * @return
-	 */
-	Single<TxInfoObject> getTransactionInfoByHash(String txHash);
 
 	/**
 	 * dry run unsigned transactions to estimate gas (!) please make sure to use

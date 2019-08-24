@@ -7,6 +7,8 @@ import com.kryptokrauts.aeternity.sdk.service.account.impl.AccountServiceImpl;
 import com.kryptokrauts.aeternity.sdk.service.aeternity.AeternityServiceConfiguration;
 import com.kryptokrauts.aeternity.sdk.service.compiler.CompilerService;
 import com.kryptokrauts.aeternity.sdk.service.compiler.impl.SophiaCompilerServiceImpl;
+import com.kryptokrauts.aeternity.sdk.service.info.InfoService;
+import com.kryptokrauts.aeternity.sdk.service.info.impl.InfoServiceImpl;
 import com.kryptokrauts.aeternity.sdk.service.transaction.TransactionService;
 import com.kryptokrauts.aeternity.sdk.service.transaction.impl.TransactionServiceImpl;
 import com.kryptokrauts.sophia.compiler.generated.api.DefaultApiImpl;
@@ -29,6 +31,8 @@ public class AeternityService {
 
 	public CompilerService compiler;
 
+	public InfoService info;
+
 	public AeternityService(AeternityServiceConfiguration config) {
 		this.config = config;
 		this.externalApi = new ExternalApi(new ExternalApiImpl(config.getApiClient()));
@@ -36,5 +40,6 @@ public class AeternityService {
 		this.transactions = new TransactionServiceImpl(this.config, this.externalApi, this.compilerApi);
 		this.accounts = new AccountServiceImpl(this.config, this.externalApi);
 		this.compiler = new SophiaCompilerServiceImpl(this.config);
+		this.info = new InfoServiceImpl(this.config, this.externalApi);
 	}
 }

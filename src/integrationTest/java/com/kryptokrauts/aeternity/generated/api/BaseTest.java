@@ -80,7 +80,7 @@ public abstract class BaseTest {
 
 	protected AeternityService aeternityServiceNative;
 
-	protected com.kryptokrauts.aeternity.sdk.service.aeternity.impl.AeternityService aeternityServiceDebug;
+	protected AeternityService aeternityServiceDebug;
 
 	BaseKeyPair baseKeyPair;
 
@@ -184,7 +184,7 @@ public abstract class BaseTest {
 	}
 
 	protected TxInfoObject waitForTxInfoObject(String txHash) throws Throwable {
-		return callMethodAndGetResult(() -> transactionServiceNative.getTransactionInfoByHash(txHash),
+		return callMethodAndGetResult(() -> aeternityServiceNative.info.getTransactionInfoByHash(txHash),
 				TxInfoObject.class);
 	}
 
@@ -194,7 +194,7 @@ public abstract class BaseTest {
 		int doneTrials = 1;
 
 		while (blockHeight == -1 && doneTrials < TestConstants.NUM_TRIALS_DEFAULT) {
-			minedTx = callMethodAndGetResult(() -> transactionServiceNative.getTransactionByHash(txHash),
+			minedTx = callMethodAndGetResult(() -> aeternityServiceNative.info.getTransactionByHash(txHash),
 					GenericSignedTx.class);
 			if (minedTx.getBlockHeight().intValue() > 1) {
 				_logger.debug("Mined tx: " + minedTx);

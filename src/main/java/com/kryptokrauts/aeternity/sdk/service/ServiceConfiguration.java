@@ -11,6 +11,7 @@ import com.google.common.collect.ImmutableMap;
 import com.kryptokrauts.aeternity.generated.ApiClient;
 import com.kryptokrauts.aeternity.sdk.constants.BaseConstants;
 import com.kryptokrauts.aeternity.sdk.domain.secret.impl.BaseKeyPair;
+import com.kryptokrauts.aeternity.sdk.exception.InvalidParameterException;
 import com.kryptokrauts.aeternity.sdk.service.wallet.WalletServiceConfiguration;
 
 import io.vertx.core.Vertx;
@@ -93,6 +94,10 @@ public class ServiceConfiguration {
 	}
 
 	public BaseKeyPair getBaseKeyPair() {
+		if (baseKeyPair == null) {
+			throw new InvalidParameterException(
+					"Service call was initiated which needs the baseKeyPair but none is set in ServiceConfiguration.baseKeyPair - check parameters");
+		}
 		return baseKeyPair;
 	}
 }
