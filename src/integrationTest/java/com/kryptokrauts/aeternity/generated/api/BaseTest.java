@@ -43,7 +43,6 @@ import com.kryptokrauts.aeternity.sdk.service.transaction.AccountParameter;
 import com.kryptokrauts.aeternity.sdk.service.transaction.TransactionService;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.model.ContractCallTransactionModel;
 import com.kryptokrauts.sophia.compiler.generated.model.Calldata;
-import com.kryptokrauts.sophia.compiler.generated.model.SophiaJsonData;
 
 import io.reactivex.Single;
 import io.reactivex.observers.TestObserver;
@@ -219,10 +218,11 @@ public abstract class BaseTest {
 
 	protected JsonObject decodeCalldata(String encodedValue, String sophiaReturnType) throws Throwable {
 		// decode the result to json
-		SophiaJsonData sophiaJsonData = callMethodAndGetResult(
-				() -> this.aeternityServiceNative.compiler.decodeCalldata(encodedValue, sophiaReturnType),
-				SophiaJsonData.class);
-		return JsonObject.mapFrom(sophiaJsonData.getData());
+//		String sophiaJsonData = callMethodAndGetResult(
+//				() -> this.aeternityServiceNative.compiler.asyncDecodeCalldata(encodedValue, sophiaReturnType),
+//				SophiaJsonData.class);
+		return JsonObject
+				.mapFrom(this.aeternityServiceNative.compiler.blockingDecodeCalldata(encodedValue, sophiaReturnType));
 	}
 
 	protected DryRunResults performDryRunTransactions(List<Map<AccountParameter, Object>> accounts, BigInteger block,

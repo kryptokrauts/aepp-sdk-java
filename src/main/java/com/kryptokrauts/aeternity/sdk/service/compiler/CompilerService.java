@@ -3,7 +3,6 @@ package com.kryptokrauts.aeternity.sdk.service.compiler;
 import java.util.List;
 
 import com.kryptokrauts.sophia.compiler.generated.model.ACI;
-import com.kryptokrauts.sophia.compiler.generated.model.SophiaJsonData;
 
 import io.reactivex.Single;
 
@@ -34,9 +33,11 @@ public interface CompilerService {
 	 *
 	 * @param calldata   the calldata
 	 * @param sophiaType the awaited sophia type
-	 * @return decoded answer
+	 * @return decoded answer as json string
 	 */
-	Single<SophiaJsonData> decodeCalldata(String calldata, String sophiaType);
+	Single<Object> asyncDecodeCalldata(String calldata, String sophiaType);
+
+	Object blockingDecodeCalldata(String calldata, String sophiaType);
 
 	/**
 	 * generates the ACI for this contractCode
@@ -45,5 +46,7 @@ public interface CompilerService {
 	 * @param contractCode the sourcecode of the contract
 	 * @return the ACI for a given contract
 	 */
-	Single<ACI> generateACI(String contractCode);
+	Single<ACI> asyncGenerateACI(String contractCode);
+
+	ACI blockingGenerateACI(String contractCode);
 }

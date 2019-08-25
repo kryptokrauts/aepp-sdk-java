@@ -67,7 +67,7 @@ public class TransactionChannelsTest extends BaseTest {
 
 		txResponse.subscribe(resultObject -> {
 			context.assertNotNull(resultObject);
-			System.out.println(resultObject);
+			_logger.info("Channel create tx hash: " + resultObject);
 			async.complete();
 		});
 		async.awaitSuccess(TEST_CASE_TIMEOUT_MILLIS);

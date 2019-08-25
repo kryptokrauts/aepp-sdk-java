@@ -7,7 +7,6 @@ import java.util.Map;
 import org.bouncycastle.crypto.CryptoException;
 
 import com.kryptokrauts.aeternity.generated.model.DryRunResults;
-import com.kryptokrauts.aeternity.generated.model.PostTxResponse;
 import com.kryptokrauts.aeternity.sdk.exception.TransactionCreateException;
 import com.kryptokrauts.aeternity.sdk.service.domain.transaction.PostTransactionResult;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.model.AbstractTransactionModel;
@@ -15,14 +14,6 @@ import com.kryptokrauts.aeternity.sdk.service.transaction.type.model.AbstractTra
 import io.reactivex.Single;
 
 public interface TransactionService {
-
-	/**
-	 * This method is for testing the signing process and needs to be removed
-	 * 
-	 * @param tx
-	 * @return
-	 */
-	Single<PostTxResponse> postTransaction(String signedTx);
 
 	/**
 	 * @param unsignedTx

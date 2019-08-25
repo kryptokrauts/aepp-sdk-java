@@ -19,7 +19,6 @@ import com.kryptokrauts.aeternity.generated.api.rxjava.ExternalApi;
 import com.kryptokrauts.aeternity.generated.model.DryRunAccount;
 import com.kryptokrauts.aeternity.generated.model.DryRunInput;
 import com.kryptokrauts.aeternity.generated.model.DryRunResults;
-import com.kryptokrauts.aeternity.generated.model.PostTxResponse;
 import com.kryptokrauts.aeternity.generated.model.Tx;
 import com.kryptokrauts.aeternity.sdk.constants.ApiIdentifiers;
 import com.kryptokrauts.aeternity.sdk.constants.SerializationTags;
@@ -64,11 +63,6 @@ public class TransactionServiceImpl implements TransactionService {
 	public String blockingCreateUnsignedTransaction(AbstractTransactionModel<?> tx) {
 		return tx.buildTransaction(externalApi, compilerApi)
 				.createUnsignedTransaction(config.isNativeMode(), config.getMinimalGasPrice()).blockingGet().getTx();
-	}
-
-	@Override
-	public Single<PostTxResponse> postTransaction(String signedTx) {
-		return externalApi.rxPostTransaction(createTxObject(signedTx));
 	}
 
 	@Override

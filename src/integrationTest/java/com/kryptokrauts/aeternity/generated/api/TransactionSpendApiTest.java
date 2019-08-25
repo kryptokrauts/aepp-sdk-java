@@ -8,7 +8,6 @@ import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
 
-import com.kryptokrauts.aeternity.generated.model.PostTxResponse;
 import com.kryptokrauts.aeternity.sdk.domain.secret.impl.BaseKeyPair;
 import com.kryptokrauts.aeternity.sdk.exception.TransactionCreateException;
 import com.kryptokrauts.aeternity.sdk.service.domain.account.AccountResult;
@@ -59,8 +58,6 @@ public class TransactionSpendApiTest extends BaseTest {
 	public void postSpendSelfSignTxTest(TestContext context) {
 		Async async = context.async();
 
-		BaseKeyPair keyPair = keyPairService.generateBaseKeyPairFromSecret(TestConstants.BENEFICIARY_PRIVATE_KEY);
-
 		// get the currents accounts nonce in case a transaction is already
 		// created and increase it by one
 		Single<AccountResult> acc = this.aeternityServiceNative.accounts.asyncGetAccount(Optional.empty());
@@ -75,12 +72,8 @@ public class TransactionSpendApiTest extends BaseTest {
 			SpendTransactionModel spendTx = SpendTransactionModel.builder().sender(account.getPublicKey())
 					.recipient(recipient).amount(amount).payload(payload).ttl(ttl).nonce(nonce).build();
 
-			String unsignedTxNative = aeternityServiceNative.transactions.asyncCreateUnsignedTransaction(spendTx)
-					.blockingGet();
-			String signedTx = aeternityServiceNative.transactions.signTransaction(unsignedTxNative,
-					keyPair.getPrivateKey());
-
-			Single<PostTxResponse> txResponse = aeternityServiceNative.transactions.postTransaction(signedTx);
+			Single<PostTransactionResult> txResponse = aeternityServiceNative.transactions
+					.asyncPostTransaction(spendTx);
 			txResponse.subscribe(it -> {
 				_logger.info("SpendTx hash: " + it.getTxHash());
 				context.assertEquals(it.getTxHash(), aeternityServiceNative.transactions.computeTxHash(spendTx));
@@ -91,6 +84,7 @@ public class TransactionSpendApiTest extends BaseTest {
 		}, throwable -> {
 			context.fail();
 		});
+		async.awaitSuccess(TEST_CASE_TIMEOUT_MILLIS);
 	}
 
 	@Test

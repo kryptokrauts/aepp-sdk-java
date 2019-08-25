@@ -1,6 +1,7 @@
 package com.kryptokrauts.aeternity.sdk.service.compiler.impl;
 
 import java.util.List;
+import java.util.Optional;
 
 import javax.annotation.Nonnull;
 
@@ -59,19 +60,40 @@ public final class SophiaCompilerServiceImpl implements CompilerService {
 	}
 
 	@Override
-	public Single<SophiaJsonData> decodeCalldata(String calldata, String sophiaType) {
-		SophiaBinaryData body = new SophiaBinaryData();
-		body.setData(calldata);
-		body.setSophiaType(sophiaType);
-		return this.getCompilerApi().rxDecodeData(body);
+	public Single<Object> asyncDecodeCalldata(String calldata, String sophiaType) {
+		return Optional.ofNullable(this.getCompilerApi().rxDecodeData(buildDecodeBody(calldata, sophiaType)))
+				.orElse(Single.just(new SophiaJsonData())).map(s -> s.getData());
 	}
 
 	@Override
-	public Single<ACI> generateACI(String contractCode) {
+	public Object blockingDecodeCalldata(String calldata, String sophiaType) {
+		return Optional
+				.ofNullable(this.getCompilerApi().rxDecodeData(buildDecodeBody(calldata, sophiaType)).blockingGet())
+				.orElse(new SophiaJsonData()).getData();
+	}
+
+	private SophiaBinaryData buildDecodeBody(String calldata, String sophiaType) {
+		SophiaBinaryData body = new SophiaBinaryData();
+		body.setData(calldata);
+		body.setSophiaType(sophiaType);
+		return body;
+	}
+
+	@Override
+	public Single<ACI> asyncGenerateACI(String contractCode) {
+		return this.getCompilerApi().rxGenerateACI(buildACIBody(contractCode));
+	}
+
+	@Override
+	public ACI blockingGenerateACI(String contractCode) {
+		return this.getCompilerApi().rxGenerateACI(buildACIBody(contractCode)).blockingGet();
+	}
+
+	private Contract buildACIBody(String contractCode) {
 		Contract body = new Contract().code(contractCode);
 		CompileOpts compileOpts = new CompileOpts();
 		body.setOptions(compileOpts);
-		return this.getCompilerApi().rxGenerateACI(body);
+		return body;
 	}
 
 	@Override
