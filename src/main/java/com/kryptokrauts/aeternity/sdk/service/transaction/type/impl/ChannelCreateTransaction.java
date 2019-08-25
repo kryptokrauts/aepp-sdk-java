@@ -6,6 +6,8 @@ import org.apache.tuweni.rlp.RLP;
 import com.kryptokrauts.aeternity.generated.api.rxjava.ExternalApi;
 import com.kryptokrauts.aeternity.generated.model.UnsignedTx;
 import com.kryptokrauts.aeternity.sdk.constants.SerializationTags;
+import com.kryptokrauts.aeternity.sdk.service.transaction.fee.FeeCalculationModel;
+import com.kryptokrauts.aeternity.sdk.service.transaction.fee.impl.ChannelForceProgressFeeCalculationModel;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.AbstractTransaction;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.model.ChannelCreateTransactionModel;
 import com.kryptokrauts.aeternity.sdk.util.EncodingUtils;
@@ -48,5 +50,10 @@ public class ChannelCreateTransaction extends AbstractTransaction<ChannelCreateT
 			this.checkZeroAndWriteValue(rlpWriter, model.getNonce());
 		});
 		return encodedRlp;
+	}
+
+	@Override
+	protected FeeCalculationModel getFeeCalculationModel() {
+		return new ChannelForceProgressFeeCalculationModel();
 	}
 }

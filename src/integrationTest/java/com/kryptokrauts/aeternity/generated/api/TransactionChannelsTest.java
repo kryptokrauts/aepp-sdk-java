@@ -7,7 +7,6 @@ import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
 
-import com.kryptokrauts.aeternity.generated.model.UnsignedTx;
 import com.kryptokrauts.aeternity.sdk.domain.secret.impl.BaseKeyPair;
 import com.kryptokrauts.aeternity.sdk.exception.TransactionCreateException;
 import com.kryptokrauts.aeternity.sdk.service.domain.transaction.PostTransactionResult;
@@ -64,12 +63,11 @@ public class TransactionChannelsTest extends BaseTest {
 				.responderAmount(amount).channelReserve(BigInteger.ZERO).lockPeriod(BigInteger.ZERO)
 				.ttl(BigInteger.ZERO).stateHash("").nonce(nonce).build();
 
-//		Single<PostTransactionResult> txResponse = aeternityServiceNative.transactions.asyncPostTransaction(model);
-		Single<UnsignedTx> txResponse = aeternityServiceNative.transactions.asyncCreateUnsignedTransaction(model);
+		Single<String> txResponse = aeternityServiceNative.transactions.asyncCreateUnsignedTransaction(model);
 
 		txResponse.subscribe(resultObject -> {
 			context.assertNotNull(resultObject);
-			System.out.println(resultObject.getTx());
+			System.out.println(resultObject);
 			async.complete();
 		});
 		async.awaitSuccess(TEST_CASE_TIMEOUT_MILLIS);
