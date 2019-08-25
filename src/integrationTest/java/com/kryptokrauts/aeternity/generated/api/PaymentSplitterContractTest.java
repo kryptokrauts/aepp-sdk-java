@@ -126,9 +126,6 @@ public class PaymentSplitterContractTest extends BaseTest {
 
 	@Test
 	public void b_callPayAndSplitMethodTest(TestContext context) throws Throwable {
-//		Async async = context.async();
-//		rule.vertx().executeBlocking(future -> {
-//			try {
 		AccountResult account = getAccount(owner.getPublicKey(), context);
 		BigInteger balanceRecipient1;
 		BigInteger balanceRecipient2;
@@ -184,10 +181,19 @@ public class PaymentSplitterContractTest extends BaseTest {
 		context.assertEquals(balanceRecipient3.add(paymentValue.multiply(BigDecimal.valueOf(0.2)).toBigInteger()),
 				getAccount(initialReceiver3.getPublicKey(), context).getBalance());
 
-//			} catch (Throwable e) {
-//				context.fail(e);
-//			}
-//			future.complete();
-//		}, success -> async.complete());
+	}
+
+	protected String createUnsignedContractCallTx(String callerId, BigInteger nonce, String calldata,
+			BigInteger gasPrice, String contractId, BigInteger amount) throws Throwable {
+		BigInteger abiVersion = BigInteger.ONE;
+		BigInteger ttl = BigInteger.ZERO;
+		BigInteger gas = BigInteger.valueOf(1579000);
+
+		ContractCallTransactionModel model = ContractCallTransactionModel.builder().abiVersion(abiVersion)
+				.callData(calldata).contractId(contractId).gas(gas).amount(amount)
+				.gasPrice(gasPrice != null ? gasPrice : BigInteger.valueOf(BaseConstants.MINIMAL_GAS_PRICE))
+				.nonce(nonce).callerId(callerId).ttl(ttl).build();
+
+		return aeternityServiceNative.transactions.blockingCreateUnsignedTransaction(model);
 	}
 }

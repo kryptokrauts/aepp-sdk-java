@@ -8,6 +8,7 @@ import com.kryptokrauts.aeternity.sdk.service.transaction.type.AbstractTransacti
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.impl.ContractCallTransaction;
 import com.kryptokrauts.sophia.compiler.generated.api.rxjava.DefaultApi;
 
+import lombok.Builder.Default;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.experimental.SuperBuilder;
@@ -18,8 +19,8 @@ public class ContractCallTransactionModel extends AbstractTransactionModel<Contr
 
 	@NonNull
 	private BigInteger abiVersion;
-
-	private BigInteger amount;
+	@Default
+	private BigInteger amount = BigInteger.ZERO;
 	@NonNull
 	private String callData;
 	@NonNull
