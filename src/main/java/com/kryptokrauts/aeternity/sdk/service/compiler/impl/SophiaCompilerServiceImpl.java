@@ -9,8 +9,6 @@ import com.kryptokrauts.aeternity.sdk.service.compiler.CompilerService;
 import com.kryptokrauts.sophia.compiler.generated.api.DefaultApiImpl;
 import com.kryptokrauts.sophia.compiler.generated.api.rxjava.DefaultApi;
 import com.kryptokrauts.sophia.compiler.generated.model.ACI;
-import com.kryptokrauts.sophia.compiler.generated.model.ByteCode;
-import com.kryptokrauts.sophia.compiler.generated.model.Calldata;
 import com.kryptokrauts.sophia.compiler.generated.model.CompileOpts;
 import com.kryptokrauts.sophia.compiler.generated.model.Contract;
 import com.kryptokrauts.sophia.compiler.generated.model.FunctionCallInput;
@@ -37,7 +35,18 @@ public final class SophiaCompilerServiceImpl implements CompilerService {
 	}
 
 	@Override
-	public Single<Calldata> encodeCalldata(String sourceCode, String function, List<String> arguments) {
+	public Single<String> asyncEncodeCalldata(String sourceCode, String function, List<String> arguments) {
+		return this.getCompilerApi().rxEncodeCalldata(buildFunctionCallInput(sourceCode, function, arguments))
+				.map(calldata -> calldata.getCalldata());
+	}
+
+	@Override
+	public String blockingEncodeCalldata(String sourceCode, String function, List<String> arguments) {
+		return this.getCompilerApi().rxEncodeCalldata(buildFunctionCallInput(sourceCode, function, arguments))
+				.blockingGet().getCalldata();
+	}
+
+	private FunctionCallInput buildFunctionCallInput(String sourceCode, String function, List<String> arguments) {
 		FunctionCallInput body = new FunctionCallInput();
 		body.source(sourceCode);
 		body.function(function);
@@ -46,7 +55,7 @@ public final class SophiaCompilerServiceImpl implements CompilerService {
 				body.addArgumentsItem(argument);
 			}
 		}
-		return this.getCompilerApi().rxEncodeCalldata(body);
+		return body;
 	}
 
 	@Override
@@ -66,7 +75,18 @@ public final class SophiaCompilerServiceImpl implements CompilerService {
 	}
 
 	@Override
-	public Single<ByteCode> compile(String contractCode, String srcFile, Object fileSystem) {
+	public Single<String> asyncCompile(String contractCode, String srcFile, Object fileSystem) {
+		return this.getCompilerApi().rxCompileContract(buildContractBody(contractCode, srcFile, fileSystem))
+				.map(byteCode -> byteCode.getBytecode());
+	}
+
+	@Override
+	public String blockingCompile(String contractCode, String srcFile, Object fileSystem) {
+		return this.getCompilerApi().rxCompileContract(buildContractBody(contractCode, srcFile, fileSystem))
+				.blockingGet().getBytecode();
+	}
+
+	private Contract buildContractBody(String contractCode, String srcFile, Object fileSystem) {
 		Contract body = new Contract().code(contractCode);
 		CompileOpts compileOpts = new CompileOpts();
 		if (!StringUtil.isNullOrEmpty(srcFile)) {
@@ -76,6 +96,6 @@ public final class SophiaCompilerServiceImpl implements CompilerService {
 			compileOpts.setFileSystem(fileSystem);
 		}
 		body.setOptions(compileOpts);
-		return this.getCompilerApi().rxCompileContract(body);
+		return body;
 	}
 }

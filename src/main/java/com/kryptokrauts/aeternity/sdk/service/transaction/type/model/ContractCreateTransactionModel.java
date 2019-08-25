@@ -13,7 +13,7 @@ import lombok.NonNull;
 import lombok.experimental.SuperBuilder;
 
 @Getter
-@SuperBuilder
+@SuperBuilder(toBuilder = true)
 public class ContractCreateTransactionModel extends AbstractTransactionModel<ContractCreateTx> {
 
 	@NonNull

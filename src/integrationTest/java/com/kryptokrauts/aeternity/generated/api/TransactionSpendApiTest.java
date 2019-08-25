@@ -9,10 +9,10 @@ import org.junit.Test;
 import org.junit.runners.MethodSorters;
 
 import com.kryptokrauts.aeternity.generated.model.PostTxResponse;
-import com.kryptokrauts.aeternity.generated.model.Tx;
-import com.kryptokrauts.aeternity.generated.model.UnsignedTx;
 import com.kryptokrauts.aeternity.sdk.domain.secret.impl.BaseKeyPair;
-import com.kryptokrauts.aeternity.sdk.service.account.domain.AccountResult;
+import com.kryptokrauts.aeternity.sdk.exception.TransactionCreateException;
+import com.kryptokrauts.aeternity.sdk.service.domain.account.AccountResult;
+import com.kryptokrauts.aeternity.sdk.service.domain.transaction.PostTransactionResult;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.model.SpendTransactionModel;
 
 import io.reactivex.Single;
@@ -43,10 +43,10 @@ public class TransactionSpendApiTest extends BaseTest {
 		SpendTransactionModel spendTx = SpendTransactionModel.builder().sender(sender).recipient(recipient)
 				.amount(amount).payload(payload).ttl(ttl).nonce(nonce).build();
 
-		UnsignedTx unsignedTxNative = aeternityServiceNative.transactions.createUnsignedTransaction(spendTx)
+		String unsignedTxNative = aeternityServiceNative.transactions.asyncCreateUnsignedTransaction(spendTx)
 				.blockingGet();
 
-		Single<UnsignedTx> unsignedTx = aeternityServiceNative.transactions.createUnsignedTransaction(spendTx);
+		Single<String> unsignedTx = aeternityServiceNative.transactions.asyncCreateUnsignedTransaction(spendTx);
 		unsignedTx.subscribe(it -> {
 			context.assertEquals(it, unsignedTxNative);
 			async.complete();
@@ -75,9 +75,9 @@ public class TransactionSpendApiTest extends BaseTest {
 			SpendTransactionModel spendTx = SpendTransactionModel.builder().sender(account.getPublicKey())
 					.recipient(recipient).amount(amount).payload(payload).ttl(ttl).nonce(nonce).build();
 
-			UnsignedTx unsignedTxNative = aeternityServiceNative.transactions.createUnsignedTransaction(spendTx)
+			String unsignedTxNative = aeternityServiceNative.transactions.asyncCreateUnsignedTransaction(spendTx)
 					.blockingGet();
-			Tx signedTx = aeternityServiceNative.transactions.signTransaction(unsignedTxNative,
+			String signedTx = aeternityServiceNative.transactions.signTransaction(unsignedTxNative,
 					keyPair.getPrivateKey());
 
 			Single<PostTxResponse> txResponse = aeternityServiceNative.transactions.postTransaction(signedTx);
@@ -94,7 +94,8 @@ public class TransactionSpendApiTest extends BaseTest {
 	}
 
 	@Test
-	public void postSpendSelfSignTxTestWithModel(TestContext context) throws CryptoException {
+	public void postSpendSelfSignTxTestWithModel(TestContext context)
+			throws CryptoException, TransactionCreateException {
 		Async async = context.async();
 
 		AccountResult acc = this.aeternityServiceNative.accounts.blockingGetAccount(Optional.empty());
@@ -105,7 +106,7 @@ public class TransactionSpendApiTest extends BaseTest {
 				.recipient(recipient.getPublicKey()).amount(new BigInteger("1000000000000000000")).payload("donation")
 				.ttl(BigInteger.ZERO).nonce(acc.getNonce().add(BigInteger.ONE)).build();
 
-		Single<PostTxResponse> txResponse = aeternityServiceNative.transactions.postTransaction(spendTx);
+		Single<PostTransactionResult> txResponse = aeternityServiceNative.transactions.asyncPostTransaction(spendTx);
 
 		txResponse.subscribe(it -> {
 			_logger.info("SpendTx hash: " + it.getTxHash());

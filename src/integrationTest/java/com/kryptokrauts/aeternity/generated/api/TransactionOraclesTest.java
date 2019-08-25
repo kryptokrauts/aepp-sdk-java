@@ -62,7 +62,7 @@ public class TransactionOraclesTest extends BaseTest {
                             BigInteger.ZERO,
                             nonce.add(BigInteger.ONE));
                 UnsignedTx unsignedTx =
-                    transactionServiceNative.createUnsignedTransaction(spendTx).blockingGet();
+                    transactionServiceNative.asyncCreateUnsignedTransaction(spendTx).blockingGet();
                 Tx signedTx =
                     transactionServiceNative.signTransaction(
                         unsignedTx, queryAccount.getPrivateKey());
@@ -107,7 +107,7 @@ public class TransactionOraclesTest extends BaseTest {
 
                 UnsignedTx unsignedTx =
                     transactionServiceNative
-                        .createUnsignedTransaction(oracleRegisterTransaction)
+                        .asyncCreateUnsignedTransaction(oracleRegisterTransaction)
                         .blockingGet();
                 Tx signedTx =
                     transactionServiceNative.signTransaction(
@@ -154,7 +154,7 @@ public class TransactionOraclesTest extends BaseTest {
 
                 UnsignedTx unsignedTx =
                     transactionServiceNative
-                        .createUnsignedTransaction(oracleQueryTransaction)
+                        .asyncCreateUnsignedTransaction(oracleQueryTransaction)
                         .blockingGet();
                 Tx signedTx =
                     transactionServiceNative.signTransaction(
@@ -204,7 +204,7 @@ public class TransactionOraclesTest extends BaseTest {
 
                 UnsignedTx unsignedTx =
                     transactionServiceNative
-                        .createUnsignedTransaction(oracleRespondTransaction)
+                        .asyncCreateUnsignedTransaction(oracleRespondTransaction)
                         .blockingGet();
                 Tx signedTx =
                     transactionServiceNative.signTransaction(
@@ -244,7 +244,7 @@ public class TransactionOraclesTest extends BaseTest {
                         .build();
                 UnsignedTx unsignedTx =
                     transactionServiceNative
-                        .createUnsignedTransaction(oracleExtendTransaction)
+                        .asyncCreateUnsignedTransaction(oracleExtendTransaction)
                         .blockingGet();
                 Tx signedTx =
                     transactionServiceNative.signTransaction(

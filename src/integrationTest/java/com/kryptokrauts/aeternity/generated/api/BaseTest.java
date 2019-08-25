@@ -22,11 +22,11 @@ import com.kryptokrauts.aeternity.generated.model.PostTxResponse;
 import com.kryptokrauts.aeternity.generated.model.Tx;
 import com.kryptokrauts.aeternity.generated.model.TxInfoObject;
 import com.kryptokrauts.aeternity.generated.model.UnsignedTx;
+import com.kryptokrauts.aeternity.sdk.constants.BaseConstants;
 import com.kryptokrauts.aeternity.sdk.constants.Network;
 import com.kryptokrauts.aeternity.sdk.domain.secret.impl.BaseKeyPair;
 import com.kryptokrauts.aeternity.sdk.service.ServiceConfiguration;
 import com.kryptokrauts.aeternity.sdk.service.account.AccountService;
-import com.kryptokrauts.aeternity.sdk.service.account.domain.AccountResult;
 import com.kryptokrauts.aeternity.sdk.service.aens.NameService;
 import com.kryptokrauts.aeternity.sdk.service.aens.NameServiceFactory;
 import com.kryptokrauts.aeternity.sdk.service.aeternity.AeternityServiceConfiguration;
@@ -34,12 +34,14 @@ import com.kryptokrauts.aeternity.sdk.service.aeternity.AeternityServiceFactory;
 import com.kryptokrauts.aeternity.sdk.service.aeternity.impl.AeternityService;
 import com.kryptokrauts.aeternity.sdk.service.chain.ChainService;
 import com.kryptokrauts.aeternity.sdk.service.chain.ChainServiceFactory;
+import com.kryptokrauts.aeternity.sdk.service.domain.account.AccountResult;
 import com.kryptokrauts.aeternity.sdk.service.keypair.KeyPairService;
 import com.kryptokrauts.aeternity.sdk.service.keypair.KeyPairServiceFactory;
 import com.kryptokrauts.aeternity.sdk.service.oracle.OracleService;
 import com.kryptokrauts.aeternity.sdk.service.oracle.OracleServiceFactory;
 import com.kryptokrauts.aeternity.sdk.service.transaction.AccountParameter;
 import com.kryptokrauts.aeternity.sdk.service.transaction.TransactionService;
+import com.kryptokrauts.aeternity.sdk.service.transaction.type.model.ContractCallTransactionModel;
 import com.kryptokrauts.sophia.compiler.generated.model.Calldata;
 import com.kryptokrauts.sophia.compiler.generated.model.SophiaJsonData;
 
@@ -161,24 +163,17 @@ public abstract class BaseTest {
 	}
 
 	protected AccountResult getAccount(String publicKey, TestContext context) {
-		Single<AccountResult> accountSingle = aeternityServiceNative.accounts
-				.asyncGetAccount(Optional.ofNullable(publicKey));
-		TestObserver<AccountResult> accountTestObserver = accountSingle.test();
-		accountTestObserver.awaitTerminalEvent();
-		if (accountTestObserver.errorCount() > 0) {
-			context.fail("Failed due to Exception " + accountTestObserver.errors().get(0));
-		}
-		AccountResult account = accountTestObserver.values().get(0);
-		return account;
+		return aeternityServiceNative.accounts.blockingGetAccount(Optional.ofNullable(publicKey));
 	}
 
 	protected PostTxResponse postTx(Tx signedTx) throws Throwable {
-		PostTxResponse postTxResponse = callMethodAndGetResult(() -> transactionServiceNative.postTransaction(signedTx),
-				PostTxResponse.class);
-		_logger.info("PostTx hash: " + postTxResponse.getTxHash());
-		GenericSignedTx txValue = waitForTxMined(postTxResponse.getTxHash());
-		_logger.info(String.format("Transaction of type %s is mined at block %s with height %s",
-				txValue.getTx().getType(), txValue.getBlockHash(), txValue.getBlockHeight()));
+		PostTxResponse postTxResponse = null;
+//				callMethodAndGetResult(() -> transactionServiceNative.postTransaction(signedTx),
+//				PostTxResponse.class);
+//		_logger.info("PostTx hash: " + postTxResponse.getTxHash());
+//		GenericSignedTx txValue = waitForTxMined(postTxResponse.getTxHash());
+//		_logger.info(String.format("Transaction of type %s is mined at block %s with height %s",
+//				txValue.getTx().getType(), txValue.getBlockHash(), txValue.getBlockHeight()));
 
 		return postTxResponse;
 	}
@@ -217,8 +212,9 @@ public abstract class BaseTest {
 
 	protected Calldata encodeCalldata(String contractSourceCode, String contractFunction,
 			List<String> contractFunctionParams) throws Throwable {
-		return callMethodAndGetResult(() -> this.aeternityServiceNative.compiler.encodeCalldata(contractSourceCode,
-				contractFunction, contractFunctionParams), Calldata.class);
+//		return callMethodAndGetResult(() -> this.aeternityServiceNative.compiler.encodeCalldata(contractSourceCode,
+//				contractFunction, contractFunctionParams), Calldata.class);
+		return null;
 	}
 
 	protected JsonObject decodeCalldata(String encodedValue, String sophiaReturnType) throws Throwable {
@@ -232,32 +228,28 @@ public abstract class BaseTest {
 	protected DryRunResults performDryRunTransactions(List<Map<AccountParameter, Object>> accounts, BigInteger block,
 			List<UnsignedTx> unsignedTxes) throws Throwable {
 
-		return callMethodAndGetResult(
-				() -> this.transactionServiceNative.dryRunTransactions(accounts, block, unsignedTxes),
-				DryRunResults.class);
+//		return callMethodAndGetResult(
+//				() -> this.transactionServiceNative.dryRunTransactions(accounts, block, unsignedTxes),
+//				DryRunResults.class);
+		return null;
 	}
 
 	/**
 	 * @TODO FIX
 	 * 
 	 */
-	protected UnsignedTx createUnsignedContractCallTx(String callerId, BigInteger nonce, String calldata,
+	protected String createUnsignedContractCallTx(String callerId, BigInteger nonce, String calldata,
 			BigInteger gasPrice, String contractId, BigInteger amount) throws Throwable {
 		BigInteger abiVersion = BigInteger.ONE;
 		BigInteger ttl = BigInteger.ZERO;
 		BigInteger gas = BigInteger.valueOf(1579000);
 
-//		AbstractTransaction<?> contractTx = aeternityServiceNative.compiler.createContractCallTransaction(abiVersion,
-//				calldata, contractId, gas,
-//				gasPrice != null ? gasPrice : BigInteger.valueOf(BaseConstants.MINIMAL_GAS_PRICE), nonce, callerId,
-//				ttl);
-//		if (amount != null) {
-//			((ContractCallTransaction) contractTx).setAmount(amount);
-//		}
-//
-//		return callMethodAndGetResult(() -> aeternityServiceNative.createUnsignedTransaction(contractTx),
-//				UnsignedTx.class);
-		return null;
+		ContractCallTransactionModel model = ContractCallTransactionModel.builder().abiVersion(abiVersion)
+				.callData(calldata).contractId(contractId).gas(gas).amount(amount)
+				.gasPrice(gasPrice != null ? gasPrice : BigInteger.valueOf(BaseConstants.MINIMAL_GAS_PRICE))
+				.nonce(nonce).callerId(callerId).ttl(ttl).build();
+
+		return aeternityServiceNative.transactions.blockingCreateUnsignedTransaction(model);
 	}
 
 	protected <T> T callMethodAndAwaitException(Supplier<Single<T>> observerMethod, Class<T> exception)

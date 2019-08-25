@@ -12,7 +12,7 @@ import lombok.experimental.SuperBuilder;
 
 @Getter
 @Setter
-@SuperBuilder
+@SuperBuilder(toBuilder = true)
 public abstract class AbstractTransactionModel<GeneratedTxModel> {
 
 	/**

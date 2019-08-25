@@ -6,6 +6,8 @@ import org.apache.tuweni.rlp.RLP;
 import com.kryptokrauts.aeternity.generated.api.rxjava.ExternalApi;
 import com.kryptokrauts.aeternity.generated.model.UnsignedTx;
 import com.kryptokrauts.aeternity.sdk.constants.SerializationTags;
+import com.kryptokrauts.aeternity.sdk.service.transaction.fee.FeeCalculationModel;
+import com.kryptokrauts.aeternity.sdk.service.transaction.fee.impl.ContractCallFeeCalculationModel;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.AbstractTransaction;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.model.ContractCallTransactionModel;
 import com.kryptokrauts.aeternity.sdk.util.EncodingUtils;
@@ -50,4 +52,8 @@ public class ContractCallTransaction extends AbstractTransaction<ContractCallTra
 		return externalApi.rxPostContractCall(model.toApiModel());
 	}
 
+	@Override
+	protected FeeCalculationModel getFeeCalculationModel() {
+		return new ContractCallFeeCalculationModel();
+	}
 }

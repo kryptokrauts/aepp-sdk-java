@@ -37,7 +37,7 @@ public abstract class AbstractTransaction<TxModel extends AbstractTransactionMod
 	 * fee calculation model for this transaction type, one of
 	 * {@link FeeCalculationModel}
 	 */
-	private FeeCalculationModel getFeeCalculationModel() {
+	protected FeeCalculationModel getFeeCalculationModel() {
 		return new BaseFeeCalculationModel();
 	}
 

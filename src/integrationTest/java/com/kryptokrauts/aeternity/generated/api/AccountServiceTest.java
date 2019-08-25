@@ -5,10 +5,10 @@ import java.util.Optional;
 
 import org.junit.Test;
 
-import com.kryptokrauts.aeternity.sdk.service.account.domain.AccountResult;
+import com.kryptokrauts.aeternity.sdk.service.domain.account.AccountResult;
 
 import io.reactivex.Single;
-import io.reactivex.observers.TestObserver;
+import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
 
 public class AccountServiceTest extends BaseTest {
@@ -22,14 +22,13 @@ public class AccountServiceTest extends BaseTest {
 
 	@Test
 	public void testAsyncGetAccountReactive(TestContext context) {
-		Single<AccountResult> accountSingle = aeternityServiceNative.accounts.asyncGetAccount(Optional.empty());
-		TestObserver<AccountResult> accountTestObserver = accountSingle.test();
-		accountTestObserver.awaitTerminalEvent();
-		if (accountTestObserver.errorCount() > 0) {
-			context.fail("Failed due to Exception " + accountTestObserver.errors().get(0));
-		}
-		AccountResult account = accountTestObserver.values().get(0);
-		context.assertTrue(account.getBalance().compareTo(BigInteger.ZERO) == 1);
+		Async async = context.async();
+		Single<AccountResult> result = this.aeternityServiceNative.accounts.asyncGetAccount(Optional.empty());
+		result.subscribe(resultObject -> {
+			context.assertTrue(resultObject.getBalance().compareTo(BigInteger.ZERO) == 1);
+			async.complete();
+		});
+		async.awaitSuccess(TEST_CASE_TIMEOUT_MILLIS);
 	}
 
 	@Test

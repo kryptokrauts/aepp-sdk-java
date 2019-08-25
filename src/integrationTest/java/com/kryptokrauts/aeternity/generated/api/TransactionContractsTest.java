@@ -65,11 +65,11 @@ public class TransactionContractsTest extends BaseTest {
 				.contractByteCode(TestConstants.testContractByteCode).deposit(deposit).fee(fee).gas(gas)
 				.gasPrice(gasPrice).nonce(nonce).ownerId(ownerId).ttl(ttl).vmVersion(vmVersion).build();
 
-		UnsignedTx unsignedTxNative = aeternityServiceNative.transactions.createUnsignedTransaction(contractTx)
+		UnsignedTx unsignedTxNative = aeternityServiceNative.transactions.asyncCreateUnsignedTransaction(contractTx)
 				.blockingGet();
 
 		Single<UnsignedTx> unsignedTxDebugSingle = aeternityServiceDebug.transactions
-				.createUnsignedTransaction(contractTx);
+				.asyncCreateUnsignedTransaction(contractTx);
 		unsignedTxDebugSingle.subscribe(it -> {
 			context.assertEquals(it.getTx(), unsignedTxNative.getTx());
 			async.complete();
@@ -95,12 +95,12 @@ public class TransactionContractsTest extends BaseTest {
 								gasPrice, nonce, callerId, ttl);
 				contractTx.setFee(BigInteger.valueOf(1454500000000000l));
 
-				UnsignedTx unsignedTxNative = transactionServiceNative.createUnsignedTransaction(contractTx)
+				UnsignedTx unsignedTxNative = transactionServiceNative.asyncCreateUnsignedTransaction(contractTx)
 						.blockingGet();
 				_logger.info("CreateContractTx hash (native unsigned): " + unsignedTxNative.getTx());
 
 				UnsignedTx unsignedTxDebug = callMethodAndGetResult(
-						() -> transactionServiceDebug.createUnsignedTransaction(contractTx), UnsignedTx.class);
+						() -> transactionServiceDebug.asyncCreateUnsignedTransaction(contractTx), UnsignedTx.class);
 				_logger.debug("CreateContractTx hash (debug unsigned): " + unsignedTxDebug.getTx());
 
 				context.assertEquals(unsignedTxNative.getTx(), unsignedTxDebug.getTx());
@@ -203,7 +203,7 @@ public class TransactionContractsTest extends BaseTest {
 									BigInteger.ZERO);
 
 					UnsignedTx unsignedTxNative = transactionServiceNative
-							.createUnsignedTransaction(contractAfterDryRunTx).blockingGet();
+							.asyncCreateUnsignedTransaction(contractAfterDryRunTx).blockingGet();
 
 					Tx signedTxNative = transactionServiceNative.signTransaction(unsignedTxNative,
 							baseKeyPair.getPrivateKey());
@@ -269,7 +269,7 @@ public class TransactionContractsTest extends BaseTest {
 								TestConstants.testContractByteCode, deposit, gas, gasPrice, nonce, ownerId, ttl,
 								vmVersion);
 
-				UnsignedTx unsignedTxNative = transactionServiceNative.createUnsignedTransaction(contractTx)
+				UnsignedTx unsignedTxNative = transactionServiceNative.asyncCreateUnsignedTransaction(contractTx)
 						.blockingGet();
 
 				Tx signedTxNative = transactionServiceNative.signTransaction(unsignedTxNative,
@@ -359,13 +359,13 @@ public class TransactionContractsTest extends BaseTest {
 								TestConstants.testContractByteCode, deposit, gas, gasPrice, nonce, ownerId, ttl,
 								vmVersion);
 
-				UnsignedTx unsignedTxNative = testnetTransactionService.createUnsignedTransaction(contractTx)
+				UnsignedTx unsignedTxNative = testnetTransactionService.asyncCreateUnsignedTransaction(contractTx)
 						.blockingGet();
 
 				Tx signedTxNative = testnetTransactionService.signTransaction(unsignedTxNative,
 						baseKeyPair.getPrivateKey());
 
-				Single<PostTxResponse> postTxResponseSingle = testnetTransactionService.postTransaction(signedTxNative);
+				Single<PostTxResponse> postTxResponseSingle = testnetTransactionService.asyncPostTransaction(signedTxNative);
 				TestObserver<PostTxResponse> postTxResponseTestObserver = postTxResponseSingle.test();
 				postTxResponseTestObserver.awaitTerminalEvent();
 				PostTxResponse postTxResponse = postTxResponseTestObserver.values().get(0);

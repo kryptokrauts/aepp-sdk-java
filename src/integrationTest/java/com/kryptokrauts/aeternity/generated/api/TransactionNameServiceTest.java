@@ -55,10 +55,10 @@ public class TransactionNameServiceTest extends BaseTest {
             .getTransactionFactory()
             .createNamePreclaimTransaction(sender, validDomain, salt, nonce, ttl);
     UnsignedTx unsignedTxNative =
-        transactionServiceNative.createUnsignedTransaction(namePreclaimTx).blockingGet();
+        transactionServiceNative.asyncCreateUnsignedTransaction(namePreclaimTx).blockingGet();
 
     Single<UnsignedTx> unsignedTx =
-        transactionServiceDebug.createUnsignedTransaction(namePreclaimTx);
+        transactionServiceDebug.asyncCreateUnsignedTransaction(namePreclaimTx);
     unsignedTx.subscribe(
         it -> {
           context.assertEquals(it, unsignedTxNative);
@@ -92,7 +92,7 @@ public class TransactionNameServiceTest extends BaseTest {
                             keyPair.getPublicKey(), validDomain, salt, nonce, ttl);
                 UnsignedTx unsignedTx =
                     transactionServiceNative
-                        .createUnsignedTransaction(namePreclaimTx)
+                        .asyncCreateUnsignedTransaction(namePreclaimTx)
                         .blockingGet();
                 Tx signedTx =
                     transactionServiceNative.signTransaction(unsignedTx, keyPair.getPrivateKey());
@@ -114,7 +114,7 @@ public class TransactionNameServiceTest extends BaseTest {
                             nonce.add(BigInteger.ONE),
                             ttl);
                 UnsignedTx unsignedClaimTx =
-                    transactionServiceNative.createUnsignedTransaction(nameClaimTx).blockingGet();
+                    transactionServiceNative.asyncCreateUnsignedTransaction(nameClaimTx).blockingGet();
                 Tx signedClaimTx =
                     transactionServiceNative.signTransaction(
                         unsignedClaimTx, keyPair.getPrivateKey());
@@ -169,7 +169,7 @@ public class TransactionNameServiceTest extends BaseTest {
                             keyPair.getPublicKey(), domain, salt, nonce, ttl);
                 UnsignedTx unsignedTx =
                     transactionServiceNative
-                        .createUnsignedTransaction(namePreclaimTx)
+                        .asyncCreateUnsignedTransaction(namePreclaimTx)
                         .blockingGet();
                 Tx signedTx =
                     transactionServiceNative.signTransaction(unsignedTx, keyPair.getPrivateKey());
@@ -183,7 +183,7 @@ public class TransactionNameServiceTest extends BaseTest {
                         .createNameClaimTransaction(
                             keyPair.getPublicKey(), domain, salt, nonce.add(BigInteger.ONE), ttl);
                 UnsignedTx unsignedClaimTx =
-                    transactionServiceNative.createUnsignedTransaction(nameClaimTx).blockingGet();
+                    transactionServiceNative.asyncCreateUnsignedTransaction(nameClaimTx).blockingGet();
                 Tx signedClaimTx =
                     transactionServiceNative.signTransaction(
                         unsignedClaimTx, keyPair.getPrivateKey());
@@ -217,7 +217,7 @@ public class TransactionNameServiceTest extends BaseTest {
                             nameTtl,
                             new LinkedList<>());
                 UnsignedTx unsignedUpdateTx =
-                    transactionServiceNative.createUnsignedTransaction(nameUpdateTx).blockingGet();
+                    transactionServiceNative.asyncCreateUnsignedTransaction(nameUpdateTx).blockingGet();
                 Tx signedUpdateTx =
                     transactionServiceNative.signTransaction(
                         unsignedUpdateTx, keyPair.getPrivateKey());
@@ -281,7 +281,7 @@ public class TransactionNameServiceTest extends BaseTest {
                         .getTransactionFactory()
                         .createNameRevokeTransaction(keyPair.getPublicKey(), nameId, nonce, ttl);
                 UnsignedTx unsignedTx =
-                    transactionServiceNative.createUnsignedTransaction(nameRevokeTx).blockingGet();
+                    transactionServiceNative.asyncCreateUnsignedTransaction(nameRevokeTx).blockingGet();
                 Tx signedTx =
                     transactionServiceNative.signTransaction(unsignedTx, keyPair.getPrivateKey());
                 _logger.info("Signed NameRevokeTx: " + signedTx.getTx());

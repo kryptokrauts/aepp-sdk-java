@@ -6,7 +6,6 @@ import org.slf4j.LoggerFactory;
 import com.kryptokrauts.aeternity.generated.ApiException;
 
 import io.reactivex.Single;
-import lombok.Getter;
 import lombok.experimental.SuperBuilder;
 
 /**
@@ -16,7 +15,6 @@ import lombok.experimental.SuperBuilder;
  * @author mitch
  * @param <T> the generated ae result object class
  */
-@Getter
 @SuperBuilder
 public abstract class GenericServiceResultObject<T, V extends GenericServiceResultObject<?, ?>> {
 
@@ -63,7 +61,7 @@ public abstract class GenericServiceResultObject<T, V extends GenericServiceResu
 		result.rootErrorMessage = determineRootErrorMessage(e);
 		result.aeAPIErrorMessage = e.getMessage();
 		_logger.warn(String.format("Error mapping GenericResultObject to class %s\ncause: %s\nroot cause: %s",
-				getResultObjectClassName(), result.getAeAPIErrorMessage(), result.getRootErrorMessage()));
+				getResultObjectClassName(), result.aeAPIErrorMessage, result.rootErrorMessage));
 		if (_logger.isDebugEnabled()) {
 			result.throwable = e;
 		}

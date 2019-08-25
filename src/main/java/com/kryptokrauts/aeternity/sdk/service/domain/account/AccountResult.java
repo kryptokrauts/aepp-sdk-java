@@ -1,4 +1,4 @@
-package com.kryptokrauts.aeternity.sdk.service.account.domain;
+package com.kryptokrauts.aeternity.sdk.service.domain.account;
 
 import java.math.BigInteger;
 
