@@ -1,25 +1,22 @@
 package com.kryptokrauts.aeternity.generated.api;
 
 import java.math.BigInteger;
-import java.util.LinkedList;
 import java.util.Random;
 
 import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
 
-import com.kryptokrauts.aeternity.generated.ApiException;
-import com.kryptokrauts.aeternity.generated.model.NameEntry;
-import com.kryptokrauts.aeternity.generated.model.PostTxResponse;
-import com.kryptokrauts.aeternity.generated.model.Tx;
-import com.kryptokrauts.aeternity.generated.model.UnsignedTx;
-import com.kryptokrauts.aeternity.sdk.domain.secret.impl.BaseKeyPair;
 import com.kryptokrauts.aeternity.sdk.service.domain.account.AccountResult;
-import com.kryptokrauts.aeternity.sdk.service.transaction.type.AbstractTransaction;
+import com.kryptokrauts.aeternity.sdk.service.domain.name.NameIdResult;
+import com.kryptokrauts.aeternity.sdk.service.domain.transaction.PostTransactionResult;
+import com.kryptokrauts.aeternity.sdk.service.transaction.type.model.NameClaimTransactionModel;
+import com.kryptokrauts.aeternity.sdk.service.transaction.type.model.NamePreclaimTransactionModel;
+import com.kryptokrauts.aeternity.sdk.service.transaction.type.model.NameRevokeTransactionModel;
+import com.kryptokrauts.aeternity.sdk.service.transaction.type.model.NameUpdateTransactionModel;
 import com.kryptokrauts.aeternity.sdk.util.CryptoUtils;
 import com.kryptokrauts.aeternity.sdk.util.EncodingUtils;
 
-import io.reactivex.Single;
 import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
 
@@ -38,68 +35,62 @@ public class TransactionNameServiceTest extends BaseTest {
 	 */
 	@Test
 	public void buildNativeNamePreclaimTransactionTest(TestContext context) {
-		Async async = context.async();
-
 		String sender = keyPairService.generateBaseKeyPair().getPublicKey();
 		BigInteger salt = CryptoUtils.generateNamespaceSalt();
 		BigInteger nonce = BigInteger.valueOf(1);
 		BigInteger ttl = BigInteger.valueOf(100);
 
-		AbstractTransaction<?> namePreclaimTx = transactionServiceNative.getTransactionFactory()
-				.createNamePreclaimTransaction(sender, validDomain, salt, nonce, ttl);
-		UnsignedTx unsignedTxNative = transactionServiceNative.asyncCreateUnsignedTransaction(namePreclaimTx)
-				.blockingGet();
+		NamePreclaimTransactionModel preclaim = NamePreclaimTransactionModel.builder().accountId(sender)
+				.name(validDomain).salt(salt).nonce(nonce).ttl(ttl).build();
 
-		Single<UnsignedTx> unsignedTx = transactionServiceDebug.asyncCreateUnsignedTransaction(namePreclaimTx);
-		unsignedTx.subscribe(it -> {
-			context.assertEquals(it, unsignedTxNative);
-			async.complete();
-		}, throwable -> context.fail(throwable));
+		String unsignedTxNative = this.aeternityServiceNative.transactions.blockingCreateUnsignedTransaction(preclaim);
+
+		String unsignedTxDebug = this.aeternityServiceDebug.transactions.blockingCreateUnsignedTransaction(preclaim);
+
+		context.assertEquals(unsignedTxDebug, unsignedTxNative);
 	}
 
-	/** @param context */
+	/**
+	 * @param context
+	 * @throws Throwable
+	 */
 	@Test
 	public void postNameClaimTxTest(TestContext context) {
 		Async async = context.async();
-		BaseKeyPair keyPair = keyPairService.generateBaseKeyPairFromSecret(TestConstants.BENEFICIARY_PRIVATE_KEY);
 		rule.vertx().executeBlocking(future -> {
 			try {
-				AccountResult account = callMethodAndGetResult(
-						() -> accountService.asyncGetAccount(keyPair.getPublicKey()), AccountResult.class);
+				_logger.info("--------------------- postNameClaimTxTest ---------------------");
+				AccountResult account = getAccount(baseKeyPair.getPublicKey(), context);
 				BigInteger salt = CryptoUtils.generateNamespaceSalt();
-				BigInteger nonce = account.getNonce().add(BigInteger.ONE);
+				BigInteger nonce = account.getNonce().add(ONE);
 				BigInteger ttl = BigInteger.ZERO;
 
-				AbstractTransaction<?> namePreclaimTx = transactionServiceNative.getTransactionFactory()
-						.createNamePreclaimTransaction(keyPair.getPublicKey(), validDomain, salt, nonce, ttl);
-				UnsignedTx unsignedTx = transactionServiceNative.asyncCreateUnsignedTransaction(namePreclaimTx)
-						.blockingGet();
-				Tx signedTx = transactionServiceNative.signTransaction(unsignedTx, keyPair.getPrivateKey());
-				_logger.info("Signed NamePreclaimTx: " + signedTx.getTx());
+				NamePreclaimTransactionModel namePreclaimTx = NamePreclaimTransactionModel.builder()
+						.accountId(baseKeyPair.getPublicKey()).name(validDomain).salt(salt).nonce(nonce).ttl(ttl)
+						.build();
 
-				PostTxResponse postTxResponse = postTx(signedTx);
-				_logger.info("NamePreclaimTx hash: " + postTxResponse.getTxHash());
-				context.assertEquals(postTxResponse.getTxHash(),
-						transactionServiceNative.computeTxHash(signedTx.getTx()));
+				PostTransactionResult result = this.postTx(namePreclaimTx);
+				_logger.info("NamePreclaimTx hash: " + result.getTxHash());
+				context.assertEquals(result.getTxHash(),
+						this.aeternityServiceNative.transactions.computeTxHash(namePreclaimTx));
 
-				AbstractTransaction<?> nameClaimTx = transactionServiceNative.getTransactionFactory()
-						.createNameClaimTransaction(keyPair.getPublicKey(), validDomain, salt,
-								nonce.add(BigInteger.ONE), ttl);
-				UnsignedTx unsignedClaimTx = transactionServiceNative.asyncCreateUnsignedTransaction(nameClaimTx)
-						.blockingGet();
-				Tx signedClaimTx = transactionServiceNative.signTransaction(unsignedClaimTx, keyPair.getPrivateKey());
-				_logger.info("Signed NameClaimTx: " + signedClaimTx.getTx());
-				postTxResponse = postTx(signedClaimTx);
+				NameClaimTransactionModel nameClaimTx = NameClaimTransactionModel.builder()
+						.accountId(baseKeyPair.getPublicKey()).name(validDomain).nameSalt(salt).nonce(nonce.add(ONE))
+						.ttl(ttl).build();
+
+				_logger.info(this.aeternityServiceNative.transactions.blockingCreateUnsignedTransaction(nameClaimTx));
+
+				result = this.postTx(nameClaimTx);
 				_logger.info(String.format("Using namespace %s and salt %s for committmentId %s", validDomain, salt,
 						EncodingUtils.generateCommitmentHash(validDomain, salt)));
-				_logger.info("NameClaimTx hash: " + postTxResponse.getTxHash());
+				_logger.info("NameClaimTx hash: " + result.getTxHash());
 
 				// GenericSignedTx genericSignedTx = getTxByHash(postTxResponse.getTxHash(),
 				// 10);
 				// context.assertTrue(genericSignedTx.getBlockHeight().intValue() > 0);
 				// NameClaimTxJSON typedTx = (NameClaimTxJSON) genericSignedTx.getTx();
 				// _logger.info("Successfully claimed aens " + typedTx.getName());
-
+				_logger.info("--------------------- postNameClaimTxTest ---------------------");
 			} catch (Throwable e) {
 				context.fail(e);
 			}
@@ -107,65 +98,67 @@ public class TransactionNameServiceTest extends BaseTest {
 		}, success -> async.complete());
 	}
 
-	/** @param context */
+	/**
+	 * @param context
+	 * @throws Throwable
+	 */
 	@Test
 	public void postUpdateTxTest(TestContext context) {
 		Async async = context.async();
-		BaseKeyPair keyPair = keyPairService.generateBaseKeyPairFromSecret(TestConstants.BENEFICIARY_PRIVATE_KEY);
 		rule.vertx().executeBlocking(future -> {
 			try {
-				AccountResult account = callMethodAndGetResult(
-						() -> accountService.asyncGetAccount(keyPair.getPublicKey()), AccountResult.class);
-				BigInteger nonce = account.getNonce().add(BigInteger.ONE);
+				_logger.info("--------------------- postUpdateTxTest ---------------------");
+				AccountResult account = getAccount(baseKeyPair.getPublicKey(), context);
+				BigInteger nonce = account.getNonce().add(ONE);
 				BigInteger salt = CryptoUtils.generateNamespaceSalt();
 				BigInteger ttl = BigInteger.ZERO;
 				String domain = TestConstants.DOMAIN + random.nextInt() + TestConstants.NAMESPACE;
 
 				/** create a new namespace to update later */
-				AbstractTransaction<?> namePreclaimTx = transactionServiceNative.getTransactionFactory()
-						.createNamePreclaimTransaction(keyPair.getPublicKey(), domain, salt, nonce, ttl);
-				UnsignedTx unsignedTx = transactionServiceNative.asyncCreateUnsignedTransaction(namePreclaimTx)
-						.blockingGet();
-				Tx signedTx = transactionServiceNative.signTransaction(unsignedTx, keyPair.getPrivateKey());
-				PostTxResponse postTxResponse = postTx(signedTx);
-				context.assertEquals(postTxResponse.getTxHash(),
-						transactionServiceNative.computeTxHash(signedTx.getTx()));
-				AbstractTransaction<?> nameClaimTx = transactionServiceNative.getTransactionFactory()
-						.createNameClaimTransaction(keyPair.getPublicKey(), domain, salt, nonce.add(BigInteger.ONE),
-								ttl);
-				UnsignedTx unsignedClaimTx = transactionServiceNative.asyncCreateUnsignedTransaction(nameClaimTx)
-						.blockingGet();
-				Tx signedClaimTx = transactionServiceNative.signTransaction(unsignedClaimTx, keyPair.getPrivateKey());
-				PostTxResponse postClaimTxResponse = postTx(signedClaimTx);
-				NameEntry nameEntry = callMethodAndGetResult(() -> this.nameService.getNameId(domain), NameEntry.class);
-				BigInteger initialTTL = nameEntry.getTtl();
+				NamePreclaimTransactionModel namePreclaimTx = NamePreclaimTransactionModel.builder()
+						.accountId(baseKeyPair.getPublicKey()).name(domain).salt(salt).nonce(nonce).ttl(ttl).build();
+
+				PostTransactionResult namePreclaimResult = this.postTx(namePreclaimTx);
+				_logger.info("NamePreclaimTx hash: " + namePreclaimResult.getTxHash());
+
+				context.assertEquals(namePreclaimResult.getTxHash(),
+						this.aeternityServiceNative.transactions.computeTxHash(namePreclaimTx));
+
+				NameClaimTransactionModel nameClaimTx = NameClaimTransactionModel.builder()
+						.accountId(baseKeyPair.getPublicKey()).name(domain).nameSalt(salt).nonce(nonce.add(ONE))
+						.ttl(ttl).build();
+				PostTransactionResult nameClaimResult = this.postTx(nameClaimTx);
+				_logger.info(String.format("Using namespace %s and salt %s for committmentId %s", domain, salt,
+						EncodingUtils.generateCommitmentHash(domain, salt)));
+				_logger.info("NameClaimTx hash: " + nameClaimResult.getTxHash());
+
+				NameIdResult nameIdResult = this.aeternityServiceNative.names.blockingGetNameId(domain);
+				BigInteger initialTTL = nameIdResult.getTtl();
+
 				_logger.info(
 						String.format("Created namespace %s with salt %s and nameEntry %s in tx %s for update test",
-								domain, salt, nameEntry, postClaimTxResponse.getTxHash()));
+								domain, salt, nameIdResult, nameClaimResult.getTxHash()));
 				/** finished creating namespace */
+
 				BigInteger nameTtl = BigInteger.valueOf(10000l);
 				BigInteger clientTtl = BigInteger.valueOf(50l);
-				account = callMethodAndGetResult(() -> accountService.asyncGetAccount(keyPair.getPublicKey()),
-						AccountResult.class);
-				nonce = account.getNonce().add(BigInteger.ONE);
+				account = getAccount(baseKeyPair.getPublicKey(), context);
+				nonce = account.getNonce().add(ONE);
 
-				AbstractTransaction<?> nameUpdateTx = transactionServiceNative.getTransactionFactory()
-						.createNameUpdateTransaction(keyPair.getPublicKey(), nameEntry.getId(), nonce, ttl, clientTtl,
-								nameTtl, new LinkedList<>());
-				UnsignedTx unsignedUpdateTx = transactionServiceNative.asyncCreateUnsignedTransaction(nameUpdateTx)
-						.blockingGet();
-				Tx signedUpdateTx = transactionServiceNative.signTransaction(unsignedUpdateTx, keyPair.getPrivateKey());
+				NameUpdateTransactionModel nameUpdateTx = NameUpdateTransactionModel.builder()
+						.accountId(baseKeyPair.getPublicKey()).nameId(nameIdResult.getId()).nonce(nonce).ttl(ttl)
+						.clientTtl(clientTtl).nameTtl(nameTtl).build();
 
-				PostTxResponse postUpdateTxResponse = postTx(signedUpdateTx);
-				context.assertEquals(postUpdateTxResponse.getTxHash(),
-						transactionServiceNative.computeTxHash(signedUpdateTx.getTx()));
+				PostTransactionResult nameUpdateResult = this.postTx(nameUpdateTx);
+				context.assertEquals(nameUpdateResult.getTxHash(),
+						this.aeternityServiceNative.transactions.computeTxHash(nameUpdateTx));
 
-				nameEntry = callMethodAndGetResult(() -> this.nameService.getNameId(domain), NameEntry.class);
+				nameIdResult = this.aeternityServiceNative.names.blockingGetNameId(domain);
 				_logger.info(
 						String.format("Updated namespace %s with salt %s and nameEntry %s in tx %s for update test",
-								domain, salt, nameEntry, postClaimTxResponse.getTxHash()));
+								domain, salt, nameIdResult, nameUpdateResult.getTxHash()));
 
-				BigInteger updatedTTL = nameEntry.getTtl();
+				BigInteger updatedTTL = nameIdResult.getTtl();
 				// subtract 40000 because initial default ttl is 50000 and updated ttl was 10000
 				int diffTtl = initialTTL.subtract(updatedTTL).intValue();
 				context.assertTrue(diffTtl <= 40000);
@@ -173,7 +166,7 @@ public class TransactionNameServiceTest extends BaseTest {
 					_logger.info(String.format("Diff of Ttl is %s, this happens when meanwhile new blocks are mined",
 							diffTtl));
 				}
-
+				_logger.info("--------------------- postUpdateTxTest ---------------------");
 			} catch (Throwable e) {
 				context.fail(e);
 			}
@@ -181,41 +174,37 @@ public class TransactionNameServiceTest extends BaseTest {
 		}, success -> async.complete());
 	}
 
-	/** @param context */
+	/**
+	 * @param context
+	 * @throws Throwable
+	 */
 	@Test
 	public void postRevokeTxTest(TestContext context) {
 		Async async = context.async();
-		BaseKeyPair keyPair = keyPairService.generateBaseKeyPairFromSecret(TestConstants.BENEFICIARY_PRIVATE_KEY);
 		rule.vertx().executeBlocking(future -> {
 			try {
-				String nameId = callMethodAndGetResult(() -> this.nameService.getNameId(validDomain), NameEntry.class)
-						.getId();
+				_logger.info("--------------------- postRevokeTxTest ---------------------");
+				String nameId = this.aeternityServiceNative.names.blockingGetNameId(validDomain).getId();
 
-				AccountResult account = callMethodAndGetResult(
-						() -> accountService.asyncGetAccount(keyPair.getPublicKey()), AccountResult.class);
-				BigInteger nonce = account.getNonce().add(BigInteger.ONE);
+				AccountResult account = getAccount(baseKeyPair.getPublicKey(), context);
+				BigInteger nonce = account.getNonce().add(ONE);
 				BigInteger ttl = BigInteger.ZERO;
 
-				AbstractTransaction<?> nameRevokeTx = transactionServiceNative.getTransactionFactory()
-						.createNameRevokeTransaction(keyPair.getPublicKey(), nameId, nonce, ttl);
-				UnsignedTx unsignedTx = transactionServiceNative.asyncCreateUnsignedTransaction(nameRevokeTx)
-						.blockingGet();
-				Tx signedTx = transactionServiceNative.signTransaction(unsignedTx, keyPair.getPrivateKey());
-				_logger.info("Signed NameRevokeTx: " + signedTx.getTx());
+				NameRevokeTransactionModel nameRevokeTx = NameRevokeTransactionModel.builder()
+						.accountId(baseKeyPair.getPublicKey()).nameId(nameId).nonce(nonce).ttl(ttl).build();
 
-				PostTxResponse postTxResponse = postTx(signedTx);
-				_logger.info("NameRevokeTx hash: " + postTxResponse.getTxHash());
-				context.assertEquals(postTxResponse.getTxHash(),
-						transactionServiceNative.computeTxHash(signedTx.getTx()));
+				PostTransactionResult nameRevokeResult = this.postTx(nameRevokeTx);
+				_logger.info("NameRevokeTx hash: " + nameRevokeResult.getTxHash());
 
-				try {
-					callMethodAndAwaitException(() -> this.nameService.getNameId(validDomain), NameEntry.class);
-				} catch (Throwable t) {
-					context.assertEquals(ApiException.class, t.getClass());
-					context.assertEquals("Not Found", t.getMessage());
-					_logger.info(String.format("Validated, that namespace %s is revoked", validDomain));
-				}
+				context.assertEquals(nameRevokeResult.getTxHash(),
+						this.aeternityServiceNative.transactions.computeTxHash(nameRevokeTx));
 
+				NameIdResult result = this.aeternityServiceNative.names.blockingGetNameId(validDomain);
+				context.assertTrue("{\"reason\":\"Name revoked\"}".contentEquals(result.getRootErrorMessage()));
+
+				_logger.info(String.format("Validated, that namespace %s is revoked", validDomain));
+
+				_logger.info("--------------------- postRevokeTxTest ---------------------");
 			} catch (Throwable e) {
 				context.fail(e);
 			}

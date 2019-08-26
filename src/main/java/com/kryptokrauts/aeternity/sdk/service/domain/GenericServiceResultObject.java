@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory;
 import com.kryptokrauts.aeternity.generated.ApiException;
 
 import io.reactivex.Single;
+import lombok.Getter;
 import lombok.experimental.SuperBuilder;
 
 /**
@@ -15,6 +16,7 @@ import lombok.experimental.SuperBuilder;
  * @author mitch
  * @param <T> the generated ae result object class
  */
+@Getter
 @SuperBuilder
 public abstract class GenericServiceResultObject<T, V extends GenericServiceResultObject<?, ?>> {
 
