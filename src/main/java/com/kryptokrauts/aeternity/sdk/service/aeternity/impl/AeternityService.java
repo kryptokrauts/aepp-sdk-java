@@ -11,40 +11,43 @@ import com.kryptokrauts.aeternity.sdk.service.compiler.CompilerService;
 import com.kryptokrauts.aeternity.sdk.service.compiler.impl.SophiaCompilerServiceImpl;
 import com.kryptokrauts.aeternity.sdk.service.info.InfoService;
 import com.kryptokrauts.aeternity.sdk.service.info.impl.InfoServiceImpl;
+import com.kryptokrauts.aeternity.sdk.service.oracle.OracleService;
+import com.kryptokrauts.aeternity.sdk.service.oracle.impl.OracleServiceImpl;
 import com.kryptokrauts.aeternity.sdk.service.transaction.TransactionService;
 import com.kryptokrauts.aeternity.sdk.service.transaction.impl.TransactionServiceImpl;
 import com.kryptokrauts.sophia.compiler.generated.api.DefaultApiImpl;
 import com.kryptokrauts.sophia.compiler.generated.api.rxjava.DefaultApi;
-
 import lombok.NonNull;
 
 public class AeternityService {
 
-	@NonNull
-	protected AeternityServiceConfiguration config;
+  @NonNull protected AeternityServiceConfiguration config;
 
-	private ExternalApi externalApi;
+  private ExternalApi externalApi;
 
-	private DefaultApi compilerApi;
+  private DefaultApi compilerApi;
 
-	public TransactionService transactions;
+  public TransactionService transactions;
 
-	public AccountService accounts;
+  public AccountService accounts;
 
-	public CompilerService compiler;
+  public CompilerService compiler;
 
-	public InfoService info;
+  public InfoService info;
 
-	public NameService names;
+  public NameService names;
 
-	public AeternityService(AeternityServiceConfiguration config) {
-		this.config = config;
-		this.externalApi = new ExternalApi(new ExternalApiImpl(config.getApiClient()));
-		this.compilerApi = new DefaultApi(new DefaultApiImpl(config.getCompilerApiClient()));
-		this.transactions = new TransactionServiceImpl(this.config, this.externalApi, this.compilerApi);
-		this.accounts = new AccountServiceImpl(this.config, this.externalApi);
-		this.compiler = new SophiaCompilerServiceImpl(this.config);
-		this.info = new InfoServiceImpl(this.config, this.externalApi);
-		this.names = new NameServiceImpl(this.config, this.externalApi);
-	}
+  public OracleService oracles;
+
+  public AeternityService(AeternityServiceConfiguration config) {
+    this.config = config;
+    this.externalApi = new ExternalApi(new ExternalApiImpl(config.getApiClient()));
+    this.compilerApi = new DefaultApi(new DefaultApiImpl(config.getCompilerApiClient()));
+    this.transactions = new TransactionServiceImpl(this.config, this.externalApi, this.compilerApi);
+    this.accounts = new AccountServiceImpl(this.config, this.externalApi);
+    this.compiler = new SophiaCompilerServiceImpl(this.config);
+    this.info = new InfoServiceImpl(this.config, this.externalApi);
+    this.names = new NameServiceImpl(this.config, this.externalApi);
+    this.oracles = new OracleServiceImpl(this.config, this.externalApi);
+  }
 }

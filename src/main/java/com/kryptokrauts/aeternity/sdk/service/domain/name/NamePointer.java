@@ -6,7 +6,7 @@ import lombok.Getter;
 @Builder
 @Getter
 public class NamePointer {
-	private String key;
+  private String key;
 
-	private String id;
+  private String id;
 }

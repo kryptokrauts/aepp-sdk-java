@@ -1,20 +1,15 @@
 package com.kryptokrauts.aeternity.generated.api;
 
 import com.kryptokrauts.aeternity.generated.model.OracleQuery;
-import com.kryptokrauts.aeternity.generated.model.PostTxResponse;
 import com.kryptokrauts.aeternity.generated.model.RegisteredOracle;
-import com.kryptokrauts.aeternity.generated.model.RelativeTTL;
-import com.kryptokrauts.aeternity.generated.model.TTL;
-import com.kryptokrauts.aeternity.generated.model.TTL.TypeEnum;
-import com.kryptokrauts.aeternity.generated.model.Tx;
-import com.kryptokrauts.aeternity.generated.model.UnsignedTx;
 import com.kryptokrauts.aeternity.sdk.domain.secret.impl.BaseKeyPair;
-import com.kryptokrauts.aeternity.sdk.service.transaction.fee.impl.OracleFeeCalculationModel;
-import com.kryptokrauts.aeternity.sdk.service.transaction.type.impl.OracleExtendTransaction;
-import com.kryptokrauts.aeternity.sdk.service.transaction.type.impl.OracleQueryTransaction;
-import com.kryptokrauts.aeternity.sdk.service.transaction.type.impl.OracleRegisterTransaction;
-import com.kryptokrauts.aeternity.sdk.service.transaction.type.impl.OracleRespondTransaction;
-import com.kryptokrauts.aeternity.sdk.service.transaction.type.impl.SpendTransaction;
+import com.kryptokrauts.aeternity.sdk.service.domain.transaction.PostTransactionResult;
+import com.kryptokrauts.aeternity.sdk.service.oracle.domain.OracleTTLType;
+import com.kryptokrauts.aeternity.sdk.service.transaction.type.model.OracleExtendTransactionModel;
+import com.kryptokrauts.aeternity.sdk.service.transaction.type.model.OracleQueryTransactionModel;
+import com.kryptokrauts.aeternity.sdk.service.transaction.type.model.OracleRegisterTransactionModel;
+import com.kryptokrauts.aeternity.sdk.service.transaction.type.model.OracleRespondTransactionModel;
+import com.kryptokrauts.aeternity.sdk.service.transaction.type.model.SpendTransactionModel;
 import com.kryptokrauts.aeternity.sdk.util.EncodingUtils;
 import com.kryptokrauts.aeternity.sdk.util.UnitConversionUtil;
 import com.kryptokrauts.aeternity.sdk.util.UnitConversionUtil.Unit;
@@ -28,7 +23,6 @@ import org.junit.runners.MethodSorters;
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class TransactionOraclesTest extends BaseTest {
 
-  static BaseKeyPair queryAccount;
   static BaseKeyPair oracleAccount;
 
   static String oracleId;
@@ -38,8 +32,6 @@ public class TransactionOraclesTest extends BaseTest {
 
   @Test
   public void aGenerateKeyPairAndFundOracleAccount(TestContext context) {
-    queryAccount =
-        keyPairService.generateBaseKeyPairFromSecret(TestConstants.BENEFICIARY_PRIVATE_KEY);
     oracleAccount = keyPairService.generateBaseKeyPair();
 
     oracleId = oracleAccount.getPublicKey().replace("ak_", "ok_");
@@ -50,26 +42,17 @@ public class TransactionOraclesTest extends BaseTest {
             future -> {
               try {
                 BigInteger amount = UnitConversionUtil.toAettos("10", Unit.AE).toBigInteger();
-                BigInteger nonce = getAccount(queryAccount.getPublicKey()).getNonce();
-                SpendTransaction spendTx =
-                    transactionServiceNative
-                        .getTransactionFactory()
-                        .createSpendTransaction(
-                            queryAccount.getPublicKey(),
-                            oracleAccount.getPublicKey(),
-                            amount,
-                            "",
-                            BigInteger.ZERO,
-                            nonce.add(BigInteger.ONE));
-                UnsignedTx unsignedTx =
-                    transactionServiceNative.asyncCreateUnsignedTransaction(spendTx).blockingGet();
-                Tx signedTx =
-                    transactionServiceNative.signTransaction(
-                        unsignedTx, queryAccount.getPrivateKey());
-                PostTxResponse txResponse =
-                    transactionServiceNative.postTransaction(signedTx).blockingGet();
-                _logger.info(txResponse.getTxHash());
-                waitForTxMined(txResponse.getTxHash());
+                SpendTransactionModel spendTx =
+                    SpendTransactionModel.builder()
+                        .amount(amount)
+                        .sender(baseKeyPair.getPublicKey())
+                        .recipient(oracleAccount.getPublicKey())
+                        .ttl(ZERO)
+                        .nonce(getNextBaseKeypairNonce())
+                        .build();
+                PostTransactionResult postResult = this.postTx(spendTx);
+                _logger.info(postResult.getTxHash());
+                waitForTxMined(postResult.getTxHash());
               } catch (Throwable e) {
                 context.fail(e);
               }
@@ -85,38 +68,29 @@ public class TransactionOraclesTest extends BaseTest {
         .executeBlocking(
             future -> {
               try {
-                BigInteger nonce = getAccount(oracleAccount.getPublicKey()).getNonce();
+                BigInteger nonce = getAccount(oracleAccount.getPublicKey()).getNonce().add(ONE);
                 BigInteger currentHeight =
-                    chainService.getCurrentKeyBlock().blockingGet().getHeight();
+                    this.aeternityServiceNative.info.blockingGetCurrentKeyBlock().getHeight();
                 initialOracleTtl = currentHeight.add(BigInteger.valueOf(5000));
-                TTL oracleTtl = new TTL();
-                oracleTtl.setType(TypeEnum.BLOCK);
-                oracleTtl.setValue(initialOracleTtl);
-                OracleRegisterTransaction oracleRegisterTransaction =
-                    OracleRegisterTransaction.builder()
+
+                OracleRegisterTransactionModel oracleRegisterTx =
+                    OracleRegisterTransactionModel.builder()
                         .accountId(oracleAccount.getPublicKey())
-                        .abiVersion(BigInteger.ZERO)
-                        .nonce(nonce.add(BigInteger.ONE))
-                        .oracleTtl(oracleTtl)
-                        .queryFee(BigInteger.valueOf(100)) // 100 ættos
+                        .abiVersion(ZERO)
+                        .nonce(nonce)
+                        .oracleTtl(initialOracleTtl)
+                        .oracleTtlType(OracleTTLType.BLOCK)
+                        .queryFee(BigInteger.valueOf(100))
                         .queryFormat("string")
                         .responseFormat("string")
-                        .ttl(BigInteger.ZERO)
-                        .feeCalculationModel(new OracleFeeCalculationModel())
+                        .ttl(ZERO)
                         .build();
 
-                UnsignedTx unsignedTx =
-                    transactionServiceNative
-                        .asyncCreateUnsignedTransaction(oracleRegisterTransaction)
-                        .blockingGet();
-                Tx signedTx =
-                    transactionServiceNative.signTransaction(
-                        unsignedTx, oracleAccount.getPrivateKey());
-                _logger.info("SignedTx: " + signedTx.getTx());
-                PostTxResponse postTxResponse =
-                    transactionServiceNative.postTransaction(signedTx).blockingGet();
-                _logger.info("OracleRegisterTx-Hash: " + postTxResponse.getTxHash());
-                waitForTxMined(postTxResponse.getTxHash());
+                PostTransactionResult postResult =
+                    this.aeternityServiceNative.transactions.blockingPostTransaction(
+                        oracleRegisterTx, oracleAccount.getPrivateKey());
+                _logger.info(postResult.getTxHash());
+                waitForTxMined(postResult.getTxHash());
               } catch (Throwable e) {
                 context.fail(e);
               }
@@ -132,43 +106,31 @@ public class TransactionOraclesTest extends BaseTest {
         .executeBlocking(
             future -> {
               try {
-                BigInteger nonce = getAccount(queryAccount.getPublicKey()).getNonce();
-                TTL queryTtl = new TTL();
-                queryTtl.setType(TypeEnum.DELTA);
-                queryTtl.setValue(BigInteger.valueOf(50));
-                RelativeTTL responseTtl = new RelativeTTL();
-                responseTtl.setType(RelativeTTL.TypeEnum.DELTA);
-                responseTtl.setValue(BigInteger.valueOf(100));
-                OracleQueryTransaction oracleQueryTransaction =
-                    OracleQueryTransaction.builder()
-                        .senderId(queryAccount.getPublicKey())
+                BigInteger nonce = getNextBaseKeypairNonce();
+                OracleQueryTransactionModel oracleQueryTx =
+                    OracleQueryTransactionModel.builder()
+                        .senderId(baseKeyPair.getPublicKey())
                         .oracleId(oracleId)
-                        .nonce(nonce.add(BigInteger.ONE))
+                        .nonce(nonce)
                         .query("Am I stupid?")
-                        .queryFee(BigInteger.valueOf(100)) // 100 ættos
-                        .queryTtl(queryTtl)
-                        .responseTtl(responseTtl)
-                        .ttl(BigInteger.ZERO)
-                        .feeCalculationModel(new OracleFeeCalculationModel())
+                        .queryFee(BigInteger.valueOf(100))
+                        .queryTtl(BigInteger.valueOf(50))
+                        .ttl(ZERO)
+                        .queryTtlType(OracleTTLType.DELTA)
+                        .responseTtl(BigInteger.valueOf(100))
                         .build();
 
-                UnsignedTx unsignedTx =
-                    transactionServiceNative
-                        .asyncCreateUnsignedTransaction(oracleQueryTransaction)
-                        .blockingGet();
-                Tx signedTx =
-                    transactionServiceNative.signTransaction(
-                        unsignedTx, queryAccount.getPrivateKey());
-                _logger.info("SignedTx: " + signedTx.getTx());
-                PostTxResponse postTxResponse =
-                    transactionServiceNative.postTransaction(signedTx).blockingGet();
-                _logger.info("OracleQueryTx-Hash: " + postTxResponse.getTxHash());
-                waitForTxMined(postTxResponse.getTxHash());
-                queryId =
-                    EncodingUtils.queryId(
-                        queryAccount.getPublicKey(), nonce.add(BigInteger.ONE), oracleId);
+                PostTransactionResult postResult =
+                    this.aeternityServiceNative.transactions.blockingPostTransaction(
+                        oracleQueryTx, baseKeyPair.getPrivateKey());
+                _logger.info(postResult.getTxHash());
+                waitForTxMined(postResult.getTxHash());
+                queryId = EncodingUtils.queryId(baseKeyPair.getPublicKey(), nonce, oracleId);
                 OracleQuery oracleQuery =
-                    oracleService.getOracleQuery(oracleId, queryId).blockingGet();
+                    this.aeternityServiceNative
+                        .oracles
+                        .getOracleQuery(oracleId, queryId)
+                        .blockingGet();
                 _logger.debug(oracleQuery.toString());
               } catch (Throwable e) {
                 context.fail(e);
@@ -185,35 +147,25 @@ public class TransactionOraclesTest extends BaseTest {
         .executeBlocking(
             future -> {
               try {
-                BigInteger nonce = getAccount(oracleAccount.getPublicKey()).getNonce();
-                RelativeTTL responseTtl = new RelativeTTL();
-                responseTtl.setType(RelativeTTL.TypeEnum.DELTA);
-                responseTtl.setValue(BigInteger.valueOf(100));
-                OracleRespondTransaction oracleRespondTransaction =
-                    OracleRespondTransaction.builder()
+                BigInteger nonce = getAccount(oracleAccount.getPublicKey()).getNonce().add(ONE);
+                OracleRespondTransactionModel oracleRespondTx =
+                    OracleRespondTransactionModel.builder()
                         .senderId(oracleAccount.getPublicKey())
                         .oracleId(oracleAccount.getPublicKey().replace("ak_", "ok_"))
                         .queryId(queryId)
-                        .nonce(nonce.add(BigInteger.ONE))
-                        .response("yes you are!")
-                        .responseTtl(responseTtl)
+                        .nonce(nonce)
+                        .response("yes you are nuts!")
+                        .responseTtl(BigInteger.valueOf(100))
                         .responseFormat("response Specification")
-                        .ttl(BigInteger.ZERO)
-                        .feeCalculationModel(new OracleFeeCalculationModel())
+                        .ttl(ZERO)
                         .build();
 
-                UnsignedTx unsignedTx =
-                    transactionServiceNative
-                        .asyncCreateUnsignedTransaction(oracleRespondTransaction)
-                        .blockingGet();
-                Tx signedTx =
-                    transactionServiceNative.signTransaction(
-                        unsignedTx, oracleAccount.getPrivateKey());
-                _logger.info("SignedTx: " + signedTx.getTx());
-                PostTxResponse postTxResponse =
-                    transactionServiceNative.postTransaction(signedTx).blockingGet();
-                _logger.info("OracleResponseTx-Hash: " + postTxResponse.getTxHash());
-                waitForTxMined(postTxResponse.getTxHash());
+                PostTransactionResult postResult =
+                    this.aeternityServiceNative.transactions.blockingPostTransaction(
+                        oracleRespondTx, oracleAccount.getPrivateKey());
+                _logger.info(postResult.getTxHash());
+                waitForTxMined(postResult.getTxHash());
+
               } catch (Throwable e) {
                 context.fail(e);
               }
@@ -230,32 +182,24 @@ public class TransactionOraclesTest extends BaseTest {
             future -> {
               try {
                 BigInteger additionalTtl = BigInteger.valueOf(100);
-                BigInteger nonce = getAccount(oracleAccount.getPublicKey()).getNonce();
-                RelativeTTL relativeTTL = new RelativeTTL();
-                relativeTTL.setType(RelativeTTL.TypeEnum.DELTA);
-                relativeTTL.setValue(additionalTtl);
-                OracleExtendTransaction oracleExtendTransaction =
-                    OracleExtendTransaction.builder()
-                        .nonce(nonce.add(BigInteger.ONE))
+                BigInteger nonce = getAccount(oracleAccount.getPublicKey()).getNonce().add(ONE);
+
+                OracleExtendTransactionModel oracleExtendTx =
+                    OracleExtendTransactionModel.builder()
+                        .nonce(nonce)
                         .oracleId(oracleId)
-                        .oracleRelativeTtl(relativeTTL)
-                        .ttl(BigInteger.ZERO)
-                        .feeCalculationModel(new OracleFeeCalculationModel())
+                        .oracleRelativeTtl(additionalTtl)
+                        .ttl(ZERO)
                         .build();
-                UnsignedTx unsignedTx =
-                    transactionServiceNative
-                        .asyncCreateUnsignedTransaction(oracleExtendTransaction)
-                        .blockingGet();
-                Tx signedTx =
-                    transactionServiceNative.signTransaction(
-                        unsignedTx, oracleAccount.getPrivateKey());
-                _logger.info("SignedTx: " + signedTx.getTx());
-                PostTxResponse postTxResponse =
-                    transactionServiceNative.postTransaction(signedTx).blockingGet();
-                _logger.info("OracleExtendTx-Hash: " + postTxResponse.getTxHash());
-                waitForTxMined(postTxResponse.getTxHash());
+
+                PostTransactionResult postResult =
+                    this.aeternityServiceNative.transactions.blockingPostTransaction(
+                        oracleExtendTx, oracleAccount.getPrivateKey());
+                _logger.info(postResult.getTxHash());
+                waitForTxMined(postResult.getTxHash());
+
                 RegisteredOracle registeredOracle =
-                    oracleService.getRegisteredOracle(oracleId).blockingGet();
+                    this.aeternityServiceNative.oracles.getRegisteredOracle(oracleId).blockingGet();
                 context.assertEquals(
                     initialOracleTtl.add(additionalTtl), registeredOracle.getTtl());
                 _logger.info(registeredOracle.toString());
