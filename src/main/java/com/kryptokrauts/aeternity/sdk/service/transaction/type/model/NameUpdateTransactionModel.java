@@ -3,7 +3,7 @@ package com.kryptokrauts.aeternity.sdk.service.transaction.type.model;
 import com.kryptokrauts.aeternity.generated.api.rxjava.ExternalApi;
 import com.kryptokrauts.aeternity.generated.model.NameUpdateTx;
 import com.kryptokrauts.aeternity.sdk.constants.ApiIdentifiers;
-import com.kryptokrauts.aeternity.sdk.service.domain.name.NamePointer;
+import com.kryptokrauts.aeternity.sdk.service.name.domain.NamePointerModel;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.AbstractTransaction;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.impl.NameUpdateTransaction;
 import com.kryptokrauts.aeternity.sdk.util.ValidationUtil;
@@ -30,7 +30,7 @@ public class NameUpdateTransactionModel extends AbstractTransactionModel<NameUpd
   @NonNull private BigInteger nameTtl;
   @NonNull private BigInteger clientTtl;
 
-  @Default private List<NamePointer> pointers = new LinkedList<NamePointer>();
+  @Default private List<NamePointerModel> pointers = new LinkedList<NamePointerModel>();
 
   @Override
   public NameUpdateTx toApiModel() {

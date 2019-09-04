@@ -1,7 +1,7 @@
-package com.kryptokrauts.aeternity.sdk.service.domain.account;
+package com.kryptokrauts.aeternity.sdk.service.account.domain;
 
 import com.kryptokrauts.aeternity.generated.model.Account;
-import com.kryptokrauts.aeternity.sdk.service.domain.GenericServiceResultObject;
+import com.kryptokrauts.aeternity.sdk.domain.GenericResultObject;
 import java.math.BigInteger;
 import lombok.Getter;
 import lombok.ToString;
@@ -10,7 +10,7 @@ import lombok.experimental.SuperBuilder;
 @Getter
 @SuperBuilder
 @ToString
-public class AccountResult extends GenericServiceResultObject<Account, AccountResult> {
+public class AccountResult extends GenericResultObject<Account, AccountResult> {
 
   private String publicKey;
 

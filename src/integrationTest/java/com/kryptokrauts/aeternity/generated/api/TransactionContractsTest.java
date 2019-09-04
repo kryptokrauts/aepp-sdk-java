@@ -1,24 +1,23 @@
 package com.kryptokrauts.aeternity.generated.api;
 
-import com.google.common.collect.ImmutableMap;
-import com.kryptokrauts.aeternity.generated.model.DryRunResult;
-import com.kryptokrauts.aeternity.generated.model.DryRunResults;
 import com.kryptokrauts.aeternity.generated.model.TxInfoObject;
 import com.kryptokrauts.aeternity.sdk.constants.BaseConstants;
 import com.kryptokrauts.aeternity.sdk.constants.Network;
 import com.kryptokrauts.aeternity.sdk.exception.TransactionCreateException;
+import com.kryptokrauts.aeternity.sdk.service.account.domain.AccountResult;
 import com.kryptokrauts.aeternity.sdk.service.aeternity.AeternityServiceConfiguration;
 import com.kryptokrauts.aeternity.sdk.service.aeternity.impl.AeternityService;
-import com.kryptokrauts.aeternity.sdk.service.domain.account.AccountResult;
-import com.kryptokrauts.aeternity.sdk.service.domain.transaction.PostTransactionResult;
-import com.kryptokrauts.aeternity.sdk.service.transaction.AccountParameter;
+import com.kryptokrauts.aeternity.sdk.service.transaction.domain.DryRunAccountModel;
+import com.kryptokrauts.aeternity.sdk.service.transaction.domain.DryRunRequest;
+import com.kryptokrauts.aeternity.sdk.service.transaction.domain.DryRunTransactionResult;
+import com.kryptokrauts.aeternity.sdk.service.transaction.domain.DryRunTransactionResults;
+import com.kryptokrauts.aeternity.sdk.service.transaction.domain.PostTransactionResult;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.model.ContractCallTransactionModel;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.model.ContractCreateTransactionModel;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
 import java.math.BigInteger;
-import java.util.Arrays;
 import java.util.Optional;
 import org.junit.FixMethodOrder;
 import org.junit.Ignore;
@@ -133,18 +132,18 @@ public class TransactionContractsTest extends BaseTest {
             TestConstants.testContractFunction,
             TestConstants.testContractFunctionParams);
 
-    DryRunResults results =
+    DryRunTransactionResults results =
         this.aeternityServiceNative.transactions.blockingDryRunTransactions(
-            Arrays.asList(
-                ImmutableMap.of(AccountParameter.PUBLIC_KEY, baseKeyPair.getPublicKey()),
-                ImmutableMap.of(AccountParameter.PUBLIC_KEY, baseKeyPair.getPublicKey())),
-            null,
-            Arrays.asList(
-                createUnsignedContractCallTx(context, nonce, calldata, null),
-                createUnsignedContractCallTx(context, nonce.add(ONE), calldata, null)));
+            DryRunRequest.builder()
+                .build()
+                .account(DryRunAccountModel.builder().publicKey(baseKeyPair.getPublicKey()).build())
+                .account(DryRunAccountModel.builder().publicKey(baseKeyPair.getPublicKey()).build())
+                .transaction(createUnsignedContractCallTx(context, nonce, calldata, null))
+                .transaction(
+                    createUnsignedContractCallTx(context, nonce.add(ONE), calldata, null)));
 
     _logger.info(results.toString());
-    for (DryRunResult result : results.getResults()) {
+    for (DryRunTransactionResult result : results.getResults()) {
       context.assertEquals("ok", result.getResult());
     }
   }
@@ -158,14 +157,15 @@ public class TransactionContractsTest extends BaseTest {
             TestConstants.testContractFunction,
             TestConstants.testContractFunctionParams);
 
-    DryRunResults results =
+    DryRunTransactionResults results =
         this.aeternityServiceNative.transactions.blockingDryRunTransactions(
-            Arrays.asList(ImmutableMap.of(AccountParameter.PUBLIC_KEY, baseKeyPair.getPublicKey())),
-            null,
-            Arrays.asList(createUnsignedContractCallTx(context, ONE, calldata, null)));
+            DryRunRequest.builder()
+                .build()
+                .account(DryRunAccountModel.builder().publicKey(baseKeyPair.getPublicKey()).build())
+                .transaction(createUnsignedContractCallTx(context, ONE, calldata, null)));
 
     _logger.info(results.toString());
-    for (DryRunResult result : results.getResults()) {
+    for (DryRunTransactionResult result : results.getResults()) {
       context.assertEquals("error", result.getResult());
     }
   }
@@ -186,15 +186,18 @@ public class TransactionContractsTest extends BaseTest {
             TestConstants.testContractFunction,
             TestConstants.testContractFunctionParams);
 
-    DryRunResults results =
-        performDryRunTransactions(
-            Arrays.asList(ImmutableMap.of(AccountParameter.PUBLIC_KEY, baseKeyPair.getPublicKey())),
-            null,
-            Arrays.asList(
-                createUnsignedContractCallTx(context, getNextBaseKeypairNonce(), calldata, null)));
+    DryRunTransactionResults results =
+        this.aeternityServiceNative.transactions.blockingDryRunTransactions(
+            DryRunRequest.builder()
+                .build()
+                .account(DryRunAccountModel.builder().publicKey(baseKeyPair.getPublicKey()).build())
+                .transaction(
+                    createUnsignedContractCallTx(
+                        context, getNextBaseKeypairNonce(), calldata, null)));
+
     _logger.info("callContractAfterDryRunOnLocalNode: " + results.toString());
 
-    for (DryRunResult result : results.getResults()) {
+    for (DryRunTransactionResult result : results.getResults()) {
       context.assertEquals("ok", result.getResult());
 
       ContractCallTransactionModel callTx =
@@ -202,8 +205,8 @@ public class TransactionContractsTest extends BaseTest {
               .abiVersion(ONE)
               .callData(calldata)
               .contractId(localDeployedContractId)
-              .gas(result.getCallObj().getGasUsed())
-              .gasPrice(result.getCallObj().getGasPrice())
+              .gas(result.getContractCallObject().getGasUsed())
+              .gasPrice(result.getContractCallObject().getGasPrice())
               .nonce(getNextBaseKeypairNonce())
               .callerId(baseKeyPair.getPublicKey())
               .ttl(ZERO)

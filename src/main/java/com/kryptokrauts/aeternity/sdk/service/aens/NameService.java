@@ -1,11 +1,23 @@
 package com.kryptokrauts.aeternity.sdk.service.aens;
 
-import com.kryptokrauts.aeternity.sdk.service.domain.name.NameIdResult;
+import com.kryptokrauts.aeternity.sdk.service.name.domain.NameIdResult;
 import io.reactivex.Single;
 
 public interface NameService {
 
-  Single<NameIdResult> asyncGetNameId(String name);
+  /**
+   * asynchronously returns the nameid object for given aens name
+   *
+   * @param name
+   * @return
+   */
+  public Single<NameIdResult> asyncGetNameId(String name);
 
-  NameIdResult blockingGetNameId(String name);
+  /**
+   * synchronously returns the nameid object for given aens name
+   *
+   * @param name
+   * @return
+   */
+  public NameIdResult blockingGetNameId(String name);
 }

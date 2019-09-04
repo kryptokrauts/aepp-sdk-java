@@ -1,13 +1,12 @@
 package com.kryptokrauts.aeternity.sdk.service.transaction;
 
-import com.kryptokrauts.aeternity.generated.model.DryRunResults;
 import com.kryptokrauts.aeternity.sdk.exception.TransactionCreateException;
-import com.kryptokrauts.aeternity.sdk.service.domain.transaction.PostTransactionResult;
+import com.kryptokrauts.aeternity.sdk.service.transaction.domain.DryRunRequest;
+import com.kryptokrauts.aeternity.sdk.service.transaction.domain.DryRunTransactionResults;
+import com.kryptokrauts.aeternity.sdk.service.transaction.domain.PostTransactionResult;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.model.AbstractTransactionModel;
 import io.reactivex.Single;
-import java.math.BigInteger;
 import java.util.List;
-import java.util.Map;
 import org.bouncycastle.crypto.CryptoException;
 
 public interface TransactionService {
@@ -45,15 +44,9 @@ public interface TransactionService {
    * @param unsignedTransactions
    * @return
    */
-  Single<DryRunResults> asyncDryRunTransactions(
-      List<Map<AccountParameter, Object>> accounts,
-      BigInteger block,
-      List<String> unsignedTransactions);
+  Single<DryRunTransactionResults> asyncDryRunTransactions(DryRunRequest input);
 
-  DryRunResults blockingDryRunTransactions(
-      List<Map<AccountParameter, Object>> accounts,
-      BigInteger block,
-      List<String> unsignedTransactions);
+  DryRunTransactionResults blockingDryRunTransactions(DryRunRequest input);
 
   /**
    * async post a transaction for given model

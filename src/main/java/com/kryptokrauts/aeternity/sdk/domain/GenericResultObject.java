@@ -1,8 +1,9 @@
-package com.kryptokrauts.aeternity.sdk.service.domain;
+package com.kryptokrauts.aeternity.sdk.domain;
 
 import com.kryptokrauts.aeternity.generated.ApiException;
 import io.reactivex.Single;
 import lombok.Getter;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,7 +17,8 @@ import org.slf4j.LoggerFactory;
  */
 @Getter
 @SuperBuilder
-public abstract class GenericServiceResultObject<T, V extends GenericServiceResultObject<?, ?>> {
+@ToString
+public abstract class GenericResultObject<T, V extends GenericResultObject<?, ?>> {
 
   protected String rootErrorMessage;
 
@@ -24,7 +26,7 @@ public abstract class GenericServiceResultObject<T, V extends GenericServiceResu
 
   protected Throwable throwable;
 
-  protected static final Logger _logger = LoggerFactory.getLogger(GenericServiceResultObject.class);
+  protected static final Logger _logger = LoggerFactory.getLogger(GenericResultObject.class);
 
   /**
    * execute a blocking call and return mapped result

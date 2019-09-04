@@ -1,6 +1,6 @@
 package com.kryptokrauts.aeternity.sdk.service.account;
 
-import com.kryptokrauts.aeternity.sdk.service.domain.account.AccountResult;
+import com.kryptokrauts.aeternity.sdk.service.account.domain.AccountResult;
 import com.kryptokrauts.aeternity.sdk.util.EncodingType;
 import com.kryptokrauts.aeternity.sdk.util.EncodingUtils;
 import io.reactivex.Single;

@@ -1,7 +1,7 @@
-package com.kryptokrauts.aeternity.sdk.service.domain.transaction;
+package com.kryptokrauts.aeternity.sdk.service.transaction.domain;
 
 import com.kryptokrauts.aeternity.generated.model.PostTxResponse;
-import com.kryptokrauts.aeternity.sdk.service.domain.GenericServiceResultObject;
+import com.kryptokrauts.aeternity.sdk.domain.GenericResultObject;
 import lombok.Getter;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
@@ -10,7 +10,7 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @ToString
 public class PostTransactionResult
-    extends GenericServiceResultObject<PostTxResponse, PostTransactionResult> {
+    extends GenericResultObject<PostTxResponse, PostTransactionResult> {
 
   private String txHash;
 

@@ -10,11 +10,25 @@ public interface CompilerService {
    * gets the encoded calldata for this contractCode
    *
    * @param contractCode the sourcecode of the contract
-   * @return encoded calldata
+   * @return async encoded calldata
    */
   Single<String> asyncEncodeCalldata(String contractCode, String function, List<String> arguments);
 
+  /**
+   * gets the encoded calldata for this contractCode
+   *
+   * @param contractCode the sourcecode of the contract
+   * @return encoded calldata
+   */
   String blockingEncodeCalldata(String contractCode, String function, List<String> arguments);
+
+  /**
+   * gets the contract bytecode for this contractCode
+   *
+   * @param contractCode the sourcecode of the contract
+   * @return async byteCode of the compiled contract
+   */
+  Single<String> asyncCompile(String contractCode, String srcFile, Object fileSystem);
 
   /**
    * gets the contract bytecode for this contractCode
@@ -22,9 +36,16 @@ public interface CompilerService {
    * @param contractCode the sourcecode of the contract
    * @return byteCode of the compiled contract
    */
-  Single<String> asyncCompile(String contractCode, String srcFile, Object fileSystem);
-
   String blockingCompile(String contractCode, String srcFile, Object fileSystem);
+
+  /**
+   * decodes a calldata
+   *
+   * @param calldata the calldata
+   * @param sophiaType the awaited sophia type
+   * @return async decoded answer as json string
+   */
+  Single<Object> asyncDecodeCalldata(String calldata, String sophiaType);
 
   /**
    * decodes a calldata
@@ -33,9 +54,16 @@ public interface CompilerService {
    * @param sophiaType the awaited sophia type
    * @return decoded answer as json string
    */
-  Single<Object> asyncDecodeCalldata(String calldata, String sophiaType);
-
   Object blockingDecodeCalldata(String calldata, String sophiaType);
+
+  /**
+   * generates the ACI for this contractCode
+   * https://github.com/aeternity/aesophia/blob/master/docs/aeso_aci.md
+   *
+   * @param contractCode the sourcecode of the contract
+   * @return asnyc ACI for a given contract
+   */
+  Single<ACI> asyncGenerateACI(String contractCode);
 
   /**
    * generates the ACI for this contractCode
@@ -44,7 +72,5 @@ public interface CompilerService {
    * @param contractCode the sourcecode of the contract
    * @return the ACI for a given contract
    */
-  Single<ACI> asyncGenerateACI(String contractCode);
-
   ACI blockingGenerateACI(String contractCode);
 }

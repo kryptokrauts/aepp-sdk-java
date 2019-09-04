@@ -3,7 +3,7 @@ package com.kryptokrauts.aeternity.sdk.service.account.impl;
 import com.kryptokrauts.aeternity.generated.api.rxjava.ExternalApi;
 import com.kryptokrauts.aeternity.sdk.service.ServiceConfiguration;
 import com.kryptokrauts.aeternity.sdk.service.account.AccountService;
-import com.kryptokrauts.aeternity.sdk.service.domain.account.AccountResult;
+import com.kryptokrauts.aeternity.sdk.service.account.domain.AccountResult;
 import io.reactivex.Single;
 import java.util.Optional;
 import javax.annotation.Nonnull;

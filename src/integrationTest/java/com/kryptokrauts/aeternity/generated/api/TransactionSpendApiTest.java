@@ -2,8 +2,8 @@ package com.kryptokrauts.aeternity.generated.api;
 
 import com.kryptokrauts.aeternity.sdk.domain.secret.impl.BaseKeyPair;
 import com.kryptokrauts.aeternity.sdk.exception.TransactionCreateException;
-import com.kryptokrauts.aeternity.sdk.service.domain.account.AccountResult;
-import com.kryptokrauts.aeternity.sdk.service.domain.transaction.PostTransactionResult;
+import com.kryptokrauts.aeternity.sdk.service.account.domain.AccountResult;
+import com.kryptokrauts.aeternity.sdk.service.transaction.domain.PostTransactionResult;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.model.SpendTransactionModel;
 import io.reactivex.Single;
 import io.vertx.ext.unit.Async;

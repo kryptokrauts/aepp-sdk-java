@@ -1,6 +1,6 @@
 package com.kryptokrauts.aeternity.generated.api;
 
-import com.kryptokrauts.aeternity.sdk.service.domain.account.AccountResult;
+import com.kryptokrauts.aeternity.sdk.service.account.domain.AccountResult;
 import io.reactivex.Single;
 import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;

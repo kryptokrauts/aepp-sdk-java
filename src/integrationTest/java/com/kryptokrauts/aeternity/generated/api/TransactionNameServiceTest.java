@@ -1,7 +1,7 @@
 package com.kryptokrauts.aeternity.generated.api;
 
-import com.kryptokrauts.aeternity.sdk.service.domain.name.NameIdResult;
-import com.kryptokrauts.aeternity.sdk.service.domain.transaction.PostTransactionResult;
+import com.kryptokrauts.aeternity.sdk.service.name.domain.NameIdResult;
+import com.kryptokrauts.aeternity.sdk.service.transaction.domain.PostTransactionResult;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.model.NameClaimTransactionModel;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.model.NamePreclaimTransactionModel;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.model.NameRevokeTransactionModel;

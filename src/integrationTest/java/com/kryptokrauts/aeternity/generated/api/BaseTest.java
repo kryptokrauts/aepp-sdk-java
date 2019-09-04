@@ -1,18 +1,16 @@
 package com.kryptokrauts.aeternity.generated.api;
 
-import com.kryptokrauts.aeternity.generated.model.DryRunResults;
 import com.kryptokrauts.aeternity.generated.model.GenericSignedTx;
 import com.kryptokrauts.aeternity.generated.model.TxInfoObject;
 import com.kryptokrauts.aeternity.sdk.constants.Network;
 import com.kryptokrauts.aeternity.sdk.domain.secret.impl.BaseKeyPair;
+import com.kryptokrauts.aeternity.sdk.service.account.domain.AccountResult;
 import com.kryptokrauts.aeternity.sdk.service.aeternity.AeternityServiceConfiguration;
 import com.kryptokrauts.aeternity.sdk.service.aeternity.AeternityServiceFactory;
 import com.kryptokrauts.aeternity.sdk.service.aeternity.impl.AeternityService;
-import com.kryptokrauts.aeternity.sdk.service.domain.account.AccountResult;
-import com.kryptokrauts.aeternity.sdk.service.domain.transaction.PostTransactionResult;
 import com.kryptokrauts.aeternity.sdk.service.keypair.KeyPairService;
 import com.kryptokrauts.aeternity.sdk.service.keypair.KeyPairServiceFactory;
-import com.kryptokrauts.aeternity.sdk.service.transaction.AccountParameter;
+import com.kryptokrauts.aeternity.sdk.service.transaction.domain.PostTransactionResult;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.model.AbstractTransactionModel;
 import io.reactivex.Single;
 import io.reactivex.observers.TestObserver;
@@ -23,7 +21,6 @@ import io.vertx.ext.unit.junit.RunTestOnContext;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
 import java.math.BigInteger;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.function.Supplier;
 import javax.naming.ConfigurationException;
@@ -195,13 +192,6 @@ public abstract class BaseTest {
     return JsonObject.mapFrom(
         this.aeternityServiceNative.compiler.blockingDecodeCalldata(
             encodedValue, sophiaReturnType));
-  }
-
-  protected DryRunResults performDryRunTransactions(
-      List<Map<AccountParameter, Object>> accounts, BigInteger block, List<String> unsignedTxes) {
-
-    return this.aeternityServiceNative.transactions.blockingDryRunTransactions(
-        accounts, block, unsignedTxes);
   }
 
   protected <T> T callMethodAndAwaitException(

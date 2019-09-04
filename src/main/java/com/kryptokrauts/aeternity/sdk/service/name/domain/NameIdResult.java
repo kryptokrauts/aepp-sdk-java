@@ -1,7 +1,7 @@
-package com.kryptokrauts.aeternity.sdk.service.domain.name;
+package com.kryptokrauts.aeternity.sdk.service.name.domain;
 
 import com.kryptokrauts.aeternity.generated.model.NameEntry;
-import com.kryptokrauts.aeternity.sdk.service.domain.GenericServiceResultObject;
+import com.kryptokrauts.aeternity.sdk.domain.GenericResultObject;
 import java.math.BigInteger;
 import java.util.LinkedList;
 import java.util.List;
@@ -14,13 +14,13 @@ import lombok.experimental.SuperBuilder;
 @Getter
 @SuperBuilder
 @ToString
-public class NameIdResult extends GenericServiceResultObject<NameEntry, NameIdResult> {
+public class NameIdResult extends GenericResultObject<NameEntry, NameIdResult> {
 
   private String id;
 
   private BigInteger ttl;
 
-  @Default private List<NamePointer> pointers = new LinkedList<NamePointer>();
+  @Default private List<NamePointerModel> pointers = new LinkedList<NamePointerModel>();
 
   @Override
   protected NameIdResult map(NameEntry generatedResultObject) {
@@ -32,7 +32,10 @@ public class NameIdResult extends GenericServiceResultObject<NameEntry, NameIdRe
               generatedResultObject.getPointers().stream()
                   .map(
                       pointer ->
-                          NamePointer.builder().id(pointer.getId()).key(pointer.getKey()).build())
+                          NamePointerModel.builder()
+                              .id(pointer.getId())
+                              .key(pointer.getKey())
+                              .build())
                   .collect(Collectors.toList()))
           .build();
     else return NameIdResult.builder().build();

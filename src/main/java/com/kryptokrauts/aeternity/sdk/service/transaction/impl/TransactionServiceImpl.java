@@ -1,33 +1,23 @@
 package com.kryptokrauts.aeternity.sdk.service.transaction.impl;
 
 import com.kryptokrauts.aeternity.generated.api.rxjava.ExternalApi;
-import com.kryptokrauts.aeternity.generated.model.DryRunAccount;
-import com.kryptokrauts.aeternity.generated.model.DryRunInput;
-import com.kryptokrauts.aeternity.generated.model.DryRunResults;
 import com.kryptokrauts.aeternity.generated.model.Tx;
 import com.kryptokrauts.aeternity.sdk.constants.ApiIdentifiers;
 import com.kryptokrauts.aeternity.sdk.constants.SerializationTags;
 import com.kryptokrauts.aeternity.sdk.exception.TransactionCreateException;
 import com.kryptokrauts.aeternity.sdk.service.aeternity.AeternityServiceConfiguration;
-import com.kryptokrauts.aeternity.sdk.service.domain.transaction.PostTransactionResult;
-import com.kryptokrauts.aeternity.sdk.service.transaction.AccountParameter;
 import com.kryptokrauts.aeternity.sdk.service.transaction.TransactionService;
+import com.kryptokrauts.aeternity.sdk.service.transaction.domain.DryRunRequest;
+import com.kryptokrauts.aeternity.sdk.service.transaction.domain.DryRunTransactionResults;
+import com.kryptokrauts.aeternity.sdk.service.transaction.domain.PostTransactionResult;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.model.AbstractTransactionModel;
 import com.kryptokrauts.aeternity.sdk.util.ByteUtils;
 import com.kryptokrauts.aeternity.sdk.util.EncodingUtils;
 import com.kryptokrauts.aeternity.sdk.util.SigningUtil;
-import com.kryptokrauts.aeternity.sdk.util.ValidationUtil;
 import com.kryptokrauts.sophia.compiler.generated.api.rxjava.DefaultApi;
 import io.reactivex.Single;
-import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 import javax.annotation.Nonnull;
-import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.apache.tuweni.bytes.Bytes;
 import org.apache.tuweni.rlp.RLP;
@@ -72,7 +62,7 @@ public class TransactionServiceImpl implements TransactionService {
         .build()
         .asyncGet(
             externalApi.rxPostTransaction(
-                createTxObject(
+                createGeneratedTxObject(
                     signTransaction(
                         asyncCreateUnsignedTransaction(tx).blockingGet(), privateKey))));
   }
@@ -89,7 +79,7 @@ public class TransactionServiceImpl implements TransactionService {
         .build()
         .blockingGet(
             externalApi.rxPostTransaction(
-                createTxObject(
+                createGeneratedTxObject(
                     signTransaction(
                         asyncCreateUnsignedTransaction(tx).blockingGet(), privateKey))));
   }
@@ -121,86 +111,17 @@ public class TransactionServiceImpl implements TransactionService {
   }
 
   @Override
-  public Single<DryRunResults> asyncDryRunTransactions(
-      @NonNull List<Map<AccountParameter, Object>> accounts,
-      BigInteger block,
-      @NonNull List<String> unsignedTransactions) {
-    return this.externalApi.rxDryRunTxs(createDryRunBody(accounts, block, unsignedTransactions));
+  public Single<DryRunTransactionResults> asyncDryRunTransactions(DryRunRequest input) {
+    return DryRunTransactionResults.builder()
+        .build()
+        .asyncGet(this.externalApi.rxDryRunTxs(input.toGeneratedModel()));
   }
 
   @Override
-  public DryRunResults blockingDryRunTransactions(
-      @NonNull List<Map<AccountParameter, Object>> accounts,
-      BigInteger block,
-      @NonNull List<String> unsignedTransactions) {
-    return this.externalApi
-        .rxDryRunTxs(createDryRunBody(accounts, block, unsignedTransactions))
-        .blockingGet();
-  }
-
-  private DryRunInput createDryRunBody(
-      List<Map<AccountParameter, Object>> accounts,
-      BigInteger block,
-      List<String> unsignedTransactions) {
-    DryRunInput body = new DryRunInput();
-    // Validate parameters
-    ValidationUtil.checkParameters(
-        validate -> Optional.ofNullable(accounts.size() > 0),
-        accounts,
-        "dryRunTransactions",
-        Arrays.asList("accounts"),
-        ValidationUtil.NO_ENTRIES);
-    ValidationUtil.checkParameters(
-        validate -> Optional.ofNullable(unsignedTransactions.size() > 0),
-        accounts,
-        "dryRunTransactions",
-        Arrays.asList("unsignedTransactions"),
-        ValidationUtil.NO_ENTRIES);
-    ValidationUtil.checkParameters(
-        validate -> Optional.ofNullable(unsignedTransactions.size() == accounts.size()),
-        accounts,
-        "dryRunTransactions",
-        Arrays.asList("unsignedTransactions", "accounts"),
-        ValidationUtil.LIST_NOT_SAME_SIZE);
-
-    List<DryRunAccount> dryRunAccounts = new LinkedList<DryRunAccount>();
-
-    for (Map<AccountParameter, Object> txParams : accounts) {
-      DryRunAccount currAccount = new DryRunAccount();
-      ValidationUtil.checkParameters(
-          validate -> Optional.ofNullable(txParams.size() > 0),
-          accounts,
-          "dryRunTransactions",
-          Arrays.asList("accounts.map"),
-          ValidationUtil.NO_ENTRIES);
-      ValidationUtil.checkParameters(
-          validate -> Optional.ofNullable(txParams.containsKey(AccountParameter.PUBLIC_KEY)),
-          accounts,
-          "dryRunTransactions",
-          Arrays.asList("accounts.map.values"),
-          ValidationUtil.MAP_MISSING_VALUE,
-          AccountParameter.PUBLIC_KEY);
-
-      currAccount.setPubKey(txParams.get(AccountParameter.PUBLIC_KEY).toString());
-      BigInteger amount =
-          txParams.get(AccountParameter.AMOUNT) != null
-              ? new BigInteger(txParams.get(AccountParameter.AMOUNT).toString())
-              : BigInteger.ZERO;
-      currAccount.setAmount(amount);
-
-      dryRunAccounts.add(currAccount);
-    }
-
-    body.setAccounts(dryRunAccounts);
-    if (block != null) {
-      body.setTop(block.toString());
-    } else {
-      body.top(null);
-    }
-    unsignedTransactions.forEach(item -> body.addTxsItem(item));
-
-    _logger.debug(String.format("Calling dry run on block %s with body %s", block, body));
-    return body;
+  public DryRunTransactionResults blockingDryRunTransactions(DryRunRequest input) {
+    return DryRunTransactionResults.builder()
+        .build()
+        .blockingGet(this.externalApi.rxDryRunTxs(input.toGeneratedModel()));
   }
 
   /**
@@ -233,7 +154,7 @@ public class TransactionServiceImpl implements TransactionService {
         String.format("Technical error creating exception: ", e.getMessage()), e);
   }
 
-  private Tx createTxObject(String signedTx) {
+  private Tx createGeneratedTxObject(String signedTx) {
     Tx tx = new Tx();
     tx.setTx(signedTx);
     return tx;
