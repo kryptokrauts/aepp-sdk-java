@@ -1,11 +1,9 @@
 package com.kryptokrauts.aeternity.sdk.service.info.domain;
 
-import java.math.BigInteger;
-import java.util.List;
-
 import com.kryptokrauts.aeternity.generated.model.GenericSignedTx;
 import com.kryptokrauts.aeternity.sdk.domain.GenericResultObject;
-
+import java.math.BigInteger;
+import java.util.List;
 import lombok.Getter;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
@@ -15,32 +13,34 @@ import lombok.experimental.SuperBuilder;
 @ToString
 public class TransactionResult extends GenericResultObject<GenericSignedTx, TransactionResult> {
 
-	private BigInteger txVersion;
+  private BigInteger txVersion;
 
-	private String txType;
+  private String txType;
 
-	private BigInteger blockHeight;
+  private BigInteger blockHeight;
 
-	private String blockHash;
+  private String blockHash;
 
-	private String hash;
+  private String hash;
 
-	private List<String> signatures;
+  private List<String> signatures;
 
-	@Override
-	protected TransactionResult map(GenericSignedTx generatedResultObject) {
-		if (generatedResultObject != null)
-			return this.toBuilder().txType(generatedResultObject.getTx().getType())
-					.txVersion(generatedResultObject.getTx().getVersion())
-					.blockHash(generatedResultObject.getBlockHash()).blockHeight(generatedResultObject.getBlockHeight())
-					.hash(generatedResultObject.getHash()).signatures(generatedResultObject.getSignatures()).build();
-		else
-			return this.toBuilder().build();
-	}
+  @Override
+  protected TransactionResult map(GenericSignedTx generatedResultObject) {
+    if (generatedResultObject != null)
+      return this.toBuilder()
+          .txType(generatedResultObject.getTx().getType())
+          .txVersion(generatedResultObject.getTx().getVersion())
+          .blockHash(generatedResultObject.getBlockHash())
+          .blockHeight(generatedResultObject.getBlockHeight())
+          .hash(generatedResultObject.getHash())
+          .signatures(generatedResultObject.getSignatures())
+          .build();
+    else return this.toBuilder().build();
+  }
 
-	@Override
-	protected String getResultObjectClassName() {
-		return this.getClass().getName();
-	}
-
+  @Override
+  protected String getResultObjectClassName() {
+    return this.getClass().getName();
+  }
 }

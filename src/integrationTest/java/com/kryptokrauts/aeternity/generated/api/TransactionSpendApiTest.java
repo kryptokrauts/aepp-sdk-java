@@ -122,7 +122,7 @@ public class TransactionSpendApiTest extends BaseTest {
             .amount(new BigInteger("1000000000000000000"))
             .payload("donation")
             .ttl(ZERO)
-            .nonce(acc.getNonce().add(ONE))
+            .nonce(getNextBaseKeypairNonce())
             .build();
 
     Single<PostTransactionResult> txResponse =

@@ -26,9 +26,7 @@ public class DryRunTransactionResult
           .result(generatedResultObject.getResult())
           .reason(generatedResultObject.getReason())
           .contractCallObject(
-              ContractCallObjectModel.builder()
-                  .build()
-                  .map(generatedResultObject.getCallObj()))
+              ContractCallObjectModel.builder().build().map(generatedResultObject.getCallObj()))
           .build();
     else return this.toBuilder().build();
   }
