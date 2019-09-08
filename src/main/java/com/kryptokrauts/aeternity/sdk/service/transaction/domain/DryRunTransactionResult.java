@@ -6,7 +6,7 @@ import lombok.Getter;
 import lombok.experimental.SuperBuilder;
 
 @Getter
-@SuperBuilder
+@SuperBuilder(toBuilder = true)
 public class DryRunTransactionResult
     extends GenericResultObject<DryRunResult, DryRunTransactionResult> {
 
@@ -21,7 +21,7 @@ public class DryRunTransactionResult
   @Override
   protected DryRunTransactionResult map(DryRunResult generatedResultObject) {
     if (generatedResultObject != null)
-      return DryRunTransactionResult.builder()
+      return this.toBuilder()
           .type(generatedResultObject.getType())
           .result(generatedResultObject.getResult())
           .reason(generatedResultObject.getReason())
@@ -30,7 +30,7 @@ public class DryRunTransactionResult
                   .build()
                   .map(generatedResultObject.getCallObj()))
           .build();
-    else return DryRunTransactionResult.builder().build();
+    else return this.toBuilder().build();
   }
 
   @Override

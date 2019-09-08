@@ -16,7 +16,7 @@ import org.slf4j.LoggerFactory;
  * @param <T> the generated ae result object class
  */
 @Getter
-@SuperBuilder
+@SuperBuilder(toBuilder = true)
 @ToString
 public abstract class GenericResultObject<T, V extends GenericResultObject<?, ?>> {
 

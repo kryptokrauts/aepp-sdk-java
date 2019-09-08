@@ -3,6 +3,9 @@ package com.kryptokrauts.aeternity.sdk.service.oracle;
 import com.kryptokrauts.aeternity.generated.model.OracleQueries;
 import com.kryptokrauts.aeternity.generated.model.OracleQuery;
 import com.kryptokrauts.aeternity.generated.model.RegisteredOracle;
+import com.kryptokrauts.aeternity.sdk.service.name.domain.OracleQueriesResult;
+import com.kryptokrauts.aeternity.sdk.service.name.domain.OracleQueryResult;
+import com.kryptokrauts.aeternity.sdk.service.oracle.domain.RegisteredOracleResult;
 import io.reactivex.Single;
 import java.math.BigInteger;
 import java.util.Optional;
@@ -15,7 +18,9 @@ public interface OracleService {
    * @param publicKey The public key of the oracle (required)
    * @return Asynchronous result handler (RxJava Single) for {@link RegisteredOracle}
    */
-  Single<RegisteredOracle> getRegisteredOracle(String publicKey);
+  Single<RegisteredOracleResult> asyncGetRegisteredOracle(String publicKey);
+
+  RegisteredOracleResult blockingGetRegisteredOracle(String publicKey);
 
   /**
    * Get oracle queries by public key
@@ -26,7 +31,10 @@ public interface OracleService {
    * @param type The type of a query: open, closed or all (optional)
    * @return Asynchronous result handler (RxJava Single) for {@link OracleQueries}
    */
-  Single<OracleQueries> getOracleQueries(
+  Single<OracleQueriesResult> asyncGetOracleQueries(
+      String publicKey, Optional<String> from, Optional<BigInteger> limit, Optional<String> type);
+
+  OracleQueriesResult blockingGetOracleQueries(
       String publicKey, Optional<String> from, Optional<BigInteger> limit, Optional<String> type);
 
   /**
@@ -36,5 +44,7 @@ public interface OracleService {
    * @param queryId The ID of the query (required)
    * @return Asynchronous result handler (RxJava Single) for {@link OracleQuery}
    */
-  Single<OracleQuery> getOracleQuery(String publicKey, String queryId);
+  Single<OracleQueryResult> asyncGetOracleQuery(String publicKey, String queryId);
+
+  OracleQueryResult blockingGetOracleQuery(String publicKey, String queryId);
 }

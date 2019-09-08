@@ -12,7 +12,7 @@ import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
 @Getter
-@SuperBuilder
+@SuperBuilder(toBuilder = true)
 @ToString
 public class NameIdResult extends GenericResultObject<NameEntry, NameIdResult> {
 
@@ -25,7 +25,7 @@ public class NameIdResult extends GenericResultObject<NameEntry, NameIdResult> {
   @Override
   protected NameIdResult map(NameEntry generatedResultObject) {
     if (generatedResultObject != null)
-      return NameIdResult.builder()
+      return this.toBuilder()
           .id(generatedResultObject.getId())
           .ttl(generatedResultObject.getTtl())
           .pointers(
@@ -38,7 +38,7 @@ public class NameIdResult extends GenericResultObject<NameEntry, NameIdResult> {
                               .build())
                   .collect(Collectors.toList()))
           .build();
-    else return NameIdResult.builder().build();
+    else return this.toBuilder().build();
   }
 
   @Override

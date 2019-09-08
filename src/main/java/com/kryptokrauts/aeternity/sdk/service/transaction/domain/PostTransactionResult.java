@@ -7,7 +7,7 @@ import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
 @Getter
-@SuperBuilder
+@SuperBuilder(toBuilder = true)
 @ToString
 public class PostTransactionResult
     extends GenericResultObject<PostTxResponse, PostTransactionResult> {
@@ -17,8 +17,8 @@ public class PostTransactionResult
   @Override
   protected PostTransactionResult map(PostTxResponse generatedResultObject) {
     if (generatedResultObject != null)
-      return PostTransactionResult.builder().txHash(generatedResultObject.getTxHash()).build();
-    else return PostTransactionResult.builder().build();
+      return this.toBuilder().txHash(generatedResultObject.getTxHash()).build();
+    else return this.toBuilder().build();
   }
 
   @Override

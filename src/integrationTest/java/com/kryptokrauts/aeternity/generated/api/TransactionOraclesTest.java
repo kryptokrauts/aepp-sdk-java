@@ -1,9 +1,9 @@
 package com.kryptokrauts.aeternity.generated.api;
 
-import com.kryptokrauts.aeternity.generated.model.OracleQuery;
-import com.kryptokrauts.aeternity.generated.model.RegisteredOracle;
 import com.kryptokrauts.aeternity.sdk.domain.secret.impl.BaseKeyPair;
+import com.kryptokrauts.aeternity.sdk.service.name.domain.OracleQueryResult;
 import com.kryptokrauts.aeternity.sdk.service.oracle.domain.OracleTTLType;
+import com.kryptokrauts.aeternity.sdk.service.oracle.domain.RegisteredOracleResult;
 import com.kryptokrauts.aeternity.sdk.service.transaction.domain.PostTransactionResult;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.model.OracleExtendTransactionModel;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.model.OracleQueryTransactionModel;
@@ -126,11 +126,8 @@ public class TransactionOraclesTest extends BaseTest {
                 _logger.info(postResult.getTxHash());
                 waitForTxMined(postResult.getTxHash());
                 queryId = EncodingUtils.queryId(baseKeyPair.getPublicKey(), nonce, oracleId);
-                OracleQuery oracleQuery =
-                    this.aeternityServiceNative
-                        .oracles
-                        .getOracleQuery(oracleId, queryId)
-                        .blockingGet();
+                OracleQueryResult oracleQuery =
+                    this.aeternityServiceNative.oracles.blockingGetOracleQuery(oracleId, queryId);
                 _logger.debug(oracleQuery.toString());
               } catch (Throwable e) {
                 context.fail(e);
@@ -198,8 +195,8 @@ public class TransactionOraclesTest extends BaseTest {
                 _logger.info(postResult.getTxHash());
                 waitForTxMined(postResult.getTxHash());
 
-                RegisteredOracle registeredOracle =
-                    this.aeternityServiceNative.oracles.getRegisteredOracle(oracleId).blockingGet();
+                RegisteredOracleResult registeredOracle =
+                    this.aeternityServiceNative.oracles.blockingGetRegisteredOracle(oracleId);
                 context.assertEquals(
                     initialOracleTtl.add(additionalTtl), registeredOracle.getTtl());
                 _logger.info(registeredOracle.toString());

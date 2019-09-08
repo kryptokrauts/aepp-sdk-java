@@ -11,7 +11,7 @@ import lombok.Getter;
 import lombok.experimental.SuperBuilder;
 
 @Getter
-@SuperBuilder
+@SuperBuilder(toBuilder = true)
 public class DryRunContractCallObjectModel
     extends GenericResultObject<ContractCallObject, DryRunContractCallObjectModel> {
 
@@ -36,7 +36,7 @@ public class DryRunContractCallObjectModel
   @Override
   protected DryRunContractCallObjectModel map(ContractCallObject generatedResultObject) {
     if (generatedResultObject != null)
-      return DryRunContractCallObjectModel.builder()
+      return this.toBuilder()
           .callerId(generatedResultObject.getCallerId())
           .callerNonce(generatedResultObject.getCallerNonce())
           .height(generatedResultObject.getHeight())
@@ -44,7 +44,7 @@ public class DryRunContractCallObjectModel
           .gasPrice(generatedResultObject.getGasPrice())
           .gasUsed(generatedResultObject.getGasUsed())
           .build();
-    else return DryRunContractCallObjectModel.builder().build();
+    else return this.toBuilder().build();
   }
 
   @Override
