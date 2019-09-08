@@ -16,7 +16,7 @@ public class DryRunTransactionResult
 
   private String reason;
 
-  private DryRunContractCallObjectModel contractCallObject;
+  private ContractCallObjectModel contractCallObject;
 
   @Override
   protected DryRunTransactionResult map(DryRunResult generatedResultObject) {
@@ -26,7 +26,7 @@ public class DryRunTransactionResult
           .result(generatedResultObject.getResult())
           .reason(generatedResultObject.getReason())
           .contractCallObject(
-              DryRunContractCallObjectModel.builder()
+              ContractCallObjectModel.builder()
                   .build()
                   .map(generatedResultObject.getCallObj()))
           .build();

@@ -1,38 +1,50 @@
 package com.kryptokrauts.aeternity.sdk.service.info;
 
-import com.kryptokrauts.aeternity.generated.model.GenericSignedTx;
-import com.kryptokrauts.aeternity.generated.model.GenericTxs;
-import com.kryptokrauts.aeternity.generated.model.KeyBlock;
-import com.kryptokrauts.aeternity.generated.model.TxInfoObject;
+import com.kryptokrauts.aeternity.sdk.service.info.domain.KeyBlockResult;
+import com.kryptokrauts.aeternity.sdk.service.info.domain.TransactionInfoResult;
+import com.kryptokrauts.aeternity.sdk.service.info.domain.TransactionResult;
+import com.kryptokrauts.aeternity.sdk.service.info.domain.TransactionResults;
+
 import io.reactivex.Single;
 
 public interface InfoService {
 
-  /**
-   * get the transaction object for given tx hash
-   *
-   * @param txHash
-   * @return
-   */
-  Single<GenericSignedTx> getTransactionByHash(String txHash);
+	/**
+	 * get the transaction object for given tx hash
+	 *
+	 * @param txHash
+	 * @return
+	 */
+	Single<TransactionResult> asyncGetTransactionByHash(String txHash);
 
-  /**
-   * gets the information object for given tx hash
-   *
-   * @param txHash
-   * @return
-   */
-  Single<TxInfoObject> getTransactionInfoByHash(String txHash);
+	TransactionResult blockingGetTransactionByHash(String txHash);
 
-  /**
-   * get transaction object for given microblock tx hash
-   *
-   * @param microBlockHash
-   * @return
-   */
-  Single<GenericTxs> getMicroBlockTransactions(String microBlockHash);
+	/**
+	 * gets the information object for given tx hash
+	 *
+	 * @param txHash
+	 * @return
+	 */
+	Single<TransactionInfoResult> asyncGetTransactionInfoByHash(String txHash);
 
-  Single<KeyBlock> asyncGetCurrentKeyBlock();
+	TransactionInfoResult blockingGetTransactionInfoByHash(String txHash);
 
-  KeyBlock blockingGetCurrentKeyBlock();
+	/**
+	 * get transaction object for given microblock tx hash
+	 *
+	 * @param microBlockHash
+	 * @return
+	 */
+	Single<TransactionResults> asyncGetMicroBlockTransactions(String microBlockHash);
+
+	TransactionResults blockingGetMicroBlockTransactions(String microBlockHash);
+
+	/**
+	 * retrieve the current keyblock
+	 * 
+	 * @return the current keyblock
+	 */
+	Single<KeyBlockResult> asyncGetCurrentKeyBlock();
+
+	KeyBlockResult blockingGetCurrentKeyBlock();
 }
