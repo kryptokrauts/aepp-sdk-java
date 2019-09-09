@@ -35,7 +35,7 @@ import org.slf4j.LoggerFactory;
 @RunWith(VertxUnitRunner.class)
 public abstract class BaseTest {
 
-  protected static final long TEST_CASE_TIMEOUT_MILLIS = 5000l;
+  protected static final long TEST_CASE_TIMEOUT_MILLIS = 30000l;
 
   protected static final BigInteger ONE = BigInteger.ONE;
 
