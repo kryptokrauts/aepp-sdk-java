@@ -274,41 +274,33 @@ public class TransactionContractsTest extends BaseTest {
   @Test
   public void aDeployContractNativeOnLocalNode(TestContext context) throws Throwable {
     Async async = context.async();
-    rule.vertx()
-        .executeBlocking(
-            future -> {
-              try {
-                BigInteger vmVersion = BigInteger.valueOf(4);
-                BigInteger gas = BigInteger.valueOf(1000000);
-                BigInteger gasPrice = BigInteger.valueOf(2000000000);
 
-                ContractCreateTransactionModel contractTx =
-                    ContractCreateTransactionModel.builder()
-                        .abiVersion(ONE)
-                        .amount(ZERO)
-                        .callData(TestConstants.testContractCallData)
-                        .contractByteCode(TestConstants.testContractByteCode)
-                        .deposit(ZERO)
-                        .gas(gas)
-                        .gasPrice(gasPrice)
-                        .nonce(getNextBaseKeypairNonce())
-                        .ownerId(baseKeyPair.getPublicKey())
-                        .ttl(ZERO)
-                        .vmVersion(vmVersion)
-                        .build();
+    BigInteger vmVersion = BigInteger.valueOf(4);
+    BigInteger gas = BigInteger.valueOf(1000000);
+    BigInteger gasPrice = BigInteger.valueOf(2000000000);
 
-                PostTransactionResult result =
-                    this.aeternityServiceNative.transactions.blockingPostTransaction(contractTx);
-                TransactionInfoResult txInfoObject = waitForTxInfoObject(result.getTxHash());
-                localDeployedContractId = txInfoObject.getCallInfo().getContractId();
-                _logger.info(
-                    "Deployed contract - hash " + result.getTxHash() + " - " + txInfoObject);
-              } catch (Throwable e) {
-                context.fail(e);
-              }
-              future.complete();
-            },
-            success -> async.complete());
+    ContractCreateTransactionModel contractTx =
+        ContractCreateTransactionModel.builder()
+            .abiVersion(ONE)
+            .amount(ZERO)
+            .callData(TestConstants.testContractCallData)
+            .contractByteCode(TestConstants.testContractByteCode)
+            .deposit(ZERO)
+            .gas(gas)
+            .gasPrice(gasPrice)
+            .nonce(getNextBaseKeypairNonce())
+            .ownerId(baseKeyPair.getPublicKey())
+            .ttl(ZERO)
+            .vmVersion(vmVersion)
+            .build();
+
+    PostTransactionResult result =
+        this.aeternityServiceNative.transactions.blockingPostTransaction(contractTx);
+    TransactionInfoResult txInfoObject = waitForTxInfoObject(result.getTxHash());
+    localDeployedContractId = txInfoObject.getCallInfo().getContractId();
+    _logger.info("Deployed contract - hash " + result.getTxHash() + " - " + txInfoObject);
+    async.complete();
+    async.awaitSuccess(TEST_CASE_TIMEOUT_MILLIS);
   }
 
   @Test
