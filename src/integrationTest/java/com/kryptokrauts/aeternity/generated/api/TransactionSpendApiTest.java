@@ -110,33 +110,45 @@ public class TransactionSpendApiTest extends BaseTest {
   public void postSpendSelfSignTxTestWithModel(TestContext context)
       throws CryptoException, TransactionCreateException {
     Async async = context.async();
+    rule.vertx()
+        .executeBlocking(
+            future -> {
+              try {
 
-    AccountResult acc = this.aeternityServiceNative.accounts.blockingGetAccount(Optional.empty());
+                AccountResult acc =
+                    this.aeternityServiceNative.accounts.blockingGetAccount(Optional.empty());
 
-    BaseKeyPair recipient = keyPairService.generateBaseKeyPair();
+                BaseKeyPair recipient = keyPairService.generateBaseKeyPair();
 
-    SpendTransactionModel spendTx =
-        SpendTransactionModel.builder()
-            .sender(acc.getPublicKey())
-            .recipient(recipient.getPublicKey())
-            .amount(new BigInteger("1000000000000000000"))
-            .payload("donation")
-            .ttl(ZERO)
-            .nonce(getNextBaseKeypairNonce())
-            .build();
+                SpendTransactionModel spendTx =
+                    SpendTransactionModel.builder()
+                        .sender(acc.getPublicKey())
+                        .recipient(recipient.getPublicKey())
+                        .amount(new BigInteger("1000000000000000000"))
+                        .payload("donation")
+                        .ttl(ZERO)
+                        .nonce(getNextBaseKeypairNonce())
+                        .build();
 
-    Single<PostTransactionResult> txResponse =
-        aeternityServiceNative.transactions.asyncPostTransaction(spendTx);
+                Single<PostTransactionResult> txResponse =
+                    aeternityServiceNative.transactions.asyncPostTransaction(spendTx);
 
-    txResponse.subscribe(
-        it -> {
-          _logger.info("SpendTx hash: " + it.getTxHash());
-          context.assertEquals(
-              it.getTxHash(), aeternityServiceNative.transactions.computeTxHash(spendTx));
-          async.complete();
-        },
-        throwable -> {
-          context.fail();
-        });
+                txResponse.subscribe(
+                    it -> {
+                      _logger.info("SpendTx hash: " + it.getTxHash());
+                      context.assertEquals(
+                          it.getTxHash(),
+                          aeternityServiceNative.transactions.computeTxHash(spendTx));
+                      async.complete();
+                    },
+                    throwable -> {
+                      context.fail();
+                    });
+              } catch (Throwable e) {
+                context.fail(e);
+              }
+              future.complete();
+            },
+            success -> async.complete());
   }
 }

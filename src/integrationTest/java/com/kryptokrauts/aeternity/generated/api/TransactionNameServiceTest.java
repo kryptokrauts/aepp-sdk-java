@@ -1,5 +1,6 @@
 package com.kryptokrauts.aeternity.generated.api;
 
+import com.kryptokrauts.aeternity.sdk.service.info.domain.TransactionResult;
 import com.kryptokrauts.aeternity.sdk.service.name.domain.NameIdResult;
 import com.kryptokrauts.aeternity.sdk.service.transaction.domain.PostTransactionResult;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.model.NameClaimTransactionModel;
@@ -104,11 +105,12 @@ public class TransactionNameServiceTest extends BaseTest {
                         EncodingUtils.generateCommitmentHash(validDomain, salt)));
                 _logger.info("NameClaimTx hash: " + result.getTxHash());
 
-                // GenericSignedTx genericSignedTx = getTxByHash(postTxResponse.getTxHash(),
-                // 10);
-                // context.assertTrue(genericSignedTx.getBlockHeight().intValue() > 0);
-                // NameClaimTxJSON typedTx = (NameClaimTxJSON) genericSignedTx.getTx();
-                // _logger.info("Successfully claimed aens " + typedTx.getName());
+                TransactionResult genericSignedTx =
+                    this.aeternityServiceNative.info.blockingGetTransactionByHash(
+                        result.getTxHash());
+                context.assertTrue(genericSignedTx.getBlockHeight().intValue() > 0);
+                //				NameClaimTx typedTx = (NameClaimTx) genericSignedTx.gett
+                //				_logger.info("Successfully claimed aens " + typedTx.getName());
                 _logger.info("--------------------- postNameClaimTxTest ---------------------");
               } catch (Throwable e) {
                 context.fail(e);

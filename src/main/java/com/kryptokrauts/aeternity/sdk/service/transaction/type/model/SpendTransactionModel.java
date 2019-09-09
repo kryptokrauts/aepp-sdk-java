@@ -1,13 +1,14 @@
 package com.kryptokrauts.aeternity.sdk.service.transaction.type.model;
 
 import com.kryptokrauts.aeternity.generated.api.rxjava.ExternalApi;
+import com.kryptokrauts.aeternity.generated.model.GenericTx;
 import com.kryptokrauts.aeternity.generated.model.SpendTx;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.impl.SpendTransaction;
 import com.kryptokrauts.sophia.compiler.generated.api.rxjava.DefaultApi;
 import java.math.BigInteger;
+import java.util.function.Function;
 import lombok.Builder.Default;
 import lombok.Getter;
-import lombok.NonNull;
 import lombok.experimental.SuperBuilder;
 
 /**
@@ -21,14 +22,14 @@ import lombok.experimental.SuperBuilder;
  * @param nonce senders nonce + 1
  */
 @Getter
-@SuperBuilder
+@SuperBuilder(toBuilder = true)
 public class SpendTransactionModel extends AbstractTransactionModel<SpendTx> {
-  @NonNull private String sender;
-  @NonNull private String recipient;
-  @NonNull private BigInteger amount;
+  private String sender;
+  private String recipient;
+  private BigInteger amount;
   @Default private String payload = "";
-  @NonNull private BigInteger ttl;
-  @NonNull private BigInteger nonce;
+  private BigInteger ttl;
+  private BigInteger nonce;
 
   @Override
   public SpendTx toApiModel() {
@@ -42,6 +43,22 @@ public class SpendTransactionModel extends AbstractTransactionModel<SpendTx> {
     spendTx.setNonce(this.nonce);
 
     return spendTx;
+  }
+
+  @Override
+  public Function<GenericTx, SpendTransactionModel> getApiToModelFunction() {
+    return (tx) -> {
+      SpendTx castedTx = (SpendTx) tx;
+      return this.toBuilder()
+          .sender(castedTx.getSenderId())
+          .recipient(castedTx.getRecipientId())
+          .amount(castedTx.getAmount())
+          .payload(castedTx.getPayload())
+          .fee(castedTx.getFee())
+          .nonce(castedTx.getNonce())
+          .ttl(castedTx.getTtl())
+          .build();
+    };
   }
 
   @Override

@@ -2,24 +2,25 @@ package com.kryptokrauts.aeternity.sdk.service.transaction.type.model;
 
 import com.kryptokrauts.aeternity.generated.api.rxjava.ExternalApi;
 import com.kryptokrauts.aeternity.generated.model.ChannelSnapshotSoloTx;
+import com.kryptokrauts.aeternity.generated.model.GenericTx;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.AbstractTransaction;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.impl.ChannelSnapshotSoloTransaction;
 import com.kryptokrauts.sophia.compiler.generated.api.rxjava.DefaultApi;
 import java.math.BigInteger;
+import java.util.function.Function;
 import lombok.Getter;
-import lombok.NonNull;
 import lombok.experimental.SuperBuilder;
 
 @Getter
-@SuperBuilder
+@SuperBuilder(toBuilder = true)
 public class ChannelSnapshotSoloTransactionModel
     extends AbstractTransactionModel<ChannelSnapshotSoloTx> {
 
-  @NonNull private String channelId;
-  @NonNull private String fromId;
-  @NonNull private String payload;
-  @NonNull private BigInteger ttl;
-  @NonNull private BigInteger nonce;
+  private String channelId;
+  private String fromId;
+  private String payload;
+  private BigInteger ttl;
+  private BigInteger nonce;
 
   @Override
   public ChannelSnapshotSoloTx toApiModel() {
@@ -31,6 +32,21 @@ public class ChannelSnapshotSoloTransactionModel
     channelSnapshotSoloTx.setTtl(ttl);
     channelSnapshotSoloTx.setNonce(nonce);
     return channelSnapshotSoloTx;
+  }
+
+  @Override
+  public Function<GenericTx, ChannelSnapshotSoloTransactionModel> getApiToModelFunction() {
+    return (tx) -> {
+      ChannelSnapshotSoloTx castedTx = (ChannelSnapshotSoloTx) tx;
+      return this.toBuilder()
+          .channelId(castedTx.getChannelId())
+          .fromId(castedTx.getFromId())
+          .fee(castedTx.getFee())
+          .payload(castedTx.getPayload())
+          .ttl(castedTx.getTtl())
+          .nonce(castedTx.getNonce())
+          .build();
+    };
   }
 
   @Override

@@ -1,6 +1,7 @@
 package com.kryptokrauts.aeternity.sdk.service.transaction.type.model;
 
 import com.kryptokrauts.aeternity.generated.api.rxjava.ExternalApi;
+import com.kryptokrauts.aeternity.generated.model.GenericTx;
 import com.kryptokrauts.aeternity.generated.model.OracleRegisterTx;
 import com.kryptokrauts.aeternity.generated.model.TTL;
 import com.kryptokrauts.aeternity.sdk.service.oracle.domain.OracleTTLType;
@@ -8,23 +9,23 @@ import com.kryptokrauts.aeternity.sdk.service.transaction.type.AbstractTransacti
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.impl.OracleRegisterTransaction;
 import com.kryptokrauts.sophia.compiler.generated.api.rxjava.DefaultApi;
 import java.math.BigInteger;
+import java.util.function.Function;
 import lombok.Getter;
-import lombok.NonNull;
 import lombok.experimental.SuperBuilder;
 
 @Getter
-@SuperBuilder
+@SuperBuilder(toBuilder = true)
 public class OracleRegisterTransactionModel extends AbstractTransactionModel<OracleRegisterTx> {
 
-  @NonNull private String accountId;
-  @NonNull private BigInteger abiVersion;
-  @NonNull private BigInteger nonce;
-  @NonNull private BigInteger oracleTtl;
-  @NonNull private OracleTTLType oracleTtlType;
-  @NonNull private BigInteger queryFee;
-  @NonNull private String queryFormat;
-  @NonNull private String responseFormat;
-  @NonNull private BigInteger ttl;
+  private String accountId;
+  private BigInteger abiVersion;
+  private BigInteger nonce;
+  private BigInteger oracleTtl;
+  private OracleTTLType oracleTtlType;
+  private BigInteger queryFee;
+  private String queryFormat;
+  private String responseFormat;
+  private BigInteger ttl;
 
   @Override
   public OracleRegisterTx toApiModel() {
@@ -39,6 +40,24 @@ public class OracleRegisterTransactionModel extends AbstractTransactionModel<Ora
     oracleRegisterTx.setResponseFormat(this.responseFormat);
     oracleRegisterTx.setTtl(this.ttl);
     return oracleRegisterTx;
+  }
+
+  @Override
+  public Function<GenericTx, OracleRegisterTransactionModel> getApiToModelFunction() {
+    return (tx) -> {
+      OracleRegisterTx castedTx = (OracleRegisterTx) tx;
+      return this.toBuilder()
+          .abiVersion(castedTx.getAbiVersion())
+          .accountId(castedTx.getAccountId())
+          .fee(castedTx.getFee())
+          .oracleTtl(castedTx.getOracleTtl().getValue())
+          .queryFee(castedTx.getQueryFee())
+          .queryFormat(castedTx.getQueryFormat())
+          .responseFormat(castedTx.getResponseFormat())
+          .nonce(castedTx.getNonce())
+          .ttl(castedTx.getTtl())
+          .build();
+    };
   }
 
   @Override

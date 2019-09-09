@@ -2,25 +2,32 @@ package com.kryptokrauts.aeternity.sdk.service.transaction.type.model;
 
 import com.kryptokrauts.aeternity.generated.api.rxjava.ExternalApi;
 import com.kryptokrauts.aeternity.generated.model.ChannelDepositTx;
+import com.kryptokrauts.aeternity.generated.model.GenericTx;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.AbstractTransaction;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.impl.ChannelDepositTransaction;
 import com.kryptokrauts.sophia.compiler.generated.api.rxjava.DefaultApi;
 import java.math.BigInteger;
+import java.util.function.Function;
 import lombok.Getter;
-import lombok.NonNull;
 import lombok.experimental.SuperBuilder;
 
 @Getter
-@SuperBuilder
+@SuperBuilder(toBuilder = true)
 public class ChannelDepositTransactionModel extends AbstractTransactionModel<ChannelDepositTx> {
 
-  @NonNull private String channelId;
-  @NonNull private String fromId;
-  @NonNull private BigInteger amount;
-  @NonNull private BigInteger ttl;
-  @NonNull private String stateHash;
-  @NonNull private BigInteger round;
-  @NonNull private BigInteger nonce;
+  private String channelId;
+
+  private String fromId;
+
+  private BigInteger amount;
+
+  private BigInteger ttl;
+
+  private String stateHash;
+
+  private BigInteger round;
+
+  private BigInteger nonce;
 
   @Override
   public ChannelDepositTx toApiModel() {
@@ -34,6 +41,23 @@ public class ChannelDepositTransactionModel extends AbstractTransactionModel<Cha
     channelDepositTx.setRound(round);
     channelDepositTx.setNonce(nonce);
     return channelDepositTx;
+  }
+
+  @Override
+  public Function<GenericTx, ChannelDepositTransactionModel> getApiToModelFunction() {
+    return (tx) -> {
+      ChannelDepositTx castedTx = (ChannelDepositTx) tx;
+      return this.toBuilder()
+          .channelId(castedTx.getChannelId())
+          .fromId(castedTx.getFromId())
+          .amount(castedTx.getAmount())
+          .stateHash(castedTx.getStateHash())
+          .round(castedTx.getRound())
+          .fee(castedTx.getFee())
+          .ttl(castedTx.getTtl())
+          .nonce(castedTx.getNonce())
+          .build();
+    };
   }
 
   @Override

@@ -1,6 +1,7 @@
 package com.kryptokrauts.aeternity.sdk.service.transaction.type.model;
 
 import com.kryptokrauts.aeternity.generated.api.rxjava.ExternalApi;
+import com.kryptokrauts.aeternity.generated.model.GenericTx;
 import com.kryptokrauts.aeternity.generated.model.NamePreclaimTx;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.AbstractTransaction;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.impl.NamePreclaimTransaction;
@@ -8,19 +9,21 @@ import com.kryptokrauts.aeternity.sdk.util.EncodingUtils;
 import com.kryptokrauts.aeternity.sdk.util.ValidationUtil;
 import com.kryptokrauts.sophia.compiler.generated.api.rxjava.DefaultApi;
 import java.math.BigInteger;
+import java.util.function.Function;
 import lombok.Getter;
-import lombok.NonNull;
 import lombok.experimental.SuperBuilder;
 
 @Getter
-@SuperBuilder
+@SuperBuilder(toBuilder = true)
 public class NamePreclaimTransactionModel extends AbstractTransactionModel<NamePreclaimTx> {
 
-  @NonNull private String accountId;
-  @NonNull private String name; // will be used to generate the commitmentId
-  @NonNull private BigInteger salt; // will be used to generate the commitmentId
-  @NonNull private BigInteger nonce;
-  @NonNull private BigInteger ttl;
+  private String accountId;
+  private String name; // will be used to generate the commitmentId
+  private BigInteger salt; // will be used to generate the commitmentId
+
+  private BigInteger nonce;
+
+  private BigInteger ttl;
 
   @Override
   public NamePreclaimTx toApiModel() {
@@ -31,6 +34,19 @@ public class NamePreclaimTransactionModel extends AbstractTransactionModel<NameP
     namePreclaimTx.setNonce(this.nonce);
     namePreclaimTx.setTtl(this.ttl);
     return namePreclaimTx;
+  }
+
+  @Override
+  public Function<GenericTx, NamePreclaimTransactionModel> getApiToModelFunction() {
+    return (tx) -> {
+      NamePreclaimTx castedTx = (NamePreclaimTx) tx;
+      return this.toBuilder()
+          .accountId(castedTx.getAccountId())
+          .fee(castedTx.getFee())
+          .nonce(castedTx.getNonce())
+          .ttl(castedTx.getTtl())
+          .build();
+    };
   }
 
   @Override

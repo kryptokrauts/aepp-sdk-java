@@ -2,29 +2,30 @@ package com.kryptokrauts.aeternity.sdk.service.transaction.type.model;
 
 import com.kryptokrauts.aeternity.generated.api.rxjava.ExternalApi;
 import com.kryptokrauts.aeternity.generated.model.ContractCreateTx;
+import com.kryptokrauts.aeternity.generated.model.GenericTx;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.AbstractTransaction;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.impl.ContractCreateTransaction;
 import com.kryptokrauts.sophia.compiler.generated.api.rxjava.DefaultApi;
 import java.math.BigInteger;
+import java.util.function.Function;
 import lombok.Getter;
-import lombok.NonNull;
 import lombok.experimental.SuperBuilder;
 
 @Getter
 @SuperBuilder(toBuilder = true)
 public class ContractCreateTransactionModel extends AbstractTransactionModel<ContractCreateTx> {
 
-  @NonNull private BigInteger abiVersion;
-  @NonNull private BigInteger amount;
-  @NonNull private String callData;
-  @NonNull private String contractByteCode;
-  @NonNull private BigInteger deposit;
-  @NonNull private BigInteger gas;
-  @NonNull private BigInteger gasPrice;
-  @NonNull private BigInteger nonce;
-  @NonNull private String ownerId;
-  @NonNull private BigInteger ttl;
-  @NonNull private BigInteger vmVersion;
+  private BigInteger abiVersion;
+  private BigInteger amount;
+  private String callData;
+  private String contractByteCode;
+  private BigInteger deposit;
+  private BigInteger gas;
+  private BigInteger gasPrice;
+  private BigInteger nonce;
+  private String ownerId;
+  private BigInteger ttl;
+  private BigInteger vmVersion;
 
   @Override
   public ContractCreateTx toApiModel() {
@@ -43,6 +44,27 @@ public class ContractCreateTransactionModel extends AbstractTransactionModel<Con
     contractCreateTx.setVmVersion(vmVersion);
 
     return contractCreateTx;
+  }
+
+  @Override
+  public Function<GenericTx, ContractCreateTransactionModel> getApiToModelFunction() {
+    return (tx) -> {
+      ContractCreateTx castedTx = (ContractCreateTx) tx;
+      return this.toBuilder()
+          .abiVersion(castedTx.getAbiVersion())
+          .amount(castedTx.getAmount())
+          .callData(castedTx.getCallData())
+          .contractByteCode(castedTx.getCode())
+          .deposit(castedTx.getDeposit())
+          .fee(castedTx.getFee())
+          .gas(castedTx.getGas())
+          .ownerId(castedTx.getOwnerId())
+          .vmVersion(castedTx.getVmVersion())
+          .gasPrice(castedTx.getGasPrice())
+          .ttl(castedTx.getTtl())
+          .nonce(castedTx.getNonce())
+          .build();
+    };
   }
 
   @Override

@@ -1,6 +1,8 @@
 package com.kryptokrauts.aeternity.sdk.service.transaction.type.model;
 
 import com.kryptokrauts.aeternity.generated.api.rxjava.ExternalApi;
+import com.kryptokrauts.aeternity.generated.model.GenericTx;
+import com.kryptokrauts.aeternity.generated.model.NamePointer;
 import com.kryptokrauts.aeternity.generated.model.NameUpdateTx;
 import com.kryptokrauts.aeternity.sdk.constants.ApiIdentifiers;
 import com.kryptokrauts.aeternity.sdk.service.name.domain.NamePointerModel;
@@ -13,22 +15,22 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import lombok.Builder.Default;
 import lombok.Getter;
-import lombok.NonNull;
 import lombok.experimental.SuperBuilder;
 
 @Getter
-@SuperBuilder
+@SuperBuilder(toBuilder = true)
 public class NameUpdateTransactionModel extends AbstractTransactionModel<NameUpdateTx> {
 
-  @NonNull private String accountId;
-  @NonNull private BigInteger nonce;
-  @NonNull private String nameId;
-  @NonNull private BigInteger ttl;
-  @NonNull private BigInteger nameTtl;
-  @NonNull private BigInteger clientTtl;
+  private String accountId;
+  private BigInteger nonce;
+  private String nameId;
+  private BigInteger ttl;
+  private BigInteger nameTtl;
+  private BigInteger clientTtl;
 
   @Default private List<NamePointerModel> pointers = new LinkedList<NamePointerModel>();
 
@@ -46,14 +48,35 @@ public class NameUpdateTransactionModel extends AbstractTransactionModel<NameUpd
     return nameUpdateTx;
   }
 
-  public List<com.kryptokrauts.aeternity.generated.model.NamePointer> getGeneratedPointers() {
+  public List<NamePointer> getGeneratedPointers() {
     return pointers.stream()
-        .map(
-            pointer ->
-                new com.kryptokrauts.aeternity.generated.model.NamePointer()
-                    .id(pointer.getId())
-                    .key(pointer.getKey()))
+        .map(pointer -> new NamePointer().id(pointer.getId()).key(pointer.getKey()))
         .collect(Collectors.toList());
+  }
+
+  @Override
+  public Function<GenericTx, NameUpdateTransactionModel> getApiToModelFunction() {
+    return (tx) -> {
+      NameUpdateTx castedTx = (NameUpdateTx) tx;
+      return this.toBuilder()
+          .accountId(castedTx.getAccountId())
+          .fee(castedTx.getFee())
+          .nonce(castedTx.getNonce())
+          .nameId(castedTx.getNameId())
+          .nameTtl(castedTx.getNameTtl())
+          .clientTtl(castedTx.getClientTtl())
+          .ttl(castedTx.getTtl())
+          .pointers(
+              castedTx.getPointers().stream()
+                  .map(
+                      pointer ->
+                          NamePointerModel.builder()
+                              .id(pointer.getId())
+                              .key(pointer.getKey())
+                              .build())
+                  .collect(Collectors.toList()))
+          .build();
+    };
   }
 
   @Override

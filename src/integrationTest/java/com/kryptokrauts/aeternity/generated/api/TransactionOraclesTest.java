@@ -147,13 +147,11 @@ public class TransactionOraclesTest extends BaseTest {
                 BigInteger nonce = getAccount(oracleAccount.getPublicKey()).getNonce().add(ONE);
                 OracleRespondTransactionModel oracleRespondTx =
                     OracleRespondTransactionModel.builder()
-                        .senderId(oracleAccount.getPublicKey())
                         .oracleId(oracleAccount.getPublicKey().replace("ak_", "ok_"))
                         .queryId(queryId)
                         .nonce(nonce)
                         .response("yes you are nuts!")
                         .responseTtl(BigInteger.valueOf(100))
-                        .responseFormat("response Specification")
                         .ttl(ZERO)
                         .build();
 

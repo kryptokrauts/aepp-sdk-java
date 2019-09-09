@@ -1,25 +1,26 @@
 package com.kryptokrauts.aeternity.sdk.service.transaction.type.model;
 
 import com.kryptokrauts.aeternity.generated.api.rxjava.ExternalApi;
+import com.kryptokrauts.aeternity.generated.model.GenericTx;
 import com.kryptokrauts.aeternity.generated.model.NameClaimTx;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.AbstractTransaction;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.impl.NameClaimTransaction;
 import com.kryptokrauts.aeternity.sdk.util.ValidationUtil;
 import com.kryptokrauts.sophia.compiler.generated.api.rxjava.DefaultApi;
 import java.math.BigInteger;
+import java.util.function.Function;
 import lombok.Getter;
-import lombok.NonNull;
 import lombok.experimental.SuperBuilder;
 
 @Getter
-@SuperBuilder
+@SuperBuilder(toBuilder = true)
 public class NameClaimTransactionModel extends AbstractTransactionModel<NameClaimTx> {
 
-  @NonNull private String accountId;
-  @NonNull private BigInteger nonce;
-  @NonNull private String name;
-  @NonNull private BigInteger nameSalt;
-  @NonNull private BigInteger ttl;
+  private String accountId;
+  private BigInteger nonce;
+  private String name;
+  private BigInteger nameSalt;
+  private BigInteger ttl;
 
   @Override
   public NameClaimTx toApiModel() {
@@ -31,6 +32,21 @@ public class NameClaimTransactionModel extends AbstractTransactionModel<NameClai
     nameClaimTx.setFee(this.fee);
     nameClaimTx.setTtl(this.ttl);
     return nameClaimTx;
+  }
+
+  @Override
+  public Function<GenericTx, NameClaimTransactionModel> getApiToModelFunction() {
+    return (tx) -> {
+      NameClaimTx castedTx = (NameClaimTx) tx;
+      return this.toBuilder()
+          .accountId(castedTx.getAccountId())
+          .fee(castedTx.getFee())
+          .nonce(castedTx.getNonce())
+          .name(castedTx.getName())
+          .nameSalt(castedTx.getNameSalt())
+          .ttl(castedTx.getTtl())
+          .build();
+    };
   }
 
   @Override

@@ -1,6 +1,7 @@
 package com.kryptokrauts.aeternity.sdk.service.transaction.type.model;
 
 import com.kryptokrauts.aeternity.generated.api.rxjava.ExternalApi;
+import com.kryptokrauts.aeternity.generated.model.GenericTx;
 import com.kryptokrauts.aeternity.generated.model.OracleRespondTx;
 import com.kryptokrauts.aeternity.generated.model.RelativeTTL;
 import com.kryptokrauts.aeternity.generated.model.RelativeTTL.TypeEnum;
@@ -8,22 +9,20 @@ import com.kryptokrauts.aeternity.sdk.service.transaction.type.AbstractTransacti
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.impl.OracleRespondTransaction;
 import com.kryptokrauts.sophia.compiler.generated.api.rxjava.DefaultApi;
 import java.math.BigInteger;
+import java.util.function.Function;
 import lombok.Getter;
-import lombok.NonNull;
 import lombok.experimental.SuperBuilder;
 
 @Getter
-@SuperBuilder
+@SuperBuilder(toBuilder = true)
 public class OracleRespondTransactionModel extends AbstractTransactionModel<OracleRespondTx> {
 
-  @NonNull private String senderId;
-  @NonNull private String oracleId;
-  @NonNull private String queryId;
-  @NonNull private BigInteger nonce;
-  @NonNull private String response;
-  @NonNull private BigInteger responseTtl;
-  @NonNull private String responseFormat;
-  @NonNull private BigInteger ttl;
+  private String oracleId;
+  private String queryId;
+  private BigInteger nonce;
+  private String response;
+  private BigInteger responseTtl;
+  private BigInteger ttl;
 
   @Override
   public OracleRespondTx toApiModel() {
@@ -36,6 +35,22 @@ public class OracleRespondTransactionModel extends AbstractTransactionModel<Orac
     oracleRespondTx.responseTtl(new RelativeTTL().type(TypeEnum.DELTA).value(responseTtl));
     oracleRespondTx.ttl(this.ttl);
     return oracleRespondTx;
+  }
+
+  @Override
+  public Function<GenericTx, OracleRespondTransactionModel> getApiToModelFunction() {
+    return (tx) -> {
+      OracleRespondTx castedTx = (OracleRespondTx) tx;
+      return this.toBuilder()
+          .oracleId(castedTx.getOracleId())
+          .nonce(castedTx.getNonce())
+          .fee(castedTx.getFee())
+          .queryId(castedTx.getQueryId())
+          .response(castedTx.getResponse())
+          .responseTtl(castedTx.getResponseTtl().getValue())
+          .ttl(castedTx.getTtl())
+          .build();
+    };
   }
 
   @Override
