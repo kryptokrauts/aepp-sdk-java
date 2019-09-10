@@ -7,10 +7,12 @@ import java.util.ArrayList;
 import java.util.List;
 import lombok.Builder.Default;
 import lombok.Getter;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
 @Getter
 @SuperBuilder(toBuilder = true)
+@ToString
 public class EventModel extends GenericResultObject<Event, EventModel> {
   private String address;
 

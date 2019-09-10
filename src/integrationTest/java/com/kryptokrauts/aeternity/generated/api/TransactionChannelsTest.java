@@ -7,8 +7,6 @@ import com.kryptokrauts.aeternity.sdk.service.transaction.type.model.ChannelCrea
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.model.SpendTransactionModel;
 import com.kryptokrauts.aeternity.sdk.util.UnitConversionUtil;
 import com.kryptokrauts.aeternity.sdk.util.UnitConversionUtil.Unit;
-import io.reactivex.Single;
-import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
 import java.math.BigInteger;
 import org.junit.Before;
@@ -30,59 +28,48 @@ public class TransactionChannelsTest extends BaseTest {
 
   @Test
   public void aFundResponderAccount(TestContext context) throws TransactionCreateException {
-    Async async = context.async();
-
-    BigInteger amount = UnitConversionUtil.toAettos("10", Unit.AE).toBigInteger();
-
-    SpendTransactionModel spendTx =
-        SpendTransactionModel.builder()
-            .sender(initiator.getPublicKey())
-            .recipient(responder.getPublicKey())
-            .amount(amount)
-            .payload("")
-            .ttl(ZERO)
-            .nonce(getNextBaseKeypairNonce())
-            .build();
-
-    Single<PostTransactionResult> txResponse =
-        aeternityServiceNative.transactions.asyncPostTransaction(spendTx);
-
-    txResponse.subscribe(
-        resultObject -> {
-          context.assertNotNull(resultObject);
-          async.complete();
+    this.executeTest(
+        context,
+        t -> {
+          BigInteger amount = UnitConversionUtil.toAettos("10", Unit.AE).toBigInteger();
+          SpendTransactionModel spendTx =
+              SpendTransactionModel.builder()
+                  .sender(initiator.getPublicKey())
+                  .recipient(responder.getPublicKey())
+                  .amount(amount)
+                  .payload("")
+                  .ttl(ZERO)
+                  .nonce(getNextBaseKeypairNonce())
+                  .build();
+          PostTransactionResult txResponse =
+              aeternityServiceNative.transactions.blockingPostTransaction(spendTx);
+          context.assertNotNull(txResponse);
         });
-    async.awaitSuccess(TEST_CASE_TIMEOUT_MILLIS);
   }
 
   @Test
   public void channelCreateTest(TestContext context) throws TransactionCreateException {
-    Async async = context.async();
+    this.executeTest(
+        context,
+        t -> {
+          BigInteger amount = UnitConversionUtil.toAettos("2", Unit.AE).toBigInteger();
 
-    BigInteger amount = UnitConversionUtil.toAettos("2", Unit.AE).toBigInteger();
-
-    ChannelCreateTransactionModel model =
-        ChannelCreateTransactionModel.builder()
-            .initiator(initiator.getPublicKey())
-            .initiatorAmount(amount)
-            .responder(responder.getPublicKey())
-            .responderAmount(amount)
-            .channelReserve(ZERO)
-            .lockPeriod(ZERO)
-            .ttl(ZERO)
-            .stateHash("")
-            .nonce(getNextBaseKeypairNonce())
-            .build();
-
-    Single<String> txResponse =
-        aeternityServiceNative.transactions.asyncCreateUnsignedTransaction(model);
-
-    txResponse.subscribe(
-        resultObject -> {
-          context.assertNotNull(resultObject);
-          _logger.info("Channel create tx hash: " + resultObject);
-          async.complete();
+          ChannelCreateTransactionModel model =
+              ChannelCreateTransactionModel.builder()
+                  .initiator(initiator.getPublicKey())
+                  .initiatorAmount(amount)
+                  .responder(responder.getPublicKey())
+                  .responderAmount(amount)
+                  .channelReserve(ZERO)
+                  .lockPeriod(ZERO)
+                  .ttl(ZERO)
+                  .stateHash("")
+                  .nonce(getNextBaseKeypairNonce())
+                  .build();
+          String txResponse =
+              aeternityServiceNative.transactions.blockingCreateUnsignedTransaction(model);
+          context.assertNotNull(txResponse);
+          _logger.info("Channel create tx hash: " + txResponse);
         });
-    async.awaitSuccess(TEST_CASE_TIMEOUT_MILLIS);
   }
 }

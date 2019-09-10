@@ -8,10 +8,12 @@ import java.util.List;
 import java.util.stream.Collectors;
 import lombok.Builder.Default;
 import lombok.Getter;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
 @Getter
 @SuperBuilder(toBuilder = true)
+@ToString
 public class ContractCallObjectModel
     extends GenericResultObject<ContractCallObject, ContractCallObjectModel> {
 

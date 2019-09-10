@@ -3,10 +3,12 @@ package com.kryptokrauts.aeternity.sdk.service.transaction.domain;
 import com.kryptokrauts.aeternity.generated.model.DryRunResult;
 import com.kryptokrauts.aeternity.sdk.domain.GenericResultObject;
 import lombok.Getter;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
 @Getter
 @SuperBuilder(toBuilder = true)
+@ToString
 public class DryRunTransactionResult
     extends GenericResultObject<DryRunResult, DryRunTransactionResult> {
 

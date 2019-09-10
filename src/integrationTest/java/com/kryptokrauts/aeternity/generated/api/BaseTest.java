@@ -16,12 +16,14 @@ import io.reactivex.Single;
 import io.reactivex.observers.TestObserver;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
+import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.RunTestOnContext;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
 import java.math.BigInteger;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 import javax.naming.ConfigurationException;
 import org.junit.After;
@@ -35,7 +37,7 @@ import org.slf4j.LoggerFactory;
 @RunWith(VertxUnitRunner.class)
 public abstract class BaseTest {
 
-  protected static final long TEST_CASE_TIMEOUT_MILLIS = 30000l;
+  protected static final long TEST_CASE_TIMEOUT_MILLIS = 5000l;
 
   protected static final BigInteger ONE = BigInteger.ONE;
 
@@ -58,8 +60,12 @@ public abstract class BaseTest {
 
   @Rule public RunTestOnContext rule = new RunTestOnContext();
 
+  Vertx vertx;
+
   @Before
   public void setupApiClient(TestContext context) throws ConfigurationException {
+    vertx = rule.vertx();
+
     keyPairService = new KeyPairServiceFactory().getService();
 
     baseKeyPair =
@@ -74,6 +80,7 @@ public abstract class BaseTest {
                     .network(Network.DEVNET)
                     .nativeMode(true)
                     .baseKeyPair(baseKeyPair)
+                    .vertx(vertx)
                     .compile());
     aeternityServiceDebug =
         new AeternityServiceFactory()
@@ -84,13 +91,13 @@ public abstract class BaseTest {
                     .network(Network.DEVNET)
                     .nativeMode(false)
                     .baseKeyPair(baseKeyPair)
+                    .vertx(vertx)
                     .compile());
   }
 
   @After
   public void shutdownClient(TestContext context) {
     _logger.info("Closing vertx");
-    Vertx vertx = rule.vertx();
     vertx.close();
   }
 
@@ -253,5 +260,26 @@ public abstract class BaseTest {
     } while (result == null);
 
     return result;
+  }
+
+  protected void executeTest(TestContext context, Consumer<?> method) {
+    Async async = context.async();
+    vertx.executeBlocking(
+        future -> {
+          try {
+            method.accept(null);
+            future.complete();
+          } catch (Throwable e) {
+            _logger.error("Error occured in test", e);
+            context.fail();
+          }
+        },
+        result -> {
+          if (result.succeeded()) {
+            async.complete();
+          } else {
+            context.fail(result.cause());
+          }
+        });
   }
 }
