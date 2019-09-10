@@ -1,52 +1,27 @@
 package com.kryptokrauts.aeternity.sdk.service.transaction.type.impl;
 
-import com.kryptokrauts.aeternity.generated.api.rxjava.NameServiceApi;
-import com.kryptokrauts.aeternity.generated.model.NamePreclaimTx;
+import com.kryptokrauts.aeternity.generated.api.rxjava.ExternalApi;
 import com.kryptokrauts.aeternity.generated.model.UnsignedTx;
 import com.kryptokrauts.aeternity.sdk.constants.SerializationTags;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.AbstractTransaction;
+import com.kryptokrauts.aeternity.sdk.service.transaction.type.model.NamePreclaimTransactionModel;
 import com.kryptokrauts.aeternity.sdk.util.EncodingUtils;
-import com.kryptokrauts.aeternity.sdk.util.ValidationUtil;
 import io.reactivex.Single;
-import java.math.BigInteger;
-import lombok.Getter;
 import lombok.NonNull;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import org.apache.tuweni.bytes.Bytes;
 import org.apache.tuweni.rlp.RLP;
 
-@Getter
 @SuperBuilder
 @ToString
-public class NamePreclaimTransaction extends AbstractTransaction<NamePreclaimTx> {
+public class NamePreclaimTransaction extends AbstractTransaction<NamePreclaimTransactionModel> {
 
-  @NonNull private String accountId;
-  @NonNull private String name; // will be used to generate the commitmentId
-  @NonNull private BigInteger salt; // will be used to generate the commitmentId
-  @NonNull private BigInteger nonce;
-  @NonNull private BigInteger ttl;
-  @NonNull private NameServiceApi nameServiceApi;
+  @NonNull private ExternalApi externalApi;
 
   @Override
   protected Single<UnsignedTx> createInternal() {
-    return nameServiceApi.rxPostNamePreclaim(getApiModel());
-  }
-
-  @Override
-  protected NamePreclaimTx toModel() {
-    NamePreclaimTx namePreclaimTx = new NamePreclaimTx();
-    namePreclaimTx.setAccountId(this.accountId);
-    namePreclaimTx.setCommitmentId(EncodingUtils.generateCommitmentHash(this.name, this.salt));
-    namePreclaimTx.setFee(this.fee);
-    namePreclaimTx.setNonce(this.nonce);
-    namePreclaimTx.setTtl(this.ttl);
-    return namePreclaimTx;
-  }
-
-  @Override
-  protected void validateInput() {
-    ValidationUtil.checkNamespace(this.name);
+    return externalApi.rxPostNamePreclaim(model.toApiModel());
   }
 
   @Override
@@ -57,16 +32,17 @@ public class NamePreclaimTransaction extends AbstractTransaction<NamePreclaimTx>
               rlpWriter.writeInt(SerializationTags.OBJECT_TAG_NAME_SERVICE_PRECLAIM_TRANSACTION);
               rlpWriter.writeInt(SerializationTags.VSN);
               byte[] accountIdWithTag =
-                  EncodingUtils.decodeCheckAndTag(this.accountId, SerializationTags.ID_TAG_ACCOUNT);
+                  EncodingUtils.decodeCheckAndTag(
+                      model.getAccountId(), SerializationTags.ID_TAG_ACCOUNT);
               byte[] commitmentIdWithTag =
                   EncodingUtils.decodeCheckAndTag(
-                      EncodingUtils.generateCommitmentHash(this.name, this.salt),
+                      EncodingUtils.generateCommitmentHash(model.getName(), model.getSalt()),
                       SerializationTags.ID_TAG_COMMITMENT);
               rlpWriter.writeByteArray(accountIdWithTag);
-              this.checkZeroAndWriteValue(rlpWriter, this.nonce);
+              this.checkZeroAndWriteValue(rlpWriter, model.getNonce());
               rlpWriter.writeByteArray(commitmentIdWithTag);
-              this.checkZeroAndWriteValue(rlpWriter, this.fee);
-              this.checkZeroAndWriteValue(rlpWriter, this.ttl);
+              this.checkZeroAndWriteValue(rlpWriter, model.getFee());
+              this.checkZeroAndWriteValue(rlpWriter, model.getTtl());
             });
     return encodedRlp;
   }

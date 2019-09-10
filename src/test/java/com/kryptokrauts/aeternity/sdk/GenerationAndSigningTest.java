@@ -12,11 +12,11 @@ import com.kryptokrauts.aeternity.sdk.domain.secret.impl.BaseKeyPair;
 import com.kryptokrauts.aeternity.sdk.domain.secret.impl.RawKeyPair;
 import com.kryptokrauts.aeternity.sdk.service.keypair.KeyPairService;
 import com.kryptokrauts.aeternity.sdk.service.keypair.KeyPairServiceFactory;
+import com.kryptokrauts.aeternity.sdk.util.ByteUtils;
 import com.kryptokrauts.aeternity.sdk.util.EncodingType;
 import com.kryptokrauts.aeternity.sdk.util.EncodingUtils;
 import com.kryptokrauts.aeternity.sdk.util.SigningUtil;
 import java.nio.charset.StandardCharsets;
-import org.bouncycastle.pqc.math.linearalgebra.ByteUtils;
 import org.bouncycastle.util.encoders.Hex;
 
 public class GenerationAndSigningTest extends BaseTest {
@@ -406,7 +406,8 @@ public class GenerationAndSigningTest extends BaseTest {
                       (byte) 193,
                       91
                     };
-                final byte[] formattedSalt = EncodingUtils.formatSalt(BaseTest.TEST_SALT);
+                final byte[] formattedSalt =
+                    ByteUtils.leftPad(32, BaseTest.TEST_SALT.toByteArray());
 
                 assertArrayEquals(oneSalt, formattedSalt);
               });
@@ -525,7 +526,7 @@ public class GenerationAndSigningTest extends BaseTest {
                 final byte[] generatedNameIdAndSalt =
                     ByteUtils.concatenate(
                         EncodingUtils.nameId(BaseTest.KK_NAMESPACE),
-                        EncodingUtils.formatSalt(BaseTest.TEST_SALT));
+                        ByteUtils.leftPad(32, BaseTest.TEST_SALT.toByteArray()));
 
                 assertArrayEquals(nameIdAndSalt, generatedNameIdAndSalt);
               });
@@ -571,7 +572,7 @@ public class GenerationAndSigningTest extends BaseTest {
                     EncodingUtils.hash(
                         ByteUtils.concatenate(
                             EncodingUtils.nameId(BaseTest.KK_NAMESPACE),
-                            EncodingUtils.formatSalt(BaseTest.TEST_SALT)));
+                            ByteUtils.leftPad(32, BaseTest.TEST_SALT.toByteArray())));
 
                 assertArrayEquals(nameIdAndSalt, generatedNameIdAndSalt);
               });

@@ -1,5 +1,6 @@
 package com.kryptokrauts.aeternity.sdk.service.transaction.fee;
 
+import com.kryptokrauts.aeternity.sdk.service.transaction.type.AbstractTransaction;
 import java.math.BigInteger;
 
 public interface FeeCalculationModel {
@@ -11,7 +12,9 @@ public interface FeeCalculationModel {
    *
    * @param tx_byte_size transaction size in bytes
    * @param minimalGasPrice minimal gas price
+   * @param transaction the tx-object
    * @return the actual fee
    */
-  BigInteger calculateFee(int tx_byte_size, long minimalGasPrice);
+  public BigInteger calculateFee(
+      int tx_byte_size, long minimalGasPrice, AbstractTransaction<?> transaction);
 }

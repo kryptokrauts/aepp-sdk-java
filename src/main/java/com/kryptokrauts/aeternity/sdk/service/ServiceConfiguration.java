@@ -3,6 +3,8 @@ package com.kryptokrauts.aeternity.sdk.service;
 import com.google.common.collect.ImmutableMap;
 import com.kryptokrauts.aeternity.generated.ApiClient;
 import com.kryptokrauts.aeternity.sdk.constants.BaseConstants;
+import com.kryptokrauts.aeternity.sdk.domain.secret.impl.BaseKeyPair;
+import com.kryptokrauts.aeternity.sdk.exception.InvalidParameterException;
 import com.kryptokrauts.aeternity.sdk.service.wallet.WalletServiceConfiguration;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
@@ -45,6 +47,8 @@ public class ServiceConfiguration {
 
   @Default @Nonnull protected String contractBaseUrl = BaseConstants.DEFAULT_TESTNET_CONTRACT_URL;
 
+  private BaseKeyPair baseKeyPair;
+
   /** the vertx instance */
   protected Vertx vertx;
 
@@ -83,5 +87,13 @@ public class ServiceConfiguration {
     } else
       throw new RuntimeException(
           "Cannot intantiate ApiClient due to missing params vertx and or contractBaseUrl");
+  }
+
+  public BaseKeyPair getBaseKeyPair() {
+    if (baseKeyPair == null) {
+      throw new InvalidParameterException(
+          "Service call was initiated which needs the baseKeyPair but none is set in ServiceConfiguration.baseKeyPair - check parameters");
+    }
+    return baseKeyPair;
   }
 }

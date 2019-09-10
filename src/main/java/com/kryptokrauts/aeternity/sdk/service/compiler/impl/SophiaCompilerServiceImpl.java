@@ -2,11 +2,8 @@ package com.kryptokrauts.aeternity.sdk.service.compiler.impl;
 
 import com.kryptokrauts.aeternity.sdk.service.ServiceConfiguration;
 import com.kryptokrauts.aeternity.sdk.service.compiler.CompilerService;
-import com.kryptokrauts.sophia.compiler.generated.api.DefaultApiImpl;
+import com.kryptokrauts.aeternity.sdk.service.compiler.domain.ACIResult;
 import com.kryptokrauts.sophia.compiler.generated.api.rxjava.DefaultApi;
-import com.kryptokrauts.sophia.compiler.generated.model.ACI;
-import com.kryptokrauts.sophia.compiler.generated.model.ByteCode;
-import com.kryptokrauts.sophia.compiler.generated.model.Calldata;
 import com.kryptokrauts.sophia.compiler.generated.model.CompileOpts;
 import com.kryptokrauts.sophia.compiler.generated.model.Contract;
 import com.kryptokrauts.sophia.compiler.generated.model.FunctionCallInput;
@@ -15,25 +12,34 @@ import com.kryptokrauts.sophia.compiler.generated.model.SophiaJsonData;
 import io.netty.util.internal.StringUtil;
 import io.reactivex.Single;
 import java.util.List;
-import javax.annotation.Nonnull;
+import java.util.Optional;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 public final class SophiaCompilerServiceImpl implements CompilerService {
 
-  @Nonnull private ServiceConfiguration config;
+  @NonNull private ServiceConfiguration config;
 
-  private DefaultApi compilerApi;
+  @NonNull private DefaultApi compilerApi;
 
-  private DefaultApi getCompilerApi() {
-    if (compilerApi == null) {
-      compilerApi = new DefaultApi(new DefaultApiImpl(config.getCompilerApiClient()));
-    }
-    return compilerApi;
+  @Override
+  public Single<String> asyncEncodeCalldata(
+      String sourceCode, String function, List<String> arguments) {
+    return this.compilerApi
+        .rxEncodeCalldata(buildFunctionCallInput(sourceCode, function, arguments))
+        .map(calldata -> calldata.getCalldata());
   }
 
   @Override
-  public Single<Calldata> encodeCalldata(
+  public String blockingEncodeCalldata(String sourceCode, String function, List<String> arguments) {
+    return this.compilerApi
+        .rxEncodeCalldata(buildFunctionCallInput(sourceCode, function, arguments))
+        .blockingGet()
+        .getCalldata();
+  }
+
+  private FunctionCallInput buildFunctionCallInput(
       String sourceCode, String function, List<String> arguments) {
     FunctionCallInput body = new FunctionCallInput();
     body.source(sourceCode);
@@ -43,27 +49,76 @@ public final class SophiaCompilerServiceImpl implements CompilerService {
         body.addArgumentsItem(argument);
       }
     }
-    return this.getCompilerApi().rxEncodeCalldata(body);
+    return body;
   }
 
   @Override
-  public Single<SophiaJsonData> decodeCalldata(String calldata, String sophiaType) {
+  public Single<Object> asyncDecodeCalldata(String calldata, String sophiaType) {
+    return Optional.ofNullable(this.compilerApi.rxDecodeData(buildDecodeBody(calldata, sophiaType)))
+        .orElse(Single.just(new SophiaJsonData()))
+        .map(s -> s.getData());
+  }
+
+  @Override
+  public Object blockingDecodeCalldata(String calldata, String sophiaType) {
+    return Optional.ofNullable(
+            this.compilerApi.rxDecodeData(buildDecodeBody(calldata, sophiaType)).blockingGet())
+        .orElse(new SophiaJsonData())
+        .getData();
+  }
+
+  private SophiaBinaryData buildDecodeBody(String calldata, String sophiaType) {
     SophiaBinaryData body = new SophiaBinaryData();
     body.setData(calldata);
     body.setSophiaType(sophiaType);
-    return this.getCompilerApi().rxDecodeData(body);
+    return body;
   }
 
   @Override
-  public Single<ACI> generateACI(String contractCode) {
+  public Single<ACIResult> asyncGenerateACI(
+      String contractCode, String srcFile, Object fileSystem) {
+    return ACIResult.builder()
+        .build()
+        .asyncGet(this.compilerApi.rxGenerateACI(buildACIBody(contractCode, srcFile, fileSystem)));
+  }
+
+  @Override
+  public ACIResult blockingGenerateACI(String contractCode, String srcFile, Object fileSystem) {
+    return ACIResult.builder()
+        .build()
+        .blockingGet(
+            this.compilerApi.rxGenerateACI(buildACIBody(contractCode, srcFile, fileSystem)));
+  }
+
+  private Contract buildACIBody(String contractCode, String srcFile, Object fileSystem) {
     Contract body = new Contract().code(contractCode);
     CompileOpts compileOpts = new CompileOpts();
+    if (fileSystem != null) {
+      compileOpts.fileSystem(fileSystem);
+    }
+    if (!StringUtil.isNullOrEmpty(srcFile)) {
+      compileOpts.setSrcFile(srcFile);
+    }
     body.setOptions(compileOpts);
-    return this.getCompilerApi().rxGenerateACI(body);
+    return body;
   }
 
   @Override
-  public Single<ByteCode> compile(String contractCode, String srcFile, Object fileSystem) {
+  public Single<String> asyncCompile(String contractCode, String srcFile, Object fileSystem) {
+    return this.compilerApi
+        .rxCompileContract(buildContractBody(contractCode, srcFile, fileSystem))
+        .map(byteCode -> byteCode.getBytecode());
+  }
+
+  @Override
+  public String blockingCompile(String contractCode, String srcFile, Object fileSystem) {
+    return this.compilerApi
+        .rxCompileContract(buildContractBody(contractCode, srcFile, fileSystem))
+        .blockingGet()
+        .getBytecode();
+  }
+
+  private Contract buildContractBody(String contractCode, String srcFile, Object fileSystem) {
     Contract body = new Contract().code(contractCode);
     CompileOpts compileOpts = new CompileOpts();
     if (!StringUtil.isNullOrEmpty(srcFile)) {
@@ -73,6 +128,6 @@ public final class SophiaCompilerServiceImpl implements CompilerService {
       compileOpts.setFileSystem(fileSystem);
     }
     body.setOptions(compileOpts);
-    return this.getCompilerApi().rxCompileContract(body);
+    return body;
   }
 }

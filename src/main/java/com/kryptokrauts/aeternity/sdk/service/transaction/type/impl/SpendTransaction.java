@@ -1,53 +1,27 @@
 package com.kryptokrauts.aeternity.sdk.service.transaction.type.impl;
 
-import com.kryptokrauts.aeternity.generated.api.rxjava.TransactionApi;
-import com.kryptokrauts.aeternity.generated.model.SpendTx;
+import com.kryptokrauts.aeternity.generated.api.rxjava.ExternalApi;
 import com.kryptokrauts.aeternity.generated.model.UnsignedTx;
 import com.kryptokrauts.aeternity.sdk.constants.SerializationTags;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.AbstractTransaction;
+import com.kryptokrauts.aeternity.sdk.service.transaction.type.model.SpendTransactionModel;
 import com.kryptokrauts.aeternity.sdk.util.EncodingUtils;
 import io.reactivex.Single;
-import java.math.BigInteger;
-import lombok.Getter;
 import lombok.NonNull;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import org.apache.tuweni.bytes.Bytes;
 import org.apache.tuweni.rlp.RLP;
 
-@Getter
 @SuperBuilder
-public class SpendTransaction extends AbstractTransaction<SpendTx> {
+@ToString
+public class SpendTransaction extends AbstractTransaction<SpendTransactionModel> {
 
-  @NonNull private String sender;
-  @NonNull private String recipient;
-  @NonNull private BigInteger amount;
-  @NonNull private String payload;
-  @NonNull private BigInteger ttl;
-  @NonNull private BigInteger nonce;
-  @NonNull private TransactionApi transactionApi;
+  @NonNull private ExternalApi externalApi;
 
   @Override
   protected Single<UnsignedTx> createInternal() {
-    return transactionApi.rxPostSpend(toModel());
-  }
-
-  @Override
-  protected SpendTx toModel() {
-    SpendTx spendTx = new SpendTx();
-    spendTx.setSenderId(sender);
-    spendTx.setRecipientId(recipient);
-    spendTx.setAmount(amount);
-    spendTx.setPayload(payload);
-    spendTx.setFee(fee);
-    spendTx.setTtl(ttl);
-    spendTx.setNonce(nonce);
-
-    return spendTx;
-  }
-
-  @Override
-  protected void validateInput() {
-    // nothing to validate here
+    return externalApi.rxPostSpend(model.toApiModel());
   }
 
   @Override
@@ -58,16 +32,18 @@ public class SpendTransaction extends AbstractTransaction<SpendTx> {
               rlpWriter.writeInt(SerializationTags.OBJECT_TAG_SPEND_TRANSACTION);
               rlpWriter.writeInt(SerializationTags.VSN);
               byte[] senderWithTag =
-                  EncodingUtils.decodeCheckAndTag(this.sender, SerializationTags.ID_TAG_ACCOUNT);
+                  EncodingUtils.decodeCheckAndTag(
+                      model.getSender(), SerializationTags.ID_TAG_ACCOUNT);
               byte[] recipientWithTag =
-                  EncodingUtils.decodeCheckAndTag(this.recipient, SerializationTags.ID_TAG_ACCOUNT);
+                  EncodingUtils.decodeCheckAndTag(
+                      model.getRecipient(), SerializationTags.ID_TAG_ACCOUNT);
               rlpWriter.writeByteArray(senderWithTag);
               rlpWriter.writeByteArray(recipientWithTag);
-              this.checkZeroAndWriteValue(rlpWriter, this.amount);
-              this.checkZeroAndWriteValue(rlpWriter, this.fee);
-              this.checkZeroAndWriteValue(rlpWriter, this.ttl);
-              this.checkZeroAndWriteValue(rlpWriter, this.nonce);
-              rlpWriter.writeByteArray(this.payload.getBytes());
+              this.checkZeroAndWriteValue(rlpWriter, model.getAmount());
+              this.checkZeroAndWriteValue(rlpWriter, model.getFee());
+              this.checkZeroAndWriteValue(rlpWriter, model.getTtl());
+              this.checkZeroAndWriteValue(rlpWriter, model.getNonce());
+              rlpWriter.writeByteArray(model.getPayload().getBytes());
             });
     return encodedRlp;
   }

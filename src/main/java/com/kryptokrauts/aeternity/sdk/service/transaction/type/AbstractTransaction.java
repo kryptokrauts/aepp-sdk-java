@@ -3,9 +3,12 @@ package com.kryptokrauts.aeternity.sdk.service.transaction.type;
 import com.kryptokrauts.aeternity.generated.model.UnsignedTx;
 import com.kryptokrauts.aeternity.sdk.constants.ApiIdentifiers;
 import com.kryptokrauts.aeternity.sdk.service.transaction.fee.FeeCalculationModel;
+import com.kryptokrauts.aeternity.sdk.service.transaction.fee.impl.BaseFeeCalculationModel;
+import com.kryptokrauts.aeternity.sdk.service.transaction.type.model.AbstractTransactionModel;
 import com.kryptokrauts.aeternity.sdk.util.EncodingUtils;
 import io.reactivex.Single;
 import java.math.BigInteger;
+import lombok.NonNull;
 import lombok.experimental.SuperBuilder;
 import org.apache.tuweni.bytes.Bytes;
 import org.apache.tuweni.rlp.RLPWriter;
@@ -19,14 +22,16 @@ import org.slf4j.LoggerFactory;
  * @param <TxModel>
  */
 @SuperBuilder
-public abstract class AbstractTransaction<TxModel> {
+public abstract class AbstractTransaction<TxModel extends AbstractTransactionModel<?>> {
 
   private static final Logger _logger = LoggerFactory.getLogger(AbstractTransaction.class);
 
-  protected BigInteger fee;
+  @NonNull protected TxModel model;
 
   /** fee calculation model for this transaction type, one of {@link FeeCalculationModel} */
-  protected FeeCalculationModel feeCalculationModel;
+  protected FeeCalculationModel getFeeCalculationModel() {
+    return new BaseFeeCalculationModel();
+  }
 
   /**
    * generates a Bytes object from the attributes. this is necessary for calculating the fee based
@@ -44,14 +49,6 @@ public abstract class AbstractTransaction<TxModel> {
   protected abstract <T extends UnsignedTx> Single<T> createInternal();
 
   /**
-   * this method needs to be implemented for testing purposes (non native mode) and returns the
-   * generated tx model from the transaction fields
-   *
-   * @return one of {@link com.kryptokrauts.aeternity.generated.model}
-   */
-  protected abstract TxModel toModel();
-
-  /**
    * this method creates an unsigned transaction whether in native or debug mode if no fee is
    * defined (null), the fee will be calculated based on the transactions byte size and maybe other
    * transaction attributes using the fee calculation model
@@ -62,19 +59,19 @@ public abstract class AbstractTransaction<TxModel> {
    */
   public Single<UnsignedTx> createUnsignedTransaction(boolean nativeMode, long minimalGasPrice) {
     /** before creating the unsigned transaction we validate the input */
-    validateInput();
+    model.validateInput();
     if (nativeMode) {
       /** if no fee is given - use default fee to create a tx and get its size */
-      if (fee == null) {
-        fee = BigInteger.ONE.shiftLeft(48);
+      if (model.getFee() == null) {
+        model.setFee(BigInteger.ONE.shiftLeft(48));
         Bytes encodedRLPArray = createRLPEncodedList();
         int byte_size = encodedRLPArray.bitLength() / 8;
         /** now calculate fee based on tx size */
-        fee = feeCalculationModel.calculateFee(byte_size, minimalGasPrice);
+        model.setFee(getFeeCalculationModel().calculateFee(byte_size, minimalGasPrice, this));
         _logger.info(
             String.format(
                 "Using calculation model %s the following fee was calculated %s",
-                feeCalculationModel.getClass().getName(), fee));
+                getFeeCalculationModel().getClass().getName(), model.getFee()));
       } else {
         _logger.warn(
             "You defined a custom transaction fee which might be not sufficient to execute the transaction!");
@@ -91,29 +88,6 @@ public abstract class AbstractTransaction<TxModel> {
     return createInternal();
   }
 
-  /** @return the calculated or given fee for this transaction */
-  public BigInteger getFee() {
-    return fee;
-  }
-
-  /**
-   * this method can be used to set a self-defined fee. otherwise the fee will automatically
-   * calculated
-   *
-   * @param fee a self-defined fee
-   */
-  public void setFee(BigInteger fee) {
-    this.fee = fee;
-  }
-
-  /**
-   * @return the transaction model which is actually used to create the remote call to the generated
-   *     api functions (classes of package {@link com.kryptokrauts.aeternity.generated.api.rxjava})
-   */
-  public TxModel getApiModel() {
-    return toModel();
-  }
-
   /**
    * check if value is 0 -> if so, serialize as byte, otherwise serialize value as BigInteger
    *
@@ -128,6 +102,7 @@ public abstract class AbstractTransaction<TxModel> {
     }
   }
 
-  /** this method can be used to perform transaction specific validations that will */
-  protected abstract void validateInput();
+  public TxModel getModel() {
+    return model;
+  }
 }
