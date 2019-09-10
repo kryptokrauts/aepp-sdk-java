@@ -116,6 +116,7 @@ public class TransactionSpendApiTest extends BaseTest {
             PostTransactionResult txResponse =
                 aeternityServiceNative.transactions.blockingPostTransaction(spendTx);
             _logger.info("SpendTx hash: " + txResponse.getTxHash());
+            waitForTxMined(txResponse.getTxHash());
             context.assertEquals(
                 txResponse.getTxHash(), aeternityServiceNative.transactions.computeTxHash(spendTx));
           } catch (Throwable e) {
