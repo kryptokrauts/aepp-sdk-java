@@ -7,21 +7,22 @@ import com.kryptokrauts.aeternity.sdk.service.transaction.domain.PostTransaction
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.model.AbstractTransactionModel;
 import io.reactivex.Single;
 import java.util.List;
-import org.bouncycastle.crypto.CryptoException;
 
 public interface TransactionService {
 
   /**
+   * [@PURPOSE-DEBUG] synchronously sign an unsigned transaction with the given private key
+   *
    * @param unsignedTx
    * @param privateKey
    * @return signed and encoded transaction
-   * @throws CryptoException
+   * @throws TransactionCreateException
    */
   String signTransaction(String unsignedTx, String privateKey) throws TransactionCreateException;
 
   /**
-   * creates an unsignedTx object for further processing and especially abstracts the fee
-   * calculation for this transaction thus this is an
+   * asynchronously creates an unsignedTx object for further processing and especially abstracts the
+   * fee calculation for this transaction thus this is an
    *
    * @param tx transaction typed model, one of {link AbstractTransaction}
    * @return a single-wrapped unsignedTx object
@@ -29,52 +30,79 @@ public interface TransactionService {
   Single<String> asyncCreateUnsignedTransaction(AbstractTransactionModel<?> tx);
 
   /**
-   * @see asyncCreateUnsignedTransaction
-   * @param tx
-   * @return
+   * synchronously creates an unsignedTx object for further processing and especially abstracts the
+   * fee calculation for this transaction thus this is an
+   *
+   * @param tx transaction typed model, one of {link AbstractTransaction}
+   * @return a single-wrapped unsignedTx object
    */
   String blockingCreateUnsignedTransaction(AbstractTransactionModel<?> tx);
 
   /**
-   * dry run unsigned transactions to estimate gas (!) please make sure to use implementations of
-   * {@link List} to ensure correct order of transactions called by accounts
+   * asynchronously dry run unsigned transactions to estimate gas (!) please make sure to use
+   * implementations of {@link List} to ensure correct order of transactions called by accounts
+   *
+   * @param accounts
+   * @param block
+   * @param unsignedTransactions
+   * @return asynchronous result handler (RxJava Single) for @{DryRunTransactionResults}
+   */
+  Single<DryRunTransactionResults> asyncDryRunTransactions(DryRunRequest input);
+
+  /**
+   * synchronously dry run unsigned transactions to estimate gas (!) please make sure to use
+   * implementations of {@link List} to ensure correct order of transactions called by accounts
    *
    * @param accounts
    * @param block
    * @param unsignedTransactions
    * @return
    */
-  Single<DryRunTransactionResults> asyncDryRunTransactions(DryRunRequest input);
-
   DryRunTransactionResults blockingDryRunTransactions(DryRunRequest input);
 
   /**
-   * async post a transaction for given model
+   * asynchronously post a transaction for given model
    *
    * @param tx
-   * @param privateKey the privateKey to sign the tx, if none is given it will be
-   * @return
-   * @throws TransactionCreateException
+   * @param privateKey the privateKey to sign the tx
+   * @return asynchronous result handler (RxJava Single) for {PostTransactionResult}
    */
   Single<PostTransactionResult> asyncPostTransaction(
       AbstractTransactionModel<?> tx, String privateKey);
 
   /**
-   * async post a transaction for given model
+   * asynchronously post a transaction for given model with the private key stored in the
+   * configuration
    *
    * @param tx
-   * @return
-   * @throws TransactionCreateException
+   * @return asynchronous result handler (RxJava Single) for {PostTransactionResult}s
    */
   Single<PostTransactionResult> asyncPostTransaction(AbstractTransactionModel<?> tx);
 
+  /**
+   * synchronously post a transaction for given model
+   *
+   * @param tx
+   * @param privateKey the privateKey to sign the tx
+   * @return
+   */
   PostTransactionResult blockingPostTransaction(AbstractTransactionModel<?> tx, String privateKey);
 
+  /**
+   * synchronously post a transaction for given model with the private key stored in the
+   * configuration
+   *
+   * @param tx
+   * @return
+   */
   PostTransactionResult blockingPostTransaction(AbstractTransactionModel<?> tx);
 
   /**
+   * [@PURPOSE-DEBUG] synchronously compute the transaction hash for the given transaction model
+   *
    * @param transaction object
    * @return the hash from a signed and encoded transaction
+   * @throws TransactionCreateException
    */
   String computeTxHash(AbstractTransactionModel<?> tx) throws TransactionCreateException;
 }

@@ -19,6 +19,10 @@ import com.kryptokrauts.sophia.compiler.generated.api.DefaultApiImpl;
 import com.kryptokrauts.sophia.compiler.generated.api.rxjava.DefaultApi;
 import lombok.NonNull;
 
+/**
+ * the central service to access all provided functions. these are classified into their purpose for
+ * better organization
+ */
 public class AeternityService {
 
   @NonNull protected AeternityServiceConfiguration config;

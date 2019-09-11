@@ -4,10 +4,12 @@ import com.kryptokrauts.aeternity.generated.model.GAObject;
 import com.kryptokrauts.aeternity.sdk.domain.GenericResultObject;
 import java.math.BigInteger;
 import lombok.Getter;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
 @Getter
 @SuperBuilder(toBuilder = true)
+@ToString
 public class GAObjectModel extends GenericResultObject<GAObject, GAObjectModel> {
 
   private String callerId;

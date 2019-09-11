@@ -5,8 +5,10 @@ import com.kryptokrauts.aeternity.generated.model.TTL.TypeEnum;
 import com.kryptokrauts.aeternity.sdk.exception.NoSuchOracleTTLTypeException;
 import java.math.BigInteger;
 import lombok.Getter;
+import lombok.ToString;
 
 @Getter
+@ToString
 public enum OracleTTLType {
   DELTA("delta"),
 

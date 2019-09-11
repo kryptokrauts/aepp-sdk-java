@@ -9,41 +9,64 @@ import io.reactivex.Single;
 public interface InfoService {
 
   /**
-   * get the transaction object for given tx hash
+   * asynchronously get the transaction object for given tx hash
    *
    * @param txHash
-   * @return
+   * @return asynchronous result handler (RxJava Single) for {@link TransactionResult}
    */
   Single<TransactionResult> asyncGetTransactionByHash(String txHash);
 
+  /**
+   * synchronously get the transaction object for given tx hash
+   *
+   * @param txHash
+   * @return result of {@link TransactionResult}
+   */
   TransactionResult blockingGetTransactionByHash(String txHash);
 
   /**
-   * gets the information object for given tx hash
+   * asynchronously gets the information object for given tx hash
    *
    * @param txHash
-   * @return
+   * @return asynchronous result handler (RxJava Single) for {@link TransactionInfoResult}
    */
   Single<TransactionInfoResult> asyncGetTransactionInfoByHash(String txHash);
 
+  /**
+   * synchronously gets the information object for given tx hash
+   *
+   * @param txHash
+   * @return result of {@link TransactionResult}
+   */
   TransactionInfoResult blockingGetTransactionInfoByHash(String txHash);
 
   /**
-   * get transaction object for given microblock tx hash
+   * asynchronously get transaction object for given microblock tx hash
    *
    * @param microBlockHash
-   * @return
+   * @return asynchronous result handler (RxJava Single) for {@link TransactionResults}
    */
   Single<TransactionResults> asyncGetMicroBlockTransactions(String microBlockHash);
 
+  /**
+   * synchronously get transaction object for given microblock tx hash
+   *
+   * @param microBlockHash
+   * @return result for {@link TransactionResults}
+   */
   TransactionResults blockingGetMicroBlockTransactions(String microBlockHash);
 
   /**
-   * retrieve the current keyblock
+   * asynchronously retrieve the current keyblock
    *
-   * @return the current keyblock
+   * @return asynchronous result handler (RxJava Single) for {@link KeyBlockResult}
    */
   Single<KeyBlockResult> asyncGetCurrentKeyBlock();
 
+  /**
+   * synchronously retrieve the current keyblock
+   *
+   * @return result for {@link KeyBlockResult}
+   */
   KeyBlockResult blockingGetCurrentKeyBlock();
 }
