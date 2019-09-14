@@ -7,15 +7,15 @@ import java.util.List;
 public interface CompilerService {
 
   /**
-   * gets the encoded calldata for this contractCode
+   * asynchronously gets the encoded calldata for this contractCode
    *
    * @param contractCode the sourcecode of the contract
-   * @return async encoded calldata
+   * @return asynchronous result handler (RxJava Single) for encoded calldata
    */
   Single<String> asyncEncodeCalldata(String contractCode, String function, List<String> arguments);
 
   /**
-   * gets the encoded calldata for this contractCode
+   * synchronously gets the encoded calldata for this contractCode
    *
    * @param contractCode the sourcecode of the contract
    * @return encoded calldata
@@ -23,15 +23,15 @@ public interface CompilerService {
   String blockingEncodeCalldata(String contractCode, String function, List<String> arguments);
 
   /**
-   * gets the contract bytecode for this contractCode
+   * asynchronously gets the contract bytecode for this contractCode
    *
    * @param contractCode the sourcecode of the contract
-   * @return async byteCode of the compiled contract
+   * @return asynchronous result handler (RxJava Single) for byteCode of the compiled contract
    */
   Single<String> asyncCompile(String contractCode, String srcFile, Object fileSystem);
 
   /**
-   * gets the contract bytecode for this contractCode
+   * synchronously gets the contract bytecode for this contractCode
    *
    * @param contractCode the sourcecode of the contract
    * @return byteCode of the compiled contract
@@ -39,16 +39,16 @@ public interface CompilerService {
   String blockingCompile(String contractCode, String srcFile, Object fileSystem);
 
   /**
-   * decodes a calldata
+   * asynchronously decodes a calldata
    *
    * @param calldata the calldata
    * @param sophiaType the awaited sophia type
-   * @return async decoded answer as json string
+   * @return asynchronous result handler (RxJava Single) for decoded answer as json string
    */
   Single<Object> asyncDecodeCalldata(String calldata, String sophiaType);
 
   /**
-   * decodes a calldata
+   * synchronously decodes a calldata
    *
    * @param calldata the calldata
    * @param sophiaType the awaited sophia type
@@ -57,20 +57,20 @@ public interface CompilerService {
   Object blockingDecodeCalldata(String calldata, String sophiaType);
 
   /**
-   * generates the ACI for this contractCode
+   * asynchronously generates the ACI for this contractCode
    * https://github.com/aeternity/aesophia/blob/master/docs/aeso_aci.md
    *
    * @param contractCode the sourcecode of the contract
-   * @return asnyc ACI for a given contract
+   * @return asynchronous result handler (RxJava Single) for {@link ACIResult}
    */
   Single<ACIResult> asyncGenerateACI(String contractCode, String srcFile, Object fileSystem);
 
   /**
-   * generates the ACI for this contractCode
+   * synchronously generates the ACI for this contractCode
    * https://github.com/aeternity/aesophia/blob/master/docs/aeso_aci.md
    *
    * @param contractCode the sourcecode of the contract
-   * @return the ACI for a given contract
+   * @return result of {@linkACIResult}
    */
   ACIResult blockingGenerateACI(String contractCode, String srcFile, Object fileSystem);
 }

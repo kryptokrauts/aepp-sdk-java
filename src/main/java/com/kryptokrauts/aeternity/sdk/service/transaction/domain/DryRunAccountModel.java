@@ -5,9 +5,11 @@ import com.kryptokrauts.aeternity.sdk.domain.GenericInputObject;
 import java.math.BigInteger;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.ToString;
 
 @Getter
 @Builder
+@ToString
 public class DryRunAccountModel extends GenericInputObject<DryRunAccount> {
 
   private String publicKey;

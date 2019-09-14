@@ -12,7 +12,6 @@ import org.slf4j.LoggerFactory;
  * This class encapsules the generated result objects to keep the SDK stable in terms of changes
  * within the underlying AE protocol
  *
- * @author mitch
  * @param <T> the generated ae result object class
  */
 @Getter

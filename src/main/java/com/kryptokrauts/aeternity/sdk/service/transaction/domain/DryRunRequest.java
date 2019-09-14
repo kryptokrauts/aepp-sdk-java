@@ -12,9 +12,11 @@ import lombok.Builder;
 import lombok.Builder.Default;
 import lombok.Getter;
 import lombok.NonNull;
+import lombok.ToString;
 
 @Getter
 @Builder
+@ToString
 public class DryRunRequest extends GenericInputObject<DryRunInput> {
 
   private String block;
