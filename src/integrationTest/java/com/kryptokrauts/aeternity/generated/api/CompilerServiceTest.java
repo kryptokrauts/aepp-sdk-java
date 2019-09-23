@@ -89,6 +89,8 @@ public class CompilerServiceTest extends BaseTest {
                 this.aeternityServiceNative.compiler.blockingGenerateACI(
                     paymentSplitterSource, null, null);
             _logger.info(aci.getEncodedAci().toString());
+            ObjectMapper mapper = new ObjectMapper();
+            System.out.println(mapper.writeValueAsString(aci.getEncodedAci()));
             context.assertEquals(TestConstants.paymentSplitterACI, aci.getEncodedAci().toString());
           } catch (IOException e) {
             context.fail(e);

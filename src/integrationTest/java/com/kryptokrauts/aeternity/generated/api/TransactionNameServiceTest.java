@@ -2,6 +2,7 @@ package com.kryptokrauts.aeternity.generated.api;
 
 import com.kryptokrauts.aeternity.sdk.service.info.domain.TransactionResult;
 import com.kryptokrauts.aeternity.sdk.service.name.domain.NameIdResult;
+import com.kryptokrauts.aeternity.sdk.service.name.domain.NamePointerModel;
 import com.kryptokrauts.aeternity.sdk.service.transaction.domain.PostTransactionResult;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.model.NameClaimTransactionModel;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.model.NamePreclaimTransactionModel;
@@ -11,6 +12,7 @@ import com.kryptokrauts.aeternity.sdk.util.CryptoUtils;
 import com.kryptokrauts.aeternity.sdk.util.EncodingUtils;
 import io.vertx.ext.unit.TestContext;
 import java.math.BigInteger;
+import java.util.Arrays;
 import java.util.Random;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
@@ -174,6 +176,18 @@ public class TransactionNameServiceTest extends BaseTest {
             BigInteger nameTtl = BigInteger.valueOf(10000l);
             BigInteger clientTtl = BigInteger.valueOf(50l);
 
+            NamePointerModel accPointer =
+                NamePointerModel.builder()
+                    .key(NameUpdateTransactionModel.POINTER_KEY_ACCOUNT)
+                    .id(baseKeyPair.getPublicKey())
+                    .build();
+
+            NamePointerModel contractPointer =
+                NamePointerModel.builder()
+                    .key(NameUpdateTransactionModel.POINTER_KEY_CONTRACT)
+                    .id(baseKeyPair.getPublicKey().replace("ak_", "ct_"))
+                    .build();
+
             NameUpdateTransactionModel nameUpdateTx =
                 NameUpdateTransactionModel.builder()
                     .accountId(baseKeyPair.getPublicKey())
@@ -182,6 +196,7 @@ public class TransactionNameServiceTest extends BaseTest {
                     .ttl(ZERO)
                     .clientTtl(clientTtl)
                     .nameTtl(nameTtl)
+                    .pointers(Arrays.asList(accPointer, contractPointer))
                     .build();
 
             PostTransactionResult nameUpdateResult = this.postTx(nameUpdateTx);

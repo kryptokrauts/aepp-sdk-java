@@ -1,7 +1,6 @@
 package com.kryptokrauts.aeternity.sdk.service.transaction.type.impl;
 
 import com.kryptokrauts.aeternity.generated.api.rxjava.ExternalApi;
-import com.kryptokrauts.aeternity.generated.model.NamePointer;
 import com.kryptokrauts.aeternity.generated.model.UnsignedTx;
 import com.kryptokrauts.aeternity.sdk.constants.SerializationTags;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.AbstractTransaction;
@@ -42,14 +41,18 @@ public class NameUpdateTransaction extends AbstractTransaction<NameUpdateTransac
               rlpWriter.writeByteArray(nameIdWithTag);
               this.checkZeroAndWriteValue(rlpWriter, model.getNameTtl());
               rlpWriter.writeList(
-                  writer -> {
-                    for (NamePointer pointer : model.getGeneratedPointers()) {
-                      writer.writeString("account_pubkey");
-                      byte[] pointerAccountIdWithTag =
-                          EncodingUtils.decodeCheckAndTag(
-                              pointer.getId(), SerializationTags.ID_TAG_ACCOUNT);
-                      rlpWriter.writeByteArray(pointerAccountIdWithTag);
-                    }
+                  model.getGeneratedPointers(),
+                  (writer, namePointer) -> {
+                    writer.writeList(
+                        innerWriter -> {
+                          innerWriter.writeByteArray(namePointer.getKey().getBytes());
+                          byte[] pointerWithTag =
+                              EncodingUtils.decodeCheckAndTag(
+                                  namePointer.getId(),
+                                  NameUpdateTransactionModel.pointerSerializationMap.get(
+                                      namePointer.getKey()));
+                          innerWriter.writeByteArray(pointerWithTag);
+                        });
                   });
               this.checkZeroAndWriteValue(rlpWriter, model.getClientTtl());
               this.checkZeroAndWriteValue(rlpWriter, model.getFee());

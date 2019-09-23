@@ -5,16 +5,14 @@ import com.kryptokrauts.aeternity.generated.model.GenericTx;
 import com.kryptokrauts.aeternity.generated.model.NamePointer;
 import com.kryptokrauts.aeternity.generated.model.NameUpdateTx;
 import com.kryptokrauts.aeternity.sdk.constants.ApiIdentifiers;
+import com.kryptokrauts.aeternity.sdk.constants.SerializationTags;
 import com.kryptokrauts.aeternity.sdk.service.name.domain.NamePointerModel;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.AbstractTransaction;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.impl.NameUpdateTransaction;
 import com.kryptokrauts.aeternity.sdk.util.ValidationUtil;
 import com.kryptokrauts.sophia.compiler.generated.api.rxjava.DefaultApi;
 import java.math.BigInteger;
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import lombok.Builder.Default;
@@ -25,6 +23,21 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder(toBuilder = true)
 public class NameUpdateTransactionModel extends AbstractTransactionModel<NameUpdateTx> {
 
+  public static String POINTER_KEY_ACCOUNT = "account_pubkey";
+  public static String POINTER_KEY_ORACLE = "oracle_pubkey";
+  public static String POINTER_KEY_CONTRACT = "contract_pubkey";
+  public static String POINTER_KEY_CHANNEL = "channel";
+
+  public static Map<String, Integer> pointerSerializationMap =
+      new HashMap<String, Integer>() {
+        {
+          put(POINTER_KEY_ACCOUNT, SerializationTags.ID_TAG_ACCOUNT);
+          put(POINTER_KEY_ORACLE, SerializationTags.ID_TAG_ORACLE);
+          put(POINTER_KEY_CONTRACT, SerializationTags.ID_TAG_CONTRACT);
+          put(POINTER_KEY_CHANNEL, SerializationTags.ID_TAG_CHANNEL);
+        }
+      };
+
   private String accountId;
   private BigInteger nonce;
   private String nameId;
@@ -32,7 +45,7 @@ public class NameUpdateTransactionModel extends AbstractTransactionModel<NameUpd
   private BigInteger nameTtl;
   private BigInteger clientTtl;
 
-  @Default private List<NamePointerModel> pointers = new LinkedList<NamePointerModel>();
+  @Default private List<NamePointerModel> pointers = new ArrayList<>();
 
   @Override
   public NameUpdateTx toApiModel() {
@@ -94,6 +107,14 @@ public class NameUpdateTransactionModel extends AbstractTransactionModel<NameUpd
         "validateUpdateTransaction",
         Arrays.asList("nameId", ApiIdentifiers.NAME),
         ValidationUtil.MISSING_API_IDENTIFIER);
+    for (NamePointerModel pointer : pointers) {
+      ValidationUtil.checkParameters(
+          validate -> Optional.ofNullable(pointerSerializationMap.containsKey(pointer.getKey())),
+          pointer,
+          "validateUpdateTransaction",
+          Arrays.asList("pointer key", pointer.getKey()),
+          ValidationUtil.INVALID_POINTER_KEY);
+    }
   }
 
   @Override
