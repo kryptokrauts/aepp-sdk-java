@@ -28,7 +28,7 @@ public class ValidationUtil {
 
   public static final List<String> ALLOWED_NAMESPACES = Arrays.asList("test");
 
-  public static final String INVALID_POINTER_KEY = "Pointer key '%s' is not valid.";
+  public static final String INVALID_POINTER_ADDRESS = "Pointer address '%s' is not valid.";
 
   /**
    * encapsule validation of given parameters

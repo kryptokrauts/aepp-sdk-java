@@ -2,7 +2,6 @@ package com.kryptokrauts.aeternity.generated.api;
 
 import com.kryptokrauts.aeternity.sdk.service.info.domain.TransactionResult;
 import com.kryptokrauts.aeternity.sdk.service.name.domain.NameIdResult;
-import com.kryptokrauts.aeternity.sdk.service.name.domain.NamePointerModel;
 import com.kryptokrauts.aeternity.sdk.service.transaction.domain.PostTransactionResult;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.model.NameClaimTransactionModel;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.model.NamePreclaimTransactionModel;
@@ -176,17 +175,9 @@ public class TransactionNameServiceTest extends BaseTest {
             BigInteger nameTtl = BigInteger.valueOf(10000l);
             BigInteger clientTtl = BigInteger.valueOf(50l);
 
-            NamePointerModel accPointer =
-                NamePointerModel.builder()
-                    .key(NameUpdateTransactionModel.POINTER_KEY_ACCOUNT)
-                    .id(baseKeyPair.getPublicKey())
-                    .build();
-
-            NamePointerModel contractPointer =
-                NamePointerModel.builder()
-                    .key(NameUpdateTransactionModel.POINTER_KEY_CONTRACT)
-                    .id(baseKeyPair.getPublicKey().replace("ak_", "ct_"))
-                    .build();
+            String accountPointer = baseKeyPair.getPublicKey();
+            // fake contract-address
+            String contractPointer = baseKeyPair.getPublicKey().replace("ak_", "ct_");
 
             NameUpdateTransactionModel nameUpdateTx =
                 NameUpdateTransactionModel.builder()
@@ -196,7 +187,7 @@ public class TransactionNameServiceTest extends BaseTest {
                     .ttl(ZERO)
                     .clientTtl(clientTtl)
                     .nameTtl(nameTtl)
-                    .pointers(Arrays.asList(accPointer, contractPointer))
+                    .pointerAddresses(Arrays.asList(accountPointer, contractPointer))
                     .build();
 
             PostTransactionResult nameUpdateResult = this.postTx(nameUpdateTx);

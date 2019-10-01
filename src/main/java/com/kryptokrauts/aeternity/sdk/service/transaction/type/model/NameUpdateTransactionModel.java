@@ -5,8 +5,6 @@ import com.kryptokrauts.aeternity.generated.model.GenericTx;
 import com.kryptokrauts.aeternity.generated.model.NamePointer;
 import com.kryptokrauts.aeternity.generated.model.NameUpdateTx;
 import com.kryptokrauts.aeternity.sdk.constants.ApiIdentifiers;
-import com.kryptokrauts.aeternity.sdk.constants.SerializationTags;
-import com.kryptokrauts.aeternity.sdk.service.name.domain.NamePointerModel;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.AbstractTransaction;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.impl.NameUpdateTransaction;
 import com.kryptokrauts.aeternity.sdk.util.ValidationUtil;
@@ -15,7 +13,6 @@ import java.math.BigInteger;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import lombok.Builder.Default;
 import lombok.Getter;
 import lombok.experimental.SuperBuilder;
 
@@ -24,19 +21,23 @@ import lombok.experimental.SuperBuilder;
 public class NameUpdateTransactionModel extends AbstractTransactionModel<NameUpdateTx> {
 
   public static String POINTER_KEY_ACCOUNT = "account_pubkey";
-  public static String POINTER_KEY_ORACLE = "oracle_pubkey";
-  public static String POINTER_KEY_CONTRACT = "contract_pubkey";
   public static String POINTER_KEY_CHANNEL = "channel";
+  public static String POINTER_KEY_CONTRACT = "contract_pubkey";
+  public static String POINTER_KEY_ORACLE = "oracle_pubkey";
 
-  public static Map<String, Integer> pointerSerializationMap =
-      new HashMap<String, Integer>() {
-        {
-          put(POINTER_KEY_ACCOUNT, SerializationTags.ID_TAG_ACCOUNT);
-          put(POINTER_KEY_ORACLE, SerializationTags.ID_TAG_ORACLE);
-          put(POINTER_KEY_CONTRACT, SerializationTags.ID_TAG_CONTRACT);
-          put(POINTER_KEY_CHANNEL, SerializationTags.ID_TAG_CHANNEL);
-        }
-      };
+  private static Map<String, String> identifierToPointerKeyMap;
+
+  {
+    identifierToPointerKeyMap =
+        new HashMap<String, String>() {
+          {
+            put(ApiIdentifiers.ACCOUNT_PUBKEY, POINTER_KEY_ACCOUNT);
+            put(ApiIdentifiers.CHANNEL, POINTER_KEY_CHANNEL);
+            put(ApiIdentifiers.CONTRACT_PUBKEY, POINTER_KEY_CONTRACT);
+            put(ApiIdentifiers.ORACLE_PUBKEY, POINTER_KEY_ORACLE);
+          }
+        };
+  }
 
   private String accountId;
   private BigInteger nonce;
@@ -45,7 +46,7 @@ public class NameUpdateTransactionModel extends AbstractTransactionModel<NameUpd
   private BigInteger nameTtl;
   private BigInteger clientTtl;
 
-  @Default private List<NamePointerModel> pointers = new ArrayList<>();
+  private List<String> pointerAddresses;
 
   @Override
   public NameUpdateTx toApiModel() {
@@ -62,8 +63,8 @@ public class NameUpdateTransactionModel extends AbstractTransactionModel<NameUpd
   }
 
   public List<NamePointer> getGeneratedPointers() {
-    return pointers.stream()
-        .map(pointer -> new NamePointer().id(pointer.getId()).key(pointer.getKey()))
+    return pointerAddresses.stream()
+        .map(pointerAddress -> buildNamePointer(pointerAddress))
         .collect(Collectors.toList());
   }
 
@@ -79,14 +80,9 @@ public class NameUpdateTransactionModel extends AbstractTransactionModel<NameUpd
           .nameTtl(castedTx.getNameTtl())
           .clientTtl(castedTx.getClientTtl())
           .ttl(castedTx.getTtl())
-          .pointers(
+          .pointerAddresses(
               castedTx.getPointers().stream()
-                  .map(
-                      pointer ->
-                          NamePointerModel.builder()
-                              .id(pointer.getId())
-                              .key(pointer.getKey())
-                              .build())
+                  .map(pointer -> pointer.getId())
                   .collect(Collectors.toList()))
           .build();
     };
@@ -107,18 +103,32 @@ public class NameUpdateTransactionModel extends AbstractTransactionModel<NameUpd
         "validateUpdateTransaction",
         Arrays.asList("nameId", ApiIdentifiers.NAME),
         ValidationUtil.MISSING_API_IDENTIFIER);
-    for (NamePointerModel pointer : pointers) {
+    for (String pointerAddress : pointerAddresses) {
       ValidationUtil.checkParameters(
-          validate -> Optional.ofNullable(pointerSerializationMap.containsKey(pointer.getKey())),
-          pointer,
+          validate -> Optional.ofNullable(checkPointerAddress(pointerAddress)),
+          pointerAddress,
           "validateUpdateTransaction",
-          Arrays.asList("pointer key", pointer.getKey()),
-          ValidationUtil.INVALID_POINTER_KEY);
+          Arrays.asList("pointer address", pointerAddress),
+          ValidationUtil.INVALID_POINTER_ADDRESS);
     }
   }
 
   @Override
   public AbstractTransaction<?> buildTransaction(ExternalApi externalApi, DefaultApi compilerApi) {
     return NameUpdateTransaction.builder().externalApi(externalApi).model(this).build();
+  }
+
+  private boolean checkPointerAddress(String pointerAddress) {
+    return identifierToPointerKeyMap.keySet().contains(getIdentifier(pointerAddress));
+  }
+
+  private NamePointer buildNamePointer(String pointerAddress) {
+    return new NamePointer()
+        .key(identifierToPointerKeyMap.get(getIdentifier(pointerAddress)))
+        .id(pointerAddress);
+  }
+
+  private String getIdentifier(String pointerAddress) {
+    return pointerAddress.split("_")[0];
   }
 }
