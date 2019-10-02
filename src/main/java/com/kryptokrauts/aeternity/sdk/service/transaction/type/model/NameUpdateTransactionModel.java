@@ -5,6 +5,7 @@ import com.kryptokrauts.aeternity.generated.model.GenericTx;
 import com.kryptokrauts.aeternity.generated.model.NamePointer;
 import com.kryptokrauts.aeternity.generated.model.NameUpdateTx;
 import com.kryptokrauts.aeternity.sdk.constants.ApiIdentifiers;
+import com.kryptokrauts.aeternity.sdk.exception.InvalidParameterException;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.AbstractTransaction;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.impl.NameUpdateTransaction;
 import com.kryptokrauts.aeternity.sdk.util.ValidationUtil;
@@ -13,6 +14,7 @@ import java.math.BigInteger;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import lombok.Getter;
 import lombok.experimental.SuperBuilder;
 
@@ -103,12 +105,19 @@ public class NameUpdateTransactionModel extends AbstractTransactionModel<NameUpd
         "validateUpdateTransaction",
         Arrays.asList("nameId", ApiIdentifiers.NAME),
         ValidationUtil.MISSING_API_IDENTIFIER);
+    ValidationUtil.checkParameters(
+        validate -> Optional.ofNullable(areDistinctPointerKeys(pointerAddresses)),
+        pointerAddresses,
+        "validateUpdateTransaction",
+        Stream.concat(Arrays.asList("pointerAddresses").stream(), pointerAddresses.stream())
+            .collect(Collectors.toList()),
+        ValidationUtil.DUPLICATE_POINTER_KEY);
     for (String pointerAddress : pointerAddresses) {
       ValidationUtil.checkParameters(
-          validate -> Optional.ofNullable(checkPointerAddress(pointerAddress)),
+          validate -> Optional.ofNullable(isValidPointerAddress(pointerAddress)),
           pointerAddress,
           "validateUpdateTransaction",
-          Arrays.asList("pointer address", pointerAddress),
+          Arrays.asList("pointerAddress", pointerAddress),
           ValidationUtil.INVALID_POINTER_ADDRESS);
     }
   }
@@ -118,7 +127,12 @@ public class NameUpdateTransactionModel extends AbstractTransactionModel<NameUpd
     return NameUpdateTransaction.builder().externalApi(externalApi).model(this).build();
   }
 
-  private boolean checkPointerAddress(String pointerAddress) {
+  private boolean areDistinctPointerKeys(List<String> pointerAddresses) {
+    return pointerAddresses.stream().map(p -> getIdentifier(p)).distinct().count()
+        == pointerAddresses.size();
+  }
+
+  private boolean isValidPointerAddress(String pointerAddress) {
     return identifierToPointerKeyMap.keySet().contains(getIdentifier(pointerAddress));
   }
 
@@ -129,6 +143,9 @@ public class NameUpdateTransactionModel extends AbstractTransactionModel<NameUpd
   }
 
   private String getIdentifier(String pointerAddress) {
+    if (pointerAddress == null) {
+      throw new InvalidParameterException("pointerAddress mustn't be null");
+    }
     return pointerAddress.split("_")[0];
   }
 }
