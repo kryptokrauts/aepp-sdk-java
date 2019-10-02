@@ -33,7 +33,7 @@ public class OracleRespondTransaction extends AbstractTransaction<OracleRespondT
         RLP.encodeList(
             rlpWriter -> {
               rlpWriter.writeInt(SerializationTags.OBJECT_TAG_ORACLE_RESPONSE_TRANSACTION);
-              rlpWriter.writeInt(SerializationTags.VSN);
+              rlpWriter.writeInt(SerializationTags.VSN_1);
               byte[] oracleIdWithTag =
                   EncodingUtils.decodeCheckAndTag(
                       model.getOracleId(), SerializationTags.ID_TAG_ORACLE);

@@ -1,10 +1,10 @@
 package com.kryptokrauts.aeternity.sdk.service.transaction.domain;
 
 import com.kryptokrauts.aeternity.generated.model.DryRunInput;
+import com.kryptokrauts.aeternity.generated.model.DryRunInputItem;
 import com.kryptokrauts.aeternity.sdk.domain.GenericInputObject;
 import com.kryptokrauts.aeternity.sdk.util.ValidationUtil;
 import java.util.Arrays;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -21,9 +21,9 @@ public class DryRunRequest extends GenericInputObject<DryRunInput> {
 
   private String block;
 
-  @NonNull @Default private List<DryRunAccountModel> accounts = new LinkedList();
+  @NonNull @Default private List<DryRunAccountModel> accounts;
 
-  @NonNull @Default private List<String> transactions = new LinkedList();
+  @NonNull @Default private List<DryRunInputItem> transactions;
 
   public DryRunInput mapToModel() {
     return new DryRunInput()
@@ -63,7 +63,7 @@ public class DryRunRequest extends GenericInputObject<DryRunInput> {
   }
 
   public DryRunRequest transaction(String unsignedTx) {
-    this.transactions.add(unsignedTx);
+    this.transactions.add(new DryRunInputItem().tx(unsignedTx));
     return this;
   }
 }

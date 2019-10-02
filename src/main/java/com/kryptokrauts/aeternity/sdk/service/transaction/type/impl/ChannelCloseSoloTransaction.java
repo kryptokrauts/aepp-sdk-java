@@ -30,7 +30,7 @@ public class ChannelCloseSoloTransaction
         RLP.encodeList(
             rlpWriter -> {
               rlpWriter.writeInt(SerializationTags.OBJECT_TAG_CHANNEL_CLOSE_SOLO_TRANSACTION);
-              rlpWriter.writeInt(SerializationTags.VSN);
+              rlpWriter.writeInt(SerializationTags.VSN_1);
               byte[] channelIdWithTag =
                   EncodingUtils.decodeCheckAndTag(
                       model.getChannelId(), SerializationTags.ID_TAG_CHANNEL);

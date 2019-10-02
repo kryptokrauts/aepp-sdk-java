@@ -24,7 +24,7 @@ public class ValidationUtil {
   public static final String NAMESPACE_EXCEEDS_LIMIT =
       String.format("Domainname exceeds %s char limit.", DOMAIN_NAME_MAX_LENGHT);
 
-  public static final List<String> ALLOWED_NAMESPACES = Arrays.asList("test");
+  public static final List<String> ALLOWED_NAMESPACES = Arrays.asList("aet");
 
   public static final String INVALID_POINTER_ADDRESS = "Pointer address is not valid.";
 

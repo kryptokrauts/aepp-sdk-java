@@ -29,7 +29,7 @@ public class NameClaimTransaction extends AbstractTransaction<NameClaimTransacti
         RLP.encodeList(
             rlpWriter -> {
               rlpWriter.writeInt(SerializationTags.OBJECT_TAG_NAME_SERVICE_CLAIM_TRANSACTION);
-              rlpWriter.writeInt(SerializationTags.VSN);
+              rlpWriter.writeInt(SerializationTags.VSN_2);
               byte[] accountIdWithTag =
                   EncodingUtils.decodeCheckAndTag(
                       model.getAccountId(), SerializationTags.ID_TAG_ACCOUNT);
@@ -37,6 +37,7 @@ public class NameClaimTransaction extends AbstractTransaction<NameClaimTransacti
               this.checkZeroAndWriteValue(rlpWriter, model.getNonce());
               rlpWriter.writeString(model.getName());
               this.checkZeroAndWriteValue(rlpWriter, model.getNameSalt());
+              this.checkZeroAndWriteValue(rlpWriter, model.getNameFee());
               this.checkZeroAndWriteValue(rlpWriter, model.getFee());
               this.checkZeroAndWriteValue(rlpWriter, model.getTtl());
             });

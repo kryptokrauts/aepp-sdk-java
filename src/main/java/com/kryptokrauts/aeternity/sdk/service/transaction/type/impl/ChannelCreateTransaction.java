@@ -32,7 +32,7 @@ public class ChannelCreateTransaction extends AbstractTransaction<ChannelCreateT
         RLP.encodeList(
             rlpWriter -> {
               rlpWriter.writeInt(SerializationTags.OBJECT_TAG_CHANNEL_CREATE_TRANSACTION);
-              rlpWriter.writeInt(SerializationTags.VSN);
+              rlpWriter.writeInt(SerializationTags.VSN_1);
               byte[] initiatorIdWithTag =
                   EncodingUtils.decodeCheckAndTag(
                       model.getInitiator(), SerializationTags.ID_TAG_ACCOUNT);

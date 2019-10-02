@@ -20,6 +20,7 @@ public class NameClaimTransactionModel extends AbstractTransactionModel<NameClai
   private BigInteger nonce;
   private String name;
   private BigInteger nameSalt;
+  private BigInteger nameFee;
   private BigInteger ttl;
 
   @Override
@@ -29,6 +30,7 @@ public class NameClaimTransactionModel extends AbstractTransactionModel<NameClai
     nameClaimTx.setNonce(this.nonce);
     nameClaimTx.setName(this.name);
     nameClaimTx.setNameSalt(this.nameSalt);
+    nameClaimTx.setNameFee(this.nameFee);
     nameClaimTx.setFee(this.fee);
     nameClaimTx.setTtl(this.ttl);
     return nameClaimTx;
@@ -44,6 +46,7 @@ public class NameClaimTransactionModel extends AbstractTransactionModel<NameClai
           .nonce(castedTx.getNonce())
           .name(castedTx.getName())
           .nameSalt(castedTx.getNameSalt())
+          .nameFee(castedTx.getNameFee())
           .ttl(castedTx.getTtl())
           .build();
     };

@@ -4,7 +4,8 @@ public interface SerializationTags {
 
   // RLP version number
   // https://github.com/aeternity/protocol/blob/master/serializations.md#binary-serialization
-  int VSN = 1;
+  int VSN_1 = 1;
+  int VSN_2 = 2;
 
   // Tag constant for ids (type uint8)
   // see

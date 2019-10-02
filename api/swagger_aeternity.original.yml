@@ -193,7 +193,6 @@ paths:
   /key-blocks:
     post:
       tags:
-        - external
         - internal
         - chain
       operationId: PostKeyBlock
@@ -951,7 +950,6 @@ paths:
   /debug/contracts/create:
     post:
       tags:
-        - external
         - internal
         - contract
         - debug
@@ -983,7 +981,6 @@ paths:
   /debug/contracts/call:
     post:
       tags:
-        - external
         - internal
         - contract
         - debug
@@ -1015,7 +1012,6 @@ paths:
   /debug/oracles/register:
     post:
       tags:
-        - external
         - internal
         - oracle
         - debug
@@ -1047,7 +1043,6 @@ paths:
   /debug/oracles/extend:
     post:
       tags:
-        - external
         - internal
         - oracle
         - debug
@@ -1079,7 +1074,6 @@ paths:
   /debug/oracles/query:
     post:
       tags:
-        - external
         - internal
         - oracle
         - debug
@@ -1111,7 +1105,6 @@ paths:
   /debug/oracles/respond:
     post:
       tags:
-        - external
         - internal
         - oracle
         - debug
@@ -1143,7 +1136,6 @@ paths:
   /debug/names/preclaim:
     post:
       tags:
-        - external
         - internal
         - name_service
         - debug
@@ -1173,7 +1165,6 @@ paths:
   /debug/names/claim:
     post:
       tags:
-        - external
         - internal
         - name_service
         - debug
@@ -1203,7 +1194,6 @@ paths:
   /debug/names/update:
     post:
       tags:
-        - external
         - internal
         - name_service
         - debug
@@ -1233,7 +1223,6 @@ paths:
   /debug/names/transfer:
     post:
       tags:
-        - external
         - internal
         - name_service
         - debug
@@ -1263,7 +1252,6 @@ paths:
   /debug/names/revoke:
     post:
       tags:
-        - external
         - internal
         - name_service
         - debug
@@ -1293,7 +1281,6 @@ paths:
   /debug/transactions/spend:
     post:
       tags:
-        - external
         - internal
         - transaction
         - debug
@@ -1326,7 +1313,6 @@ paths:
   /debug/channels/create:
     post:
       tags:
-        - external
         - internal
         - channel
         - debug
@@ -1356,7 +1342,6 @@ paths:
   /debug/channels/deposit:
     post:
       tags:
-        - external
         - internal
         - channel
         - debug
@@ -1382,7 +1367,6 @@ paths:
   /debug/channels/withdraw:
     post:
       tags:
-        - external
         - internal
         - channel
         - debug
@@ -1408,7 +1392,6 @@ paths:
   /debug/channels/snapshot/solo:
     post:
       tags:
-        - external
         - internal
         - channel
         - debug
@@ -1434,7 +1417,6 @@ paths:
   /debug/channels/close/mutual:
     post:
       tags:
-        - external
         - internal
         - channel
         - debug
@@ -1460,7 +1442,6 @@ paths:
   /debug/channels/close/solo:
     post:
       tags:
-        - external
         - internal
         - channel
         - debug
@@ -1486,7 +1467,6 @@ paths:
   /debug/channels/slash:
     post:
       tags:
-        - external
         - internal
         - channel
         - debug
@@ -1512,7 +1492,6 @@ paths:
   /debug/channels/settle:
     post:
       tags:
-        - external
         - internal
         - channel
         - debug
@@ -1538,7 +1517,6 @@ paths:
   /debug/transactions/pending:
     get:
       tags:
-        - external
         - internal
         - transaction
         - debug
@@ -1554,7 +1532,6 @@ paths:
   /debug/names/commitment-id:
     get:
       tags:
-        - external
         - internal
         - name_service
         - debug
@@ -1581,7 +1558,6 @@ paths:
   /debug/accounts/beneficiary:
     get:
       tags:
-        - external
         - internal
         - node_info
         - debug
@@ -1601,7 +1577,6 @@ paths:
   /debug/accounts/node:
     get:
       tags:
-        - external
         - internal
         - node_info
         - debug
@@ -1621,7 +1596,6 @@ paths:
   /debug/peers:
     get:
       tags:
-        - external
         - internal
         - node_info
         - debug
@@ -1641,7 +1615,6 @@ paths:
   /debug/transactions/dry-run:
     post:
       tags:
-        - external
         - internal
         - debug
       operationId: 'DryRunTxs'
@@ -1669,7 +1642,6 @@ paths:
   /debug/token-supply/height/{height}:
     get:
       tags:
-        - external
         - internal
         - debug
       operationId: GetTokenSupplyByHeight
@@ -1699,7 +1671,7 @@ parameters:
     description: 'The height'
     required: true
     # UInt64
-    type: integer
+    type : integer
     minimum: 0
     maximum: 18446744073709551615
   SaltIn:
@@ -1978,23 +1950,21 @@ definitions:
       - oracle_queries
   SpendTx:
     type: object
-    allOf:
-      - $ref: '#/definitions/GenericTx'
-      - properties:
-          recipient_id:
-            $ref: '#/definitions/EncodedPubkey'
-          amount:
-            $ref: '#/definitions/UInt'
-          fee:
-            $ref: '#/definitions/UInt'
-          ttl:
-            $ref: '#/definitions/UInt64'
-          sender_id:
-            $ref: '#/definitions/EncodedPubkey'
-          nonce:
-            $ref: '#/definitions/UInt64'
-          payload:
-            $ref: '#/definitions/EncodedByteArray'
+    properties:
+      recipient_id:
+        $ref: '#/definitions/EncodedPubkey'
+      amount:
+        $ref: '#/definitions/UInt'
+      fee:
+        $ref: '#/definitions/UInt'
+      ttl:
+        $ref: '#/definitions/UInt64'
+      sender_id:
+        $ref: '#/definitions/EncodedPubkey'
+      nonce:
+        $ref: '#/definitions/UInt64'
+      payload:
+        $ref: '#/definitions/EncodedByteArray'
     required:
       - recipient_id
       - amount
@@ -2003,29 +1973,27 @@ definitions:
       - payload
   OracleRegisterTx:
     type: object
-    allOf:
-      - $ref: '#/definitions/GenericTx'
-      - properties:
-          query_format:
-            # Depending on ABI version it might be a EncodedByteArray
-            type: string
-          response_format:
-            # Depending on ABI version it might be a EncodedByteArray
-            type: string
-          query_fee:
-            $ref: '#/definitions/UInt'
-          oracle_ttl:
-            $ref: '#/definitions/TTL'
-          account_id:
-            $ref: '#/definitions/EncodedPubkey'
-          nonce:
-            $ref: '#/definitions/UInt64'
-          fee:
-            $ref: '#/definitions/UInt'
-          ttl:
-            $ref: '#/definitions/UInt64'
-          abi_version:
-            $ref: '#/definitions/UInt16'
+    properties:
+      query_format:
+        # Depending on ABI version it might be a EncodedByteArray
+        type: string
+      response_format:
+        # Depending on ABI version it might be a EncodedByteArray
+        type: string
+      query_fee:
+        $ref: '#/definitions/UInt'
+      oracle_ttl:
+        $ref: '#/definitions/TTL'
+      account_id:
+        $ref: '#/definitions/EncodedPubkey'
+      nonce:
+        $ref: '#/definitions/UInt64'
+      fee:
+        $ref: '#/definitions/UInt'
+      ttl:
+        $ref: '#/definitions/UInt64'
+      abi_version:
+        $ref: '#/definitions/UInt16'
     required:
       - query_format
       - response_format
@@ -2035,48 +2003,44 @@ definitions:
       - account_id
   OracleExtendTx:
     type: object
-    allOf:
-      - $ref: '#/definitions/GenericTx'
-      - properties:
-          fee:
-            $ref: '#/definitions/UInt'
-          oracle_ttl:
-            $ref: '#/definitions/RelativeTTL'
-          oracle_id:
-            $ref: '#/definitions/EncodedPubkey'
-          nonce:
-            $ref: '#/definitions/UInt64'
-          ttl:
-            $ref: '#/definitions/UInt64'
+    properties:
+      fee:
+        $ref: '#/definitions/UInt'
+      oracle_ttl:
+        $ref: '#/definitions/RelativeTTL'
+      oracle_id:
+        $ref: '#/definitions/EncodedPubkey'
+      nonce:
+        $ref: '#/definitions/UInt64'
+      ttl:
+        $ref: '#/definitions/UInt64'
     required:
       - fee
       - oracle_ttl
       - oracle_id
   OracleQueryTx:
     type: object
-    allOf:
-      - $ref: '#/definitions/GenericTx'
-      - properties:
-          oracle_id:
-            $ref: '#/definitions/EncodedPubkey'
-          query:
-            # Depending on ABI version it might be a EncodedByteArray
-            type: string
-          query_fee:
-            $ref: '#/definitions/UInt'
-          query_ttl:
-            $ref: '#/definitions/TTL'
-          response_ttl:
-            $ref: '#/definitions/RelativeTTL'
-          fee:
-            $ref: '#/definitions/UInt'
-          ttl:
-            $ref: '#/definitions/UInt64'
-          sender_id:
-            $ref: '#/definitions/EncodedPubkey'
-          nonce:
-            description: 'Sender nonce'
-            $ref: '#/definitions/UInt64'
+    properties:
+      oracle_id:
+        $ref: '#/definitions/EncodedPubkey'
+      query:
+        # Depending on ABI version it might be a EncodedByteArray
+        type: string
+      query_fee:
+        $ref: '#/definitions/UInt'
+      query_ttl:
+        $ref: '#/definitions/TTL'
+      response_ttl:
+        $ref: '#/definitions/RelativeTTL'
+      fee:
+        $ref: '#/definitions/UInt'
+      ttl:
+        $ref: '#/definitions/UInt64'
+      sender_id:
+        $ref: '#/definitions/EncodedPubkey'
+      nonce:
+        description: 'Sender nonce'
+        $ref: '#/definitions/UInt64'
     required:
       - oracle_id
       - query
@@ -2087,24 +2051,22 @@ definitions:
       - sender_id
   OracleRespondTx:
     type: object
-    allOf:
-      - $ref: '#/definitions/GenericTx'
-      - properties:
-          query_id:
-            $ref: '#/definitions/EncodedValue'
-          response:
-            # Depending on ABI version it might be a EncodedByteArray
-            type: string
-          response_ttl:
-            $ref: '#/definitions/RelativeTTL'
-          fee:
-            $ref: '#/definitions/UInt'
-          ttl:
-            $ref: '#/definitions/UInt64'
-          oracle_id:
-            $ref: '#/definitions/EncodedPubkey'
-          nonce:
-            $ref: '#/definitions/UInt64'
+    properties:
+      query_id:
+        $ref: '#/definitions/EncodedValue'
+      response:
+        # Depending on ABI version it might be a EncodedByteArray
+        type: string
+      response_ttl:
+        $ref: '#/definitions/RelativeTTL'
+      fee:
+        $ref: '#/definitions/UInt'
+      ttl:
+        $ref: '#/definitions/UInt64'
+      oracle_id:
+        $ref: '#/definitions/EncodedPubkey'
+      nonce:
+        $ref: '#/definitions/UInt64'
     required:
       - query_id
       - response
@@ -2150,42 +2112,38 @@ definitions:
       - pointers
   NamePreclaimTx:
     type: object
-    allOf:
-      - $ref: '#/definitions/GenericTx'
-      - properties:
-          commitment_id:
-            $ref: '#/definitions/EncodedValue'
-          fee:
-            $ref: '#/definitions/UInt'
-          ttl:
-            $ref: '#/definitions/UInt64'
-          account_id:
-            $ref: '#/definitions/EncodedPubkey'
-          nonce:
-            $ref: '#/definitions/UInt64'
+    properties:
+      commitment_id:
+        $ref: '#/definitions/EncodedValue'
+      fee:
+        $ref: '#/definitions/UInt'
+      ttl:
+        $ref: '#/definitions/UInt64'
+      account_id:
+        $ref: '#/definitions/EncodedPubkey'
+      nonce:
+        $ref: '#/definitions/UInt64'
     required:
       - commitment_id
       - fee
       - account_id
   NameClaimTx:
     type: object
-    allOf:
-      - $ref: '#/definitions/GenericTx'
-      - properties:
-          name:
-            type: string
-          name_salt:
-            $ref: '#/definitions/UInt'
-          name_fee:
-            $ref: '#/definitions/UInt'
-          fee:
-            $ref: '#/definitions/UInt'
-          ttl:
-            $ref: '#/definitions/UInt64'
-          account_id:
-            $ref: '#/definitions/EncodedPubkey'
-          nonce:
-            $ref: '#/definitions/UInt64'
+    properties:
+      name:
+        type: string
+      name_salt:
+        $ref: '#/definitions/UInt'
+      name_fee:
+        $ref: '#/definitions/UInt'
+      fee:
+        $ref: '#/definitions/UInt'
+      ttl:
+        $ref: '#/definitions/UInt64'
+      account_id:
+        $ref: '#/definitions/EncodedPubkey'
+      nonce:
+        $ref: '#/definitions/UInt64'
     required:
       - name
       - name_salt
@@ -2193,27 +2151,25 @@ definitions:
       - account_id
   NameUpdateTx:
     type: object
-    allOf:
-      - $ref: '#/definitions/GenericTx'
-      - properties:
-          name_id:
-            $ref: '#/definitions/EncodedValue'
-          name_ttl:
-            $ref: '#/definitions/UInt64'
-          pointers:
-            type: array
-            items:
-              $ref: '#/definitions/NamePointer'
-          client_ttl:
-            $ref: '#/definitions/UInt64'
-          fee:
-            $ref: '#/definitions/UInt'
-          ttl:
-            $ref: '#/definitions/UInt64'
-          account_id:
-            $ref: '#/definitions/EncodedPubkey'
-          nonce:
-            $ref: '#/definitions/UInt64'
+    properties:
+      name_id:
+        $ref: '#/definitions/EncodedValue'
+      name_ttl:
+        $ref: '#/definitions/UInt64'
+      pointers:
+        type: array
+        items:
+          $ref: '#/definitions/NamePointer'
+      client_ttl:
+        $ref: '#/definitions/UInt64'
+      fee:
+        $ref: '#/definitions/UInt'
+      ttl:
+        $ref: '#/definitions/UInt64'
+      account_id:
+        $ref: '#/definitions/EncodedPubkey'
+      nonce:
+        $ref: '#/definitions/UInt64'
     required:
       - name_id
       - name_ttl
@@ -2223,21 +2179,19 @@ definitions:
       - account_id
   NameTransferTx:
     type: object
-    allOf:
-      - $ref: '#/definitions/GenericTx'
-      - properties:
-          name_id:
-            $ref: '#/definitions/EncodedValue'
-          recipient_id:
-            $ref: '#/definitions/EncodedPubkey'
-          fee:
-            $ref: '#/definitions/UInt'
-          ttl:
-            $ref: '#/definitions/UInt64'
-          account_id:
-            $ref: '#/definitions/EncodedPubkey'
-          nonce:
-            $ref: '#/definitions/UInt64'
+    properties:
+      name_id:
+        $ref: '#/definitions/EncodedValue'
+      recipient_id:
+        $ref: '#/definitions/EncodedPubkey'
+      fee:
+        $ref: '#/definitions/UInt'
+      ttl:
+        $ref: '#/definitions/UInt64'
+      account_id:
+        $ref: '#/definitions/EncodedPubkey'
+      nonce:
+        $ref: '#/definitions/UInt64'
     required:
       - name_id
       - recipient_id
@@ -2245,19 +2199,17 @@ definitions:
       - account_id
   NameRevokeTx:
     type: object
-    allOf:
-      - $ref: '#/definitions/GenericTx'
-      - properties:
-          name_id:
-            $ref: '#/definitions/EncodedValue'
-          fee:
-            $ref: '#/definitions/UInt'
-          ttl:
-            $ref: '#/definitions/UInt64'
-          account_id:
-            $ref: '#/definitions/EncodedPubkey'
-          nonce:
-            $ref: '#/definitions/UInt64'
+    properties:
+      name_id:
+        $ref: '#/definitions/EncodedValue'
+      fee:
+        $ref: '#/definitions/UInt'
+      ttl:
+        $ref: '#/definitions/UInt64'
+      account_id:
+        $ref: '#/definitions/EncodedPubkey'
+      nonce:
+        $ref: '#/definitions/UInt64'
     required:
       - name_id
       - fee
@@ -2333,36 +2285,34 @@ definitions:
       - locked_until
   ChannelCreateTx:
     type: object
-    allOf:
-      - $ref: '#/definitions/GenericTx'
-      - properties:
-          initiator_id:
-            $ref: '#/definitions/EncodedPubkey'
-          initiator_amount:
-            $ref: '#/definitions/UInt'
-          responder_id:
-            $ref: '#/definitions/EncodedPubkey'
-          responder_amount:
-            $ref: '#/definitions/UInt'
-          push_amount:
-            $ref: '#/definitions/UInt'
-          channel_reserve:
-            $ref: '#/definitions/UInt'
-          lock_period:
-            $ref: '#/definitions/UInt64'
-          ttl:
-            $ref: '#/definitions/UInt64'
-          fee:
-            $ref: '#/definitions/UInt'
-          nonce:
-            $ref: '#/definitions/UInt64'
-          state_hash:
-            description: 'Root hash of the channel''s internal state tree'
-            $ref: '#/definitions/EncodedHash'
-          delegate_ids:
-            type: array
-            items:
-              $ref: '#/definitions/EncodedPubkey'
+    properties:
+      initiator_id:
+        $ref: '#/definitions/EncodedPubkey'
+      initiator_amount:
+        $ref: '#/definitions/UInt'
+      responder_id:
+        $ref: '#/definitions/EncodedPubkey'
+      responder_amount:
+        $ref: '#/definitions/UInt'
+      push_amount:
+        $ref: '#/definitions/UInt'
+      channel_reserve:
+        $ref: '#/definitions/UInt'
+      lock_period:
+        $ref: '#/definitions/UInt64'
+      ttl:
+        $ref: '#/definitions/UInt64'
+      fee:
+        $ref: '#/definitions/UInt'
+      nonce:
+        $ref: '#/definitions/UInt64'
+      state_hash:
+        description: 'Root hash of the channel''s internal state tree'
+        $ref: '#/definitions/EncodedHash'
+      delegate_ids:
+        type: array
+        items:
+          $ref: '#/definitions/EncodedPubkey'
     required:
       - initiator_id
       - initiator_amount
@@ -2375,27 +2325,25 @@ definitions:
       - state_hash
   ChannelDepositTx:
     type: object
-    allOf:
-      - $ref: '#/definitions/GenericTx'
-      - properties:
-          channel_id:
-            $ref: '#/definitions/EncodedPubkey'
-          from_id:
-            $ref: '#/definitions/EncodedPubkey'
-          amount:
-            $ref: '#/definitions/UInt'
-          ttl:
-            $ref: '#/definitions/UInt64'
-          fee:
-            $ref: '#/definitions/UInt'
-          nonce:
-            $ref: '#/definitions/UInt64'
-          state_hash:
-            description: 'Root hash of the channel''s internal state tree after the deposit had been applied to it'
-            $ref: '#/definitions/EncodedHash'
-          round:
-            description: 'Channel''s next round'
-            $ref: '#/definitions/UInt64'
+    properties:
+      channel_id:
+        $ref: '#/definitions/EncodedPubkey'
+      from_id:
+        $ref: '#/definitions/EncodedPubkey'
+      amount:
+        $ref: '#/definitions/UInt'
+      ttl:
+        $ref: '#/definitions/UInt64'
+      fee:
+        $ref: '#/definitions/UInt'
+      nonce:
+        $ref: '#/definitions/UInt64'
+      state_hash:
+        description: 'Root hash of the channel''s internal state tree after the deposit had been applied to it'
+        $ref: '#/definitions/EncodedHash'
+      round:
+        description: 'Channel''s next round'
+        $ref: '#/definitions/UInt64'
     required:
       - channel_id
       - from_id
@@ -2406,27 +2354,25 @@ definitions:
       - round
   ChannelWithdrawTx:
     type: object
-    allOf:
-      - $ref: '#/definitions/GenericTx'
-      - properties:
-          channel_id:
-            $ref: '#/definitions/EncodedPubkey'
-          to_id:
-            $ref: '#/definitions/EncodedPubkey'
-          amount:
-            $ref: '#/definitions/UInt'
-          ttl:
-            $ref: '#/definitions/UInt64'
-          fee:
-            $ref: '#/definitions/UInt'
-          nonce:
-            $ref: '#/definitions/UInt64'
-          state_hash:
-            description: 'Root hash of the channel''s internal state tree after the withdraw had been applied to it'
-            $ref: '#/definitions/EncodedHash'
-          round:
-            description: 'Channel''s next round'
-            $ref: '#/definitions/UInt64'
+    properties:
+      channel_id:
+        $ref: '#/definitions/EncodedPubkey'
+      to_id:
+        $ref: '#/definitions/EncodedPubkey'
+      amount:
+        $ref: '#/definitions/UInt'
+      ttl:
+        $ref: '#/definitions/UInt64'
+      fee:
+        $ref: '#/definitions/UInt'
+      nonce:
+        $ref: '#/definitions/UInt64'
+      state_hash:
+        description: 'Root hash of the channel''s internal state tree after the withdraw had been applied to it'
+        $ref: '#/definitions/EncodedHash'
+      round:
+        description: 'Channel''s next round'
+        $ref: '#/definitions/UInt64'
     required:
       - channel_id
       - to_id
@@ -2437,33 +2383,31 @@ definitions:
       - round
   ChannelForceProgressTx:
     type: object
-    allOf:
-      - $ref: '#/definitions/GenericTx'
-      - properties:
-          channel_id:
-            $ref: '#/definitions/EncodedPubkey'
-          from_id:
-            $ref: '#/definitions/EncodedPubkey'
-          payload:
-            $ref: '#/definitions/EncodedByteArray'
-          round:
-            description: 'Channel''s next round'
-            $ref: '#/definitions/UInt64'
-          update:
-            description: 'Update to be applied. Must be a OffChainCallContract'
-            $ref: '#/definitions/OffChainUpdate'
-          state_hash:
-            description: 'Channel''s next state_hash'
-            $ref: '#/definitions/EncodedHash'
-          ttl:
-            $ref: '#/definitions/UInt64'
-          fee:
-            $ref: '#/definitions/UInt'
-          nonce:
-            $ref: '#/definitions/UInt64'
-          offchain_trees:
-            $ref: '#/definitions/EncodedByteArray'
-            description: 'The whole set of off-chain state trees'
+    properties:
+      channel_id:
+        $ref: '#/definitions/EncodedPubkey'
+      from_id:
+        $ref: '#/definitions/EncodedPubkey'
+      payload:
+        $ref: '#/definitions/EncodedByteArray'
+      round:
+        description: 'Channel''s next round'
+        $ref: '#/definitions/UInt64'
+      update:
+        description: 'Update to be applied. Must be a OffChainCallContract'
+        $ref: '#/definitions/OffChainUpdate'
+      state_hash:
+        description: 'Channel''s next state_hash'
+        $ref: '#/definitions/EncodedHash'
+      ttl:
+        $ref: '#/definitions/UInt64'
+      fee:
+        $ref: '#/definitions/UInt'
+      nonce:
+        $ref: '#/definitions/UInt64'
+      offchain_trees:
+        description: 'The whole set of off-chain state trees'
+        $ref: '#/definitions/EncodedByteArray'
     required:
       - channel_id
       - from_id
@@ -2474,23 +2418,21 @@ definitions:
       - fee
   ChannelCloseMutualTx:
     type: object
-    allOf:
-      - $ref: '#/definitions/GenericTx'
-      - properties:
-          channel_id:
-            $ref: '#/definitions/EncodedPubkey'
-          from_id:
-            $ref: '#/definitions/EncodedPubkey'
-          initiator_amount_final:
-            $ref: '#/definitions/UInt'
-          responder_amount_final:
-            $ref: '#/definitions/UInt'
-          ttl:
-            $ref: '#/definitions/UInt64'
-          fee:
-            $ref: '#/definitions/UInt64'
-          nonce:
-            $ref: '#/definitions/UInt64'
+    properties:
+      channel_id:
+        $ref: '#/definitions/EncodedPubkey'
+      from_id:
+        $ref: '#/definitions/EncodedPubkey'
+      initiator_amount_final:
+        $ref: '#/definitions/UInt'
+      responder_amount_final:
+        $ref: '#/definitions/UInt'
+      ttl:
+        $ref: '#/definitions/UInt64'
+      fee:
+        $ref: '#/definitions/UInt64'
+      nonce:
+        $ref: '#/definitions/UInt64'
     required:
       - channel_id
       - from_id
@@ -2500,24 +2442,22 @@ definitions:
       - nonce
   ChannelCloseSoloTx:
     type: object
-    allOf:
-      - $ref: '#/definitions/GenericTx'
-      - properties:
-          channel_id:
-            $ref: '#/definitions/EncodedPubkey'
-          from_id:
-            $ref: '#/definitions/EncodedPubkey'
-          payload:
-            $ref: '#/definitions/EncodedByteArray'
-          ttl:
-            $ref: '#/definitions/UInt64'
-          fee:
-            $ref: '#/definitions/UInt'
-          nonce:
-            $ref: '#/definitions/UInt64'
-          poi:
-            $ref: '#/definitions/EncodedByteArray'
-            description: 'Proof of inclusion containing information for closing the channel'
+    properties:
+      channel_id:
+        $ref: '#/definitions/EncodedPubkey'
+      from_id:
+        $ref: '#/definitions/EncodedPubkey'
+      payload:
+        $ref: '#/definitions/EncodedByteArray'
+      ttl:
+        $ref: '#/definitions/UInt64'
+      fee:
+        $ref: '#/definitions/UInt'
+      nonce:
+        $ref: '#/definitions/UInt64'
+      poi:
+        description: 'Proof of inclusion containing information for closing the channel'
+        $ref: '#/definitions/EncodedByteArray'
     required:
       - channel_id
       - from_id
@@ -2526,24 +2466,22 @@ definitions:
       - poi
   ChannelSlashTx:
     type: object
-    allOf:
-      - $ref: '#/definitions/GenericTx'
-      - properties:
-          channel_id:
-            $ref: '#/definitions/EncodedPubkey'
-          from_id:
-            $ref: '#/definitions/EncodedPubkey'
-          payload:
-            $ref: '#/definitions/EncodedByteArray'
-          ttl:
-            $ref: '#/definitions/UInt64'
-          fee:
-            $ref: '#/definitions/UInt'
-          nonce:
-            $ref: '#/definitions/UInt64'
-          poi:
-            $ref: '#/definitions/EncodedByteArray'
-            description: 'Proof of inclusion containing information for closing the channel'
+    properties:
+      channel_id:
+        $ref: '#/definitions/EncodedPubkey'
+      from_id:
+        $ref: '#/definitions/EncodedPubkey'
+      payload:
+        $ref: '#/definitions/EncodedByteArray'
+      ttl:
+        $ref: '#/definitions/UInt64'
+      fee:
+        $ref: '#/definitions/UInt'
+      nonce:
+        $ref: '#/definitions/UInt64'
+      poi:
+        description: 'Proof of inclusion containing information for closing the channel'
+        $ref: '#/definitions/EncodedByteArray'
     required:
       - channel_id
       - from_id
@@ -2552,23 +2490,21 @@ definitions:
       - poi
   ChannelSettleTx:
     type: object
-    allOf:
-      - $ref: '#/definitions/GenericTx'
-      - properties:
-          channel_id:
-            $ref: '#/definitions/EncodedPubkey'
-          from_id:
-            $ref: '#/definitions/EncodedPubkey'
-          initiator_amount_final:
-            $ref: '#/definitions/UInt'
-          responder_amount_final:
-            $ref: '#/definitions/UInt'
-          ttl:
-            $ref: '#/definitions/UInt64'
-          fee:
-            $ref: '#/definitions/UInt'
-          nonce:
-            $ref: '#/definitions/UInt64'
+    properties:
+      channel_id:
+        $ref: '#/definitions/EncodedPubkey'
+      from_id:
+        $ref: '#/definitions/EncodedPubkey'
+      initiator_amount_final:
+        $ref: '#/definitions/UInt'
+      responder_amount_final:
+        $ref: '#/definitions/UInt'
+      ttl:
+        $ref: '#/definitions/UInt64'
+      fee:
+        $ref: '#/definitions/UInt'
+      nonce:
+        $ref: '#/definitions/UInt64'
     required:
       - channel_id
       - from_id
@@ -2578,21 +2514,19 @@ definitions:
       - nonce
   ChannelSnapshotSoloTx:
     type: object
-    allOf:
-      - $ref: '#/definitions/GenericTx'
-      - properties:
-          channel_id:
-            $ref: '#/definitions/EncodedPubkey'
-          from_id:
-            $ref: '#/definitions/EncodedPubkey'
-          payload:
-            $ref: '#/definitions/EncodedByteArray'
-          ttl:
-            $ref: '#/definitions/UInt64'
-          fee:
-            $ref: '#/definitions/UInt'
-          nonce:
-            $ref: '#/definitions/UInt64'
+    properties:
+      channel_id:
+        $ref: '#/definitions/EncodedPubkey'
+      from_id:
+        $ref: '#/definitions/EncodedPubkey'
+      payload:
+        $ref: '#/definitions/EncodedByteArray'
+      ttl:
+        $ref: '#/definitions/UInt64'
+      fee:
+        $ref: '#/definitions/UInt'
+      nonce:
+        $ref: '#/definitions/UInt64'
     required:
       - channel_id
       - from_id
@@ -2708,6 +2642,98 @@ definitions:
     required:
       - version
       - type
+  ChannelCreateTxJSON:
+    allOf:
+      - $ref: '#/definitions/GenericTx'
+      - $ref: '#/definitions/ChannelCreateTx'
+  ChannelDepositTxJSON:
+    allOf:
+      - $ref: '#/definitions/GenericTx'
+      - $ref: '#/definitions/ChannelDepositTx'
+  ChannelWithdrawalTxJSON:
+    allOf:
+      - $ref: '#/definitions/GenericTx'
+      - $ref: '#/definitions/ChannelWithdrawTx'
+  ChannelForceProgressTxJSON:
+    allOf:
+      - $ref: '#/definitions/GenericTx'
+      - $ref: '#/definitions/ChannelForceProgressTx'
+  ChannelCloseMutualTxJSON:
+    allOf:
+      - $ref: '#/definitions/GenericTx'
+      - $ref: '#/definitions/ChannelCloseMutualTx'
+  ChannelCloseSoloTxJSON:
+    allOf:
+      - $ref: '#/definitions/GenericTx'
+      - $ref: '#/definitions/ChannelCloseSoloTx'
+  ChannelSlashTxJSON:
+    allOf:
+      - $ref: '#/definitions/GenericTx'
+      - $ref: '#/definitions/ChannelSlashTx'
+  ChannelSettleTxJSON:
+    allOf:
+      - $ref: '#/definitions/GenericTx'
+      - $ref: '#/definitions/ChannelSettleTx'
+  ChannelSnapshotSoloTxJSON:
+    allOf:
+      - $ref: '#/definitions/GenericTx'
+      - $ref: '#/definitions/ChannelSnapshotSoloTx'
+  SpendTxJSON:
+    allOf:
+      - $ref: '#/definitions/GenericTx'
+      - $ref: '#/definitions/SpendTx'
+  OracleRegisterTxJSON:
+    allOf:
+      - $ref: '#/definitions/GenericTx'
+      - $ref: '#/definitions/OracleRegisterTx'
+  OracleExtendTxJSON:
+    allOf:
+      - $ref: '#/definitions/GenericTx'
+      - $ref: '#/definitions/OracleExtendTx'
+  OracleQueryTxJSON:
+    allOf:
+      - $ref: '#/definitions/GenericTx'
+      - $ref: '#/definitions/OracleQueryTx'
+  OracleResponseTxJSON:
+    allOf:
+      - $ref: '#/definitions/GenericTx'
+      - $ref: '#/definitions/OracleRespondTx'
+  NamePreclaimTxJSON:
+    allOf:
+      - $ref: '#/definitions/GenericTx'
+      - $ref: '#/definitions/NamePreclaimTx'
+  NameClaimTxJSON:
+    allOf:
+      - $ref: '#/definitions/GenericTx'
+      - $ref: '#/definitions/NameClaimTx'
+  NameUpdateTxJSON:
+    allOf:
+      - $ref: '#/definitions/GenericTx'
+      - $ref: '#/definitions/NameUpdateTx'
+  NameTransferTxJSON:
+    allOf:
+      - $ref: '#/definitions/GenericTx'
+      - $ref: '#/definitions/NameTransferTx'
+  NameRevokeTxJSON:
+    allOf:
+      - $ref: '#/definitions/GenericTx'
+      - $ref: '#/definitions/NameRevokeTx'
+  ContractCreateTxJSON:
+    allOf:
+      - $ref: '#/definitions/GenericTx'
+      - $ref: '#/definitions/ContractCreateTx'
+  ContractCallTxJSON:
+    allOf:
+      - $ref: '#/definitions/GenericTx'
+      - $ref: '#/definitions/ContractCallTx'
+  GAAttachTxJSON:
+    allOf:
+      - $ref: '#/definitions/GenericTx'
+      - $ref: '#/definitions/GAAttachTx'
+  GAMetaTxJSON:
+    allOf:
+      - $ref: '#/definitions/GenericTx'
+      - $ref: '#/definitions/GAMetaTx'
   TxInfoObject:
     type: object
     properties:
@@ -2958,39 +2984,37 @@ definitions:
       - blocked
   ContractCreateTx:
     type: object
-    allOf:
-      - $ref: '#/definitions/GenericTx'
-      - properties:
-          owner_id:
-            $ref: '#/definitions/EncodedPubkey'
-            description: Contract owner pub_key
-          nonce:
-            description: 'Owner''s nonce'
-            $ref: '#/definitions/UInt64'
-          code:
-            description: 'Contract''s code'
-            $ref: '#/definitions/EncodedByteArray'
-          vm_version:
-            description: 'Virtual machine''s version'
-            $ref: '#/definitions/UInt16'
-          abi_version:
-            description: 'ABI version'
-            $ref: '#/definitions/UInt16'
-          deposit:
-            $ref: '#/definitions/UInt'
-          amount:
-            $ref: '#/definitions/UInt'
-          gas:
-            $ref: '#/definitions/UInt64'
-          gas_price:
-            $ref: '#/definitions/UInt'
-          fee:
-            $ref: '#/definitions/UInt'
-          ttl:
-            $ref: '#/definitions/UInt64'
-          call_data:
-            description: Contract call data
-            $ref: '#/definitions/EncodedByteArray'
+    properties:
+      owner_id:
+        description: Contract owner pub_key
+        $ref: '#/definitions/EncodedPubkey'
+      nonce:
+        description: 'Owner''s nonce'
+        $ref: '#/definitions/UInt64'
+      code:
+        description: 'Contract''s code'
+        $ref: '#/definitions/EncodedByteArray'
+      vm_version:
+        description: 'Virtual machine''s version'
+        $ref: '#/definitions/UInt16'
+      abi_version:
+        description: 'ABI version'
+        $ref: '#/definitions/UInt16'
+      deposit:
+        $ref: '#/definitions/UInt'
+      amount:
+        $ref: '#/definitions/UInt'
+      gas:
+        $ref: '#/definitions/UInt64'
+      gas_price:
+        $ref: '#/definitions/UInt'
+      fee:
+        $ref: '#/definitions/UInt'
+      ttl:
+        $ref: '#/definitions/UInt64'
+      call_data:
+        description: Contract call data
+        $ref: '#/definitions/EncodedByteArray'
     required:
       - owner_id
       - code
@@ -3004,34 +3028,32 @@ definitions:
       - call_data
   ContractCallTx:
     type: object
-    allOf:
-      - $ref: '#/definitions/GenericTx'
-      - properties:
-          caller_id:
-            $ref: '#/definitions/EncodedPubkey'
-            description: Contract caller pub_key
-          nonce:
-            description: 'Caller''s nonce'
-            $ref: '#/definitions/UInt64'
-          contract_id:
-            $ref: '#/definitions/EncodedPubkey'
-            description: 'Contract''s pub_key'
-          abi_version:
-            description: 'ABI version'
-            $ref: '#/definitions/UInt16'
-          fee:
-            $ref: '#/definitions/UInt'
-          ttl:
-            $ref: '#/definitions/UInt64'
-          amount:
-            $ref: '#/definitions/UInt'
-          gas:
-            $ref: '#/definitions/UInt64'
-          gas_price:
-            $ref: '#/definitions/UInt'
-          call_data:
-            description: Contract call data
-            $ref: '#/definitions/EncodedByteArray'
+    properties:
+      caller_id:
+        description: Contract caller pub_key
+        $ref: '#/definitions/EncodedPubkey'
+      nonce:
+        description: 'Caller''s nonce'
+        $ref: '#/definitions/UInt64'
+      contract_id:
+        description: 'Contract''s pub_key'
+        $ref: '#/definitions/EncodedPubkey'
+      abi_version:
+        description: 'ABI version'
+        $ref: '#/definitions/UInt16'
+      fee:
+        $ref: '#/definitions/UInt'
+      ttl:
+        $ref: '#/definitions/UInt64'
+      amount:
+        $ref: '#/definitions/UInt'
+      gas:
+        $ref: '#/definitions/UInt64'
+      gas_price:
+        $ref: '#/definitions/UInt'
+      call_data:
+        description: Contract call data
+        $ref: '#/definitions/EncodedByteArray'
     required:
       - caller_id
       - contract_id
@@ -3043,7 +3065,6 @@ definitions:
       - call_data
   UnsignedTx:
     type: object
-    discriminator: tx
     properties:
       tx:
         description: Unsigned transaction object
@@ -3059,15 +3080,15 @@ definitions:
     required:
       - tx_hash
   CreateContractUnsignedTx:
-    type: object
     allOf:
       - $ref: '#/definitions/UnsignedTx'
-      - properties:
+      - type: object
+        properties:
           contract_id:
-            $ref: '#/definitions/EncodedPubkey'
             description: Address of the contract to be created
-    required:
-      - contract_id
+            $ref: '#/definitions/EncodedPubkey'
+        required:
+          - contract_id
   PoI:
     type: object
     properties:
@@ -3102,11 +3123,11 @@ definitions:
       - type: object
         properties:
           from:
-            $ref: '#/definitions/EncodedPubkey'
             description: Sender of tokens
-          to:
             $ref: '#/definitions/EncodedPubkey'
+          to:
             description: Receiver of tokens
+            $ref: '#/definitions/EncodedPubkey'
           amount:
             $ref: '#/definitions/UInt'
         required:
@@ -3119,8 +3140,8 @@ definitions:
       - type: object
         properties:
           to:
-            $ref: '#/definitions/EncodedPubkey'
             description: Withdrawer of tokens
+            $ref: '#/definitions/EncodedPubkey'
           amount:
             $ref: '#/definitions/UInt'
         required:
@@ -3132,8 +3153,8 @@ definitions:
       - type: object
         properties:
           from:
-            $ref: '#/definitions/EncodedPubkey'
             description: Depositor of tokens
+            $ref: '#/definitions/EncodedPubkey'
           amount:
             $ref: '#/definitions/UInt'
         required:
@@ -3145,8 +3166,8 @@ definitions:
       - type: object
         properties:
           owner:
-            $ref: '#/definitions/EncodedPubkey'
             description: Contract owner
+            $ref: '#/definitions/EncodedPubkey'
           vm_version:
             $ref: '#/definitions/UInt16'
           abi_version:
@@ -3171,11 +3192,11 @@ definitions:
       - type: object
         properties:
           caller:
-            $ref: '#/definitions/EncodedPubkey'
             description: Contract caller
-          contract:
             $ref: '#/definitions/EncodedPubkey'
+          contract:
             description: Contract address
+            $ref: '#/definitions/EncodedPubkey'
           abi_version:
             $ref: '#/definitions/UInt16'
           amount:

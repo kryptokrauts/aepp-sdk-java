@@ -30,7 +30,7 @@ public class ChannelSlashTransaction extends AbstractTransaction<ChannelSlashTra
         RLP.encodeList(
             rlpWriter -> {
               rlpWriter.writeInt(SerializationTags.OBJECT_TAG_CHANNEL_SLASH_TRANSACTION);
-              rlpWriter.writeInt(SerializationTags.VSN);
+              rlpWriter.writeInt(SerializationTags.VSN_1);
               byte[] channelIdWithTag =
                   EncodingUtils.decodeCheckAndTag(
                       model.getChannelId(), SerializationTags.ID_TAG_CHANNEL);

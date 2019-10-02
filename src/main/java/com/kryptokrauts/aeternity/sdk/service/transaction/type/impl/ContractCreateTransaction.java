@@ -35,7 +35,7 @@ public class ContractCreateTransaction extends AbstractTransaction<ContractCreat
         RLP.encodeList(
             rlpWriter -> {
               rlpWriter.writeInt(SerializationTags.OBJECT_TAG_CONTRACT_CREATE_TRANSACTION);
-              rlpWriter.writeInt(SerializationTags.VSN);
+              rlpWriter.writeInt(SerializationTags.VSN_1);
               byte[] ownerWithTag =
                   EncodingUtils.decodeCheckAndTag(
                       model.getOwnerId(), SerializationTags.ID_TAG_ACCOUNT);
