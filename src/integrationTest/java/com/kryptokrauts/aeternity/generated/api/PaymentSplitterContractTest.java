@@ -95,7 +95,7 @@ public class PaymentSplitterContractTest extends BaseTest {
             _logger.info("contract bytecode: " + byteCode);
             _logger.info("contract calldata: " + callData);
 
-            BigInteger vmVersion = BigInteger.valueOf(4);
+            BigInteger vmVersion = BigInteger.valueOf(6);
             BigInteger gas = BigInteger.valueOf(4800000);
             BigInteger gasPrice = BigInteger.valueOf(BaseConstants.MINIMAL_GAS_PRICE);
 
