@@ -49,6 +49,7 @@ public final class SophiaCompilerServiceImpl implements CompilerService {
         body.addArgumentsItem(argument);
       }
     }
+    body.options(new CompileOpts().backend(CompileOpts.BackendEnum.AEVM));
     return body;
   }
 
@@ -99,6 +100,7 @@ public final class SophiaCompilerServiceImpl implements CompilerService {
     if (!StringUtil.isNullOrEmpty(srcFile)) {
       compileOpts.setSrcFile(srcFile);
     }
+    compileOpts.setBackend(CompileOpts.BackendEnum.AEVM);
     body.setOptions(compileOpts);
     return body;
   }
@@ -127,6 +129,7 @@ public final class SophiaCompilerServiceImpl implements CompilerService {
     if (fileSystem != null) {
       compileOpts.setFileSystem(fileSystem);
     }
+    compileOpts.setBackend(CompileOpts.BackendEnum.AEVM);
     body.setOptions(compileOpts);
     return body;
   }
