@@ -11,8 +11,7 @@ public interface TestConstants {
 
   String testnetURL = "https://sdk-testnet.aepps.com/v2";
 
-  String testContractSourceCode =
-      "contract Identity =\n  entrypoint main(z : int) = z";
+  String testContractSourceCode = "contract Identity =\n  entrypoint main(z : int) = z";
 
   String testContractFunction = "main";
 
@@ -43,7 +42,7 @@ public interface TestConstants {
 
   String DOMAIN = "kryptokrauts";
 
-  String NAMESPACE = ".test";
+  String NAMESPACE = ".aet";
 
   String paymentSplitterACI =
       "{contract={event={variant=[{AddingInitialRecipients=[]}, {RecipientAdded=[address, int]}, {AddressUpdated=[address, address]}, {UpdatingAllRecipients=[]}, {PaymentReceivedAndSplitted=[address, int, int]}]}, functions=[{arguments=[{name=recipientConditions', type={map=[address, int]}}], name=init, payable=false, returns=PaymentSplitter.state, stateful=false}, {arguments=[], name=getOwner, payable=false, returns=address, stateful=false}, {arguments=[], name=getRecipientsCount, payable=false, returns=int, stateful=false}, {arguments=[{name=who', type=address}], name=isRecipient, payable=false, returns=bool, stateful=false}, {arguments=[{name=who', type=address}], name=getWeight, payable=false, returns=int, stateful=false}, {arguments=[], name=getTotalAmountSplitted, payable=false, returns=int, stateful=false}, {arguments=[], name=payAndSplit, payable=true, returns={tuple=[]}, stateful=true}, {arguments=[{name=newOwner', type=address}], name=transferOwnership, payable=false, returns={tuple=[]}, stateful=true}, {arguments=[{name=oldAddress', type=address}, {name=newAddress', type=address}], name=updateAddress, payable=false, returns={tuple=[]}, stateful=true}, {arguments=[{name=recipients', type={map=[address, int]}}], name=updateRecipientConditions, payable=false, returns={tuple=[]}, stateful=true}], name=PaymentSplitter, payable=true, state={record=[{name=owner, type=address}, {name=recipientConditions, type={map=[address, int]}}, {name=totalAmountSplitted, type=int}]}, type_defs=[]}}";
