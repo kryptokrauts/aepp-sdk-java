@@ -40,7 +40,7 @@ public class TransactionContractsTest extends BaseTest {
         t -> {
           String ownerId = baseKeyPair.getPublicKey();
           BigInteger abiVersion = BigInteger.ONE;
-          BigInteger vmVersion = BigInteger.valueOf(4);
+          BigInteger vmVersion = BigInteger.valueOf(6);
           BigInteger amount = BigInteger.valueOf(100);
           BigInteger deposit = BigInteger.valueOf(100);
           BigInteger ttl = BigInteger.valueOf(20000l);
@@ -284,7 +284,7 @@ public class TransactionContractsTest extends BaseTest {
     this.executeTest(
         context,
         t -> {
-          BigInteger vmVersion = BigInteger.valueOf(4);
+          BigInteger vmVersion = BigInteger.valueOf(6);
           BigInteger gas = BigInteger.valueOf(1000000);
           BigInteger gasPrice = BigInteger.valueOf(2000000000);
 
