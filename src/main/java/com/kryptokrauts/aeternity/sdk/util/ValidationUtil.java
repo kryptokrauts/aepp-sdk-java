@@ -14,19 +14,22 @@ public class ValidationUtil {
 
   public static final String NO_ENTRIES = "List or map has no entries";
 
-  public static final String MAP_MISSING_VALUE = "Map is missing value for %s";
-
   public static final String NAMESPACE_INVALID = "Namespace not allowed / not provided.";
 
-  public static final String PARAMETER_IS_NULL = "Parameter cannot be null";
+  public static final String PARAMETER_IS_NULL = "Parameter cannot be null.";
 
   public static final String MISSING_API_IDENTIFIER =
-      "Parameter does not start with APIIdentifier %s_";
+      "Parameter does not start with expected APIIdentifier.";
 
   public static final String NAMESPACE_EXCEEDS_LIMIT =
       String.format("Domainname exceeds %s char limit.", DOMAIN_NAME_MAX_LENGHT);
 
   public static final List<String> ALLOWED_NAMESPACES = Arrays.asList("test");
+
+  public static final String INVALID_POINTER_ADDRESS = "Pointer address is not valid.";
+
+  public static final String DUPLICATE_POINTER_KEY =
+      "For each pointer key only one address may be provided. The list of pointerAddresses contains duplicate address-types.";
 
   /**
    * encapsule validation of given parameters

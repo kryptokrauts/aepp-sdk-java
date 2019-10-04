@@ -11,6 +11,7 @@ import com.kryptokrauts.aeternity.sdk.util.CryptoUtils;
 import com.kryptokrauts.aeternity.sdk.util.EncodingUtils;
 import io.vertx.ext.unit.TestContext;
 import java.math.BigInteger;
+import java.util.Arrays;
 import java.util.Random;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
@@ -174,6 +175,10 @@ public class TransactionNameServiceTest extends BaseTest {
             BigInteger nameTtl = BigInteger.valueOf(10000l);
             BigInteger clientTtl = BigInteger.valueOf(50l);
 
+            String accountPointer = baseKeyPair.getPublicKey();
+            // fake contract-address
+            String contractPointer = baseKeyPair.getPublicKey().replace("ak_", "ct_");
+
             NameUpdateTransactionModel nameUpdateTx =
                 NameUpdateTransactionModel.builder()
                     .accountId(baseKeyPair.getPublicKey())
@@ -182,6 +187,7 @@ public class TransactionNameServiceTest extends BaseTest {
                     .ttl(ZERO)
                     .clientTtl(clientTtl)
                     .nameTtl(nameTtl)
+                    .pointerAddresses(Arrays.asList(accountPointer, contractPointer))
                     .build();
 
             PostTransactionResult nameUpdateResult = this.postTx(nameUpdateTx);

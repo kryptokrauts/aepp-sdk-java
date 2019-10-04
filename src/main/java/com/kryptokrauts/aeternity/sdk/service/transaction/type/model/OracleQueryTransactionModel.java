@@ -65,8 +65,7 @@ public class OracleQueryTransactionModel extends AbstractTransactionModel<Oracle
 
   @Override
   public void validateInput() {
-    // TODO Auto-generated method stub
-
+    // nothing to validate
   }
 
   @Override

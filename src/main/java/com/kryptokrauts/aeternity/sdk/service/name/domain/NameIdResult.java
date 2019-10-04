@@ -3,10 +3,8 @@ package com.kryptokrauts.aeternity.sdk.service.name.domain;
 import com.kryptokrauts.aeternity.generated.model.NameEntry;
 import com.kryptokrauts.aeternity.sdk.domain.GenericResultObject;
 import java.math.BigInteger;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
-import lombok.Builder.Default;
 import lombok.Getter;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
@@ -20,7 +18,7 @@ public class NameIdResult extends GenericResultObject<NameEntry, NameIdResult> {
 
   private BigInteger ttl;
 
-  @Default private List<NamePointerModel> pointers = new LinkedList<NamePointerModel>();
+  private List<String> pointerAddresses;
 
   @Override
   protected NameIdResult map(NameEntry generatedResultObject) {
@@ -28,14 +26,9 @@ public class NameIdResult extends GenericResultObject<NameEntry, NameIdResult> {
       return this.toBuilder()
           .id(generatedResultObject.getId())
           .ttl(generatedResultObject.getTtl())
-          .pointers(
+          .pointerAddresses(
               generatedResultObject.getPointers().stream()
-                  .map(
-                      pointer ->
-                          NamePointerModel.builder()
-                              .id(pointer.getId())
-                              .key(pointer.getKey())
-                              .build())
+                  .map(pointer -> pointer.getId())
                   .collect(Collectors.toList()))
           .build();
     else return this.toBuilder().build();

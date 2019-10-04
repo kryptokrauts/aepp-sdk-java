@@ -5,18 +5,16 @@ import com.kryptokrauts.aeternity.generated.model.GenericTx;
 import com.kryptokrauts.aeternity.generated.model.NamePointer;
 import com.kryptokrauts.aeternity.generated.model.NameUpdateTx;
 import com.kryptokrauts.aeternity.sdk.constants.ApiIdentifiers;
-import com.kryptokrauts.aeternity.sdk.service.name.domain.NamePointerModel;
+import com.kryptokrauts.aeternity.sdk.exception.InvalidParameterException;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.AbstractTransaction;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.impl.NameUpdateTransaction;
 import com.kryptokrauts.aeternity.sdk.util.ValidationUtil;
 import com.kryptokrauts.sophia.compiler.generated.api.rxjava.DefaultApi;
 import java.math.BigInteger;
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import lombok.Builder.Default;
 import lombok.Getter;
 import lombok.experimental.SuperBuilder;
@@ -25,6 +23,25 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder(toBuilder = true)
 public class NameUpdateTransactionModel extends AbstractTransactionModel<NameUpdateTx> {
 
+  public static String POINTER_KEY_ACCOUNT = "account_pubkey";
+  public static String POINTER_KEY_CHANNEL = "channel";
+  public static String POINTER_KEY_CONTRACT = "contract_pubkey";
+  public static String POINTER_KEY_ORACLE = "oracle_pubkey";
+
+  private static Map<String, String> identifierToPointerKeyMap;
+
+  {
+    identifierToPointerKeyMap =
+        new HashMap<String, String>() {
+          {
+            put(ApiIdentifiers.ACCOUNT_PUBKEY, POINTER_KEY_ACCOUNT);
+            put(ApiIdentifiers.CHANNEL, POINTER_KEY_CHANNEL);
+            put(ApiIdentifiers.CONTRACT_PUBKEY, POINTER_KEY_CONTRACT);
+            put(ApiIdentifiers.ORACLE_PUBKEY, POINTER_KEY_ORACLE);
+          }
+        };
+  }
+
   private String accountId;
   private BigInteger nonce;
   private String nameId;
@@ -32,7 +49,7 @@ public class NameUpdateTransactionModel extends AbstractTransactionModel<NameUpd
   private BigInteger nameTtl;
   private BigInteger clientTtl;
 
-  @Default private List<NamePointerModel> pointers = new LinkedList<NamePointerModel>();
+  @Default private List<String> pointerAddresses = new LinkedList<>();
 
   @Override
   public NameUpdateTx toApiModel() {
@@ -49,8 +66,8 @@ public class NameUpdateTransactionModel extends AbstractTransactionModel<NameUpd
   }
 
   public List<NamePointer> getGeneratedPointers() {
-    return pointers.stream()
-        .map(pointer -> new NamePointer().id(pointer.getId()).key(pointer.getKey()))
+    return pointerAddresses.stream()
+        .map(pointerAddress -> buildNamePointer(pointerAddress))
         .collect(Collectors.toList());
   }
 
@@ -66,14 +83,9 @@ public class NameUpdateTransactionModel extends AbstractTransactionModel<NameUpd
           .nameTtl(castedTx.getNameTtl())
           .clientTtl(castedTx.getClientTtl())
           .ttl(castedTx.getTtl())
-          .pointers(
+          .pointerAddresses(
               castedTx.getPointers().stream()
-                  .map(
-                      pointer ->
-                          NamePointerModel.builder()
-                              .id(pointer.getId())
-                              .key(pointer.getKey())
-                              .build())
+                  .map(pointer -> pointer.getId())
                   .collect(Collectors.toList()))
           .build();
     };
@@ -94,10 +106,47 @@ public class NameUpdateTransactionModel extends AbstractTransactionModel<NameUpd
         "validateUpdateTransaction",
         Arrays.asList("nameId", ApiIdentifiers.NAME),
         ValidationUtil.MISSING_API_IDENTIFIER);
+    ValidationUtil.checkParameters(
+        validate -> Optional.ofNullable(areDistinctPointerKeys(pointerAddresses)),
+        pointerAddresses,
+        "validateUpdateTransaction",
+        Stream.concat(Arrays.asList("pointerAddresses").stream(), pointerAddresses.stream())
+            .collect(Collectors.toList()),
+        ValidationUtil.DUPLICATE_POINTER_KEY);
+    for (String pointerAddress : pointerAddresses) {
+      ValidationUtil.checkParameters(
+          validate -> Optional.ofNullable(isValidPointerAddress(pointerAddress)),
+          pointerAddress,
+          "validateUpdateTransaction",
+          Arrays.asList("pointerAddress", pointerAddress),
+          ValidationUtil.INVALID_POINTER_ADDRESS);
+    }
   }
 
   @Override
   public AbstractTransaction<?> buildTransaction(ExternalApi externalApi, DefaultApi compilerApi) {
     return NameUpdateTransaction.builder().externalApi(externalApi).model(this).build();
+  }
+
+  private boolean areDistinctPointerKeys(List<String> pointerAddresses) {
+    return pointerAddresses.stream().map(p -> getIdentifier(p)).distinct().count()
+        == pointerAddresses.size();
+  }
+
+  private boolean isValidPointerAddress(String pointerAddress) {
+    return identifierToPointerKeyMap.keySet().contains(getIdentifier(pointerAddress));
+  }
+
+  private NamePointer buildNamePointer(String pointerAddress) {
+    return new NamePointer()
+        .key(identifierToPointerKeyMap.get(getIdentifier(pointerAddress)))
+        .id(pointerAddress);
+  }
+
+  private String getIdentifier(String pointerAddress) {
+    if (pointerAddress == null) {
+      throw new InvalidParameterException("pointerAddress mustn't be null");
+    }
+    return pointerAddress.split("_")[0];
   }
 }
