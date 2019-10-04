@@ -1,4 +1,4 @@
-contract PaymentSplitter =
+payable contract PaymentSplitter =
    record state =
       {  owner: address,
          recipientConditions: map(address, int), // map of recipients with percentage to receive (value between 1 and 100)
@@ -37,7 +37,7 @@ contract PaymentSplitter =
       state.totalAmountSplitted
 
    // PAY-AND-SPLIT FUNCTION
-   stateful entrypoint payAndSplit() =
+   stateful payable entrypoint payAndSplit() =
       require(Contract.balance > 0, "contract didn't receive any payment")
       let recipientConditions: list(address * int) = Map.to_list(state.recipientConditions)
       put(state{totalAmountSplitted = Contract.balance + state.totalAmountSplitted})
