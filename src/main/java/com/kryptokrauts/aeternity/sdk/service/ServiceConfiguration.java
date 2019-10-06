@@ -3,6 +3,7 @@ package com.kryptokrauts.aeternity.sdk.service;
 import com.google.common.collect.ImmutableMap;
 import com.kryptokrauts.aeternity.generated.ApiClient;
 import com.kryptokrauts.aeternity.sdk.constants.BaseConstants;
+import com.kryptokrauts.aeternity.sdk.constants.VirtualMachine;
 import com.kryptokrauts.aeternity.sdk.domain.secret.impl.BaseKeyPair;
 import com.kryptokrauts.aeternity.sdk.exception.InvalidParameterException;
 import com.kryptokrauts.aeternity.sdk.service.wallet.WalletServiceConfiguration;
@@ -11,6 +12,7 @@ import io.vertx.core.json.JsonObject;
 import java.util.HashMap;
 import javax.annotation.Nonnull;
 import lombok.Builder.Default;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 import org.slf4j.Logger;
@@ -46,6 +48,8 @@ public class ServiceConfiguration {
   @Default @Nonnull protected String baseUrl = BaseConstants.DEFAULT_TESTNET_URL;
 
   @Default @Nonnull protected String contractBaseUrl = BaseConstants.DEFAULT_TESTNET_CONTRACT_URL;
+
+  @Getter @Default @Nonnull protected VirtualMachine targetVM = VirtualMachine.FATE;
 
   private BaseKeyPair baseKeyPair;
 

@@ -95,13 +95,11 @@ public class PaymentSplitterContractTest extends BaseTest {
             _logger.info("contract bytecode: " + byteCode);
             _logger.info("contract calldata: " + callData);
 
-            BigInteger vmVersion = BigInteger.valueOf(6);
             BigInteger gas = BigInteger.valueOf(4800000);
             BigInteger gasPrice = BigInteger.valueOf(BaseConstants.MINIMAL_GAS_PRICE);
 
             ContractCreateTransactionModel contractCreate =
                 ContractCreateTransactionModel.builder()
-                    .abiVersion(ONE)
                     .amount(ZERO)
                     .callData(callData)
                     .contractByteCode(byteCode)
@@ -111,7 +109,7 @@ public class PaymentSplitterContractTest extends BaseTest {
                     .nonce(getNextBaseKeypairNonce())
                     .ownerId(baseKeyPair.getPublicKey())
                     .ttl(ZERO)
-                    .vmVersion(vmVersion)
+                    .virtualMachine(targetVM)
                     .build();
 
             String unsignedTx =
@@ -210,7 +208,6 @@ public class PaymentSplitterContractTest extends BaseTest {
 
             ContractCallTransactionModel contractAfterDryRun =
                 ContractCallTransactionModel.builder()
-                    .abiVersion(BigInteger.ONE)
                     .callData(calldata)
                     .contractId(localDeployedContractId)
                     .gas(dryRunResult.getContractCallObject().getGasUsed())
@@ -219,6 +216,7 @@ public class PaymentSplitterContractTest extends BaseTest {
                     .callerId(baseKeyPair.getPublicKey())
                     .ttl(BigInteger.ZERO)
                     .amount(paymentValue.toBigInteger())
+                    .virtualMachine(targetVM)
                     .build();
 
             PostTransactionResult postTransactionResult =
@@ -272,7 +270,6 @@ public class PaymentSplitterContractTest extends BaseTest {
 
     ContractCallTransactionModel model =
         ContractCallTransactionModel.builder()
-            .abiVersion(ONE)
             .callData(calldata)
             .contractId(contractId)
             .gas(gas)
@@ -282,6 +279,7 @@ public class PaymentSplitterContractTest extends BaseTest {
             .nonce(nonce)
             .callerId(callerId)
             .ttl(ZERO)
+            .virtualMachine(targetVM)
             .build();
 
     return aeternityServiceNative.transactions.blockingCreateUnsignedTransaction(model);

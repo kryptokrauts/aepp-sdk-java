@@ -1,6 +1,7 @@
 package com.kryptokrauts.aeternity.generated.api;
 
 import com.kryptokrauts.aeternity.sdk.constants.Network;
+import com.kryptokrauts.aeternity.sdk.constants.VirtualMachine;
 import com.kryptokrauts.aeternity.sdk.domain.secret.impl.BaseKeyPair;
 import com.kryptokrauts.aeternity.sdk.service.account.domain.AccountResult;
 import com.kryptokrauts.aeternity.sdk.service.aeternity.AeternityServiceConfiguration;
@@ -50,6 +51,8 @@ public abstract class BaseTest {
 
   private static final String COMPILER_BASE_URL = "COMPILER_BASE_URL";
 
+  protected static final VirtualMachine targetVM = VirtualMachine.AEVM;
+
   protected KeyPairService keyPairService;
 
   protected AeternityService aeternityServiceNative;
@@ -81,6 +84,7 @@ public abstract class BaseTest {
                     .nativeMode(true)
                     .baseKeyPair(baseKeyPair)
                     .vertx(vertx)
+                    .targetVM(targetVM)
                     .compile());
     aeternityServiceDebug =
         new AeternityServiceFactory()
@@ -92,6 +96,7 @@ public abstract class BaseTest {
                     .nativeMode(false)
                     .baseKeyPair(baseKeyPair)
                     .vertx(vertx)
+                    .targetVM(targetVM)
                     .compile());
   }
 

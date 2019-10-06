@@ -3,6 +3,7 @@ package com.kryptokrauts.aeternity.sdk.service.transaction.type.model;
 import com.kryptokrauts.aeternity.generated.api.rxjava.ExternalApi;
 import com.kryptokrauts.aeternity.generated.model.ContractCreateTx;
 import com.kryptokrauts.aeternity.generated.model.GenericTx;
+import com.kryptokrauts.aeternity.sdk.constants.VirtualMachine;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.AbstractTransaction;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.impl.ContractCreateTransaction;
 import com.kryptokrauts.sophia.compiler.generated.api.rxjava.DefaultApi;
@@ -15,7 +16,6 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder(toBuilder = true)
 public class ContractCreateTransactionModel extends AbstractTransactionModel<ContractCreateTx> {
 
-  private BigInteger abiVersion;
   private BigInteger amount;
   private String callData;
   private String contractByteCode;
@@ -25,12 +25,12 @@ public class ContractCreateTransactionModel extends AbstractTransactionModel<Con
   private BigInteger nonce;
   private String ownerId;
   private BigInteger ttl;
-  private BigInteger vmVersion;
+  private VirtualMachine virtualMachine;
 
   @Override
   public ContractCreateTx toApiModel() {
     ContractCreateTx contractCreateTx = new ContractCreateTx();
-    contractCreateTx.setAbiVersion(abiVersion);
+    contractCreateTx.setAbiVersion(virtualMachine.getAbiVersion());
     contractCreateTx.setAmount(amount);
     contractCreateTx.setCallData(callData);
     contractCreateTx.setCode(contractByteCode);
@@ -41,7 +41,7 @@ public class ContractCreateTransactionModel extends AbstractTransactionModel<Con
     contractCreateTx.setNonce(nonce);
     contractCreateTx.setOwnerId(ownerId);
     contractCreateTx.setTtl(ttl);
-    contractCreateTx.setVmVersion(vmVersion);
+    contractCreateTx.setVmVersion(virtualMachine.getVmVersion());
 
     return contractCreateTx;
   }
@@ -51,7 +51,6 @@ public class ContractCreateTransactionModel extends AbstractTransactionModel<Con
     return (tx) -> {
       ContractCreateTx castedTx = (ContractCreateTx) tx;
       return this.toBuilder()
-          .abiVersion(castedTx.getAbiVersion())
           .amount(castedTx.getAmount())
           .callData(castedTx.getCallData())
           .contractByteCode(castedTx.getCode())
@@ -59,10 +58,10 @@ public class ContractCreateTransactionModel extends AbstractTransactionModel<Con
           .fee(castedTx.getFee())
           .gas(castedTx.getGas())
           .ownerId(castedTx.getOwnerId())
-          .vmVersion(castedTx.getVmVersion())
           .gasPrice(castedTx.getGasPrice())
           .ttl(castedTx.getTtl())
           .nonce(castedTx.getNonce())
+          .virtualMachine(VirtualMachine.getVirtualMachine(castedTx.getAbiVersion()))
           .build();
     };
   }

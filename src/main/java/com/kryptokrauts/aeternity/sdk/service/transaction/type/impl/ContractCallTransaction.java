@@ -37,7 +37,7 @@ public class ContractCallTransaction extends AbstractTransaction<ContractCallTra
                   EncodingUtils.decodeCheckAndTag(
                       this.model.getContractId(), SerializationTags.ID_TAG_CONTRACT);
               rlpWriter.writeByteArray(contractWithTag);
-              this.checkZeroAndWriteValue(rlpWriter, model.getAbiVersion());
+              this.checkZeroAndWriteValue(rlpWriter, model.getVirtualMachine().getAbiVersion());
               this.checkZeroAndWriteValue(rlpWriter, model.getFee());
               this.checkZeroAndWriteValue(rlpWriter, model.getTtl());
               this.checkZeroAndWriteValue(rlpWriter, model.getAmount());
