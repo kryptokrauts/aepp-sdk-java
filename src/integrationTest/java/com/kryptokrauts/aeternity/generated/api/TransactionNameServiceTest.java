@@ -91,7 +91,6 @@ public class TransactionNameServiceTest extends BaseTest {
                     .accountId(baseKeyPair.getPublicKey())
                     .name(validDomain)
                     .nameSalt(salt)
-                    .nameFee(new BigInteger("2865700000000000000"))
                     .nonce(getNextBaseKeypairNonce())
                     .ttl(ZERO)
                     .build();
@@ -155,7 +154,6 @@ public class TransactionNameServiceTest extends BaseTest {
                     .accountId(baseKeyPair.getPublicKey())
                     .name(domain)
                     .nameSalt(salt)
-                    .nameFee(new BigInteger("2865700000000000000"))
                     .nonce(getNextBaseKeypairNonce())
                     .ttl(ZERO)
                     .build();
