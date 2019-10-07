@@ -258,7 +258,6 @@ public class TransactionContractsTest extends BaseTest {
   private ContractCallTransactionModel createCallContractModel(
       BigInteger nonce, String calldata, BigInteger gasPrice) {
     String callerId = baseKeyPair.getPublicKey();
-    BigInteger abiVersion = BigInteger.ONE;
     BigInteger ttl = BigInteger.ZERO;
     BigInteger gas = BigInteger.valueOf(1579000);
     ContractCallTransactionModel model =

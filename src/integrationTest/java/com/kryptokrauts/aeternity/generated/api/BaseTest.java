@@ -51,7 +51,7 @@ public abstract class BaseTest {
 
   private static final String COMPILER_BASE_URL = "COMPILER_BASE_URL";
 
-  protected static final VirtualMachine targetVM = VirtualMachine.AEVM;
+  protected static final VirtualMachine targetVM = VirtualMachine.FATE;
 
   protected KeyPairService keyPairService;
 
