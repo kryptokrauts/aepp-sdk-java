@@ -78,7 +78,6 @@ public class TransactionContractsTest extends BaseTest {
         context,
         t -> {
           String callerId = baseKeyPair.getPublicKey();
-          BigInteger abiVersion = BigInteger.ONE;
           BigInteger ttl = BigInteger.valueOf(20000);
           BigInteger gas = BigInteger.valueOf(1000);
           BigInteger gasPrice = BigInteger.valueOf(1000000000);
@@ -138,8 +137,9 @@ public class TransactionContractsTest extends BaseTest {
                           DryRunAccountModel.builder()
                               .publicKey(baseKeyPair.getPublicKey())
                               .build())
-                      .transaction(createUnsignedContractCallTx(context, nonce, calldata, null))
-                      .transaction(
+                      .transactionInputItem(
+                          createUnsignedContractCallTx(context, nonce, calldata, null))
+                      .transactionInputItem(
                           createUnsignedContractCallTx(context, nonce.add(ONE), calldata, null)));
 
           _logger.info(results.toString());
@@ -169,7 +169,8 @@ public class TransactionContractsTest extends BaseTest {
                           DryRunAccountModel.builder()
                               .publicKey(baseKeyPair.getPublicKey())
                               .build())
-                      .transaction(createUnsignedContractCallTx(context, ONE, calldata, null)));
+                      .transactionInputItem(
+                          createUnsignedContractCallTx(context, ONE, calldata, null)));
 
           _logger.info("DryRunResult when expecting error:\n" + results.toString());
           for (DryRunTransactionResult result : results.getResults()) {
@@ -202,7 +203,7 @@ public class TransactionContractsTest extends BaseTest {
                           DryRunAccountModel.builder()
                               .publicKey(baseKeyPair.getPublicKey())
                               .build())
-                      .transaction(
+                      .transactionInputItem(
                           createUnsignedContractCallTx(
                               context, getNextBaseKeypairNonce(), calldata, null)));
 

@@ -5,6 +5,7 @@ import com.kryptokrauts.aeternity.sdk.domain.secret.impl.BaseKeyPair;
 import com.kryptokrauts.aeternity.sdk.service.info.domain.TransactionInfoResult;
 import com.kryptokrauts.aeternity.sdk.service.keypair.KeyPairServiceFactory;
 import com.kryptokrauts.aeternity.sdk.service.transaction.domain.DryRunAccountModel;
+import com.kryptokrauts.aeternity.sdk.service.transaction.domain.DryRunInputItemModel;
 import com.kryptokrauts.aeternity.sdk.service.transaction.domain.DryRunRequest;
 import com.kryptokrauts.aeternity.sdk.service.transaction.domain.DryRunTransactionResult;
 import com.kryptokrauts.aeternity.sdk.service.transaction.domain.DryRunTransactionResults;
@@ -125,7 +126,7 @@ public class PaymentSplitterContractTest extends BaseTest {
                             DryRunAccountModel.builder()
                                 .publicKey(baseKeyPair.getPublicKey())
                                 .build())
-                        .transaction(unsignedTx));
+                        .transactionInputItem(contractCreate, unsignedTx));
 
             _logger.info("callContractAfterDryRunOnLocalNode: " + dryRunResults.toString());
             context.assertEquals(1, dryRunResults.getResults().size());
@@ -192,14 +193,17 @@ public class PaymentSplitterContractTest extends BaseTest {
                             DryRunAccountModel.builder()
                                 .publicKey(baseKeyPair.getPublicKey())
                                 .build())
-                        .transaction(
-                            createUnsignedContractCallTx(
-                                baseKeyPair.getPublicKey(),
-                                getNextBaseKeypairNonce(),
-                                calldata,
-                                null,
-                                localDeployedContractId,
-                                paymentValue.toBigInteger())));
+                        .transactionInputItem(
+                            DryRunInputItemModel.builder()
+                                .tx(
+                                    createUnsignedContractCallTx(
+                                        baseKeyPair.getPublicKey(),
+                                        getNextBaseKeypairNonce(),
+                                        calldata,
+                                        null,
+                                        localDeployedContractId,
+                                        paymentValue.toBigInteger()))
+                                .build()));
 
             _logger.info("callContractAfterDryRunOnLocalNode: " + dryRunResults.toString());
             context.assertEquals(1, dryRunResults.getResults().size());
