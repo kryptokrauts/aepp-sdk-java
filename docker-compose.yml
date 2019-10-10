@@ -8,7 +8,10 @@ services:
     environment:
       AETERNITY_CONFIG: /home/aeternity/aeternity.yaml
     command: >
-      -aecore expected_mine_rate 15000
+      bin/aeternity
+      console
+      -noinput
+      -aecore expected_mine_rate 5000
       -aehttp enable_debug_endpoints true
     volumes:
       - ${PWD}/docker/aeternity.yaml:/home/aeternity/aeternity.yaml

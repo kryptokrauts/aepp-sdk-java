@@ -48,7 +48,7 @@ public class ContractCallObjectModel
               generatedResultObject.getLog().stream()
                   .map(event -> EventModel.builder().build().map(event))
                   .collect(Collectors.toList()))
-          .returnType(generatedResultObject.getReturnValue())
+          .returnType(generatedResultObject.getReturnType())
           .returnValue(generatedResultObject.getReturnValue())
           .gasUsed(generatedResultObject.getGasUsed())
           .build();

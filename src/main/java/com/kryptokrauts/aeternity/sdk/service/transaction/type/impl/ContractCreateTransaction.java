@@ -35,7 +35,7 @@ public class ContractCreateTransaction extends AbstractTransaction<ContractCreat
         RLP.encodeList(
             rlpWriter -> {
               rlpWriter.writeInt(SerializationTags.OBJECT_TAG_CONTRACT_CREATE_TRANSACTION);
-              rlpWriter.writeInt(SerializationTags.VSN);
+              rlpWriter.writeInt(SerializationTags.VSN_1);
               byte[] ownerWithTag =
                   EncodingUtils.decodeCheckAndTag(
                       model.getOwnerId(), SerializationTags.ID_TAG_ACCOUNT);
@@ -59,8 +59,8 @@ public class ContractCreateTransaction extends AbstractTransaction<ContractCreat
   private BigInteger calculateVersion() {
     try {
       ByteBuffer vm = ByteBuffer.allocate(8);
-      vm.putInt(model.getVmVersion().intValue());
-      vm.putInt(model.getAbiVersion().intValue());
+      vm.putInt(model.getVirtualMachine().getVmVersion().intValue());
+      vm.putInt(model.getVirtualMachine().getAbiVersion().intValue());
 
       ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
       outputStream.write(vm.array());
@@ -75,7 +75,7 @@ public class ContractCreateTransaction extends AbstractTransaction<ContractCreat
       System.err.println(
           String.format(
               "Error occured calculating version from parameters vmVersion %s and abiVersion %s",
-              model.getVmVersion(), model.getAbiVersion()));
+              model.getVirtualMachine().getVmVersion(), model.getVirtualMachine().getAbiVersion()));
       return null;
     }
   }

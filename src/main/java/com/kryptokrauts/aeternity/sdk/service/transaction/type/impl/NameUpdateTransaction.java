@@ -42,7 +42,7 @@ public class NameUpdateTransaction extends AbstractTransaction<NameUpdateTransac
         RLP.encodeList(
             rlpWriter -> {
               rlpWriter.writeInt(SerializationTags.OBJECT_TAG_NAME_SERVICE_UPDATE_TRANSACTION);
-              rlpWriter.writeInt(SerializationTags.VSN);
+              rlpWriter.writeInt(SerializationTags.VSN_1);
               byte[] accountIdWithTag =
                   EncodingUtils.decodeCheckAndTag(
                       model.getAccountId(), SerializationTags.ID_TAG_ACCOUNT);

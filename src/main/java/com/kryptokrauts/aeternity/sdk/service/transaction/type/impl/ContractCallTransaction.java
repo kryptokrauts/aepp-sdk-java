@@ -27,7 +27,7 @@ public class ContractCallTransaction extends AbstractTransaction<ContractCallTra
         RLP.encodeList(
             rlpWriter -> {
               rlpWriter.writeInt(SerializationTags.OBJECT_TAG_CONTRACT_CALL_TRANSACTION);
-              rlpWriter.writeInt(SerializationTags.VSN);
+              rlpWriter.writeInt(SerializationTags.VSN_1);
               byte[] callerWithTag =
                   EncodingUtils.decodeCheckAndTag(
                       model.getCallerId(), SerializationTags.ID_TAG_ACCOUNT);
@@ -37,7 +37,7 @@ public class ContractCallTransaction extends AbstractTransaction<ContractCallTra
                   EncodingUtils.decodeCheckAndTag(
                       this.model.getContractId(), SerializationTags.ID_TAG_CONTRACT);
               rlpWriter.writeByteArray(contractWithTag);
-              this.checkZeroAndWriteValue(rlpWriter, model.getAbiVersion());
+              this.checkZeroAndWriteValue(rlpWriter, model.getVirtualMachine().getAbiVersion());
               this.checkZeroAndWriteValue(rlpWriter, model.getFee());
               this.checkZeroAndWriteValue(rlpWriter, model.getTtl());
               this.checkZeroAndWriteValue(rlpWriter, model.getAmount());

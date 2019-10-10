@@ -134,7 +134,7 @@ public class TransactionServiceImpl implements TransactionService {
         RLP.encodeList(
             rlpWriter -> {
               rlpWriter.writeInt(SerializationTags.OBJECT_TAG_SIGNED_TRANSACTION);
-              rlpWriter.writeInt(SerializationTags.VSN);
+              rlpWriter.writeInt(SerializationTags.VSN_1);
               rlpWriter.writeList(
                   writer -> {
                     writer.writeByteArray(sig);

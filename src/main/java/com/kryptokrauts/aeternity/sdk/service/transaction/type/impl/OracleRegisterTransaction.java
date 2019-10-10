@@ -33,7 +33,7 @@ public class OracleRegisterTransaction extends AbstractTransaction<OracleRegiste
         RLP.encodeList(
             rlpWriter -> {
               rlpWriter.writeInt(SerializationTags.OBJECT_TAG_ORACLE_REGISTER_TRANSACTION);
-              rlpWriter.writeInt(SerializationTags.VSN);
+              rlpWriter.writeInt(SerializationTags.VSN_1);
               byte[] accountIdWithTag =
                   EncodingUtils.decodeCheckAndTag(
                       model.getAccountId(), SerializationTags.ID_TAG_ACCOUNT);

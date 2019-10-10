@@ -1,4 +1,4 @@
-contract PaymentSplitter =
+payable contract PaymentSplitter =
    record state =
       {  owner: address,
          recipientConditions: map(address, int), // map of recipients with percentage to receive (value between 1 and 100)
@@ -37,9 +37,9 @@ contract PaymentSplitter =
       state.totalAmountSplitted
 
    // PAY-AND-SPLIT FUNCTION
-   stateful entrypoint payAndSplit() =
+   stateful payable entrypoint payAndSplit() =
       require(Contract.balance > 0, "contract didn't receive any payment")
-      let recipientConditions: list((address, int)) = Map.to_list(state.recipientConditions)
+      let recipientConditions: list(address * int) = Map.to_list(state.recipientConditions)
       put(state{totalAmountSplitted = Contract.balance + state.totalAmountSplitted})
       split(recipientConditions, Contract.balance)
       Chain.event(PaymentReceivedAndSplitted(Call.caller, Call.value, Contract.balance))
@@ -73,17 +73,17 @@ contract PaymentSplitter =
       require(Call.caller == state.owner || Call.caller == recipient', "caller must be the owner or the recipient")
 
    function sumWeights(recipients': map(address, int)) : int =
-      let recipientList: list((address, int)) = Map.to_list(recipients')
+      let recipientList: list(address * int) = Map.to_list(recipients')
       let intList: list(int) = map(pair_second, recipientList)
       sum(intList, (x) => x)
 
-   function fireRecipientAddedEvents(recipientConditions': list((address, int))) =
+   function fireRecipientAddedEvents(recipientConditions': list(address * int)) =
       switch(recipientConditions')
          [] => ()
          (recipient, weight) :: l' =>
             Chain.event(RecipientAdded(recipient, weight))
 
-   stateful function split(recipientConditions': list((address, int)), totalValue: int) =
+   stateful function split(recipientConditions': list(address * int), totalValue: int) =
       switch(recipientConditions')
          [] => ()
          (recipient, weight) :: l' =>

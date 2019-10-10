@@ -4,11 +4,7 @@ import com.kryptokrauts.aeternity.sdk.service.ServiceConfiguration;
 import com.kryptokrauts.aeternity.sdk.service.compiler.CompilerService;
 import com.kryptokrauts.aeternity.sdk.service.compiler.domain.ACIResult;
 import com.kryptokrauts.sophia.compiler.generated.api.rxjava.DefaultApi;
-import com.kryptokrauts.sophia.compiler.generated.model.CompileOpts;
-import com.kryptokrauts.sophia.compiler.generated.model.Contract;
-import com.kryptokrauts.sophia.compiler.generated.model.FunctionCallInput;
-import com.kryptokrauts.sophia.compiler.generated.model.SophiaBinaryData;
-import com.kryptokrauts.sophia.compiler.generated.model.SophiaJsonData;
+import com.kryptokrauts.sophia.compiler.generated.model.*;
 import io.netty.util.internal.StringUtil;
 import io.reactivex.Single;
 import java.util.List;
@@ -49,6 +45,7 @@ public final class SophiaCompilerServiceImpl implements CompilerService {
         body.addArgumentsItem(argument);
       }
     }
+    body.options(new CompileOpts().backend(config.getTargetVM().getBackendEnum()));
     return body;
   }
 
@@ -67,10 +64,42 @@ public final class SophiaCompilerServiceImpl implements CompilerService {
         .getData();
   }
 
+  @Override
+  public Single<Object> asyncDecodeCallResult(
+      String source, String function, String callResult, String callValue) {
+    return Optional.ofNullable(
+            this.compilerApi.rxDecodeCallResult(
+                buildDecodeBody(source, function, callResult, callValue)))
+        .orElse(Single.just(new Object()));
+  }
+
+  @Override
+  public Object blockingDecodeCallResult(
+      String source, String function, String callResult, String callValue) {
+    return Optional.ofNullable(
+            this.compilerApi
+                .rxDecodeCallResult(buildDecodeBody(source, function, callResult, callValue))
+                .blockingGet())
+        .orElse(new Object());
+  }
+
   private SophiaBinaryData buildDecodeBody(String calldata, String sophiaType) {
     SophiaBinaryData body = new SophiaBinaryData();
     body.setData(calldata);
     body.setSophiaType(sophiaType);
+    return body;
+  }
+
+  private SophiaCallResultInput buildDecodeBody(
+      String source, String function, String callResult, String callValue) {
+    SophiaCallResultInput body = new SophiaCallResultInput();
+    body.setSource(source);
+    body.setFunction(function);
+    body.setCallResult(callResult);
+    body.setCallValue(callValue);
+    CompileOpts compileOpts = new CompileOpts();
+    compileOpts.setBackend(config.getTargetVM().getBackendEnum());
+    body.setOptions(compileOpts);
     return body;
   }
 
@@ -99,6 +128,7 @@ public final class SophiaCompilerServiceImpl implements CompilerService {
     if (!StringUtil.isNullOrEmpty(srcFile)) {
       compileOpts.setSrcFile(srcFile);
     }
+    compileOpts.setBackend(config.getTargetVM().getBackendEnum());
     body.setOptions(compileOpts);
     return body;
   }
@@ -127,6 +157,7 @@ public final class SophiaCompilerServiceImpl implements CompilerService {
     if (fileSystem != null) {
       compileOpts.setFileSystem(fileSystem);
     }
+    compileOpts.setBackend(config.getTargetVM().getBackendEnum());
     body.setOptions(compileOpts);
     return body;
   }

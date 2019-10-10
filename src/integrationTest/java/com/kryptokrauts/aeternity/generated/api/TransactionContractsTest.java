@@ -14,7 +14,6 @@ import com.kryptokrauts.aeternity.sdk.service.transaction.domain.DryRunTransacti
 import com.kryptokrauts.aeternity.sdk.service.transaction.domain.PostTransactionResult;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.model.ContractCallTransactionModel;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.model.ContractCreateTransactionModel;
-import io.vertx.core.json.JsonObject;
 import io.vertx.ext.unit.TestContext;
 import java.math.BigInteger;
 import java.util.Optional;
@@ -39,8 +38,6 @@ public class TransactionContractsTest extends BaseTest {
         context,
         t -> {
           String ownerId = baseKeyPair.getPublicKey();
-          BigInteger abiVersion = BigInteger.ONE;
-          BigInteger vmVersion = BigInteger.valueOf(4);
           BigInteger amount = BigInteger.valueOf(100);
           BigInteger deposit = BigInteger.valueOf(100);
           BigInteger ttl = BigInteger.valueOf(20000l);
@@ -50,7 +47,6 @@ public class TransactionContractsTest extends BaseTest {
 
           ContractCreateTransactionModel contractTx =
               ContractCreateTransactionModel.builder()
-                  .abiVersion(abiVersion)
                   .amount(amount)
                   .callData(TestConstants.testContractCallData)
                   .contractByteCode(TestConstants.testContractByteCode)
@@ -61,7 +57,7 @@ public class TransactionContractsTest extends BaseTest {
                   .nonce(getNextBaseKeypairNonce())
                   .ownerId(ownerId)
                   .ttl(ttl)
-                  .vmVersion(vmVersion)
+                  .virtualMachine(targetVM)
                   .build();
 
           String unsignedTxNative =
@@ -91,7 +87,6 @@ public class TransactionContractsTest extends BaseTest {
 
           ContractCallTransactionModel callTx =
               ContractCallTransactionModel.builder()
-                  .abiVersion(abiVersion)
                   .callData(callContractCalldata)
                   .contractId(localDeployedContractId)
                   .gas(gas)
@@ -100,6 +95,7 @@ public class TransactionContractsTest extends BaseTest {
                   .callerId(callerId)
                   .ttl(ttl)
                   .fee(BigInteger.valueOf(1454500000000000l))
+                  .virtualMachine(targetVM)
                   .build();
 
           String unsignedTxNative =
@@ -217,7 +213,6 @@ public class TransactionContractsTest extends BaseTest {
 
             ContractCallTransactionModel callTx =
                 ContractCallTransactionModel.builder()
-                    .abiVersion(ONE)
                     .callData(calldata)
                     .contractId(localDeployedContractId)
                     .gas(result.getContractCallObject().getGasUsed())
@@ -225,6 +220,7 @@ public class TransactionContractsTest extends BaseTest {
                     .nonce(getNextBaseKeypairNonce())
                     .callerId(baseKeyPair.getPublicKey())
                     .ttl(ZERO)
+                    .virtualMachine(targetVM)
                     .build();
 
             PostTransactionResult response =
@@ -238,13 +234,14 @@ public class TransactionContractsTest extends BaseTest {
             // get the tx info object to resolve the result
             try {
               TransactionInfoResult txInfoObject = waitForTxInfoObject(response.getTxHash());
-              // decode the result to json
-              JsonObject json =
-                  decodeCalldata(
-                      txInfoObject.getCallInfo().getReturnValue(),
-                      TestConstants.testContractFunctionSophiaType);
-              context.assertEquals(
-                  TestConstants.testContractFuntionParam, json.getValue("value").toString());
+              Object decodedValue =
+                  decodeCallResult(
+                      TestConstants.testContractSourceCode,
+                      TestConstants.testContractFunction,
+                      txInfoObject.getCallInfo().getReturnType(),
+                      txInfoObject.getCallInfo().getReturnValue());
+              context.assertTrue(decodedValue instanceof Integer);
+              context.assertEquals(TestConstants.testContractFuntionParam, decodedValue.toString());
             } catch (Throwable e) {
               context.fail(e);
             }
@@ -261,12 +258,10 @@ public class TransactionContractsTest extends BaseTest {
   private ContractCallTransactionModel createCallContractModel(
       BigInteger nonce, String calldata, BigInteger gasPrice) {
     String callerId = baseKeyPair.getPublicKey();
-    BigInteger abiVersion = BigInteger.ONE;
     BigInteger ttl = BigInteger.ZERO;
     BigInteger gas = BigInteger.valueOf(1579000);
     ContractCallTransactionModel model =
         ContractCallTransactionModel.builder()
-            .abiVersion(abiVersion)
             .callData(calldata)
             .contractId(localDeployedContractId)
             .gas(gas)
@@ -275,6 +270,7 @@ public class TransactionContractsTest extends BaseTest {
             .nonce(nonce)
             .callerId(callerId)
             .ttl(ttl)
+            .virtualMachine(targetVM)
             .build();
     return model;
   }
@@ -284,13 +280,11 @@ public class TransactionContractsTest extends BaseTest {
     this.executeTest(
         context,
         t -> {
-          BigInteger vmVersion = BigInteger.valueOf(4);
           BigInteger gas = BigInteger.valueOf(1000000);
           BigInteger gasPrice = BigInteger.valueOf(2000000000);
 
           ContractCreateTransactionModel contractTx =
               ContractCreateTransactionModel.builder()
-                  .abiVersion(ONE)
                   .amount(ZERO)
                   .callData(TestConstants.testContractCallData)
                   .contractByteCode(TestConstants.testContractByteCode)
@@ -300,7 +294,7 @@ public class TransactionContractsTest extends BaseTest {
                   .nonce(getNextBaseKeypairNonce())
                   .ownerId(baseKeyPair.getPublicKey())
                   .ttl(ZERO)
-                  .vmVersion(vmVersion)
+                  .virtualMachine(targetVM)
                   .build();
 
           PostTransactionResult result =
@@ -339,14 +333,14 @@ public class TransactionContractsTest extends BaseTest {
           // get the tx info object to resolve the result
           try {
             TransactionInfoResult txInfoObject = waitForTxInfoObject(result.getTxHash());
-
-            // decode the result to json
-            JsonObject json =
-                decodeCalldata(
-                    txInfoObject.getCallInfo().getReturnValue(),
-                    TestConstants.testContractFunctionSophiaType);
-            context.assertEquals(
-                TestConstants.testContractFuntionParam, json.getValue("value").toString());
+            Object decodedValue =
+                decodeCallResult(
+                    TestConstants.testContractSourceCode,
+                    TestConstants.testContractFunction,
+                    txInfoObject.getCallInfo().getReturnType(),
+                    txInfoObject.getCallInfo().getReturnValue());
+            context.assertTrue(decodedValue instanceof Integer);
+            context.assertEquals(TestConstants.testContractFuntionParam, decodedValue.toString());
           } catch (Throwable e) {
             context.fail(e);
           }
@@ -371,8 +365,6 @@ public class TransactionContractsTest extends BaseTest {
     AccountResult account =
         testnetService.accounts.blockingGetAccount(Optional.of(baseKeyPair.getPublicKey()));
     String ownerId = baseKeyPair.getPublicKey();
-    BigInteger abiVersion = BigInteger.ONE;
-    BigInteger vmVersion = BigInteger.valueOf(4);
     BigInteger amount = BigInteger.ZERO;
     BigInteger deposit = BigInteger.ZERO;
     BigInteger ttl = BigInteger.ZERO;
@@ -382,7 +374,6 @@ public class TransactionContractsTest extends BaseTest {
 
     ContractCreateTransactionModel testnetCreateTx =
         ContractCreateTransactionModel.builder()
-            .abiVersion(abiVersion)
             .amount(amount)
             .callData(TestConstants.testContractCallData)
             .contractByteCode(TestConstants.testContractByteCode)
@@ -392,7 +383,7 @@ public class TransactionContractsTest extends BaseTest {
             .nonce(nonce)
             .ownerId(ownerId)
             .ttl(ttl)
-            .vmVersion(vmVersion)
+            .virtualMachine(targetVM)
             .build();
 
     PostTransactionResult result =

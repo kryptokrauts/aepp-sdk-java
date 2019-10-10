@@ -33,7 +33,7 @@ public class OracleQueryTransaction extends AbstractTransaction<OracleQueryTrans
         RLP.encodeList(
             rlpWriter -> {
               rlpWriter.writeInt(SerializationTags.OBJECT_TAG_ORACLE_QUERY_TRANSACTION);
-              rlpWriter.writeInt(SerializationTags.VSN);
+              rlpWriter.writeInt(SerializationTags.VSN_1);
               byte[] senderIdWithTag =
                   EncodingUtils.decodeCheckAndTag(
                       model.getSenderId(), SerializationTags.ID_TAG_ACCOUNT);

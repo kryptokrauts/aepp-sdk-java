@@ -12,7 +12,6 @@ import com.kryptokrauts.aeternity.sdk.domain.secret.impl.BaseKeyPair;
 import com.kryptokrauts.aeternity.sdk.domain.secret.impl.RawKeyPair;
 import com.kryptokrauts.aeternity.sdk.exception.EncodingNotSupportedException;
 import java.math.BigInteger;
-import java.net.IDN;
 import java.util.Arrays;
 import lombok.experimental.UtilityClass;
 import org.bitcoinj.core.AddressFormatException;
@@ -232,26 +231,8 @@ public final class EncodingUtils {
 
   public static String generateCommitmentHash(final String name, final BigInteger salt) {
     return encodeCheck(
-        hash(ByteUtils.concatenate(nameId(name), ByteUtils.leftPad(32, salt.toByteArray()))),
+        hash(ByteUtils.concatenate(name.getBytes(), ByteUtils.leftPad(32, salt.toByteArray()))),
         ApiIdentifiers.COMMITMENT);
-  }
-
-  public static String normalize(final String domainName) {
-    return IDN.toASCII(domainName, IDN.USE_STD3_ASCII_RULES);
-  }
-
-  public static byte[] nameId(final String domainName) {
-    String normalizedDomainName = normalize(domainName);
-    byte[] buffer = new byte[32];
-    Arrays.fill(buffer, (byte) 0);
-    if (domainName.length() == 0 || domainName.equals("")) {
-      return buffer;
-    }
-    String[] labels = normalizedDomainName.split("\\.");
-    for (int i = 0; i < labels.length; i++) {
-      buffer = hash(ByteUtils.concatenate(buffer, hash(labels[i].getBytes())));
-    }
-    return buffer;
   }
 
   /**

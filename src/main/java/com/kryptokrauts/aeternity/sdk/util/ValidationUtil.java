@@ -24,12 +24,15 @@ public class ValidationUtil {
   public static final String NAMESPACE_EXCEEDS_LIMIT =
       String.format("Domainname exceeds %s char limit.", DOMAIN_NAME_MAX_LENGHT);
 
-  public static final List<String> ALLOWED_NAMESPACES = Arrays.asList("test");
+  public static final List<String> ALLOWED_NAMESPACES = Arrays.asList("aet");
 
   public static final String INVALID_POINTER_ADDRESS = "Pointer address is not valid.";
 
   public static final String DUPLICATE_POINTER_KEY =
       "For each pointer key only one address may be provided. The list of pointerAddresses contains duplicate address-types.";
+
+  public static final String NAME_FEE_TOO_LOW =
+      "The provided nameFee is too low. Minimum '%s' is required.";
 
   /**
    * encapsule validation of given parameters
