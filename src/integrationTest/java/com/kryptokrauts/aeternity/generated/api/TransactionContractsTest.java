@@ -14,7 +14,6 @@ import com.kryptokrauts.aeternity.sdk.service.transaction.domain.DryRunTransacti
 import com.kryptokrauts.aeternity.sdk.service.transaction.domain.PostTransactionResult;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.model.ContractCallTransactionModel;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.model.ContractCreateTransactionModel;
-import io.vertx.core.json.JsonObject;
 import io.vertx.ext.unit.TestContext;
 import java.math.BigInteger;
 import java.util.Optional;
@@ -235,13 +234,14 @@ public class TransactionContractsTest extends BaseTest {
             // get the tx info object to resolve the result
             try {
               TransactionInfoResult txInfoObject = waitForTxInfoObject(response.getTxHash());
-              // decode the result to json
-              JsonObject json =
-                  decodeCalldata(
-                      txInfoObject.getCallInfo().getReturnValue(),
-                      TestConstants.testContractFunctionSophiaType);
-              context.assertEquals(
-                  TestConstants.testContractFuntionParam, json.getValue("value").toString());
+              Object decodedValue =
+                  decodeCallResult(
+                      TestConstants.testContractSourceCode,
+                      TestConstants.testContractFunction,
+                      txInfoObject.getCallInfo().getReturnType(),
+                      txInfoObject.getCallInfo().getReturnValue());
+              context.assertTrue(decodedValue instanceof Integer);
+              context.assertEquals(TestConstants.testContractFuntionParam, decodedValue.toString());
             } catch (Throwable e) {
               context.fail(e);
             }
@@ -333,14 +333,14 @@ public class TransactionContractsTest extends BaseTest {
           // get the tx info object to resolve the result
           try {
             TransactionInfoResult txInfoObject = waitForTxInfoObject(result.getTxHash());
-
-            // decode the result to json
-            JsonObject json =
-                decodeCalldata(
-                    txInfoObject.getCallInfo().getReturnValue(),
-                    TestConstants.testContractFunctionSophiaType);
-            context.assertEquals(
-                TestConstants.testContractFuntionParam, json.getValue("value").toString());
+            Object decodedValue =
+                decodeCallResult(
+                    TestConstants.testContractSourceCode,
+                    TestConstants.testContractFunction,
+                    txInfoObject.getCallInfo().getReturnType(),
+                    txInfoObject.getCallInfo().getReturnValue());
+            context.assertTrue(decodedValue instanceof Integer);
+            context.assertEquals(TestConstants.testContractFuntionParam, decodedValue.toString());
           } catch (Throwable e) {
             context.fail(e);
           }

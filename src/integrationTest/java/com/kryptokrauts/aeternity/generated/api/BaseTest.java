@@ -207,6 +207,12 @@ public abstract class BaseTest {
             encodedValue, sophiaReturnType));
   }
 
+  protected Object decodeCallResult(
+      String source, String function, String callResult, String callValue) {
+    return this.aeternityServiceNative.compiler.blockingDecodeCallResult(
+        source, function, callResult, callValue);
+  }
+
   protected <T> T callMethodAndAwaitException(
       Supplier<Single<T>> observerMethod, Class<T> exception) throws Throwable {
     return callMethodAndGetResult(

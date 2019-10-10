@@ -287,6 +287,7 @@ definitions:
       - data
       - sophia-type
     type: object
+  SophiaCallResult: {}
   SophiaCallResultInput:
     example:
       call-result: call-result
@@ -435,12 +436,7 @@ paths:
         '200':
           description: Json encoded data
           schema:
-            oneOf:
-              - type: string
-              - type: integer
-              - type: number
-              - type: boolean
-              - type: array
+            $ref: '#/definitions/SophiaCallResult'
         '400':
           description: Invalid data
           schema:

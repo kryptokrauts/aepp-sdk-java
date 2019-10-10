@@ -57,6 +57,30 @@ public interface CompilerService {
   Object blockingDecodeCalldata(String calldata, String sophiaType);
 
   /**
+   * asynchronously decodes callresult of contract-calls
+   *
+   * @param source the contract source
+   * @param function the called function
+   * @param callResult the received resultType (ok | error | revert)
+   * @param callValue the received value
+   * @return the decoded sophia call result
+   */
+  Single<Object> asyncDecodeCallResult(
+      String source, String function, String callResult, String callValue);
+
+  /**
+   * synchronously decodes callresult of contract-calls
+   *
+   * @param source the contract source
+   * @param function the called function
+   * @param callResult the received resultType (ok | error | revert)
+   * @param callValue the received value
+   * @return the decoded sophia call result
+   */
+  Object blockingDecodeCallResult(
+      String source, String function, String callResult, String callValue);
+
+  /**
    * asynchronously generates the ACI for this contractCode
    * https://github.com/aeternity/aesophia/blob/master/docs/aeso_aci.md
    *
