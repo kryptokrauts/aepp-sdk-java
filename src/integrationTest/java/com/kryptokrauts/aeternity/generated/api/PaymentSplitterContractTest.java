@@ -5,7 +5,6 @@ import com.kryptokrauts.aeternity.sdk.domain.secret.impl.BaseKeyPair;
 import com.kryptokrauts.aeternity.sdk.service.info.domain.TransactionInfoResult;
 import com.kryptokrauts.aeternity.sdk.service.keypair.KeyPairServiceFactory;
 import com.kryptokrauts.aeternity.sdk.service.transaction.domain.DryRunAccountModel;
-import com.kryptokrauts.aeternity.sdk.service.transaction.domain.DryRunInputItemModel;
 import com.kryptokrauts.aeternity.sdk.service.transaction.domain.DryRunRequest;
 import com.kryptokrauts.aeternity.sdk.service.transaction.domain.DryRunTransactionResult;
 import com.kryptokrauts.aeternity.sdk.service.transaction.domain.DryRunTransactionResults;
@@ -126,7 +125,7 @@ public class PaymentSplitterContractTest extends BaseTest {
                             DryRunAccountModel.builder()
                                 .publicKey(baseKeyPair.getPublicKey())
                                 .build())
-                        .transactionInputItem(contractCreate, unsignedTx));
+                        .transactionInputItem(unsignedTx));
 
             _logger.info("callContractAfterDryRunOnLocalNode: " + dryRunResults.toString());
             context.assertEquals(1, dryRunResults.getResults().size());
@@ -194,15 +193,16 @@ public class PaymentSplitterContractTest extends BaseTest {
                                 .publicKey(baseKeyPair.getPublicKey())
                                 .build())
                         .transactionInputItem(
-                            DryRunInputItemModel.builder()
-                                .tx(
-                                    createUnsignedContractCallTx(
-                                        baseKeyPair.getPublicKey(),
-                                        getNextBaseKeypairNonce(),
-                                        calldata,
-                                        null,
-                                        localDeployedContractId,
-                                        paymentValue.toBigInteger()))
+                            ContractCallTransactionModel.builder()
+                                .callData(calldata)
+                                .gas(BigInteger.valueOf(1579000))
+                                .contractId(localDeployedContractId)
+                                .gasPrice(BigInteger.valueOf(BaseConstants.MINIMAL_GAS_PRICE))
+                                .amount(paymentValue.toBigInteger())
+                                .nonce(getNextBaseKeypairNonce())
+                                .callerId(baseKeyPair.getPublicKey())
+                                .ttl(ZERO)
+                                .virtualMachine(targetVM)
                                 .build()));
 
             _logger.info("callContractAfterDryRunOnLocalNode: " + dryRunResults.toString());
@@ -215,7 +215,13 @@ public class PaymentSplitterContractTest extends BaseTest {
                     .callData(calldata)
                     .contractId(localDeployedContractId)
                     .gas(dryRunResult.getContractCallObject().getGasUsed())
-                    .gasPrice(dryRunResult.getContractCallObject().getGasPrice())
+                    /**
+                     * the result currently contains a too low gasPrice, so we set the minimal gas
+                     * price manually
+                     *
+                     * <p>.gasPrice(dryRunResult.getContractCallObject().getGasPrice())
+                     */
+                    .gasPrice(BigInteger.valueOf(BaseConstants.MINIMAL_GAS_PRICE))
                     .nonce(getNextBaseKeypairNonce())
                     .callerId(baseKeyPair.getPublicKey())
                     .ttl(BigInteger.ZERO)

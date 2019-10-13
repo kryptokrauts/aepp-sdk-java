@@ -1,11 +1,11 @@
 package com.kryptokrauts.aeternity.sdk.service.transaction.domain;
 
 import com.kryptokrauts.aeternity.generated.model.DryRunInput;
+import com.kryptokrauts.aeternity.sdk.constants.BaseConstants;
 import com.kryptokrauts.aeternity.sdk.domain.GenericInputObject;
-import com.kryptokrauts.aeternity.sdk.service.transaction.type.model.AbstractTransactionModel;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.model.ContractCallTransactionModel;
-import com.kryptokrauts.aeternity.sdk.service.transaction.type.model.ContractCreateTransactionModel;
 import com.kryptokrauts.aeternity.sdk.util.ValidationUtil;
+import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
@@ -88,45 +88,24 @@ public class DryRunRequest extends GenericInputObject<DryRunInput> {
   }
 
   /**
-   * Add transaction input item using unsigned tx string and tx model class
+   * Add transaction input item using contract call model
    *
-   * @param inputTx
-   * @param unsignedTx
+   * @param contractCallModel
    * @return
    */
-  public DryRunRequest transactionInputItem(
-      AbstractTransactionModel<?> inputTx, String unsignedTx) {
-    if (inputTx instanceof ContractCreateTransactionModel) {
-      ContractCreateTransactionModel cctm = (ContractCreateTransactionModel) inputTx;
+  public DryRunRequest transactionInputItem(ContractCallTransactionModel contractCallModel) {
+    if (contractCallModel != null) {
       this.txInputs.add(
           DryRunInputItemModel.builder()
-              .tx(unsignedTx)
               .callRequest(
                   DryRunCallRequestModel.builder()
-                      .amount(cctm.getAmount())
-                      .calldata(cctm.getCallData())
-                      .gas(cctm.getGas())
-                      .contract(cctm.getContractByteCode())
-                      .caller(cctm.getOwnerId())
-                      .abiVersion(cctm.getVirtualMachine().getAbiVersion())
-                      .nonce(cctm.getNonce())
-                      .build())
-              .build());
-    }
-    if (inputTx instanceof ContractCallTransactionModel) {
-      ContractCallTransactionModel cctm = (ContractCallTransactionModel) inputTx;
-      this.txInputs.add(
-          DryRunInputItemModel.builder()
-              .tx(unsignedTx)
-              .callRequest(
-                  DryRunCallRequestModel.builder()
-                      .amount(cctm.getAmount())
-                      .calldata(cctm.getCallData())
-                      .gas(cctm.getGas())
-                      .caller(cctm.getCallerId())
-                      .contract(cctm.getContractId())
-                      .abiVersion(cctm.getVirtualMachine().getAbiVersion())
-                      .nonce(cctm.getNonce())
+                      .amount(contractCallModel.getAmount())
+                      .calldata(contractCallModel.getCallData())
+                      .caller(contractCallModel.getCallerId())
+                      .contract(contractCallModel.getContractId())
+                      .gas(BigInteger.valueOf(BaseConstants.MINIMAL_GAS_PRICE))
+                      .abiVersion(contractCallModel.getVirtualMachine().getAbiVersion())
+                      .nonce(contractCallModel.getNonce())
                       .build())
               .build());
     }
