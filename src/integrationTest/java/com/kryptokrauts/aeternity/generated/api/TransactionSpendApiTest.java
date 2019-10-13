@@ -95,6 +95,49 @@ public class TransactionSpendApiTest extends BaseTest {
   }
 
   @Test
+  public void postSpendSignedTxString(TestContext context) {
+    this.executeTest(
+        context,
+        t -> {
+          AccountResult account =
+              this.aeternityServiceNative.accounts.blockingGetAccount(Optional.empty());
+
+          BaseKeyPair kp = keyPairService.generateBaseKeyPair();
+          String recipient = kp.getPublicKey();
+          BigInteger amount = new BigInteger("1000000000000000000");
+          String payload = "payload";
+          BigInteger nonce = account.getNonce().add(ONE);
+
+          SpendTransactionModel spendTx =
+              SpendTransactionModel.builder()
+                  .sender(account.getPublicKey())
+                  .recipient(recipient)
+                  .amount(amount)
+                  .payload(payload)
+                  .ttl(ZERO)
+                  .nonce(nonce)
+                  .build();
+
+          String unsignedTxNative =
+              aeternityServiceNative
+                  .transactions
+                  .asyncCreateUnsignedTransaction(spendTx)
+                  .blockingGet();
+
+          String signedTxNative =
+              aeternityServiceNative.transactions.signTransaction(
+                  unsignedTxNative, baseKeyPair.getPrivateKey());
+
+          PostTransactionResult txResponse =
+              aeternityServiceNative.transactions.blockingPostTransaction(signedTxNative);
+
+          _logger.info("SpendTx hash: " + txResponse.getTxHash());
+          context.assertEquals(
+              txResponse.getTxHash(), aeternityServiceNative.transactions.computeTxHash(spendTx));
+        });
+  }
+
+  @Test
   public void postSpendSelfSignTxTestWithModel(TestContext context)
       throws CryptoException, TransactionCreateException {
     this.executeTest(

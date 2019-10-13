@@ -75,7 +75,7 @@ public interface TransactionService {
    * configuration
    *
    * @param tx
-   * @return asynchronous result handler (RxJava Single) for {PostTransactionResult}s
+   * @return asynchronous result handler (RxJava Single) for {PostTransactionResult}
    */
   Single<PostTransactionResult> asyncPostTransaction(AbstractTransactionModel<?> tx);
 
@@ -105,4 +105,20 @@ public interface TransactionService {
    * @throws TransactionCreateException
    */
   String computeTxHash(AbstractTransactionModel<?> tx) throws TransactionCreateException;
+
+  /**
+   * synchronously post a transaction based on the given signedTx as String
+   *
+   * @param signedTx
+   * @return
+   */
+  PostTransactionResult blockingPostTransaction(String signedTx);
+
+  /**
+   * asynchronously post a transaction based on the given signedTx as String
+   *
+   * @param tx
+   * @return asynchronous result handler (RxJava Single) for {PostTransactionResult}
+   */
+  Single<PostTransactionResult> asyncPostTransaction(String signedTx);
 }

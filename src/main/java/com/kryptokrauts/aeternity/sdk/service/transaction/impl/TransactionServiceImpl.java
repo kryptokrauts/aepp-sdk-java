@@ -73,6 +73,20 @@ public class TransactionServiceImpl implements TransactionService {
   }
 
   @Override
+  public PostTransactionResult blockingPostTransaction(String signedTx) {
+    return PostTransactionResult.builder()
+        .build()
+        .blockingGet(externalApi.rxPostTransaction(createGeneratedTxObject(signedTx)));
+  }
+
+  @Override
+  public Single<PostTransactionResult> asyncPostTransaction(String signedTx) {
+    return PostTransactionResult.builder()
+        .build()
+        .asyncGet(externalApi.rxPostTransaction(createGeneratedTxObject(signedTx)));
+  }
+
+  @Override
   public PostTransactionResult blockingPostTransaction(
       AbstractTransactionModel<?> tx, String privateKey) throws TransactionCreateException {
     return PostTransactionResult.builder()
