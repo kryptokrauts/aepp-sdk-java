@@ -125,7 +125,7 @@ public class PaymentSplitterContractTest extends BaseTest {
                             DryRunAccountModel.builder()
                                 .publicKey(baseKeyPair.getPublicKey())
                                 .build())
-                        .transaction(unsignedTx));
+                        .transactionInputItem(unsignedTx));
 
             _logger.info("callContractAfterDryRunOnLocalNode: " + dryRunResults.toString());
             context.assertEquals(1, dryRunResults.getResults().size());
@@ -192,14 +192,18 @@ public class PaymentSplitterContractTest extends BaseTest {
                             DryRunAccountModel.builder()
                                 .publicKey(baseKeyPair.getPublicKey())
                                 .build())
-                        .transaction(
-                            createUnsignedContractCallTx(
-                                baseKeyPair.getPublicKey(),
-                                getNextBaseKeypairNonce(),
-                                calldata,
-                                null,
-                                localDeployedContractId,
-                                paymentValue.toBigInteger())));
+                        .transactionInputItem(
+                            ContractCallTransactionModel.builder()
+                                .callData(calldata)
+                                .gas(BigInteger.valueOf(1579000))
+                                .contractId(localDeployedContractId)
+                                .gasPrice(BigInteger.valueOf(BaseConstants.MINIMAL_GAS_PRICE))
+                                .amount(paymentValue.toBigInteger())
+                                .nonce(getNextBaseKeypairNonce())
+                                .callerId(baseKeyPair.getPublicKey())
+                                .ttl(ZERO)
+                                .virtualMachine(targetVM)
+                                .build()));
 
             _logger.info("callContractAfterDryRunOnLocalNode: " + dryRunResults.toString());
             context.assertEquals(1, dryRunResults.getResults().size());
@@ -211,7 +215,13 @@ public class PaymentSplitterContractTest extends BaseTest {
                     .callData(calldata)
                     .contractId(localDeployedContractId)
                     .gas(dryRunResult.getContractCallObject().getGasUsed())
-                    .gasPrice(dryRunResult.getContractCallObject().getGasPrice())
+                    /**
+                     * the result delivers the default consensus gasPrice which is to low because
+                     * the tx is not added to the mempool, so we set the minimal gas price manually
+                     *
+                     * <p>.gasPrice(dryRunResult.getContractCallObject().getGasPrice())
+                     */
+                    .gasPrice(BigInteger.valueOf(BaseConstants.MINIMAL_GAS_PRICE))
                     .nonce(getNextBaseKeypairNonce())
                     .callerId(baseKeyPair.getPublicKey())
                     .ttl(BigInteger.ZERO)

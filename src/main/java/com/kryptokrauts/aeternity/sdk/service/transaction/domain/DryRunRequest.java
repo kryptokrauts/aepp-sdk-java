@@ -1,9 +1,11 @@
 package com.kryptokrauts.aeternity.sdk.service.transaction.domain;
 
 import com.kryptokrauts.aeternity.generated.model.DryRunInput;
-import com.kryptokrauts.aeternity.generated.model.DryRunInputItem;
+import com.kryptokrauts.aeternity.sdk.constants.BaseConstants;
 import com.kryptokrauts.aeternity.sdk.domain.GenericInputObject;
+import com.kryptokrauts.aeternity.sdk.service.transaction.type.model.ContractCallTransactionModel;
 import com.kryptokrauts.aeternity.sdk.util.ValidationUtil;
+import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
@@ -24,12 +26,12 @@ public class DryRunRequest extends GenericInputObject<DryRunInput> {
 
   @NonNull @Default private List<DryRunAccountModel> accounts = new LinkedList<>();
 
-  @NonNull @Default private List<DryRunInputItem> transactions = new LinkedList<>();
+  @NonNull @Default private List<DryRunInputItemModel> txInputs = new LinkedList<>();
 
   public DryRunInput mapToModel() {
     return new DryRunInput()
         .top(block)
-        .txs(transactions)
+        .txs(txInputs.stream().map(input -> input.toGeneratedModel()).collect(Collectors.toList()))
         .accounts(
             accounts.stream()
                 .map(account -> account.toGeneratedModel())
@@ -45,13 +47,13 @@ public class DryRunRequest extends GenericInputObject<DryRunInput> {
         Arrays.asList("accounts"),
         ValidationUtil.NO_ENTRIES);
     ValidationUtil.checkParameters(
-        validate -> Optional.ofNullable(this.transactions.size() > 0),
+        validate -> Optional.ofNullable(this.txInputs.size() > 0),
         this.accounts,
         "dryRunTransactions",
         Arrays.asList("unsignedTransactions"),
         ValidationUtil.NO_ENTRIES);
     ValidationUtil.checkParameters(
-        validate -> Optional.ofNullable(this.transactions.size() == this.accounts.size()),
+        validate -> Optional.ofNullable(this.txInputs.size() == this.accounts.size()),
         this.accounts,
         "dryRunTransactions",
         Arrays.asList("unsignedTransactions", "accounts"),
@@ -63,8 +65,50 @@ public class DryRunRequest extends GenericInputObject<DryRunInput> {
     return this;
   }
 
-  public DryRunRequest transaction(String unsignedTx) {
-    this.transactions.add(new DryRunInputItem().tx(unsignedTx));
+  /**
+   * Add transaction input item using custom model
+   *
+   * @param inputModel
+   * @return
+   */
+  public DryRunRequest transactionInputItem(DryRunInputItemModel inputModel) {
+    this.txInputs.add(inputModel);
+    return this;
+  }
+
+  /**
+   * Add transaction input item using unsigned tx string
+   *
+   * @param unsignedTx
+   * @return
+   */
+  public DryRunRequest transactionInputItem(String unsignedTx) {
+    this.txInputs.add(DryRunInputItemModel.builder().tx(unsignedTx).build());
+    return this;
+  }
+
+  /**
+   * Add transaction input item using contract call model
+   *
+   * @param contractCallModel
+   * @return
+   */
+  public DryRunRequest transactionInputItem(ContractCallTransactionModel contractCallModel) {
+    if (contractCallModel != null) {
+      this.txInputs.add(
+          DryRunInputItemModel.builder()
+              .callRequest(
+                  DryRunCallRequestModel.builder()
+                      .amount(contractCallModel.getAmount())
+                      .calldata(contractCallModel.getCallData())
+                      .caller(contractCallModel.getCallerId())
+                      .contract(contractCallModel.getContractId())
+                      .gas(BigInteger.valueOf(BaseConstants.MINIMAL_GAS_PRICE))
+                      .abiVersion(contractCallModel.getVirtualMachine().getAbiVersion())
+                      .nonce(contractCallModel.getNonce())
+                      .build())
+              .build());
+    }
     return this;
   }
 }
