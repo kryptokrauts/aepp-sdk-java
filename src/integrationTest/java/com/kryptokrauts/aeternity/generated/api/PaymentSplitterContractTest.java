@@ -216,8 +216,8 @@ public class PaymentSplitterContractTest extends BaseTest {
                     .contractId(localDeployedContractId)
                     .gas(dryRunResult.getContractCallObject().getGasUsed())
                     /**
-                     * the result currently contains a too low gasPrice, so we set the minimal gas
-                     * price manually
+                     * the result delivers the default consensus gasPrice which is to low because
+                     * the tx is not added to the mempool, so we set the minimal gas price manually
                      *
                      * <p>.gasPrice(dryRunResult.getContractCallObject().getGasPrice())
                      */
