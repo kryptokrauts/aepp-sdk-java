@@ -47,7 +47,7 @@ public class ServiceConfiguration {
 
   @Default @Nonnull protected String baseUrl = BaseConstants.DEFAULT_TESTNET_URL;
 
-  @Default @Nonnull protected String contractBaseUrl = BaseConstants.DEFAULT_TESTNET_CONTRACT_URL;
+  @Default @Nonnull protected String compilerBaseUrl = BaseConstants.DEFAULT_TESTNET_COMPILER_URL;
 
   @Getter @Default @Nonnull protected VirtualMachine targetVM = VirtualMachine.FATE;
 
@@ -71,7 +71,7 @@ public class ServiceConfiguration {
                   ImmutableMap.of(BaseConstants.VERTX_BASE_PATH, baseUrl))));
     } else
       throw new RuntimeException(
-          "Cannot intantiate ApiClient due to missing params vertx and or baseUrl");
+          "Cannot instantiate ApiClient due to missing params vertx and or baseUrl");
   }
 
   public com.kryptokrauts.sophia.compiler.generated.ApiClient getCompilerApiClient() {
@@ -79,15 +79,15 @@ public class ServiceConfiguration {
       _logger.debug("Vertx entry point not initialized, creating default");
       vertx = Vertx.vertx();
     }
-    if (vertx != null && contractBaseUrl != null) {
+    if (vertx != null && compilerBaseUrl != null) {
       _logger.debug(
           String.format(
-              "Initializing Vertx CompilerApiClient using contractBaseUrl %s", contractBaseUrl));
+              "Initializing Vertx CompilerApiClient using compilerBaseUrl %s", compilerBaseUrl));
       return new com.kryptokrauts.sophia.compiler.generated.ApiClient(
           vertx,
           new JsonObject(
               new HashMap<String, Object>(
-                  ImmutableMap.of(BaseConstants.VERTX_BASE_PATH, contractBaseUrl))));
+                  ImmutableMap.of(BaseConstants.VERTX_BASE_PATH, compilerBaseUrl))));
     } else
       throw new RuntimeException(
           "Cannot intantiate ApiClient due to missing params vertx and or contractBaseUrl");

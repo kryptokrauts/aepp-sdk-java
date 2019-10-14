@@ -79,7 +79,7 @@ public abstract class BaseTest {
             .getService(
                 AeternityServiceConfiguration.configure()
                     .baseUrl(getAeternityBaseUrl())
-                    .contractBaseUrl(getCompilerBaseUrl())
+                    .compilerBaseUrl(getCompilerBaseUrl())
                     .network(Network.DEVNET)
                     .nativeMode(true)
                     .baseKeyPair(baseKeyPair)
@@ -91,7 +91,7 @@ public abstract class BaseTest {
             .getService(
                 AeternityServiceConfiguration.configure()
                     .baseUrl(getAeternityBaseUrl())
-                    .contractBaseUrl(getCompilerBaseUrl())
+                    .compilerBaseUrl(getCompilerBaseUrl())
                     .network(Network.DEVNET)
                     .nativeMode(false)
                     .baseKeyPair(baseKeyPair)
