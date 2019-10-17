@@ -8,8 +8,6 @@ import com.kryptokrauts.aeternity.sdk.service.transaction.type.AbstractTransacti
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.model.NameUpdateTransactionModel;
 import com.kryptokrauts.aeternity.sdk.util.EncodingUtils;
 import io.reactivex.Single;
-import java.util.HashMap;
-import java.util.Map;
 import lombok.NonNull;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;

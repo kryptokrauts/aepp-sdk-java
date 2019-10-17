@@ -309,11 +309,12 @@ public class TransactionNameServiceTest extends BaseTest {
                     .nonce(getNextBaseKeypairNonce())
                     .ttl(ZERO)
                     .build();
-            BigInteger firstNameFee = nameClaimTx.getNameFee();
-            _logger.info("first nameFee: {} ættos", firstNameFee);
+            BigInteger currentNameFee = nameClaimTx.getNameFee();
+            _logger.info("current nameFee: {} ættos", currentNameFee);
             _logger.info(
-                "first nameFee: {} Æ",
-                UnitConversionUtil.fromAettos(firstNameFee.toString(), UnitConversionUtil.Unit.AE));
+                "current nameFee: {} Æ",
+                UnitConversionUtil.fromAettos(
+                    currentNameFee.toString(), UnitConversionUtil.Unit.AE));
             PostTransactionResult nameClaimResult = this.postTx(nameClaimTx);
             _logger.info(
                 String.format(
@@ -333,11 +334,7 @@ public class TransactionNameServiceTest extends BaseTest {
                 nameIdResult,
                 nameClaimResult.getTxHash());
 
-            BigInteger nextNameFee =
-                firstNameFee
-                    .divide(BigInteger.valueOf(100))
-                    .multiply(BigInteger.valueOf(6))
-                    .add(firstNameFee);
+            BigInteger nextNameFee = AENS.getNextNameFee(currentNameFee);
             _logger.info("next nameFee: {} ættos", nextNameFee);
             _logger.info(
                 "next nameFee: {} Æ",
@@ -391,9 +388,10 @@ public class TransactionNameServiceTest extends BaseTest {
                 transactionResult.getBlockHeight().add(AENS.getBlockTimeout(domain));
             _logger.info("claim will be final at block {}", finalBlockHeight);
             // TODO we want to wait here
-//            waitForBlockHeight(finalBlockHeight);
-//            nameIdResult = this.aeternityServiceNative.names.blockingGetNameId(domain);
-//            context.assertTrue(nameIdResult.getRootErrorMessage() == null);
+            //            waitForBlockHeight(finalBlockHeight);
+            //            nameIdResult =
+            // this.aeternityServiceNative.names.blockingGetNameId(domain);
+            //            context.assertTrue(nameIdResult.getRootErrorMessage() == null);
             _logger.info("--------------------- auctionTest ---------------------");
           } catch (Throwable e) {
             context.fail(e);

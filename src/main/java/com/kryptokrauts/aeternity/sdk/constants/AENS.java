@@ -62,14 +62,14 @@ public interface AENS {
       };
 
   Map<String, Integer> POINTER_SERIALIZATION_MAP =
-          new HashMap<String, Integer>() {
-            {
-              put(AENS.POINTER_KEY_ACCOUNT, SerializationTags.ID_TAG_ACCOUNT);
-              put(AENS.POINTER_KEY_ORACLE, SerializationTags.ID_TAG_ORACLE);
-              put(AENS.POINTER_KEY_CONTRACT, SerializationTags.ID_TAG_CONTRACT);
-              put(AENS.POINTER_KEY_CHANNEL, SerializationTags.ID_TAG_CHANNEL);
-            }
-          };
+      new HashMap<String, Integer>() {
+        {
+          put(AENS.POINTER_KEY_ACCOUNT, SerializationTags.ID_TAG_ACCOUNT);
+          put(AENS.POINTER_KEY_ORACLE, SerializationTags.ID_TAG_ORACLE);
+          put(AENS.POINTER_KEY_CONTRACT, SerializationTags.ID_TAG_CONTRACT);
+          put(AENS.POINTER_KEY_CHANNEL, SerializationTags.ID_TAG_CHANNEL);
+        }
+      };
 
   /**
    * returns the time that is needed to wait until a claim becomes final for a given domain <br>
@@ -99,5 +99,19 @@ public interface AENS {
       default:
         return BigInteger.ZERO;
     }
+  }
+
+  /**
+   * returns the nameFee which is required for the next claim based on the current nameFee <br>
+   * the next nameFee is 5% higher than the current nameFee
+   *
+   * @param currentNameFee the nameFee of the current claim
+   * @return the nameFee which is required for the next claim
+   */
+  static BigInteger getNextNameFee(BigInteger currentNameFee) {
+    return currentNameFee
+        .divide(BigInteger.valueOf(100))
+        .multiply(BigInteger.valueOf(5))
+        .add(currentNameFee);
   }
 }
