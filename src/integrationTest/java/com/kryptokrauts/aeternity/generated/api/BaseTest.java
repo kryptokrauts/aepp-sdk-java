@@ -195,6 +195,15 @@ public abstract class BaseTest {
     return minedTx;
   }
 
+  protected void waitForBlockHeight(BigInteger blockHeight) throws Throwable {
+    BigInteger currentBlockHeight = BigInteger.ZERO;
+    while (currentBlockHeight.compareTo(blockHeight) == -1) {
+      currentBlockHeight = aeternityServiceNative.info.blockingGetCurrentKeyBlock().getHeight();
+      _logger.info("current blockHeight: {}", currentBlockHeight);
+      Thread.sleep(1000);
+    }
+  }
+
   protected String encodeCalldata(
       String contractSourceCode, String contractFunction, List<String> contractFunctionParams) {
     return this.aeternityServiceNative.compiler.blockingEncodeCalldata(

@@ -2,6 +2,7 @@ package com.kryptokrauts.aeternity.sdk.service.transaction.type.impl;
 
 import com.kryptokrauts.aeternity.generated.api.rxjava.ExternalApi;
 import com.kryptokrauts.aeternity.generated.model.UnsignedTx;
+import com.kryptokrauts.aeternity.sdk.constants.AENS;
 import com.kryptokrauts.aeternity.sdk.constants.SerializationTags;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.AbstractTransaction;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.model.NameUpdateTransactionModel;
@@ -20,16 +21,6 @@ import org.apache.tuweni.rlp.RLP;
 public class NameUpdateTransaction extends AbstractTransaction<NameUpdateTransactionModel> {
 
   @NonNull private ExternalApi externalApi;
-
-  public static Map<String, Integer> pointerSerializationMap =
-      new HashMap<String, Integer>() {
-        {
-          put(NameUpdateTransactionModel.POINTER_KEY_ACCOUNT, SerializationTags.ID_TAG_ACCOUNT);
-          put(NameUpdateTransactionModel.POINTER_KEY_ORACLE, SerializationTags.ID_TAG_ORACLE);
-          put(NameUpdateTransactionModel.POINTER_KEY_CONTRACT, SerializationTags.ID_TAG_CONTRACT);
-          put(NameUpdateTransactionModel.POINTER_KEY_CHANNEL, SerializationTags.ID_TAG_CHANNEL);
-        }
-      };
 
   @Override
   protected Single<UnsignedTx> createInternal() {
@@ -61,7 +52,7 @@ public class NameUpdateTransaction extends AbstractTransaction<NameUpdateTransac
                           byte[] pointerWithTag =
                               EncodingUtils.decodeCheckAndTag(
                                   namePointer.getId(),
-                                  pointerSerializationMap.get(namePointer.getKey()));
+                                  AENS.POINTER_SERIALIZATION_MAP.get(namePointer.getKey()));
                           innerWriter.writeByteArray(pointerWithTag);
                         });
                   });

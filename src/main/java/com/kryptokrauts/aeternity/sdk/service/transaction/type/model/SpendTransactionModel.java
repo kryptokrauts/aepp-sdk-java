@@ -9,20 +9,12 @@ import java.math.BigInteger;
 import java.util.function.Function;
 import lombok.Builder.Default;
 import lombok.Getter;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
-/**
- * this class describes the input values of a spend transaction
- *
- * @param sender senders public key
- * @param recipient recipients public key
- * @param amount ættos to send
- * @param payload payload / message
- * @param ttl time to live (maximum height of a block to include the tx)
- * @param nonce senders nonce + 1
- */
 @Getter
 @SuperBuilder(toBuilder = true)
+@ToString
 public class SpendTransactionModel extends AbstractTransactionModel<SpendTx> {
   private String sender;
   private String recipient;
