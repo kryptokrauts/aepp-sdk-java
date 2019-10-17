@@ -176,8 +176,10 @@ public class TransactionNameServiceTest extends BaseTest {
             BigInteger clientTtl = BigInteger.valueOf(50l);
 
             String accountPointer = baseKeyPair.getPublicKey();
-            // fake contract-address
+            // fake other allowed pointers
             String contractPointer = baseKeyPair.getPublicKey().replace("ak_", "ct_");
+            String channelPointer = baseKeyPair.getPublicKey().replace("ak_", "ch_");
+            String oraclePointer = baseKeyPair.getPublicKey().replace("ak_", "ok_");
 
             NameUpdateTransactionModel nameUpdateTx =
                 NameUpdateTransactionModel.builder()
@@ -187,7 +189,9 @@ public class TransactionNameServiceTest extends BaseTest {
                     .ttl(ZERO)
                     .clientTtl(clientTtl)
                     .nameTtl(nameTtl)
-                    .pointerAddresses(Arrays.asList(accountPointer, contractPointer))
+                    .pointerAddresses(
+                        Arrays.asList(
+                            accountPointer, contractPointer, channelPointer, oraclePointer))
                     .build();
 
             PostTransactionResult nameUpdateResult = this.postTx(nameUpdateTx);
@@ -201,6 +205,10 @@ public class TransactionNameServiceTest extends BaseTest {
                     "Updated namespace %s with salt %s and nameEntry %s in tx %s for update test",
                     domain, salt, nameIdResult, nameUpdateResult.getTxHash()));
 
+            context.assertEquals(accountPointer, nameIdResult.getAccountPointer().get());
+            context.assertEquals(channelPointer, nameIdResult.getChannelPointer().get());
+            context.assertEquals(contractPointer, nameIdResult.getContractPointer().get());
+            context.assertEquals(oraclePointer, nameIdResult.getOraclePointer().get());
             BigInteger updatedTTL = nameIdResult.getTtl();
             // subtract 40000 because initial default ttl is 50000 and updated ttl was 10000
             int diffTtl = initialTTL.subtract(updatedTTL).intValue();

@@ -10,9 +10,9 @@ import org.junit.jupiter.api.Assertions;
 public class ValidationUtilTest extends BaseTest {
   {
     String domainTooLong =
-        "kryptokrautskryptokrautskryptokrautskryptokrautskryptokrautskryptokrautskryptokrautskryptokrautskryptokrautskryptokrautskryptokrautskryptokrautskryptokrautskryptokrautskryptokrautskryptokrautskryptokrautskryptokrautskryptokrautskryptokrautskryptokrau.aet";
+        "kryptokrautskryptokrautskryptokrautskryptokrautskryptokrautskryptokrautskryptokrautskryptokrautskryptokrautskryptokrautskryptokrautskryptokrautskryptokrautskryptokrautskryptokrautskryptokrautskryptokrautskryptokrautskryptokrautskryptokrautskryptokr.chain";
     String domainMaxAllowedLength =
-        "kryptokrautskryptokrautskryptokrautskryptokrautskryptokrautskryptokrautskryptokrautskryptokrautskryptokrautskryptokrautskryptokrautskryptokrautskryptokrautskryptokrautskryptokrautskryptokrautskryptokrautskryptokrautskryptokrautskryptokrautskryptokra.aet";
+        "kryptokrautskryptokrautskryptokrautskryptokrautskryptokrautskryptokrautskryptokrautskryptokrautskryptokrautskryptokrautskryptokrautskryptokrautskryptokrautskryptokrautskryptokrautskryptokrautskryptokrautskryptokrautskryptokrautskryptokrautskryptok.chain";
 
     describe(
         "AENS Naming System",
@@ -25,9 +25,9 @@ public class ValidationUtilTest extends BaseTest {
                     InvalidParameterException.class, () -> ValidationUtil.checkNamespace(domain));
               });
           it(
-              "kryptokrauts.aet is valid",
+              "kryptokrauts.chain is valid",
               () -> {
-                String domain = "kryptokrauts.aet";
+                String domain = "kryptokrauts.chain";
                 Assertions.assertDoesNotThrow(() -> ValidationUtil.checkNamespace(domain));
               });
           it(
