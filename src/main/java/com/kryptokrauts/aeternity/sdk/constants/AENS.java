@@ -1,6 +1,8 @@
 package com.kryptokrauts.aeternity.sdk.constants;
 
+import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.math.RoundingMode;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -109,9 +111,12 @@ public interface AENS {
    * @return the nameFee which is required for the next claim
    */
   static BigInteger getNextNameFee(BigInteger currentNameFee) {
-    return currentNameFee
-        .divide(BigInteger.valueOf(100))
-        .multiply(BigInteger.valueOf(5))
-        .add(currentNameFee);
+    BigDecimal nameFee = new BigDecimal(currentNameFee);
+    return new BigDecimal(currentNameFee)
+        .divide(BigDecimal.valueOf(100))
+        .multiply(BigDecimal.valueOf(5))
+        .add(nameFee)
+        .setScale(2, RoundingMode.HALF_UP)
+        .toBigInteger();
   }
 }
