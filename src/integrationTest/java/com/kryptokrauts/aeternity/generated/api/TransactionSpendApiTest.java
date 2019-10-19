@@ -87,10 +87,14 @@ public class TransactionSpendApiTest extends BaseTest {
 
           PostTransactionResult txResponse =
               aeternityServiceNative.transactions.blockingPostTransaction(spendTx);
-
           _logger.info("SpendTx hash: " + txResponse.getTxHash());
           context.assertEquals(
               txResponse.getTxHash(), aeternityServiceNative.transactions.computeTxHash(spendTx));
+          try {
+            waitForTxMined(txResponse.getTxHash());
+          } catch (Throwable e) {
+            context.fail(e);
+          }
         });
   }
 
@@ -134,6 +138,11 @@ public class TransactionSpendApiTest extends BaseTest {
           _logger.info("SpendTx hash: " + txResponse.getTxHash());
           context.assertEquals(
               txResponse.getTxHash(), aeternityServiceNative.transactions.computeTxHash(spendTx));
+          try {
+            waitForTxMined(txResponse.getTxHash());
+          } catch (Throwable e) {
+            context.fail(e);
+          }
         });
   }
 
@@ -144,12 +153,10 @@ public class TransactionSpendApiTest extends BaseTest {
         context,
         t -> {
           try {
-            AccountResult acc =
-                this.aeternityServiceNative.accounts.blockingGetAccount(Optional.empty());
             BaseKeyPair recipient = keyPairService.generateBaseKeyPair();
             SpendTransactionModel spendTx =
                 SpendTransactionModel.builder()
-                    .sender(acc.getPublicKey())
+                    .sender(this.baseKeyPair.getPublicKey())
                     .recipient(recipient.getPublicKey())
                     .amount(new BigInteger("1000000000000000000"))
                     .payload("donation")
@@ -162,6 +169,62 @@ public class TransactionSpendApiTest extends BaseTest {
             waitForTxMined(txResponse.getTxHash());
             context.assertEquals(
                 txResponse.getTxHash(), aeternityServiceNative.transactions.computeTxHash(spendTx));
+          } catch (Throwable e) {
+            context.fail(e);
+          }
+        });
+  }
+
+  @Test
+  public void postSpendTxWithModelAndPK(TestContext context)
+      throws CryptoException, TransactionCreateException {
+    this.executeTest(
+        context,
+        t -> {
+          try {
+            BaseKeyPair recipient = keyPairService.generateBaseKeyPair();
+            SpendTransactionModel spendTx =
+                SpendTransactionModel.builder()
+                    .sender(this.baseKeyPair.getPublicKey())
+                    .recipient(recipient.getPublicKey())
+                    .amount(new BigInteger("1000000000000000000"))
+                    .payload("donation")
+                    .ttl(ZERO)
+                    .nonce(getNextBaseKeypairNonce())
+                    .build();
+            PostTransactionResult txResponse =
+                aeternityServiceNative.transactions.blockingPostTransaction(spendTx);
+            _logger.info("SpendTx hash: " + txResponse.getTxHash());
+            waitForTxMined(txResponse.getTxHash());
+            AccountResult recipientAccount =
+                this.aeternityServiceNative.accounts.blockingGetAccount(
+                    Optional.of(recipient.getPublicKey()));
+            _logger.info("Account result for recipient {}", recipientAccount);
+            // now send amount back
+            long recipientAccountBalance = recipientAccount.getBalance().longValue();
+            long recipientAccountSendAmount = 10000000l;
+            spendTx =
+                SpendTransactionModel.builder()
+                    .sender(recipient.getPublicKey())
+                    .recipient(baseKeyPair.getPublicKey())
+                    .amount(BigInteger.valueOf(recipientAccountSendAmount))
+                    .nonce(recipientAccount.getNonce().add(ONE))
+                    .ttl(ZERO)
+                    .build();
+            _logger.info("Sending back {}", spendTx);
+            txResponse =
+                aeternityServiceNative.transactions.blockingPostTransaction(
+                    spendTx, recipient.getPrivateKey());
+            _logger.info("SpendTx hash: " + txResponse.getTxHash());
+            waitForTxMined(txResponse.getTxHash());
+            recipientAccount =
+                this.aeternityServiceNative.accounts.blockingGetAccount(
+                    Optional.of(recipient.getPublicKey()));
+            context.assertEquals(
+                recipientAccount.getBalance().longValue(),
+                recipientAccountBalance
+                    - recipientAccountSendAmount
+                    - spendTx.getFee().longValue());
           } catch (Throwable e) {
             context.fail(e);
           }
