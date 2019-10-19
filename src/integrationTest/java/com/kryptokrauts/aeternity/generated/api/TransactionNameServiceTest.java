@@ -86,7 +86,7 @@ public class TransactionNameServiceTest extends BaseTest {
                     .ttl(ZERO)
                     .build();
 
-            PostTransactionResult result = this.postTx(namePreclaimTx);
+            PostTransactionResult result = this.blockingPostTx(namePreclaimTx, Optional.empty());
             _logger.info("NamePreclaimTx hash: " + result.getTxHash());
             context.assertEquals(
                 result.getTxHash(),
@@ -105,7 +105,7 @@ public class TransactionNameServiceTest extends BaseTest {
                 this.aeternityServiceNative.transactions.blockingCreateUnsignedTransaction(
                     nameClaimTx));
 
-            result = this.postTx(nameClaimTx);
+            result = this.blockingPostTx(nameClaimTx, Optional.empty());
             _logger.info(
                 String.format(
                     "Using namespace %s and salt %s for committmentId %s",
@@ -148,7 +148,8 @@ public class TransactionNameServiceTest extends BaseTest {
                     .ttl(ZERO)
                     .build();
 
-            PostTransactionResult namePreclaimResult = this.postTx(namePreclaimTx);
+            PostTransactionResult namePreclaimResult =
+                this.blockingPostTx(namePreclaimTx, Optional.empty());
             _logger.info("NamePreclaimTx hash: " + namePreclaimResult.getTxHash());
 
             context.assertEquals(
@@ -163,7 +164,8 @@ public class TransactionNameServiceTest extends BaseTest {
                     .nonce(getNextBaseKeypairNonce())
                     .ttl(ZERO)
                     .build();
-            PostTransactionResult nameClaimResult = this.postTx(nameClaimTx);
+            PostTransactionResult nameClaimResult =
+                this.blockingPostTx(nameClaimTx, Optional.empty());
             _logger.info(
                 String.format(
                     "Using namespace %s and salt %s for committmentId %s",
@@ -200,7 +202,8 @@ public class TransactionNameServiceTest extends BaseTest {
                             accountPointer, contractPointer, channelPointer, oraclePointer))
                     .build();
 
-            PostTransactionResult nameUpdateResult = this.postTx(nameUpdateTx);
+            PostTransactionResult nameUpdateResult =
+                this.blockingPostTx(nameUpdateTx, Optional.empty());
 
             context.assertEquals(
                 nameUpdateResult.getTxHash(),
@@ -255,7 +258,8 @@ public class TransactionNameServiceTest extends BaseTest {
                     .ttl(ZERO)
                     .build();
 
-            PostTransactionResult nameRevokeResult = this.postTx(nameRevokeTx);
+            PostTransactionResult nameRevokeResult =
+                this.blockingPostTx(nameRevokeTx, Optional.empty());
             _logger.info("NameRevokeTx hash: " + nameRevokeResult.getTxHash());
 
             context.assertEquals(
