@@ -6,7 +6,11 @@ import com.kryptokrauts.aeternity.sdk.service.account.domain.AccountResult;
 import com.kryptokrauts.aeternity.sdk.service.info.domain.TransactionResult;
 import com.kryptokrauts.aeternity.sdk.service.name.domain.NameIdResult;
 import com.kryptokrauts.aeternity.sdk.service.transaction.domain.PostTransactionResult;
-import com.kryptokrauts.aeternity.sdk.service.transaction.type.model.*;
+import com.kryptokrauts.aeternity.sdk.service.transaction.type.model.NameClaimTransactionModel;
+import com.kryptokrauts.aeternity.sdk.service.transaction.type.model.NamePreclaimTransactionModel;
+import com.kryptokrauts.aeternity.sdk.service.transaction.type.model.NameRevokeTransactionModel;
+import com.kryptokrauts.aeternity.sdk.service.transaction.type.model.NameUpdateTransactionModel;
+import com.kryptokrauts.aeternity.sdk.service.transaction.type.model.SpendTransactionModel;
 import com.kryptokrauts.aeternity.sdk.util.CryptoUtils;
 import com.kryptokrauts.aeternity.sdk.util.EncodingUtils;
 import com.kryptokrauts.aeternity.sdk.util.UnitConversionUtil;
@@ -197,6 +201,7 @@ public class TransactionNameServiceTest extends BaseTest {
                     .build();
 
             PostTransactionResult nameUpdateResult = this.postTx(nameUpdateTx);
+
             context.assertEquals(
                 nameUpdateResult.getTxHash(),
                 this.aeternityServiceNative.transactions.computeTxHash(nameUpdateTx));
@@ -374,24 +379,20 @@ public class TransactionNameServiceTest extends BaseTest {
                     .nameFee(nextNameFee)
                     .nameSalt(BigInteger.ZERO)
                     .build();
-            String unsignedClaimTx =
-                this.aeternityServiceNative.transactions.blockingCreateUnsignedTransaction(
-                    nextNameClaimTx);
-            String signedClaimTx =
-                this.aeternityServiceNative.transactions.signTransaction(
-                    unsignedClaimTx, kpNextClaimer.getPrivateKey());
+
             PostTransactionResult result =
-                this.aeternityServiceNative.transactions.blockingPostTransaction(signedClaimTx);
+                this.aeternityServiceNative.transactions.blockingPostTransaction(
+                    nextNameClaimTx, kpNextClaimer.getPrivateKey());
             TransactionResult transactionResult = waitForTxMined(result.getTxHash());
             _logger.info("next claimTx result: {}", transactionResult);
             BigInteger finalBlockHeight =
                 transactionResult.getBlockHeight().add(AENS.getBlockTimeout(domain));
             _logger.info("claim will be final at block {}", finalBlockHeight);
             // TODO we want to wait here
-            //            waitForBlockHeight(finalBlockHeight);
-            //            nameIdResult =
+            // waitForBlockHeight(finalBlockHeight);
+            // nameIdResult =
             // this.aeternityServiceNative.names.blockingGetNameId(domain);
-            //            context.assertTrue(nameIdResult.getRootErrorMessage() == null);
+            // context.assertTrue(nameIdResult.getRootErrorMessage() == null);
             _logger.info("--------------------- auctionTest ---------------------");
           } catch (Throwable e) {
             context.fail(e);
