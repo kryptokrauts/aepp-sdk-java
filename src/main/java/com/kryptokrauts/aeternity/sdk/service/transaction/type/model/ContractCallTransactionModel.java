@@ -11,10 +11,12 @@ import java.math.BigInteger;
 import java.util.function.Function;
 import lombok.Builder.Default;
 import lombok.Getter;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
 @Getter
 @SuperBuilder(toBuilder = true)
+@ToString
 public class ContractCallTransactionModel extends AbstractTransactionModel<ContractCallTx> {
 
   @Default private BigInteger amount = BigInteger.ZERO;

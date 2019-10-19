@@ -1,5 +1,8 @@
 package com.kryptokrauts.aeternity.generated.api;
 
+import com.kryptokrauts.aeternity.sdk.constants.AENS;
+import com.kryptokrauts.aeternity.sdk.domain.secret.impl.BaseKeyPair;
+import com.kryptokrauts.aeternity.sdk.service.account.domain.AccountResult;
 import com.kryptokrauts.aeternity.sdk.service.info.domain.TransactionResult;
 import com.kryptokrauts.aeternity.sdk.service.name.domain.NameIdResult;
 import com.kryptokrauts.aeternity.sdk.service.transaction.domain.PostTransactionResult;
@@ -7,11 +10,14 @@ import com.kryptokrauts.aeternity.sdk.service.transaction.type.model.NameClaimTr
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.model.NamePreclaimTransactionModel;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.model.NameRevokeTransactionModel;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.model.NameUpdateTransactionModel;
+import com.kryptokrauts.aeternity.sdk.service.transaction.type.model.SpendTransactionModel;
 import com.kryptokrauts.aeternity.sdk.util.CryptoUtils;
 import com.kryptokrauts.aeternity.sdk.util.EncodingUtils;
+import com.kryptokrauts.aeternity.sdk.util.UnitConversionUtil;
 import io.vertx.ext.unit.TestContext;
 import java.math.BigInteger;
 import java.util.Arrays;
+import java.util.Optional;
 import java.util.Random;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
@@ -80,7 +86,7 @@ public class TransactionNameServiceTest extends BaseTest {
                     .ttl(ZERO)
                     .build();
 
-            PostTransactionResult result = this.postTx(namePreclaimTx);
+            PostTransactionResult result = this.blockingPostTx(namePreclaimTx, Optional.empty());
             _logger.info("NamePreclaimTx hash: " + result.getTxHash());
             context.assertEquals(
                 result.getTxHash(),
@@ -99,7 +105,7 @@ public class TransactionNameServiceTest extends BaseTest {
                 this.aeternityServiceNative.transactions.blockingCreateUnsignedTransaction(
                     nameClaimTx));
 
-            result = this.postTx(nameClaimTx);
+            result = this.blockingPostTx(nameClaimTx, Optional.empty());
             _logger.info(
                 String.format(
                     "Using namespace %s and salt %s for committmentId %s",
@@ -142,7 +148,8 @@ public class TransactionNameServiceTest extends BaseTest {
                     .ttl(ZERO)
                     .build();
 
-            PostTransactionResult namePreclaimResult = this.postTx(namePreclaimTx);
+            PostTransactionResult namePreclaimResult =
+                this.blockingPostTx(namePreclaimTx, Optional.empty());
             _logger.info("NamePreclaimTx hash: " + namePreclaimResult.getTxHash());
 
             context.assertEquals(
@@ -157,7 +164,8 @@ public class TransactionNameServiceTest extends BaseTest {
                     .nonce(getNextBaseKeypairNonce())
                     .ttl(ZERO)
                     .build();
-            PostTransactionResult nameClaimResult = this.postTx(nameClaimTx);
+            PostTransactionResult nameClaimResult =
+                this.blockingPostTx(nameClaimTx, Optional.empty());
             _logger.info(
                 String.format(
                     "Using namespace %s and salt %s for committmentId %s",
@@ -194,7 +202,9 @@ public class TransactionNameServiceTest extends BaseTest {
                             accountPointer, contractPointer, channelPointer, oraclePointer))
                     .build();
 
-            PostTransactionResult nameUpdateResult = this.postTx(nameUpdateTx);
+            PostTransactionResult nameUpdateResult =
+                this.blockingPostTx(nameUpdateTx, Optional.empty());
+
             context.assertEquals(
                 nameUpdateResult.getTxHash(),
                 this.aeternityServiceNative.transactions.computeTxHash(nameUpdateTx));
@@ -248,7 +258,8 @@ public class TransactionNameServiceTest extends BaseTest {
                     .ttl(ZERO)
                     .build();
 
-            PostTransactionResult nameRevokeResult = this.postTx(nameRevokeTx);
+            PostTransactionResult nameRevokeResult =
+                this.blockingPostTx(nameRevokeTx, Optional.empty());
             _logger.info("NameRevokeTx hash: " + nameRevokeResult.getTxHash());
 
             context.assertEquals(
@@ -262,6 +273,133 @@ public class TransactionNameServiceTest extends BaseTest {
             _logger.info(String.format("Validated, that namespace %s is revoked", validDomain));
 
             _logger.info("--------------------- postRevokeTxTest ---------------------");
+          } catch (Throwable e) {
+            context.fail(e);
+          }
+        });
+  }
+
+  /**
+   * @param context
+   * @throws Throwable
+   */
+  @Test
+  public void auctionTest(TestContext context) {
+    this.executeTest(
+        context,
+        t -> {
+          try {
+            _logger.info("--------------------- auctionTest ---------------------");
+            BigInteger salt = CryptoUtils.generateNamespaceSalt();
+            String domain = "auction" + (random.nextInt(900) + 100) + TestConstants.NAMESPACE;
+
+            /** create a new namespace to update later */
+            NamePreclaimTransactionModel namePreclaimTx =
+                NamePreclaimTransactionModel.builder()
+                    .accountId(baseKeyPair.getPublicKey())
+                    .name(domain)
+                    .salt(salt)
+                    .nonce(getNextBaseKeypairNonce())
+                    .ttl(ZERO)
+                    .build();
+
+            PostTransactionResult namePreclaimResult =
+                this.blockingPostTx(namePreclaimTx, Optional.empty());
+            _logger.info("NamePreclaimTx hash: {}", namePreclaimResult.getTxHash());
+
+            context.assertEquals(
+                namePreclaimResult.getTxHash(),
+                this.aeternityServiceNative.transactions.computeTxHash(namePreclaimTx));
+
+            NameClaimTransactionModel nameClaimTx =
+                NameClaimTransactionModel.builder()
+                    .accountId(baseKeyPair.getPublicKey())
+                    .name(domain)
+                    .nameSalt(salt)
+                    .nonce(getNextBaseKeypairNonce())
+                    .ttl(ZERO)
+                    .build();
+            BigInteger currentNameFee = nameClaimTx.getNameFee();
+            _logger.info("current nameFee: {} ættos", currentNameFee);
+            _logger.info(
+                "current nameFee: {} Æ",
+                UnitConversionUtil.fromAettos(
+                    currentNameFee.toString(), UnitConversionUtil.Unit.AE));
+            PostTransactionResult nameClaimResult =
+                this.blockingPostTx(nameClaimTx, Optional.empty());
+            _logger.info(
+                String.format(
+                    "Using namespace %s and salt %s for committmentId %s",
+                    domain, salt, EncodingUtils.generateCommitmentHash(domain, salt)));
+            _logger.info("NameClaimTx hash: {}", nameClaimResult.getTxHash());
+
+            /** name cannot be found due to running auction */
+            NameIdResult nameIdResult = this.aeternityServiceNative.names.blockingGetNameId(domain);
+            context.assertTrue(
+                nameIdResult.getRootErrorMessage() != null
+                    && nameIdResult.getRootErrorMessage().contains("Name not found"));
+            _logger.info(
+                "Created namespace {} with salt {} and nameEntry {} in tx {} for update test",
+                domain,
+                salt,
+                nameIdResult,
+                nameClaimResult.getTxHash());
+
+            BigInteger nextNameFee = AENS.getNextNameFee(currentNameFee);
+            _logger.info("next nameFee: {} ættos", nextNameFee);
+            _logger.info(
+                "next nameFee: {} Æ",
+                UnitConversionUtil.fromAettos(nextNameFee.toString(), UnitConversionUtil.Unit.AE));
+
+            /** create and fund other account to claim the same name with nextNameFee */
+            AccountResult account =
+                this.aeternityServiceNative.accounts.blockingGetAccount(Optional.empty());
+            BaseKeyPair kpNextClaimer = keyPairService.generateBaseKeyPair();
+            String recipient = kpNextClaimer.getPublicKey();
+            BigInteger amount =
+                UnitConversionUtil.toAettos("50", UnitConversionUtil.Unit.AE).toBigInteger();
+            BigInteger nonce = account.getNonce().add(ONE);
+            SpendTransactionModel spendTx =
+                SpendTransactionModel.builder()
+                    .sender(account.getPublicKey())
+                    .recipient(recipient)
+                    .amount(amount)
+                    .ttl(ZERO)
+                    .nonce(nonce)
+                    .build();
+            PostTransactionResult txResponse =
+                aeternityServiceNative.transactions.blockingPostTransaction(spendTx);
+            _logger.info("SpendTx hash: " + txResponse.getTxHash());
+            context.assertEquals(
+                txResponse.getTxHash(), aeternityServiceNative.transactions.computeTxHash(spendTx));
+            waitForTxMined(txResponse.getTxHash());
+
+            /** get funded account and create next nameClaimTx */
+            AccountResult otherAccount =
+                this.aeternityServiceNative.accounts.blockingGetAccount(Optional.of(recipient));
+            NameClaimTransactionModel nextNameClaimTx =
+                nameClaimTx
+                    .toBuilder()
+                    .accountId(recipient)
+                    .nonce(otherAccount.getNonce().add(BigInteger.ONE))
+                    .nameFee(nextNameFee)
+                    .nameSalt(BigInteger.ZERO)
+                    .build();
+
+            PostTransactionResult result =
+                this.aeternityServiceNative.transactions.blockingPostTransaction(
+                    nextNameClaimTx, kpNextClaimer.getPrivateKey());
+            TransactionResult transactionResult = waitForTxMined(result.getTxHash());
+            _logger.info("next claimTx result: {}", transactionResult);
+            BigInteger finalBlockHeight =
+                transactionResult.getBlockHeight().add(AENS.getBlockTimeout(domain));
+            _logger.info("claim will be final at block {}", finalBlockHeight);
+            // TODO we want to wait here
+            // waitForBlockHeight(finalBlockHeight);
+            // nameIdResult =
+            // this.aeternityServiceNative.names.blockingGetNameId(domain);
+            // context.assertTrue(nameIdResult.getRootErrorMessage() == null);
+            _logger.info("--------------------- auctionTest ---------------------");
           } catch (Throwable e) {
             context.fail(e);
           }

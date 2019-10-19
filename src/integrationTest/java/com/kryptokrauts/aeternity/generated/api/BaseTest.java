@@ -148,6 +148,21 @@ public abstract class BaseTest {
         TransactionInfoResult.class);
   }
 
+  protected PostTransactionResult blockingPostTx(
+      AbstractTransactionModel<?> tx, Optional<String> privateKey) throws Throwable {
+    PostTransactionResult postTxResponse =
+        this.aeternityServiceNative.transactions.blockingPostTransaction(
+            tx, privateKey.orElse(this.baseKeyPair.getPrivateKey()));
+    _logger.info("PostTx hash: " + postTxResponse.getTxHash());
+    TransactionResult txValue = waitForTxMined(postTxResponse.getTxHash());
+    _logger.info(
+        String.format(
+            "Transaction of type %s is mined at block %s with height %s",
+            txValue.getTxType(), txValue.getBlockHash(), txValue.getBlockHeight()));
+
+    return postTxResponse;
+  }
+
   protected PostTransactionResult postTx(AbstractTransactionModel<?> tx) throws Throwable {
     PostTransactionResult postTxResponse =
         callMethodAndGetResult(
@@ -193,6 +208,15 @@ public abstract class BaseTest {
     }
 
     return minedTx;
+  }
+
+  protected void waitForBlockHeight(BigInteger blockHeight) throws Throwable {
+    BigInteger currentBlockHeight = BigInteger.ZERO;
+    while (currentBlockHeight.compareTo(blockHeight) == -1) {
+      currentBlockHeight = aeternityServiceNative.info.blockingGetCurrentKeyBlock().getHeight();
+      _logger.info("current blockHeight: {}", currentBlockHeight);
+      Thread.sleep(1000);
+    }
   }
 
   protected String encodeCalldata(

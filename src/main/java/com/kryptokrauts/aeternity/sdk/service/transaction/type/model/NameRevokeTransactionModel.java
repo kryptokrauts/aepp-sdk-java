@@ -13,10 +13,12 @@ import java.util.Arrays;
 import java.util.Optional;
 import java.util.function.Function;
 import lombok.Getter;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
 @Getter
 @SuperBuilder(toBuilder = true)
+@ToString
 public class NameRevokeTransactionModel extends AbstractTransactionModel<NameRevokeTx> {
 
   private String accountId;

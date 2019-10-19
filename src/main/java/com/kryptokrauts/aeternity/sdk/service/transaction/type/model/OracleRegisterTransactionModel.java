@@ -11,10 +11,12 @@ import com.kryptokrauts.sophia.compiler.generated.api.rxjava.DefaultApi;
 import java.math.BigInteger;
 import java.util.function.Function;
 import lombok.Getter;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
 @Getter
 @SuperBuilder(toBuilder = true)
+@ToString
 public class OracleRegisterTransactionModel extends AbstractTransactionModel<OracleRegisterTx> {
 
   private String accountId;

@@ -4,6 +4,7 @@ import com.kryptokrauts.aeternity.generated.api.rxjava.ExternalApi;
 import com.kryptokrauts.aeternity.generated.model.GenericTx;
 import com.kryptokrauts.aeternity.generated.model.NamePointer;
 import com.kryptokrauts.aeternity.generated.model.NameUpdateTx;
+import com.kryptokrauts.aeternity.sdk.constants.AENS;
 import com.kryptokrauts.aeternity.sdk.constants.ApiIdentifiers;
 import com.kryptokrauts.aeternity.sdk.exception.InvalidParameterException;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.AbstractTransaction;
@@ -17,30 +18,13 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import lombok.Builder.Default;
 import lombok.Getter;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
 @Getter
 @SuperBuilder(toBuilder = true)
+@ToString
 public class NameUpdateTransactionModel extends AbstractTransactionModel<NameUpdateTx> {
-
-  public static String POINTER_KEY_ACCOUNT = "account_pubkey";
-  public static String POINTER_KEY_CHANNEL = "channel";
-  public static String POINTER_KEY_CONTRACT = "contract_pubkey";
-  public static String POINTER_KEY_ORACLE = "oracle_pubkey";
-
-  private static Map<String, String> identifierToPointerKeyMap;
-
-  {
-    identifierToPointerKeyMap =
-        new HashMap<String, String>() {
-          {
-            put(ApiIdentifiers.ACCOUNT_PUBKEY, POINTER_KEY_ACCOUNT);
-            put(ApiIdentifiers.CHANNEL, POINTER_KEY_CHANNEL);
-            put(ApiIdentifiers.CONTRACT_PUBKEY, POINTER_KEY_CONTRACT);
-            put(ApiIdentifiers.ORACLE_PUBKEY, POINTER_KEY_ORACLE);
-          }
-        };
-  }
 
   private String accountId;
   private BigInteger nonce;
@@ -134,12 +118,12 @@ public class NameUpdateTransactionModel extends AbstractTransactionModel<NameUpd
   }
 
   private boolean isValidPointerAddress(String pointerAddress) {
-    return identifierToPointerKeyMap.keySet().contains(getIdentifier(pointerAddress));
+    return AENS.IDENTIFIER_TO_POINTERKEY_MAP.keySet().contains(getIdentifier(pointerAddress));
   }
 
   private NamePointer buildNamePointer(String pointerAddress) {
     return new NamePointer()
-        .key(identifierToPointerKeyMap.get(getIdentifier(pointerAddress)))
+        .key(AENS.IDENTIFIER_TO_POINTERKEY_MAP.get(getIdentifier(pointerAddress)))
         .id(pointerAddress);
   }
 
