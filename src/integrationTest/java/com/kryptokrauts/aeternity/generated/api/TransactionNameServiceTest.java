@@ -299,7 +299,8 @@ public class TransactionNameServiceTest extends BaseTest {
                     .ttl(ZERO)
                     .build();
 
-            PostTransactionResult namePreclaimResult = this.postTx(namePreclaimTx);
+            PostTransactionResult namePreclaimResult =
+                this.blockingPostTx(namePreclaimTx, Optional.empty());
             _logger.info("NamePreclaimTx hash: {}", namePreclaimResult.getTxHash());
 
             context.assertEquals(
@@ -320,7 +321,8 @@ public class TransactionNameServiceTest extends BaseTest {
                 "current nameFee: {} Æ",
                 UnitConversionUtil.fromAettos(
                     currentNameFee.toString(), UnitConversionUtil.Unit.AE));
-            PostTransactionResult nameClaimResult = this.postTx(nameClaimTx);
+            PostTransactionResult nameClaimResult =
+                this.blockingPostTx(nameClaimTx, Optional.empty());
             _logger.info(
                 String.format(
                     "Using namespace %s and salt %s for committmentId %s",
