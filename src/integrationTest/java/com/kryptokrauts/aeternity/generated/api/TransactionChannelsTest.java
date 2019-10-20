@@ -9,6 +9,7 @@ import com.kryptokrauts.aeternity.sdk.util.UnitConversionUtil;
 import com.kryptokrauts.aeternity.sdk.util.UnitConversionUtil.Unit;
 import io.vertx.ext.unit.TestContext;
 import java.math.BigInteger;
+import java.util.Optional;
 import org.junit.Before;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
@@ -31,19 +32,22 @@ public class TransactionChannelsTest extends BaseTest {
     this.executeTest(
         context,
         t -> {
-          BigInteger amount = UnitConversionUtil.toAettos("10", Unit.AE).toBigInteger();
-          SpendTransactionModel spendTx =
-              SpendTransactionModel.builder()
-                  .sender(initiator.getPublicKey())
-                  .recipient(responder.getPublicKey())
-                  .amount(amount)
-                  .payload("")
-                  .ttl(ZERO)
-                  .nonce(getNextBaseKeypairNonce())
-                  .build();
-          PostTransactionResult txResponse =
-              aeternityServiceNative.transactions.blockingPostTransaction(spendTx);
-          context.assertNotNull(txResponse);
+          try {
+            BigInteger amount = UnitConversionUtil.toAettos("10", Unit.AE).toBigInteger();
+            SpendTransactionModel spendTx =
+                SpendTransactionModel.builder()
+                    .sender(initiator.getPublicKey())
+                    .recipient(responder.getPublicKey())
+                    .amount(amount)
+                    .payload("")
+                    .ttl(ZERO)
+                    .nonce(getNextBaseKeypairNonce())
+                    .build();
+            PostTransactionResult txResponse = this.blockingPostTx(spendTx, Optional.empty());
+            context.assertNotNull(txResponse);
+          } catch (Throwable e) {
+            context.fail(e);
+          }
         });
   }
 

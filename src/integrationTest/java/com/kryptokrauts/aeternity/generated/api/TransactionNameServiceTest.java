@@ -302,11 +302,9 @@ public class TransactionNameServiceTest extends BaseTest {
                     .nonce(getNextBaseKeypairNonce())
                     .ttl(ZERO)
                     .build();
-
             PostTransactionResult namePreclaimResult =
                 this.blockingPostTx(namePreclaimTx, Optional.empty());
             _logger.info("NamePreclaimTx hash: {}", namePreclaimResult.getTxHash());
-
             context.assertEquals(
                 namePreclaimResult.getTxHash(),
                 this.aeternityServiceNative.transactions.computeTxHash(namePreclaimTx));
@@ -367,12 +365,10 @@ public class TransactionNameServiceTest extends BaseTest {
                     .ttl(ZERO)
                     .nonce(nonce)
                     .build();
-            PostTransactionResult txResponse =
-                aeternityServiceNative.transactions.blockingPostTransaction(spendTx);
+            PostTransactionResult txResponse = this.blockingPostTx(spendTx, Optional.empty());
             _logger.info("SpendTx hash: " + txResponse.getTxHash());
             context.assertEquals(
                 txResponse.getTxHash(), aeternityServiceNative.transactions.computeTxHash(spendTx));
-            waitForTxMined(txResponse.getTxHash());
 
             /** get funded account and create next nameClaimTx */
             AccountResult otherAccount =
@@ -387,8 +383,7 @@ public class TransactionNameServiceTest extends BaseTest {
                     .build();
 
             PostTransactionResult result =
-                this.aeternityServiceNative.transactions.blockingPostTransaction(
-                    nextNameClaimTx, kpNextClaimer.getPrivateKey());
+                this.blockingPostTx(nextNameClaimTx, Optional.of(kpNextClaimer.getPrivateKey()));
             TransactionResult transactionResult = waitForTxMined(result.getTxHash());
             _logger.info("next claimTx result: {}", transactionResult);
             BigInteger finalBlockHeight =

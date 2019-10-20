@@ -3,7 +3,6 @@ package com.kryptokrauts.aeternity.generated.api;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import io.vertx.ext.unit.TestContext;
 import java.util.Optional;
-
 import org.junit.Ignore;
 import org.junit.Test;
 
