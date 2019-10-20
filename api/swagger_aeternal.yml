@@ -1,0 +1,734 @@
+swagger: '2.0'
+info:
+  version: '1.0'
+  title: aepp-middleware
+  description: API for [Aeternity Middleware](https://github.com/aeternity/aepp-middleware)
+  contact: {}
+basePath: "/middleware"
+schemes:
+  - https
+consumes:
+  - application/json
+produces:
+  - application/json
+paths:
+  "/channels/active":
+    get:
+      description: Get Active Channel Names
+      operationId: getActiveChannels
+      deprecated: false
+      produces:
+        - application/json
+      parameters: []
+      responses:
+        '200':
+          description: ''
+          headers: {}
+          schema:
+            type: object
+  "/channels/transactions/address/{address}":
+    get:
+      description: Get all transactions for a state channel
+      operationId: getChannelTx
+      deprecated: false
+      produces:
+        - application/json
+      parameters:
+        - in: path
+          name: address
+          type: string
+          required: true
+      responses:
+        '200':
+          description: ''
+          headers: {}
+          schema:
+            type: object
+  "/contracts/all":
+    get:
+      description: Get all the contracts
+      operationId: getAllContracts
+      deprecated: false
+      produces:
+        - application/json
+      parameters: []
+      responses:
+        '200':
+          description: ''
+          headers: {}
+          schema:
+            type: object
+  "/contracts/transactions/address/{address}":
+    get:
+      description: Get all the transactions for a contract
+      operationId: getContractTx
+      deprecated: false
+      produces:
+        - application/json
+      parameters:
+        - in: path
+          name: address
+          type: string
+          required: true
+          description: Contract Address/id
+      responses:
+        '200':
+          description: ''
+          headers: {}
+          schema:
+            type: object
+  "/contracts/calls/address/{address}":
+    get:
+      description: Get contract calls for a provided contract
+      operationId: getContractAddressCalls
+      deprecated: false
+      produces:
+        - application/json
+      parameters:
+        - in: path
+          name: address
+          type: string
+          required: true
+          description: Contract Address/id
+      responses:
+        '200':
+          description: ''
+          headers: {}
+          schema:
+            type: object
+  "/contracts/verify":
+    post:
+      description: Verify a contract by submitting the source, compiler version and
+        contract identifier
+      operationId: verifyContract
+      deprecated: false
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: contract
+          description: Details of the contract to verify.
+          schema:
+            type: object
+            required:
+              - contract_id
+              - source
+              - compiler
+            properties:
+              contract_id:
+                type: string
+              source:
+                type: string
+              compiler:
+                type: string
+      responses:
+        '200':
+          description: ''
+          headers: {}
+          schema:
+            type: object
+  "/compilers":
+    get:
+      description: Get list of compilers available to the middleware
+      operationId: getCompilers
+      deprecated: false
+      produces:
+        - application/json
+      parameters: []
+      responses:
+        '200':
+          description: ''
+          headers: {}
+          schema:
+            type: object
+  "/generations/{from}/{to}":
+    get:
+      description: Get generations between a given range
+      operationId: getGenerationsByRange
+      deprecated: false
+      produces:
+        - application/json
+      parameters:
+        - in: path
+          name: from
+          type: integer
+          required: true
+          description: Start Generation or Key Block Number
+        - in: path
+          name: to
+          type: integer
+          required: true
+          description: End Generation or Key Block Number
+        - name: limit
+          in: query
+          required: false
+          type: integer
+          format: int32
+          description: ''
+        - name: page
+          in: query
+          required: false
+          type: integer
+          format: int32
+          description: ''
+      responses:
+        '200':
+          description: ''
+          headers: {}
+          schema:
+            type: object
+  "/height/at/{milliseconds}":
+    get:
+      description: Get block height at a given time(provided in milliseconds)
+      operationId: getHeightByTime
+      deprecated: false
+      produces:
+        - application/json
+      parameters:
+        - in: path
+          name: milliseconds
+          type: integer
+          required: true
+          description: Time in milliseconds
+      responses:
+        '200':
+          description: ''
+          headers: {}
+          schema:
+            type: object
+  "/names":
+    get:
+      description: get all names
+      operationId: getAllNames
+      deprecated: false
+      produces:
+        - application/json
+      parameters:
+        - name: limit
+          in: query
+          required: false
+          type: integer
+          format: int32
+          description: ''
+        - name: page
+          in: query
+          required: false
+          type: integer
+          format: int32
+          description: ''
+      responses:
+        '200':
+          description: ''
+          headers: {}
+          schema:
+            type: object
+  "/names/{name}":
+    get:
+      description: Search for a name
+      operationId: searchName
+      deprecated: false
+      produces:
+        - application/json
+      parameters:
+        - in: path
+          name: name
+          type: string
+          required: true
+          description: String to match and find the name against
+      responses:
+        '200':
+          description: ''
+          headers: {}
+          schema:
+            type: object
+  "/names/active":
+    get:
+      description: Get a list of all the active names
+      operationId: getActiveNames
+      deprecated: false
+      produces:
+        - application/json
+      parameters:
+        - name: limit
+          in: query
+          required: false
+          type: integer
+          format: int32
+          description: ''
+        - name: page
+          in: query
+          required: false
+          type: integer
+          format: int32
+          description: ''
+        - in: query
+          name: owner
+          type: string
+          required: false
+          description: Address of the owner account to filter the results
+      responses:
+        '200':
+          description: ''
+          headers: {}
+          schema:
+            type: object
+  "/names/auctions/active":
+    get:
+      description: Get a list of all the active name auctions
+      operationId: getActiveNameAuctions
+      deprecated: false
+      produces:
+        - application/json
+      parameters:
+        - name: length
+          in: query
+          required: false
+          type: integer
+          format: int32
+          description: returns the names with provided length
+        - name: reverse
+          in: query
+          required: false
+          type: string
+          description: no value needs to be provided. if present the response will be
+            reversed
+        - name: limit
+          in: query
+          required: false
+          type: integer
+          format: int32
+          description: ''
+        - name: page
+          in: query
+          required: false
+          type: integer
+          format: int32
+          description: ''
+        - in: query
+          name: sort
+          type: string
+          required: false
+          description: Can be 'name', 'max_bid' or 'expiration'(default)
+      responses:
+        '200':
+          description: ''
+          headers: {}
+          schema:
+            type: object
+  "/names/auctions/active/count":
+    get:
+      description: Get a count of all the active name auctions
+      operationId: getActiveNameAuctionsCount
+      deprecated: false
+      produces:
+        - application/json
+      parameters:
+        - name: length
+          in: query
+          required: false
+          type: integer
+          format: int32
+          description: returns the names with provided length
+        - name: reverse
+          in: query
+          required: false
+          type: string
+          description: no value needs to be provided. if present the response will be
+            reversed
+        - name: limit
+          in: query
+          required: false
+          type: integer
+          format: int32
+          description: ''
+        - name: page
+          in: query
+          required: false
+          type: integer
+          format: int32
+          description: ''
+        - in: query
+          name: sort
+          type: string
+          required: false
+          description: Can be 'name', 'max_bid' or 'expiration'(default)
+      responses:
+        '200':
+          description: ''
+          headers: {}
+          schema:
+            type: object
+  "/names/auctions/bids/account/{account}":
+    get:
+      description: Get bids made by a given account
+      operationId: getNameAuctionsBidsbyAddress
+      deprecated: false
+      produces:
+        - application/json
+      parameters:
+        - in: path
+          name: account
+          type: string
+          required: true
+          description: Account address
+        - name: limit
+          in: query
+          required: false
+          type: integer
+          format: int32
+          description: ''
+        - name: page
+          in: query
+          required: false
+          type: integer
+          format: int32
+          description: ''
+      responses:
+        '200':
+          description: ''
+          headers: {}
+          schema:
+            type: object
+  "/names/auctions/bids/{name}":
+    get:
+      description: Get a bids for a given name
+      operationId: getNameAuctionsBidsbyName
+      deprecated: false
+      produces:
+        - application/json
+      parameters:
+        - in: path
+          name: name
+          type: string
+          required: true
+          description: Name to fetch the bids for
+        - name: limit
+          in: query
+          required: false
+          type: integer
+          format: int32
+          description: ''
+        - name: page
+          in: query
+          required: false
+          type: integer
+          format: int32
+          description: ''
+      responses:
+        '200':
+          description: ''
+          headers: {}
+          schema:
+            type: object
+  "/names/reverse/{account}":
+    get:
+      description: Get a list of names mapped to the given address
+      operationId: getNameByAddress
+      deprecated: false
+      produces:
+        - application/json
+      parameters:
+        - name: limit
+          in: query
+          required: false
+          type: integer
+          format: int32
+          description: ''
+        - name: page
+          in: query
+          required: false
+          type: integer
+          format: int32
+          description: ''
+        - in: path
+          name: account
+          type: string
+          required: true
+          description: Account address
+      responses:
+        '200':
+          description: ''
+          headers: {}
+          schema:
+            type: object
+  "/oracles/list":
+    get:
+      description: Get a list of oracles
+      operationId: getAllOracles
+      deprecated: false
+      produces:
+        - application/json
+      parameters:
+        - name: limit
+          in: query
+          required: false
+          type: integer
+          format: int32
+          description: ''
+        - name: page
+          in: query
+          required: false
+          type: integer
+          format: int32
+          description: ''
+      responses:
+        '200':
+          description: ''
+          headers: {}
+          schema:
+            type: object
+  "/oracles/{oracle_id}":
+    get:
+      description: Get a list of query and response for a given oracle
+      operationId: getOracleData
+      deprecated: false
+      produces:
+        - application/json
+      parameters:
+        - in: path
+          name: oracle_id
+          type: string
+          required: true
+          description: oracle address/id to get the query and responses
+        - name: limit
+          in: query
+          required: false
+          type: integer
+          format: int32
+          description: ''
+        - name: page
+          in: query
+          required: false
+          type: integer
+          format: int32
+          description: ''
+      responses:
+        '200':
+          description: ''
+          headers: {}
+          schema:
+            type: object
+  "/reward/height/{height}":
+    get:
+      description: Get the block reward for a given block height
+      operationId: getRewardAtHeight
+      deprecated: false
+      produces:
+        - application/json
+      parameters:
+        - in: path
+          name: height
+          type: integer
+          required: true
+          description: Blockchain height
+      responses:
+        '200':
+          description: ''
+          headers: {}
+          schema:
+            type: object
+  "/size/current":
+    get:
+      description: 'Get the current of size of blockchain '
+      operationId: getChainSize
+      deprecated: false
+      produces:
+        - application/json
+      parameters: []
+      responses:
+        '200':
+          description: ''
+          headers: {}
+          schema:
+            type: object
+  "/size/height/{height}":
+    get:
+      description: Get size of blockchain at a given height
+      operationId: getSizeAtHeight
+      deprecated: false
+      produces:
+        - application/json
+      parameters:
+        - in: path
+          name: height
+          type: integer
+          required: true
+          description: Blockchain height
+      responses:
+        '200':
+          description: ''
+          headers: {}
+          schema:
+            type: object
+  "/transactions/account/{address}/count":
+    get:
+      description: Get the count of transactions for a given account address
+      operationId: getTxCountByAddress
+      deprecated: false
+      produces:
+        - application/json
+      parameters:
+        - in: path
+          name: address
+          type: string
+          required: true
+          description: Account address
+        - in: query
+          name: txtype
+          type: string
+          required: false
+          description: Transaction Type
+      responses:
+        '200':
+          description: ''
+          headers: {}
+          schema:
+            type: object
+  "/transactions/account/{sender}/to/{receiver}":
+    get:
+      description: Get a list of transactions between two accounts
+      operationId: getTxBetweenAddress
+      deprecated: false
+      produces:
+        - application/json
+      parameters:
+        - in: path
+          name: sender
+          type: string
+          required: true
+          description: Sender account address
+        - in: path
+          name: receiver
+          type: string
+          required: true
+          description: Receiver account address
+      responses:
+        '200':
+          description: ''
+          headers: {}
+          schema:
+            type: object
+  "/transactions/account/{account}":
+    get:
+      description: Get list of transactions for a given account
+      operationId: getTxByAccount
+      deprecated: false
+      produces:
+        - application/json
+      parameters:
+        - in: path
+          name: account
+          type: string
+          required: true
+          description: Account address
+        - name: limit
+          in: query
+          required: false
+          type: integer
+          format: int32
+          description: ''
+        - name: page
+          in: query
+          required: false
+          type: integer
+          format: int32
+          description: ''
+      responses:
+        '200':
+          description: ''
+          headers: {}
+          schema:
+            type: object
+  "/transactions/interval/{from}/{to}":
+    get:
+      description: Get transactions between an interval of generations
+      operationId: getTxByGenerationRange
+      deprecated: false
+      produces:
+        - application/json
+      parameters:
+        - in: path
+          name: from
+          type: integer
+          required: true
+          description: Start Generation/Key-block height
+        - in: path
+          name: to
+          type: integer
+          required: true
+          description: End Generation/Key-block height
+        - name: limit
+          in: query
+          required: false
+          type: integer
+          format: int32
+          description: ''
+        - name: page
+          in: query
+          required: false
+          type: integer
+          format: int32
+          description: ''
+        - in: query
+          name: txtype
+          type: string
+          required: false
+          description: Transaction Type
+      responses:
+        '200':
+          description: ''
+          headers: {}
+          schema:
+            type: object
+  "/transactions/rate/{from}/{to}":
+    get:
+      description: Get transaction amount and count for the date interval
+      operationId: getTxRateByDateRange
+      deprecated: false
+      produces:
+        - application/json
+      parameters:
+        - in: path
+          name: from
+          type: string
+          required: true
+          description: Start Date(yyyymmdd)
+        - in: path
+          name: to
+          type: string
+          required: true
+          description: End Date(yyyymmdd)
+      responses:
+        '200':
+          description: ''
+          headers: {}
+          schema:
+            type: object
+  "/status":
+    get:
+      description: get middleware status
+      operationId: getMdwStatus
+      deprecated: false
+      produces:
+        - application/json
+      parameters: []
+      responses:
+        '200':
+          description: ''
+          headers: {}
+          schema:
+            type: object
+  "/count/current":
+    get:
+      description: get count of transactions at the current height
+      operationId: getCurrentTxCount
+      deprecated: false
+      produces:
+        - application/json
+      parameters: []
+      responses:
+        '200':
+          description: ''
+          headers: {}
+          schema:
+            type: object

@@ -1,5 +1,6 @@
 package com.kryptokrauts.aeternity.generated.api;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kryptokrauts.aeternity.sdk.constants.Network;
 import com.kryptokrauts.aeternity.sdk.constants.VirtualMachine;
 import com.kryptokrauts.aeternity.sdk.domain.secret.impl.BaseKeyPair;
@@ -51,6 +52,8 @@ public abstract class BaseTest {
 
   private static final String COMPILER_BASE_URL = "COMPILER_BASE_URL";
 
+  private static final String AETERNAL_BASE_URL = "AETERNAL_BASE_URL";
+
   protected static final VirtualMachine targetVM = VirtualMachine.FATE;
 
   protected KeyPairService keyPairService;
@@ -58,6 +61,8 @@ public abstract class BaseTest {
   protected AeternityService aeternityServiceNative;
 
   protected AeternityService aeternityServiceDebug;
+
+  protected ObjectMapper objectMapper = new ObjectMapper();
 
   BaseKeyPair baseKeyPair;
 
@@ -80,6 +85,7 @@ public abstract class BaseTest {
                 AeternityServiceConfiguration.configure()
                     .baseUrl(getAeternityBaseUrl())
                     .compilerBaseUrl(getCompilerBaseUrl())
+                    .aeternalBaseUrl(getAeternalBaseUrl())
                     .network(Network.DEVNET)
                     .nativeMode(true)
                     .baseKeyPair(baseKeyPair)
@@ -92,6 +98,7 @@ public abstract class BaseTest {
                 AeternityServiceConfiguration.configure()
                     .baseUrl(getAeternityBaseUrl())
                     .compilerBaseUrl(getCompilerBaseUrl())
+                    .aeternalBaseUrl(getAeternalBaseUrl())
                     .network(Network.DEVNET)
                     .nativeMode(false)
                     .baseKeyPair(baseKeyPair)
@@ -122,6 +129,14 @@ public abstract class BaseTest {
     return compilerBaseUrl;
   }
 
+  protected static String getAeternalBaseUrl() throws ConfigurationException {
+    String aeternalBaseUrl = System.getenv(AETERNAL_BASE_URL);
+    if (aeternalBaseUrl == null) {
+      throw new ConfigurationException("ENV variable missing: AETERNAL_BASE_URL");
+    }
+    return aeternalBaseUrl;
+  }
+
   @BeforeClass
   public static void startup() throws ConfigurationException {
     _logger.info(
@@ -130,6 +145,7 @@ public abstract class BaseTest {
             "Using following environment"));
     _logger.info(String.format("%s: %s", AETERNITY_BASE_URL, getAeternityBaseUrl()));
     _logger.info(String.format("%s: %s", COMPILER_BASE_URL, getCompilerBaseUrl()));
+    _logger.info(String.format("%s: %s", AETERNAL_BASE_URL, getAeternalBaseUrl()));
     _logger.info(
         "-----------------------------------------------------------------------------------");
   }

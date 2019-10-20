@@ -58,7 +58,7 @@ public class {{classname}}Impl implements {{classname}} {
         }
         {{/required}}{{/allParams}}
         // create path and map variables
-        String {{localVariablePrefix}}localVarPath = "{{{path}}}"{{#pathParams}}.replaceAll("\\{" + "{{baseName}}" + "\\}", {{{paramName}}}.toString()){{/pathParams}};
+        String {{localVariablePrefix}}localVarPath = "{{{contextPath}}}{{{path}}}"{{#pathParams}}.replaceAll("\\{" + "{{baseName}}" + "\\}", {{{paramName}}}.toString()){{/pathParams}};
 
         // query params
         List<Pair> {{localVariablePrefix}}localVarQueryParams = new ArrayList<>();
