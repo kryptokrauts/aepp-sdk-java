@@ -397,11 +397,10 @@ public class TransactionNameServiceTest extends BaseTest {
               Thread.sleep(1000);
             }
             _logger.info("found auction for domain {}", domain);
-            // TODO we want to wait here
-            // waitForBlockHeight(finalBlockHeight);
-            // nameIdResult =
-            // this.aeternityServiceNative.names.blockingGetNameId(domain);
-            // context.assertTrue(nameIdResult.getRootErrorMessage() == null);
+            waitForBlockHeight(finalBlockHeight, 5000l);
+            nameIdResult = this.aeternityServiceNative.names.blockingGetNameId(domain);
+            context.assertTrue(nameIdResult.getRootErrorMessage() == null);
+            _logger.info("NameIdResult: {}", nameIdResult);
             _logger.info("--------------------- auctionTest ---------------------");
           } catch (Throwable e) {
             context.fail(e);

@@ -92,7 +92,7 @@ public class ServiceConfiguration {
                   ImmutableMap.of(BaseConstants.VERTX_BASE_PATH, compilerBaseUrl))));
     } else
       throw new RuntimeException(
-          "Cannot intantiate ApiClient due to missing params vertx and or compilerBaseUrl");
+          "Cannot instantiate ApiClient due to missing params vertx and or compilerBaseUrl");
   }
 
   public com.kryptokrauts.aeternal.generated.ApiClient getAeternalApiClient() {
@@ -100,10 +100,10 @@ public class ServiceConfiguration {
       _logger.debug("Vertx entry point not initialized, creating default");
       vertx = Vertx.vertx();
     }
-    if (vertx != null && compilerBaseUrl != null) {
+    if (vertx != null && aeternalBaseUrl != null) {
       _logger.debug(
           String.format(
-              "Initializing Vertx CompilerApiClient using compilerBaseUrl %s", aeternalBaseUrl));
+              "Initializing Vertx AeternalApiClient using aeternalBaseUrl %s", aeternalBaseUrl));
       return new com.kryptokrauts.aeternal.generated.ApiClient(
           vertx,
           new JsonObject(
@@ -111,7 +111,7 @@ public class ServiceConfiguration {
                   ImmutableMap.of(BaseConstants.VERTX_BASE_PATH, aeternalBaseUrl))));
     } else
       throw new RuntimeException(
-          "Cannot intantiate ApiClient due to missing params vertx and or aeternalBaseUrl");
+          "Cannot instantiate ApiClient due to missing params vertx and or aeternalBaseUrl");
   }
 
   public BaseKeyPair getBaseKeyPair() {

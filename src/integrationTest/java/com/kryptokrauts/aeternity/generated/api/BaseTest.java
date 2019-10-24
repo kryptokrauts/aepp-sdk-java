@@ -17,10 +17,12 @@ import com.kryptokrauts.aeternity.sdk.service.transaction.type.model.AbstractTra
 import io.reactivex.Single;
 import io.reactivex.observers.TestObserver;
 import io.vertx.core.Vertx;
+import io.vertx.core.VertxOptions;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.RunTestOnContext;
+import io.vertx.ext.unit.junit.Timeout;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
 import java.math.BigInteger;
 import java.util.List;
@@ -39,7 +41,8 @@ import org.slf4j.LoggerFactory;
 @RunWith(VertxUnitRunner.class)
 public abstract class BaseTest {
 
-  protected static final long TEST_CASE_TIMEOUT_MILLIS = 5000l;
+  /** we wait max. for 5 Minutes to complete each testcase */
+  protected static final long TEST_CASE_TIMEOUT_MILLIS = 300000L;
 
   protected static final BigInteger ONE = BigInteger.ONE;
 
@@ -66,7 +69,15 @@ public abstract class BaseTest {
 
   BaseKeyPair baseKeyPair;
 
-  @Rule public RunTestOnContext rule = new RunTestOnContext();
+  @Rule
+  public RunTestOnContext rule =
+      new RunTestOnContext(
+          new VertxOptions()
+              .setMaxWorkerExecuteTime(TEST_CASE_TIMEOUT_MILLIS)
+              .setMaxEventLoopExecuteTime(TEST_CASE_TIMEOUT_MILLIS)
+              .setBlockedThreadCheckInterval(TEST_CASE_TIMEOUT_MILLIS));
+
+  @Rule public Timeout timeoutRule = Timeout.millis(TEST_CASE_TIMEOUT_MILLIS);
 
   Vertx vertx;
 
@@ -226,12 +237,16 @@ public abstract class BaseTest {
     return minedTx;
   }
 
-  protected void waitForBlockHeight(BigInteger blockHeight) throws Throwable {
+  protected void waitForBlockHeight(BigInteger blockHeight, Long timeoutMilli) throws Throwable {
     BigInteger currentBlockHeight = BigInteger.ZERO;
+    _logger.info(
+        "waiting for blockHeight {} and checking every {} seconds",
+        blockHeight,
+        timeoutMilli / 1000d);
     while (currentBlockHeight.compareTo(blockHeight) == -1) {
       currentBlockHeight = aeternityServiceNative.info.blockingGetCurrentKeyBlock().getHeight();
       _logger.info("current blockHeight: {}", currentBlockHeight);
-      Thread.sleep(1000);
+      Thread.sleep(timeoutMilli);
     }
   }
 

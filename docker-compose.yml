@@ -11,7 +11,7 @@ services:
       bin/aeternity
       console
       -noinput
-      -aecore expected_mine_rate 5000
+      -aecore expected_mine_rate 250
       -aehttp enable_debug_endpoints true
     volumes:
       - ${PWD}/docker/aeternity.yaml:/home/aeternity/aeternity.yaml
