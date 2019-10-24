@@ -33,6 +33,7 @@ services:
       - NODE_URL=node:3013
       - AESOPHIA_URL=compiler:3080
       - DATABASE_URL=postgres://aeternal:aeternal@db/aeternal
+      - LOG_CONF=/logs/log.yaml
     volumes:
       - ${PWD}/docker/wait-for-it.sh:/app/docker/wait-for-it.sh
     depends_on:

@@ -6,6 +6,7 @@ import com.kryptokrauts.aeternity.sdk.service.aeternal.AeternalService;
 import com.kryptokrauts.aeternity.sdk.service.aeternal.order.NameSortBy;
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +19,12 @@ public class AeternalServiceImpl implements AeternalService {
   @Override
   public Object blockingGetStatus() {
     return aeternalApi.rxGetMdwStatus().blockingGet();
+  }
+
+  @Override
+  public Object blockingGetNameAuctionsActive() {
+    return this.blockingGetNameAuctionsActive(
+        Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty());
   }
 
   @Override
@@ -39,25 +46,12 @@ public class AeternalServiceImpl implements AeternalService {
 
   @Override
   public boolean isAuctionActive(String name) throws IOException {
-    Object result =
-        this.blockingGetNameAuctionsActive(
-            Optional.empty(),
-            Optional.empty(),
-            Optional.empty(),
-            Optional.empty(),
-            Optional.empty());
+    Object result = this.blockingGetNameAuctionsActive();
     ObjectMapper objectMapper = new ObjectMapper();
-    List<String> auctions =
+    List<Map<String, String>> auctions =
         objectMapper.readValue(objectMapper.writeValueAsString(result), List.class);
     return auctions.stream()
-        .filter(
-            auction -> {
-              try {
-                return objectMapper.readTree(auction).get("name").equals(name);
-              } catch (IOException e) {
-                return false;
-              }
-            })
+        .filter(auction -> auction.get("name").equals(name))
         .findAny()
         .isPresent();
   }

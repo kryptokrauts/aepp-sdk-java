@@ -7,6 +7,8 @@ import java.util.Optional;
 public interface AeternalService {
   Object blockingGetStatus();
 
+  Object blockingGetNameAuctionsActive();
+
   Object blockingGetNameAuctionsActive(
       Optional<Integer> length,
       Optional<String> reverse,

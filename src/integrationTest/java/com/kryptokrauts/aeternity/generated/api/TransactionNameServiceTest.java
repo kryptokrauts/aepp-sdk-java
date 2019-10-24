@@ -291,7 +291,7 @@ public class TransactionNameServiceTest extends BaseTest {
           try {
             _logger.info("--------------------- auctionTest ---------------------");
             BigInteger salt = CryptoUtils.generateNamespaceSalt();
-            String domain = "auction" + (random.nextInt(900) + 100) + TestConstants.NAMESPACE;
+            String domain = "auction" + (random.nextInt(90) + 10) + TestConstants.NAMESPACE;
 
             /** create a new namespace to update later */
             NamePreclaimTransactionModel namePreclaimTx =
@@ -308,7 +308,8 @@ public class TransactionNameServiceTest extends BaseTest {
             context.assertEquals(
                 namePreclaimResult.getTxHash(),
                 this.aeternityServiceNative.transactions.computeTxHash(namePreclaimTx));
-
+            // currently we do not have an active auction
+            context.assertFalse(this.aeternityServiceNative.aeternal.isAuctionActive(domain));
             NameClaimTransactionModel nameClaimTx =
                 NameClaimTransactionModel.builder()
                     .accountId(baseKeyPair.getPublicKey())
@@ -389,6 +390,13 @@ public class TransactionNameServiceTest extends BaseTest {
             BigInteger finalBlockHeight =
                 transactionResult.getBlockHeight().add(AENS.getBlockTimeout(domain));
             _logger.info("claim will be final at block {}", finalBlockHeight);
+            // now we have an active auction
+            // we wait for it to be present at aeternal
+            while (!this.aeternityServiceNative.aeternal.isAuctionActive(domain)) {
+              _logger.info("waiting for auction of domain {}", domain);
+              Thread.sleep(1000);
+            }
+            _logger.info("found auction for domain {}", domain);
             // TODO we want to wait here
             // waitForBlockHeight(finalBlockHeight);
             // nameIdResult =
