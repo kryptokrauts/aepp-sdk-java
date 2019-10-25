@@ -1,12 +1,13 @@
 package com.kryptokrauts.aeternity.sdk.service.aeternal.impl;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kryptokrauts.aeternal.generated.api.rxjava.DefaultApi;
 import com.kryptokrauts.aeternity.sdk.service.aeternal.AeternalService;
+import com.kryptokrauts.aeternity.sdk.service.aeternal.domain.ActiveAuctionsResult;
 import com.kryptokrauts.aeternity.sdk.service.aeternal.order.NameSortBy;
 import java.io.IOException;
-import java.util.List;
-import java.util.Map;
+import java.math.BigInteger;
 import java.util.Optional;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -16,42 +17,51 @@ public class AeternalServiceImpl implements AeternalService {
 
   @NonNull private DefaultApi aeternalApi;
 
+  private ObjectMapper objectMapper = new ObjectMapper();
+
   @Override
   public Object blockingGetStatus() {
     return aeternalApi.rxGetMdwStatus().blockingGet();
   }
 
   @Override
-  public Object blockingGetNameAuctionsActive() {
+  public BigInteger blockingGetNameAuctionsActiveCount() throws IOException {
+    Object result =
+        aeternalApi.rxGetActiveNameAuctionsCount(null, null, null, null, null).blockingGet();
+    String resultJson = objectMapper.writeValueAsString(result);
+    JsonNode jsonNode = objectMapper.readTree(resultJson);
+    return new BigInteger(jsonNode.get("count").toString());
+  }
+
+  @Override
+  public ActiveAuctionsResult blockingGetNameAuctionsActive() {
     return this.blockingGetNameAuctionsActive(
         Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty());
   }
 
   @Override
-  public Object blockingGetNameAuctionsActive(
-      Optional<Integer> length,
+  public ActiveAuctionsResult blockingGetNameAuctionsActive(
+      Optional<BigInteger> length,
       Optional<String> reverse,
-      Optional<Integer> limit,
-      Optional<Integer> page,
+      Optional<BigInteger> limit,
+      Optional<BigInteger> page,
       Optional<NameSortBy> sortBy) {
-    return aeternalApi
-        .rxGetActiveNameAuctions(
-            length.orElse(null),
-            reverse.orElse(null),
-            limit.orElse(null),
-            page.orElse(null),
-            sortBy.orElse(NameSortBy.EXPIRATION).toString())
-        .blockingGet();
+    return ActiveAuctionsResult.builder()
+        .build()
+        .blockingGet(
+            aeternalApi.rxGetActiveNameAuctions(
+                length.orElse(null),
+                reverse.orElse(null),
+                limit.orElse(null),
+                page.orElse(null),
+                sortBy.orElse(NameSortBy.EXPIRATION).toString()));
   }
 
   @Override
-  public boolean isAuctionActive(String name) throws IOException {
-    Object result = this.blockingGetNameAuctionsActive();
-    ObjectMapper objectMapper = new ObjectMapper();
-    List<Map<String, String>> auctions =
-        objectMapper.readValue(objectMapper.writeValueAsString(result), List.class);
-    return auctions.stream()
-        .filter(auction -> auction.get("name").equals(name))
+  public boolean blockingIsAuctionActive(String name) {
+    ActiveAuctionsResult result = this.blockingGetNameAuctionsActive();
+    return result.getActiveAuctionResults().stream()
+        .filter(auction -> auction.getName().equals(name))
         .findAny()
         .isPresent();
   }

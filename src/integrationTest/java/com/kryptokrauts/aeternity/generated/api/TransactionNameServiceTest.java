@@ -293,6 +293,10 @@ public class TransactionNameServiceTest extends BaseTest {
             BigInteger salt = CryptoUtils.generateNamespaceSalt();
             String domain = "auction" + (random.nextInt(90) + 10) + TestConstants.NAMESPACE;
 
+            BigInteger oldActiveAuctions =
+                this.aeternityServiceNative.aeternal.blockingGetNameAuctionsActiveCount();
+            _logger.info("active auctions: {}", oldActiveAuctions);
+
             /** create a new namespace to update later */
             NamePreclaimTransactionModel namePreclaimTx =
                 NamePreclaimTransactionModel.builder()
@@ -309,7 +313,8 @@ public class TransactionNameServiceTest extends BaseTest {
                 namePreclaimResult.getTxHash(),
                 this.aeternityServiceNative.transactions.computeTxHash(namePreclaimTx));
             // currently we do not have an active auction
-            context.assertFalse(this.aeternityServiceNative.aeternal.isAuctionActive(domain));
+            context.assertFalse(
+                this.aeternityServiceNative.aeternal.blockingIsAuctionActive(domain));
             NameClaimTransactionModel nameClaimTx =
                 NameClaimTransactionModel.builder()
                     .accountId(baseKeyPair.getPublicKey())
@@ -392,11 +397,15 @@ public class TransactionNameServiceTest extends BaseTest {
             _logger.info("claim will be final at block {}", finalBlockHeight);
             // now we have an active auction
             // we wait for it to be present at aeternal
-            while (!this.aeternityServiceNative.aeternal.isAuctionActive(domain)) {
+            while (!this.aeternityServiceNative.aeternal.blockingIsAuctionActive(domain)) {
               _logger.info("waiting for auction of domain {}", domain);
               Thread.sleep(1000);
             }
             _logger.info("found auction for domain {}", domain);
+            BigInteger newActiveAuctions =
+                this.aeternityServiceNative.aeternal.blockingGetNameAuctionsActiveCount();
+            _logger.info("active auctions: {}", newActiveAuctions);
+            context.assertEquals(oldActiveAuctions.add(BigInteger.ONE), newActiveAuctions);
             waitForBlockHeight(finalBlockHeight, 5000l);
             nameIdResult = this.aeternityServiceNative.names.blockingGetNameId(domain);
             context.assertTrue(nameIdResult.getRootErrorMessage() == null);

@@ -1,20 +1,25 @@
 package com.kryptokrauts.aeternity.sdk.service.aeternal;
 
+import com.kryptokrauts.aeternity.sdk.service.aeternal.domain.ActiveAuctionsResult;
 import com.kryptokrauts.aeternity.sdk.service.aeternal.order.NameSortBy;
 import java.io.IOException;
+import java.math.BigInteger;
 import java.util.Optional;
 
 public interface AeternalService {
+
   Object blockingGetStatus();
 
-  Object blockingGetNameAuctionsActive();
+  BigInteger blockingGetNameAuctionsActiveCount() throws IOException;
 
-  Object blockingGetNameAuctionsActive(
-      Optional<Integer> length,
+  ActiveAuctionsResult blockingGetNameAuctionsActive();
+
+  ActiveAuctionsResult blockingGetNameAuctionsActive(
+      Optional<BigInteger> length,
       Optional<String> reverse,
-      Optional<Integer> limit,
-      Optional<Integer> page,
+      Optional<BigInteger> limit,
+      Optional<BigInteger> page,
       Optional<NameSortBy> sortBy);
 
-  boolean isAuctionActive(String name) throws IOException;
+  boolean blockingIsAuctionActive(String name);
 }

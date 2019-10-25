@@ -124,6 +124,9 @@ task generateApiClient {
                 "title"      : rootProject.name,
                 "useTags"    : "true"
         ])
+        configAeternal.setTypeMappings([
+                "Integer": "java.math.BigInteger"
+        ])
         new DefaultGenerator().opts(configAeternal.toClientOptInput()).generate()
 
         // modify UnsignedTx

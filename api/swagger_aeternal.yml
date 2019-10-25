@@ -314,7 +314,7 @@ paths:
           description: ''
           headers: {}
           schema:
-            type: object
+            $ref: '#/definitions/ActiveAuctions'
   "/names/auctions/active/count":
     get:
       description: Get a count of all the active name auctions
@@ -732,3 +732,28 @@ paths:
           headers: {}
           schema:
             type: object
+
+definitions:
+  UInt:
+    type: integer
+    minimum: 0
+  EncodedPubkey:
+    # Base58Check encoded 32-byte pubkey (account, contract, oracle, etc)
+    # pattern: "^(ak|ok|ct|ch|pp)_[1-9A-HJ-NP-Za-km-z]*$"
+    description: 'Base58Check encoded tagged pubkey'
+    type: string
+  ActiveAuction:
+    type: object
+    properties:
+      name:
+        type: string
+      expiration:
+        $ref: '#/definitions/UInt'
+      winning_bid:
+        $ref: '#/definitions/UInt'
+      winning_bidder:
+        $ref: '#/definitions/EncodedPubkey'
+  ActiveAuctions:
+    type: array
+    items:
+      $ref: '#/definitions/ActiveAuction'
