@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kryptokrauts.aeternal.generated.api.rxjava.DefaultApi;
 import com.kryptokrauts.aeternity.sdk.service.aeternal.AeternalService;
 import com.kryptokrauts.aeternity.sdk.service.aeternal.domain.ActiveAuctionsResult;
-import com.kryptokrauts.aeternity.sdk.service.aeternal.order.NameSortBy;
+import com.kryptokrauts.aeternity.sdk.service.aeternal.domain.NameSortBy;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.util.Optional;

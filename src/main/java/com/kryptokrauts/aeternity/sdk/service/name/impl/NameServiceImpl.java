@@ -1,8 +1,8 @@
-package com.kryptokrauts.aeternity.sdk.service.aens.impl;
+package com.kryptokrauts.aeternity.sdk.service.name.impl;
 
 import com.kryptokrauts.aeternity.generated.api.rxjava.ExternalApi;
-import com.kryptokrauts.aeternity.sdk.service.aens.NameService;
 import com.kryptokrauts.aeternity.sdk.service.aeternity.AeternityServiceConfiguration;
+import com.kryptokrauts.aeternity.sdk.service.name.NameService;
 import com.kryptokrauts.aeternity.sdk.service.name.domain.NameIdResult;
 import io.reactivex.Single;
 import javax.annotation.Nonnull;

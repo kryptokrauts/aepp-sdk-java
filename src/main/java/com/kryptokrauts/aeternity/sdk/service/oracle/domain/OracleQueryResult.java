@@ -1,8 +1,7 @@
-package com.kryptokrauts.aeternity.sdk.service.name.domain;
+package com.kryptokrauts.aeternity.sdk.service.oracle.domain;
 
 import com.kryptokrauts.aeternity.generated.model.OracleQuery;
 import com.kryptokrauts.aeternity.sdk.domain.GenericResultObject;
-import com.kryptokrauts.aeternity.sdk.service.oracle.domain.OracleTTLType;
 import java.math.BigInteger;
 import lombok.Getter;
 import lombok.ToString;

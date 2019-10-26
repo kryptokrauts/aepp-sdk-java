@@ -1,4 +1,4 @@
-package com.kryptokrauts.aeternity.sdk.service.aens;
+package com.kryptokrauts.aeternity.sdk.service.name;
 
 import com.kryptokrauts.aeternity.sdk.service.info.domain.KeyBlockResult;
 import com.kryptokrauts.aeternity.sdk.service.name.domain.NameIdResult;

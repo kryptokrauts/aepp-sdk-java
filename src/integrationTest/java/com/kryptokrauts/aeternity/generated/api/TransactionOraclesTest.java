@@ -1,8 +1,10 @@
 package com.kryptokrauts.aeternity.generated.api;
 
 import com.kryptokrauts.aeternity.sdk.domain.secret.impl.BaseKeyPair;
-import com.kryptokrauts.aeternity.sdk.service.name.domain.OracleQueryResult;
+import com.kryptokrauts.aeternity.sdk.service.oracle.domain.OracleQueriesResult;
+import com.kryptokrauts.aeternity.sdk.service.oracle.domain.OracleQueryResult;
 import com.kryptokrauts.aeternity.sdk.service.oracle.domain.OracleTTLType;
+import com.kryptokrauts.aeternity.sdk.service.oracle.domain.QueryType;
 import com.kryptokrauts.aeternity.sdk.service.oracle.domain.RegisteredOracleResult;
 import com.kryptokrauts.aeternity.sdk.service.transaction.domain.PostTransactionResult;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.model.OracleExtendTransactionModel;
@@ -15,6 +17,7 @@ import com.kryptokrauts.aeternity.sdk.util.UnitConversionUtil;
 import com.kryptokrauts.aeternity.sdk.util.UnitConversionUtil.Unit;
 import io.vertx.ext.unit.TestContext;
 import java.math.BigInteger;
+import java.util.Optional;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
@@ -47,9 +50,8 @@ public class TransactionOraclesTest extends BaseTest {
                     .ttl(ZERO)
                     .nonce(getNextBaseKeypairNonce())
                     .build();
-            PostTransactionResult postResult = this.postTx(spendTx);
+            PostTransactionResult postResult = this.blockingPostTx(spendTx, Optional.empty());
             _logger.info(postResult.getTxHash());
-            waitForTxMined(postResult.getTxHash());
           } catch (Throwable e) {
             context.fail(e);
           }
@@ -81,10 +83,8 @@ public class TransactionOraclesTest extends BaseTest {
                     .build();
 
             PostTransactionResult postResult =
-                this.aeternityServiceNative.transactions.blockingPostTransaction(
-                    oracleRegisterTx, oracleAccount.getPrivateKey());
+                this.blockingPostTx(oracleRegisterTx, Optional.of(oracleAccount.getPrivateKey()));
             _logger.info(postResult.getTxHash());
-            waitForTxMined(postResult.getTxHash());
           } catch (Throwable e) {
             context.fail(e);
           }
@@ -112,10 +112,8 @@ public class TransactionOraclesTest extends BaseTest {
                     .build();
 
             PostTransactionResult postResult =
-                this.aeternityServiceNative.transactions.blockingPostTransaction(
-                    oracleQueryTx, baseKeyPair.getPrivateKey());
+                this.blockingPostTx(oracleQueryTx, Optional.of(baseKeyPair.getPrivateKey()));
             _logger.info(postResult.getTxHash());
-            waitForTxMined(postResult.getTxHash());
             queryId = EncodingUtils.queryId(baseKeyPair.getPublicKey(), nonce, oracleId);
             OracleQueryResult oracleQuery =
                 this.aeternityServiceNative.oracles.blockingGetOracleQuery(oracleId, queryId);
@@ -132,11 +130,26 @@ public class TransactionOraclesTest extends BaseTest {
         context,
         t -> {
           try {
+            OracleQueriesResult oracleQueriesResult =
+                this.aeternityServiceNative.oracles.blockingGetOracleQueries(
+                    oracleAccount.getPublicKey().replace("ak_", "ok_"),
+                    Optional.empty(),
+                    Optional.empty(),
+                    Optional.of(QueryType.ALL));
+            _logger.info("OracleQueriesResult: {}", oracleQueriesResult);
+            _logger.info("OracleQuery count: {}", oracleQueriesResult.getQueryResults().size());
+            context.assertFalse(oracleQueriesResult.getQueryResults().isEmpty());
+            OracleQueryResult oracleQueryResult =
+                oracleQueriesResult.getQueryResults().stream()
+                    .filter(query -> query.getId().equals(queryId))
+                    .findFirst()
+                    .get();
+            _logger.info("found expected OracleQueryResult: {}", oracleQueryResult);
             BigInteger nonce = getAccount(oracleAccount.getPublicKey()).getNonce().add(ONE);
             OracleRespondTransactionModel oracleRespondTx =
                 OracleRespondTransactionModel.builder()
                     .oracleId(oracleAccount.getPublicKey().replace("ak_", "ok_"))
-                    .queryId(queryId)
+                    .queryId(oracleQueryResult.getId())
                     .nonce(nonce)
                     .response("yes you are nuts!")
                     .responseTtl(BigInteger.valueOf(100))
@@ -144,10 +157,8 @@ public class TransactionOraclesTest extends BaseTest {
                     .build();
 
             PostTransactionResult postResult =
-                this.aeternityServiceNative.transactions.blockingPostTransaction(
-                    oracleRespondTx, oracleAccount.getPrivateKey());
+                this.blockingPostTx(oracleRespondTx, Optional.of(oracleAccount.getPrivateKey()));
             _logger.info(postResult.getTxHash());
-            waitForTxMined(postResult.getTxHash());
           } catch (Throwable e) {
             context.fail(e);
           }
@@ -172,10 +183,8 @@ public class TransactionOraclesTest extends BaseTest {
                     .build();
 
             PostTransactionResult postResult =
-                this.aeternityServiceNative.transactions.blockingPostTransaction(
-                    oracleExtendTx, oracleAccount.getPrivateKey());
+                this.blockingPostTx(oracleExtendTx, Optional.of(oracleAccount.getPrivateKey()));
             _logger.info(postResult.getTxHash());
-            waitForTxMined(postResult.getTxHash());
 
             RegisteredOracleResult registeredOracle =
                 this.aeternityServiceNative.oracles.blockingGetRegisteredOracle(oracleId);

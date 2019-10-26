@@ -1,4 +1,4 @@
-package com.kryptokrauts.aeternity.sdk.service.name.domain;
+package com.kryptokrauts.aeternity.sdk.service.oracle.domain;
 
 import com.kryptokrauts.aeternity.generated.model.OracleQueries;
 import com.kryptokrauts.aeternity.sdk.domain.GenericResultObject;

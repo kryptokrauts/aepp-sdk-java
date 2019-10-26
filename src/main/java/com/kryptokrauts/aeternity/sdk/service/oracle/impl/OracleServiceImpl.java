@@ -2,9 +2,10 @@ package com.kryptokrauts.aeternity.sdk.service.oracle.impl;
 
 import com.kryptokrauts.aeternity.generated.api.rxjava.ExternalApi;
 import com.kryptokrauts.aeternity.sdk.service.aeternity.AeternityServiceConfiguration;
-import com.kryptokrauts.aeternity.sdk.service.name.domain.OracleQueriesResult;
-import com.kryptokrauts.aeternity.sdk.service.name.domain.OracleQueryResult;
 import com.kryptokrauts.aeternity.sdk.service.oracle.OracleService;
+import com.kryptokrauts.aeternity.sdk.service.oracle.domain.OracleQueriesResult;
+import com.kryptokrauts.aeternity.sdk.service.oracle.domain.OracleQueryResult;
+import com.kryptokrauts.aeternity.sdk.service.oracle.domain.QueryType;
 import com.kryptokrauts.aeternity.sdk.service.oracle.domain.RegisteredOracleResult;
 import io.reactivex.Single;
 import java.math.BigInteger;
@@ -35,21 +36,30 @@ public class OracleServiceImpl implements OracleService {
 
   @Override
   public Single<OracleQueriesResult> asyncGetOracleQueries(
-      String pubkey, Optional<String> from, Optional<BigInteger> limit, Optional<String> type) {
+      String pubkey, Optional<String> from, Optional<BigInteger> limit, Optional<QueryType> type) {
     return OracleQueriesResult.builder()
         .build()
         .asyncGet(
             externalApi.rxGetOracleQueriesByPubkey(
-                pubkey, from.orElse(null), limit.orElse(null), type.orElse(null)));
+                pubkey,
+                from.orElse(null),
+                limit.orElse(null),
+                type.orElse(QueryType.OPEN).toString()));
   }
 
   public OracleQueriesResult blockingGetOracleQueries(
-      String publicKey, Optional<String> from, Optional<BigInteger> limit, Optional<String> type) {
+      String publicKey,
+      Optional<String> from,
+      Optional<BigInteger> limit,
+      Optional<QueryType> type) {
     return OracleQueriesResult.builder()
         .build()
         .blockingGet(
             externalApi.rxGetOracleQueriesByPubkey(
-                publicKey, from.orElse(null), limit.orElse(null), type.orElse(null)));
+                publicKey,
+                from.orElse(null),
+                limit.orElse(null),
+                type.orElse(QueryType.OPEN).toString()));
   }
 
   @Override
