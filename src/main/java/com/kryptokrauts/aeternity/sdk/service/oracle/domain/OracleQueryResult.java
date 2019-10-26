@@ -2,6 +2,7 @@ package com.kryptokrauts.aeternity.sdk.service.oracle.domain;
 
 import com.kryptokrauts.aeternity.generated.model.OracleQuery;
 import com.kryptokrauts.aeternity.sdk.domain.GenericResultObject;
+import com.kryptokrauts.aeternity.sdk.util.EncodingUtils;
 import java.math.BigInteger;
 import lombok.Getter;
 import lombok.ToString;
@@ -38,8 +39,11 @@ public class OracleQueryResult extends GenericResultObject<OracleQuery, OracleQu
           .senderId(generatedResultObject.getSenderId())
           .senderNonce(generatedResultObject.getSenderNonce())
           .oracleId(generatedResultObject.getOracleId())
-          .query(generatedResultObject.getQuery())
-          .response(generatedResultObject.getResponse())
+          .query(
+              new String(EncodingUtils.decodeCheckWithIdentifier(generatedResultObject.getQuery())))
+          .response(
+              new String(
+                  EncodingUtils.decodeCheckWithIdentifier(generatedResultObject.getResponse())))
           .ttl(generatedResultObject.getTtl())
           .responseTtl(OracleTTLType.fromTypeEnum(generatedResultObject.getResponseTtl()))
           .fee(generatedResultObject.getFee())

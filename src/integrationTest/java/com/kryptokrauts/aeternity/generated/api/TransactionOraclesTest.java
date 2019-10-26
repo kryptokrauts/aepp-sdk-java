@@ -30,6 +30,9 @@ public class TransactionOraclesTest extends BaseTest {
   static String oracleId;
   static String queryId;
 
+  static String queryString = "Am I stupid?";
+  static String responseString = "yes you are nuts!";
+
   static BigInteger initialOracleTtl;
 
   @Test
@@ -103,7 +106,7 @@ public class TransactionOraclesTest extends BaseTest {
                     .senderId(baseKeyPair.getPublicKey())
                     .oracleId(oracleId)
                     .nonce(nonce)
-                    .query("Am I stupid?")
+                    .query(queryString)
                     .queryFee(BigInteger.valueOf(100))
                     .queryTtl(BigInteger.valueOf(50))
                     .ttl(ZERO)
@@ -130,12 +133,14 @@ public class TransactionOraclesTest extends BaseTest {
         context,
         t -> {
           try {
+            QueryType type = QueryType.ALL;
+            _logger.info("get OracleQueries with type: {}", type);
             OracleQueriesResult oracleQueriesResult =
                 this.aeternityServiceNative.oracles.blockingGetOracleQueries(
                     oracleAccount.getPublicKey().replace("ak_", "ok_"),
                     Optional.empty(),
                     Optional.empty(),
-                    Optional.of(QueryType.ALL));
+                    Optional.of(type));
             _logger.info("OracleQueriesResult: {}", oracleQueriesResult);
             _logger.info("OracleQuery count: {}", oracleQueriesResult.getQueryResults().size());
             context.assertFalse(oracleQueriesResult.getQueryResults().isEmpty());
@@ -144,14 +149,14 @@ public class TransactionOraclesTest extends BaseTest {
                     .filter(query -> query.getId().equals(queryId))
                     .findFirst()
                     .get();
-            _logger.info("found expected OracleQueryResult: {}", oracleQueryResult);
+            context.assertEquals(queryString, oracleQueryResult.getQuery());
             BigInteger nonce = getAccount(oracleAccount.getPublicKey()).getNonce().add(ONE);
             OracleRespondTransactionModel oracleRespondTx =
                 OracleRespondTransactionModel.builder()
                     .oracleId(oracleAccount.getPublicKey().replace("ak_", "ok_"))
                     .queryId(oracleQueryResult.getId())
                     .nonce(nonce)
-                    .response("yes you are nuts!")
+                    .response(responseString)
                     .responseTtl(BigInteger.valueOf(100))
                     .ttl(ZERO)
                     .build();
