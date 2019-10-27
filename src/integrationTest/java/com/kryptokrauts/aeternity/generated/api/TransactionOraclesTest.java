@@ -30,8 +30,10 @@ public class TransactionOraclesTest extends BaseTest {
   static String oracleId;
   static String queryId;
 
-  static String queryString = "Am I stupid?";
-  static String responseString = "yes you are nuts!";
+  static String queryString = "{\"lat\":48.78,\"lon\":9.18}";
+  /** example from https://api.openweathermap.org/ */
+  static String responseString =
+      "{\"coord\":{\"lon\":9.18,\"lat\":48.78},\"weather\":[{\"id\":310,\"main\":\"Drizzle\",\"description\":\"light intensity drizzle rain\",\"icon\":\"09n\"}],\"base\":\"stations\",\"main\":{\"temp\":282.56,\"pressure\":1021,\"humidity\":93,\"temp_min\":279.82,\"temp_max\":285.37},\"visibility\":7000,\"wind\":{\"speed\":4.1,\"deg\":330},\"clouds\":{\"all\":90},\"dt\":1572217099,\"sys\":{\"type\":1,\"id\":1274,\"country\":\"DE\",\"sunrise\":1572156074,\"sunset\":1572192774},\"timezone\":3600,\"id\":2825297,\"name\":\"Stuttgart\",\"cod\":200}";
 
   static BigInteger initialOracleTtl;
 
@@ -43,7 +45,7 @@ public class TransactionOraclesTest extends BaseTest {
           try {
             oracleAccount = keyPairService.generateBaseKeyPair();
 
-            oracleId = oracleAccount.getPublicKey().replace("ak_", "ok_");
+            oracleId = oracleAccount.getOraclePK();
             BigInteger amount = UnitConversionUtil.toAettos("10", Unit.AE).toBigInteger();
             SpendTransactionModel spendTx =
                 SpendTransactionModel.builder()
@@ -137,7 +139,7 @@ public class TransactionOraclesTest extends BaseTest {
             _logger.info("get OracleQueries with type: {}", type);
             OracleQueriesResult oracleQueriesResult =
                 this.aeternityServiceNative.oracles.blockingGetOracleQueries(
-                    oracleAccount.getPublicKey().replace("ak_", "ok_"),
+                    oracleAccount.getOraclePK(),
                     Optional.empty(),
                     Optional.empty(),
                     Optional.of(type));
@@ -153,7 +155,7 @@ public class TransactionOraclesTest extends BaseTest {
             BigInteger nonce = getAccount(oracleAccount.getPublicKey()).getNonce().add(ONE);
             OracleRespondTransactionModel oracleRespondTx =
                 OracleRespondTransactionModel.builder()
-                    .oracleId(oracleAccount.getPublicKey().replace("ak_", "ok_"))
+                    .oracleId(oracleAccount.getOraclePK())
                     .queryId(oracleQueryResult.getId())
                     .nonce(nonce)
                     .response(responseString)

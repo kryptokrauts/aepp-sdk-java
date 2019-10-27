@@ -185,9 +185,9 @@ public class TransactionNameServiceTest extends BaseTest {
 
             String accountPointer = baseKeyPair.getPublicKey();
             // fake other allowed pointers
-            String contractPointer = baseKeyPair.getPublicKey().replace("ak_", "ct_");
+            String contractPointer = baseKeyPair.getContractPK();
             String channelPointer = baseKeyPair.getPublicKey().replace("ak_", "ch_");
-            String oraclePointer = baseKeyPair.getPublicKey().replace("ak_", "ok_");
+            String oraclePointer = baseKeyPair.getOraclePK();
 
             NameUpdateTransactionModel nameUpdateTx =
                 NameUpdateTransactionModel.builder()
