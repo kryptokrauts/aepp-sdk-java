@@ -284,14 +284,15 @@ public class TransactionNameServiceTest extends BaseTest {
    * @throws Throwable
    */
   @Test
-  public void auctionTest(TestContext context) {
+  public void zAuctionTest(TestContext context) {
     this.executeTest(
         context,
         t -> {
           try {
             _logger.info("--------------------- auctionTest ---------------------");
             BigInteger salt = CryptoUtils.generateNamespaceSalt();
-            String domain = "auction" + (random.nextInt(90) + 10) + TestConstants.NAMESPACE;
+            String domain = "auction" + (random.nextInt(90000) + 10000) + TestConstants.NAMESPACE;
+            _logger.info("domain has {} chars", domain.split("\\.")[0].length());
 
             BigInteger oldActiveAuctions =
                 this.aeternityServiceNative.aeternal.blockingGetNameAuctionsActiveCount();
@@ -336,7 +337,12 @@ public class TransactionNameServiceTest extends BaseTest {
                     "Using namespace %s and salt %s for committmentId %s",
                     domain, salt, EncodingUtils.generateCommitmentHash(domain, salt)));
             _logger.info("NameClaimTx hash: {}", nameClaimResult.getTxHash());
-
+            /** now we have an active auction and we wait for it to be present at aeternal */
+            while (!this.aeternityServiceNative.aeternal.blockingIsAuctionActive(domain)) {
+              _logger.info("waiting for auction of domain {}", domain);
+              Thread.sleep(1000);
+            }
+            _logger.info("found auction for domain {}", domain);
             /** name cannot be found due to running auction */
             NameIdResult nameIdResult = this.aeternityServiceNative.names.blockingGetNameId(domain);
             context.assertTrue(
@@ -387,7 +393,6 @@ public class TransactionNameServiceTest extends BaseTest {
                     .nameFee(nextNameFee)
                     .nameSalt(BigInteger.ZERO)
                     .build();
-
             PostTransactionResult result =
                 this.blockingPostTx(nextNameClaimTx, Optional.of(kpNextClaimer.getPrivateKey()));
             TransactionResult transactionResult = waitForTxMined(result.getTxHash());
@@ -395,13 +400,6 @@ public class TransactionNameServiceTest extends BaseTest {
             BigInteger finalBlockHeight =
                 transactionResult.getBlockHeight().add(AENS.getBlockTimeout(domain));
             _logger.info("claim will be final at block {}", finalBlockHeight);
-            // now we have an active auction
-            // we wait for it to be present at aeternal
-            while (!this.aeternityServiceNative.aeternal.blockingIsAuctionActive(domain)) {
-              _logger.info("waiting for auction of domain {}", domain);
-              Thread.sleep(1000);
-            }
-            _logger.info("found auction for domain {}", domain);
             BigInteger newActiveAuctions =
                 this.aeternityServiceNative.aeternal.blockingGetNameAuctionsActiveCount();
             _logger.info("active auctions: {}", newActiveAuctions);
