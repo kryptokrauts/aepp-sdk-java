@@ -1,7 +1,8 @@
 package com.kryptokrauts.aeternity.sdk.service.oracle;
 
-import com.kryptokrauts.aeternity.sdk.service.name.domain.OracleQueriesResult;
-import com.kryptokrauts.aeternity.sdk.service.name.domain.OracleQueryResult;
+import com.kryptokrauts.aeternity.sdk.service.oracle.domain.OracleQueriesResult;
+import com.kryptokrauts.aeternity.sdk.service.oracle.domain.OracleQueryResult;
+import com.kryptokrauts.aeternity.sdk.service.oracle.domain.QueryType;
 import com.kryptokrauts.aeternity.sdk.service.oracle.domain.RegisteredOracleResult;
 import io.reactivex.Single;
 import java.math.BigInteger;
@@ -35,7 +36,10 @@ public interface OracleService {
    * @return asynchronous result handler (RxJava Single) for {@link OracleQueriesResult}
    */
   Single<OracleQueriesResult> asyncGetOracleQueries(
-      String publicKey, Optional<String> from, Optional<BigInteger> limit, Optional<String> type);
+      String publicKey,
+      Optional<String> from,
+      Optional<BigInteger> limit,
+      Optional<QueryType> type);
 
   /**
    * synchronously get oracle queries by public key
@@ -47,7 +51,10 @@ public interface OracleService {
    * @return result of {@link OracleQueriesResult}
    */
   OracleQueriesResult blockingGetOracleQueries(
-      String publicKey, Optional<String> from, Optional<BigInteger> limit, Optional<String> type);
+      String publicKey,
+      Optional<String> from,
+      Optional<BigInteger> limit,
+      Optional<QueryType> type);
 
   /**
    * asynchronously get an oracle query by public key and query ID

@@ -27,8 +27,8 @@ chain:
 mining:
   autostart: true
   beneficiary: "ak_twR4h7dEcUtc2iSEDv8kB7UFJJDGiEDQCXr85C3fYF8FdVdyo"
-  expected_mine_rate: 4000
-  micro_block_cycle: 1000
+  expected_mine_rate: 250
+  micro_block_cycle: 100
   cuckoo:
     miner:
       executable: mean15-generic

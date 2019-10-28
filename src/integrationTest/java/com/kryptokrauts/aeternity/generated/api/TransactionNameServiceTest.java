@@ -185,9 +185,9 @@ public class TransactionNameServiceTest extends BaseTest {
 
             String accountPointer = baseKeyPair.getPublicKey();
             // fake other allowed pointers
-            String contractPointer = baseKeyPair.getPublicKey().replace("ak_", "ct_");
+            String contractPointer = baseKeyPair.getContractPK();
             String channelPointer = baseKeyPair.getPublicKey().replace("ak_", "ch_");
-            String oraclePointer = baseKeyPair.getPublicKey().replace("ak_", "ok_");
+            String oraclePointer = baseKeyPair.getOraclePK();
 
             NameUpdateTransactionModel nameUpdateTx =
                 NameUpdateTransactionModel.builder()
@@ -284,14 +284,19 @@ public class TransactionNameServiceTest extends BaseTest {
    * @throws Throwable
    */
   @Test
-  public void auctionTest(TestContext context) {
+  public void zAuctionTest(TestContext context) {
     this.executeTest(
         context,
         t -> {
           try {
             _logger.info("--------------------- auctionTest ---------------------");
             BigInteger salt = CryptoUtils.generateNamespaceSalt();
-            String domain = "auction" + (random.nextInt(900) + 100) + TestConstants.NAMESPACE;
+            String domain = "auction" + (random.nextInt(90000) + 10000) + TestConstants.NAMESPACE;
+            _logger.info("domain has {} chars", domain.split("\\.")[0].length());
+
+            BigInteger oldActiveAuctions =
+                this.aeternityServiceNative.aeternal.blockingGetNameAuctionsActiveCount();
+            _logger.info("active auctions: {}", oldActiveAuctions);
 
             /** create a new namespace to update later */
             NamePreclaimTransactionModel namePreclaimTx =
@@ -302,15 +307,15 @@ public class TransactionNameServiceTest extends BaseTest {
                     .nonce(getNextBaseKeypairNonce())
                     .ttl(ZERO)
                     .build();
-
             PostTransactionResult namePreclaimResult =
                 this.blockingPostTx(namePreclaimTx, Optional.empty());
             _logger.info("NamePreclaimTx hash: {}", namePreclaimResult.getTxHash());
-
             context.assertEquals(
                 namePreclaimResult.getTxHash(),
                 this.aeternityServiceNative.transactions.computeTxHash(namePreclaimTx));
-
+            // currently we do not have an active auction
+            context.assertFalse(
+                this.aeternityServiceNative.aeternal.blockingIsAuctionActive(domain));
             NameClaimTransactionModel nameClaimTx =
                 NameClaimTransactionModel.builder()
                     .accountId(baseKeyPair.getPublicKey())
@@ -332,7 +337,12 @@ public class TransactionNameServiceTest extends BaseTest {
                     "Using namespace %s and salt %s for committmentId %s",
                     domain, salt, EncodingUtils.generateCommitmentHash(domain, salt)));
             _logger.info("NameClaimTx hash: {}", nameClaimResult.getTxHash());
-
+            /** now we have an active auction and we wait for it to be present at aeternal */
+            while (!this.aeternityServiceNative.aeternal.blockingIsAuctionActive(domain)) {
+              _logger.info("waiting for auction of domain {}", domain);
+              Thread.sleep(1000);
+            }
+            _logger.info("found auction for domain {}", domain);
             /** name cannot be found due to running auction */
             NameIdResult nameIdResult = this.aeternityServiceNative.names.blockingGetNameId(domain);
             context.assertTrue(
@@ -367,12 +377,10 @@ public class TransactionNameServiceTest extends BaseTest {
                     .ttl(ZERO)
                     .nonce(nonce)
                     .build();
-            PostTransactionResult txResponse =
-                aeternityServiceNative.transactions.blockingPostTransaction(spendTx);
+            PostTransactionResult txResponse = this.blockingPostTx(spendTx, Optional.empty());
             _logger.info("SpendTx hash: " + txResponse.getTxHash());
             context.assertEquals(
                 txResponse.getTxHash(), aeternityServiceNative.transactions.computeTxHash(spendTx));
-            waitForTxMined(txResponse.getTxHash());
 
             /** get funded account and create next nameClaimTx */
             AccountResult otherAccount =
@@ -385,20 +393,21 @@ public class TransactionNameServiceTest extends BaseTest {
                     .nameFee(nextNameFee)
                     .nameSalt(BigInteger.ZERO)
                     .build();
-
             PostTransactionResult result =
-                this.aeternityServiceNative.transactions.blockingPostTransaction(
-                    nextNameClaimTx, kpNextClaimer.getPrivateKey());
+                this.blockingPostTx(nextNameClaimTx, Optional.of(kpNextClaimer.getPrivateKey()));
             TransactionResult transactionResult = waitForTxMined(result.getTxHash());
             _logger.info("next claimTx result: {}", transactionResult);
             BigInteger finalBlockHeight =
                 transactionResult.getBlockHeight().add(AENS.getBlockTimeout(domain));
             _logger.info("claim will be final at block {}", finalBlockHeight);
-            // TODO we want to wait here
-            // waitForBlockHeight(finalBlockHeight);
-            // nameIdResult =
-            // this.aeternityServiceNative.names.blockingGetNameId(domain);
-            // context.assertTrue(nameIdResult.getRootErrorMessage() == null);
+            BigInteger newActiveAuctions =
+                this.aeternityServiceNative.aeternal.blockingGetNameAuctionsActiveCount();
+            _logger.info("active auctions: {}", newActiveAuctions);
+            context.assertEquals(oldActiveAuctions.add(BigInteger.ONE), newActiveAuctions);
+            waitForBlockHeight(finalBlockHeight, 5000l);
+            nameIdResult = this.aeternityServiceNative.names.blockingGetNameId(domain);
+            context.assertTrue(nameIdResult.getRootErrorMessage() == null);
+            _logger.info("NameIdResult: {}", nameIdResult);
             _logger.info("--------------------- auctionTest ---------------------");
           } catch (Throwable e) {
             context.fail(e);
