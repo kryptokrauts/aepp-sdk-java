@@ -3,12 +3,16 @@ package com.kryptokrauts.aeternity.sdk.service;
 import com.google.common.collect.ImmutableMap;
 import com.kryptokrauts.aeternity.generated.ApiClient;
 import com.kryptokrauts.aeternity.sdk.constants.BaseConstants;
+import com.kryptokrauts.aeternity.sdk.constants.VirtualMachine;
+import com.kryptokrauts.aeternity.sdk.domain.secret.impl.BaseKeyPair;
+import com.kryptokrauts.aeternity.sdk.exception.InvalidParameterException;
 import com.kryptokrauts.aeternity.sdk.service.wallet.WalletServiceConfiguration;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
 import java.util.HashMap;
 import javax.annotation.Nonnull;
 import lombok.Builder.Default;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 import org.slf4j.Logger;
@@ -43,7 +47,13 @@ public class ServiceConfiguration {
 
   @Default @Nonnull protected String baseUrl = BaseConstants.DEFAULT_TESTNET_URL;
 
-  @Default @Nonnull protected String contractBaseUrl = BaseConstants.DEFAULT_TESTNET_CONTRACT_URL;
+  @Default @Nonnull protected String compilerBaseUrl = BaseConstants.DEFAULT_TESTNET_COMPILER_URL;
+
+  @Default @Nonnull protected String aeternalBaseUrl = BaseConstants.DEFAULT_TESTNET_AETERNAL_URL;
+
+  @Getter @Default @Nonnull protected VirtualMachine targetVM = VirtualMachine.FATE;
+
+  private BaseKeyPair baseKeyPair;
 
   /** the vertx instance */
   protected Vertx vertx;
@@ -63,7 +73,7 @@ public class ServiceConfiguration {
                   ImmutableMap.of(BaseConstants.VERTX_BASE_PATH, baseUrl))));
     } else
       throw new RuntimeException(
-          "Cannot intantiate ApiClient due to missing params vertx and or baseUrl");
+          "Cannot instantiate ApiClient due to missing params vertx and or baseUrl");
   }
 
   public com.kryptokrauts.sophia.compiler.generated.ApiClient getCompilerApiClient() {
@@ -71,17 +81,44 @@ public class ServiceConfiguration {
       _logger.debug("Vertx entry point not initialized, creating default");
       vertx = Vertx.vertx();
     }
-    if (vertx != null && contractBaseUrl != null) {
+    if (vertx != null && compilerBaseUrl != null) {
       _logger.debug(
           String.format(
-              "Initializing Vertx CompilerApiClient using contractBaseUrl %s", contractBaseUrl));
+              "Initializing Vertx CompilerApiClient using compilerBaseUrl %s", compilerBaseUrl));
       return new com.kryptokrauts.sophia.compiler.generated.ApiClient(
           vertx,
           new JsonObject(
               new HashMap<String, Object>(
-                  ImmutableMap.of(BaseConstants.VERTX_BASE_PATH, contractBaseUrl))));
+                  ImmutableMap.of(BaseConstants.VERTX_BASE_PATH, compilerBaseUrl))));
     } else
       throw new RuntimeException(
-          "Cannot intantiate ApiClient due to missing params vertx and or contractBaseUrl");
+          "Cannot instantiate ApiClient due to missing params vertx and or compilerBaseUrl");
+  }
+
+  public com.kryptokrauts.aeternal.generated.ApiClient getAeternalApiClient() {
+    if (vertx == null) {
+      _logger.debug("Vertx entry point not initialized, creating default");
+      vertx = Vertx.vertx();
+    }
+    if (vertx != null && aeternalBaseUrl != null) {
+      _logger.debug(
+          String.format(
+              "Initializing Vertx AeternalApiClient using aeternalBaseUrl %s", aeternalBaseUrl));
+      return new com.kryptokrauts.aeternal.generated.ApiClient(
+          vertx,
+          new JsonObject(
+              new HashMap<String, Object>(
+                  ImmutableMap.of(BaseConstants.VERTX_BASE_PATH, aeternalBaseUrl))));
+    } else
+      throw new RuntimeException(
+          "Cannot instantiate ApiClient due to missing params vertx and or aeternalBaseUrl");
+  }
+
+  public BaseKeyPair getBaseKeyPair() {
+    if (baseKeyPair == null) {
+      throw new InvalidParameterException(
+          "Service call was initiated which needs the baseKeyPair but none is set in ServiceConfiguration.baseKeyPair - check parameters");
+    }
+    return baseKeyPair;
   }
 }

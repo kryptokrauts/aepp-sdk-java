@@ -1,45 +1,100 @@
 package com.kryptokrauts.aeternity.sdk.service.compiler;
 
-import com.kryptokrauts.sophia.compiler.generated.model.ACI;
-import com.kryptokrauts.sophia.compiler.generated.model.ByteCode;
-import com.kryptokrauts.sophia.compiler.generated.model.Calldata;
-import com.kryptokrauts.sophia.compiler.generated.model.SophiaJsonData;
+import com.kryptokrauts.aeternity.sdk.service.compiler.domain.ACIResult;
 import io.reactivex.Single;
 import java.util.List;
 
 public interface CompilerService {
 
   /**
-   * gets the encoded calldata for this contractCode
+   * asynchronously gets the encoded calldata for this contractCode
+   *
+   * @param contractCode the sourcecode of the contract
+   * @return asynchronous result handler (RxJava Single) for encoded calldata
+   */
+  Single<String> asyncEncodeCalldata(String contractCode, String function, List<String> arguments);
+
+  /**
+   * synchronously gets the encoded calldata for this contractCode
    *
    * @param contractCode the sourcecode of the contract
    * @return encoded calldata
    */
-  Single<Calldata> encodeCalldata(String contractCode, String function, List<String> arguments);
+  String blockingEncodeCalldata(String contractCode, String function, List<String> arguments);
 
   /**
-   * gets the contract bytecode for this contractCode
+   * asynchronously gets the contract bytecode for this contractCode
+   *
+   * @param contractCode the sourcecode of the contract
+   * @return asynchronous result handler (RxJava Single) for byteCode of the compiled contract
+   */
+  Single<String> asyncCompile(String contractCode, String srcFile, Object fileSystem);
+
+  /**
+   * synchronously gets the contract bytecode for this contractCode
    *
    * @param contractCode the sourcecode of the contract
    * @return byteCode of the compiled contract
    */
-  Single<ByteCode> compile(String contractCode, String srcFile, Object fileSystem);
+  String blockingCompile(String contractCode, String srcFile, Object fileSystem);
 
   /**
-   * decodes a calldata
+   * asynchronously decodes a calldata
    *
    * @param calldata the calldata
    * @param sophiaType the awaited sophia type
-   * @return decoded answer
+   * @return asynchronous result handler (RxJava Single) for decoded answer as json string
    */
-  Single<SophiaJsonData> decodeCalldata(String calldata, String sophiaType);
+  Single<Object> asyncDecodeCalldata(String calldata, String sophiaType);
 
   /**
-   * generates the ACI for this contractCode
+   * synchronously decodes a calldata
+   *
+   * @param calldata the calldata
+   * @param sophiaType the awaited sophia type
+   * @return decoded answer as json string
+   */
+  Object blockingDecodeCalldata(String calldata, String sophiaType);
+
+  /**
+   * asynchronously decodes callresult of contract-calls
+   *
+   * @param source the contract source
+   * @param function the called function
+   * @param callResult the received resultType (ok | error | revert)
+   * @param callValue the received value
+   * @return the decoded sophia call result
+   */
+  Single<Object> asyncDecodeCallResult(
+      String source, String function, String callResult, String callValue);
+
+  /**
+   * synchronously decodes callresult of contract-calls
+   *
+   * @param source the contract source
+   * @param function the called function
+   * @param callResult the received resultType (ok | error | revert)
+   * @param callValue the received value
+   * @return the decoded sophia call result
+   */
+  Object blockingDecodeCallResult(
+      String source, String function, String callResult, String callValue);
+
+  /**
+   * asynchronously generates the ACI for this contractCode
    * https://github.com/aeternity/aesophia/blob/master/docs/aeso_aci.md
    *
    * @param contractCode the sourcecode of the contract
-   * @return the ACI for a given contract
+   * @return asynchronous result handler (RxJava Single) for {@link ACIResult}
    */
-  Single<ACI> generateACI(String contractCode);
+  Single<ACIResult> asyncGenerateACI(String contractCode, String srcFile, Object fileSystem);
+
+  /**
+   * synchronously generates the ACI for this contractCode
+   * https://github.com/aeternity/aesophia/blob/master/docs/aeso_aci.md
+   *
+   * @param contractCode the sourcecode of the contract
+   * @return result of {@linkACIResult}
+   */
+  ACIResult blockingGenerateACI(String contractCode, String srcFile, Object fileSystem);
 }

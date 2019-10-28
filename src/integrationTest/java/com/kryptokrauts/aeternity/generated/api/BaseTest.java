@@ -1,43 +1,33 @@
 package com.kryptokrauts.aeternity.generated.api;
 
-import com.kryptokrauts.aeternity.generated.model.Account;
-import com.kryptokrauts.aeternity.generated.model.DryRunResults;
-import com.kryptokrauts.aeternity.generated.model.GenericSignedTx;
-import com.kryptokrauts.aeternity.generated.model.PostTxResponse;
-import com.kryptokrauts.aeternity.generated.model.Tx;
-import com.kryptokrauts.aeternity.generated.model.TxInfoObject;
-import com.kryptokrauts.aeternity.generated.model.UnsignedTx;
-import com.kryptokrauts.aeternity.sdk.constants.BaseConstants;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kryptokrauts.aeternity.sdk.constants.Network;
-import com.kryptokrauts.aeternity.sdk.service.ServiceConfiguration;
-import com.kryptokrauts.aeternity.sdk.service.account.AccountService;
-import com.kryptokrauts.aeternity.sdk.service.account.AccountServiceFactory;
-import com.kryptokrauts.aeternity.sdk.service.aens.NameService;
-import com.kryptokrauts.aeternity.sdk.service.aens.NameServiceFactory;
-import com.kryptokrauts.aeternity.sdk.service.chain.ChainService;
-import com.kryptokrauts.aeternity.sdk.service.chain.ChainServiceFactory;
-import com.kryptokrauts.aeternity.sdk.service.compiler.CompilerService;
-import com.kryptokrauts.aeternity.sdk.service.compiler.CompilerServiceFactory;
+import com.kryptokrauts.aeternity.sdk.constants.VirtualMachine;
+import com.kryptokrauts.aeternity.sdk.domain.secret.impl.BaseKeyPair;
+import com.kryptokrauts.aeternity.sdk.service.account.domain.AccountResult;
+import com.kryptokrauts.aeternity.sdk.service.aeternity.AeternityServiceConfiguration;
+import com.kryptokrauts.aeternity.sdk.service.aeternity.AeternityServiceFactory;
+import com.kryptokrauts.aeternity.sdk.service.aeternity.impl.AeternityService;
+import com.kryptokrauts.aeternity.sdk.service.info.domain.TransactionInfoResult;
+import com.kryptokrauts.aeternity.sdk.service.info.domain.TransactionResult;
 import com.kryptokrauts.aeternity.sdk.service.keypair.KeyPairService;
 import com.kryptokrauts.aeternity.sdk.service.keypair.KeyPairServiceFactory;
-import com.kryptokrauts.aeternity.sdk.service.transaction.AccountParameter;
-import com.kryptokrauts.aeternity.sdk.service.transaction.TransactionService;
-import com.kryptokrauts.aeternity.sdk.service.transaction.TransactionServiceConfiguration;
-import com.kryptokrauts.aeternity.sdk.service.transaction.TransactionServiceFactory;
-import com.kryptokrauts.aeternity.sdk.service.transaction.type.AbstractTransaction;
-import com.kryptokrauts.aeternity.sdk.service.transaction.type.impl.ContractCallTransaction;
-import com.kryptokrauts.sophia.compiler.generated.model.Calldata;
-import com.kryptokrauts.sophia.compiler.generated.model.SophiaJsonData;
+import com.kryptokrauts.aeternity.sdk.service.transaction.domain.PostTransactionResult;
+import com.kryptokrauts.aeternity.sdk.service.transaction.type.model.AbstractTransactionModel;
 import io.reactivex.Single;
 import io.reactivex.observers.TestObserver;
 import io.vertx.core.Vertx;
+import io.vertx.core.VertxOptions;
 import io.vertx.core.json.JsonObject;
+import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.RunTestOnContext;
+import io.vertx.ext.unit.junit.Timeout;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
 import java.math.BigInteger;
 import java.util.List;
-import java.util.Map;
+import java.util.Optional;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 import javax.naming.ConfigurationException;
 import org.junit.After;
@@ -51,91 +41,87 @@ import org.slf4j.LoggerFactory;
 @RunWith(VertxUnitRunner.class)
 public abstract class BaseTest {
 
-  protected static final Logger _logger = LoggerFactory.getLogger("IntegrationTest");
+  /** we wait max. for 5 Minutes to complete each testcase */
+  protected static final long TEST_CASE_TIMEOUT_MILLIS = 300000L;
+
+  protected static final BigInteger ONE = BigInteger.ONE;
+
+  protected static final BigInteger ZERO = BigInteger.ZERO;
+
+  protected static final Logger _logger =
+      LoggerFactory.getLogger("com.kryptokrauts.IntegrationTest");
 
   private static final String AETERNITY_BASE_URL = "AETERNITY_BASE_URL";
 
   private static final String COMPILER_BASE_URL = "COMPILER_BASE_URL";
 
+  private static final String AETERNAL_BASE_URL = "AETERNAL_BASE_URL";
+
+  protected static final VirtualMachine targetVM = VirtualMachine.FATE;
+
   protected KeyPairService keyPairService;
 
-  protected ChainService chainService;
+  protected AeternityService aeternityServiceNative;
 
-  protected TransactionService transactionServiceNative;
+  protected AeternityService aeternityServiceDebug;
 
-  protected TransactionService transactionServiceDebug;
+  protected ObjectMapper objectMapper = new ObjectMapper();
 
-  protected AccountService accountService;
+  BaseKeyPair baseKeyPair;
 
-  protected CompilerService sophiaCompilerService;
+  @Rule
+  public RunTestOnContext rule =
+      new RunTestOnContext(
+          new VertxOptions()
+              .setMaxWorkerExecuteTime(TEST_CASE_TIMEOUT_MILLIS)
+              .setMaxEventLoopExecuteTime(TEST_CASE_TIMEOUT_MILLIS)
+              .setBlockedThreadCheckInterval(TEST_CASE_TIMEOUT_MILLIS));
 
-  protected NameService nameService;
+  @Rule public Timeout timeoutRule = Timeout.millis(TEST_CASE_TIMEOUT_MILLIS);
 
-  @Rule public RunTestOnContext rule = new RunTestOnContext();
+  Vertx vertx;
 
   @Before
   public void setupApiClient(TestContext context) throws ConfigurationException {
-    Vertx vertx = rule.vertx();
+    vertx = rule.vertx();
+
     keyPairService = new KeyPairServiceFactory().getService();
-    accountService =
-        new AccountServiceFactory()
+
+    baseKeyPair =
+        keyPairService.generateBaseKeyPairFromSecret(TestConstants.BENEFICIARY_PRIVATE_KEY);
+
+    aeternityServiceNative =
+        new AeternityServiceFactory()
             .getService(
-                ServiceConfiguration.configure()
+                AeternityServiceConfiguration.configure()
                     .baseUrl(getAeternityBaseUrl())
-                    .vertx(vertx)
-                    .compile());
-    chainService =
-        new ChainServiceFactory()
-            .getService(
-                ServiceConfiguration.configure()
-                    .baseUrl(getAeternityBaseUrl())
-                    .vertx(vertx)
-                    .compile());
-    transactionServiceNative =
-        new TransactionServiceFactory()
-            .getService(
-                TransactionServiceConfiguration.configure()
-                    .baseUrl(getAeternityBaseUrl())
+                    .compilerBaseUrl(getCompilerBaseUrl())
+                    .aeternalBaseUrl(getAeternalBaseUrl())
                     .network(Network.DEVNET)
+                    .nativeMode(true)
+                    .baseKeyPair(baseKeyPair)
                     .vertx(vertx)
+                    .targetVM(targetVM)
                     .compile());
-    transactionServiceDebug =
-        new TransactionServiceFactory()
+    aeternityServiceDebug =
+        new AeternityServiceFactory()
             .getService(
-                TransactionServiceConfiguration.configure()
+                AeternityServiceConfiguration.configure()
+                    .baseUrl(getAeternityBaseUrl())
+                    .compilerBaseUrl(getCompilerBaseUrl())
+                    .aeternalBaseUrl(getAeternalBaseUrl())
+                    .network(Network.DEVNET)
                     .nativeMode(false)
-                    .baseUrl(getAeternityBaseUrl())
-                    .network(Network.DEVNET)
+                    .baseKeyPair(baseKeyPair)
                     .vertx(vertx)
-                    .compile());
-
-    sophiaCompilerService =
-        new CompilerServiceFactory()
-            .getService(
-                ServiceConfiguration.configure()
-                    .contractBaseUrl(getCompilerBaseUrl())
-                    .vertx(vertx)
-                    .compile());
-
-    nameService =
-        new NameServiceFactory()
-            .getService(
-                ServiceConfiguration.configure()
-                    .baseUrl(getAeternityBaseUrl())
-                    .vertx(vertx)
+                    .targetVM(targetVM)
                     .compile());
   }
 
   @After
   public void shutdownClient(TestContext context) {
     _logger.info("Closing vertx");
-    Vertx vertx = rule.vertx();
     vertx.close();
-    keyPairService = null;
-    accountService = null;
-    chainService = null;
-    transactionServiceDebug = null;
-    transactionServiceNative = null;
   }
 
   private static String getAeternityBaseUrl() throws ConfigurationException {
@@ -154,6 +140,14 @@ public abstract class BaseTest {
     return compilerBaseUrl;
   }
 
+  protected static String getAeternalBaseUrl() throws ConfigurationException {
+    String aeternalBaseUrl = System.getenv(AETERNAL_BASE_URL);
+    if (aeternalBaseUrl == null) {
+      throw new ConfigurationException("ENV variable missing: AETERNAL_BASE_URL");
+    }
+    return aeternalBaseUrl;
+  }
+
   @BeforeClass
   public static void startup() throws ConfigurationException {
     _logger.info(
@@ -162,46 +156,65 @@ public abstract class BaseTest {
             "Using following environment"));
     _logger.info(String.format("%s: %s", AETERNITY_BASE_URL, getAeternityBaseUrl()));
     _logger.info(String.format("%s: %s", COMPILER_BASE_URL, getCompilerBaseUrl()));
+    _logger.info(String.format("%s: %s", AETERNAL_BASE_URL, getAeternalBaseUrl()));
     _logger.info(
         "-----------------------------------------------------------------------------------");
   }
 
-  protected Account getAccount(String publicKey) {
-    Single<Account> accountSingle = accountService.getAccount(publicKey);
-    TestObserver<Account> accountTestObserver = accountSingle.test();
-    accountTestObserver.awaitTerminalEvent();
-    Account account = accountTestObserver.values().get(0);
-    return account;
+  protected BigInteger getNextBaseKeypairNonce() {
+    return getAccount(this.baseKeyPair.getPublicKey()).getNonce().add(ONE);
   }
 
-  protected PostTxResponse postTx(Tx signedTx) throws Throwable {
-    PostTxResponse postTxResponse =
-        callMethodAndGetResult(
-            () -> transactionServiceNative.postTransaction(signedTx), PostTxResponse.class);
-    _logger.info("Post tx hash :" + postTxResponse.getTxHash());
-    GenericSignedTx txValue = waitForTxMined(postTxResponse.getTxHash());
+  protected AccountResult getAccount(String publicKey) {
+    return aeternityServiceNative.accounts.blockingGetAccount(Optional.ofNullable(publicKey));
+  }
+
+  protected TransactionInfoResult waitForTxInfoObject(String txHash) throws Throwable {
+    return callMethodAndGetResult(
+        () -> aeternityServiceNative.info.asyncGetTransactionInfoByHash(txHash),
+        TransactionInfoResult.class);
+  }
+
+  protected PostTransactionResult blockingPostTx(
+      AbstractTransactionModel<?> tx, Optional<String> privateKey) throws Throwable {
+    PostTransactionResult postTxResponse =
+        this.aeternityServiceNative.transactions.blockingPostTransaction(
+            tx, privateKey.orElse(this.baseKeyPair.getPrivateKey()));
+    _logger.info("PostTx hash: " + postTxResponse.getTxHash());
+    TransactionResult txValue = waitForTxMined(postTxResponse.getTxHash());
     _logger.info(
         String.format(
             "Transaction of type %s is mined at block %s with height %s",
-            txValue.getTx().getType(), txValue.getBlockHash(), txValue.getBlockHeight()));
+            txValue.getTxType(), txValue.getBlockHash(), txValue.getBlockHeight()));
 
     return postTxResponse;
   }
 
-  protected TxInfoObject waitForTxInfoObject(String txHash) throws Throwable {
-    return callMethodAndGetResult(
-        () -> transactionServiceNative.getTransactionInfoByHash(txHash), TxInfoObject.class);
+  protected PostTransactionResult postTx(AbstractTransactionModel<?> tx) throws Throwable {
+    PostTransactionResult postTxResponse =
+        callMethodAndGetResult(
+            () -> this.aeternityServiceNative.transactions.asyncPostTransaction(tx),
+            PostTransactionResult.class);
+    _logger.info("PostTx hash: " + postTxResponse.getTxHash());
+    TransactionResult txValue = waitForTxMined(postTxResponse.getTxHash());
+    _logger.info(
+        String.format(
+            "Transaction of type %s is mined at block %s with height %s",
+            txValue.getTxType(), txValue.getBlockHash(), txValue.getBlockHeight()));
+
+    return postTxResponse;
   }
 
-  protected GenericSignedTx waitForTxMined(String txHash) throws Throwable {
+  protected TransactionResult waitForTxMined(String txHash) throws Throwable {
     int blockHeight = -1;
-    GenericSignedTx minedTx = null;
+    TransactionResult minedTx = null;
     int doneTrials = 1;
 
     while (blockHeight == -1 && doneTrials < TestConstants.NUM_TRIALS_DEFAULT) {
       minedTx =
           callMethodAndGetResult(
-              () -> transactionServiceNative.getTransactionByHash(txHash), GenericSignedTx.class);
+              () -> aeternityServiceNative.info.asyncGetTransactionByHash(txHash),
+              TransactionResult.class);
       if (minedTx.getBlockHeight().intValue() > 1) {
         _logger.debug("Mined tx: " + minedTx);
         blockHeight = minedTx.getBlockHeight().intValue();
@@ -224,65 +237,35 @@ public abstract class BaseTest {
     return minedTx;
   }
 
-  protected Calldata encodeCalldata(
-      String contractSourceCode, String contractFunction, List<String> contractFunctionParams)
-      throws Throwable {
-    return callMethodAndGetResult(
-        () ->
-            this.sophiaCompilerService.encodeCalldata(
-                contractSourceCode, contractFunction, contractFunctionParams),
-        Calldata.class);
-  }
-
-  protected JsonObject decodeCalldata(String encodedValue, String sophiaReturnType)
-      throws Throwable {
-    // decode the result to json
-    SophiaJsonData sophiaJsonData =
-        callMethodAndGetResult(
-            () -> this.sophiaCompilerService.decodeCalldata(encodedValue, sophiaReturnType),
-            SophiaJsonData.class);
-    return JsonObject.mapFrom(sophiaJsonData.getData());
-  }
-
-  protected DryRunResults performDryRunTransactions(
-      List<Map<AccountParameter, Object>> accounts, BigInteger block, List<UnsignedTx> unsignedTxes)
-      throws Throwable {
-
-    return callMethodAndGetResult(
-        () -> this.transactionServiceNative.dryRunTransactions(accounts, block, unsignedTxes),
-        DryRunResults.class);
-  }
-
-  protected UnsignedTx createUnsignedContractCallTx(
-      String callerId,
-      BigInteger nonce,
-      String calldata,
-      BigInteger gasPrice,
-      String contractId,
-      BigInteger amount)
-      throws Throwable {
-    BigInteger abiVersion = BigInteger.ONE;
-    BigInteger ttl = BigInteger.ZERO;
-    BigInteger gas = BigInteger.valueOf(1579000);
-
-    AbstractTransaction<?> contractTx =
-        transactionServiceNative
-            .getTransactionFactory()
-            .createContractCallTransaction(
-                abiVersion,
-                calldata,
-                contractId,
-                gas,
-                gasPrice != null ? gasPrice : BigInteger.valueOf(BaseConstants.MINIMAL_GAS_PRICE),
-                nonce,
-                callerId,
-                ttl);
-    if (amount != null) {
-      ((ContractCallTransaction) contractTx).setAmount(amount);
+  protected void waitForBlockHeight(BigInteger blockHeight, Long timeoutMilli) throws Throwable {
+    BigInteger currentBlockHeight = BigInteger.ZERO;
+    _logger.info(
+        "waiting for blockHeight {} and checking every {} seconds",
+        blockHeight,
+        timeoutMilli / 1000d);
+    while (currentBlockHeight.compareTo(blockHeight) == -1) {
+      currentBlockHeight = aeternityServiceNative.info.blockingGetCurrentKeyBlock().getHeight();
+      _logger.info("current blockHeight: {}", currentBlockHeight);
+      Thread.sleep(timeoutMilli);
     }
+  }
 
-    return callMethodAndGetResult(
-        () -> transactionServiceNative.createUnsignedTransaction(contractTx), UnsignedTx.class);
+  protected String encodeCalldata(
+      String contractSourceCode, String contractFunction, List<String> contractFunctionParams) {
+    return this.aeternityServiceNative.compiler.blockingEncodeCalldata(
+        contractSourceCode, contractFunction, contractFunctionParams);
+  }
+
+  protected JsonObject decodeCalldata(String encodedValue, String sophiaReturnType) {
+    return JsonObject.mapFrom(
+        this.aeternityServiceNative.compiler.blockingDecodeCalldata(
+            encodedValue, sophiaReturnType));
+  }
+
+  protected Object decodeCallResult(
+      String source, String function, String callResult, String callValue) {
+    return this.aeternityServiceNative.compiler.blockingDecodeCallResult(
+        source, function, callResult, callValue);
   }
 
   protected <T> T callMethodAndAwaitException(
@@ -343,5 +326,26 @@ public abstract class BaseTest {
     } while (result == null);
 
     return result;
+  }
+
+  protected void executeTest(TestContext context, Consumer<?> method) {
+    Async async = context.async();
+    vertx.executeBlocking(
+        future -> {
+          try {
+            method.accept(null);
+            future.complete();
+          } catch (Throwable e) {
+            _logger.error("Error occured in test", e);
+            context.fail();
+          }
+        },
+        result -> {
+          if (result.succeeded()) {
+            async.complete();
+          } else {
+            context.fail(result.cause());
+          }
+        });
   }
 }

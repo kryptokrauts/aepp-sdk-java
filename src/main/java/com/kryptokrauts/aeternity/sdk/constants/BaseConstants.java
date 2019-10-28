@@ -30,6 +30,9 @@ public interface BaseConstants {
   // the default testnet url
   String DEFAULT_TESTNET_URL = "https://sdk-testnet.aepps.com/v2";
 
-  // the default testnet contract url
-  String DEFAULT_TESTNET_CONTRACT_URL = "https://compiler.aepps.com";
+  // the default testnet compiler url
+  String DEFAULT_TESTNET_COMPILER_URL = "https://compiler.aepps.com";
+
+  // the default testnet compiler url
+  String DEFAULT_TESTNET_AETERNAL_URL = "https://testnet.aeternal.io/";
 }

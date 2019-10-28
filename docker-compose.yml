@@ -8,7 +8,10 @@ services:
     environment:
       AETERNITY_CONFIG: /home/aeternity/aeternity.yaml
     command: >
-      -aecore expected_mine_rate 15000
+      bin/aeternity
+      console
+      -noinput
+      -aecore expected_mine_rate 250
       -aehttp enable_debug_endpoints true
     volumes:
       - ${PWD}/docker/aeternity.yaml:/home/aeternity/aeternity.yaml
@@ -20,8 +23,32 @@ services:
     ports:
       - "3080:3080"
 
-  goggles:
-    image: kryptokrauts/aepp-goggles
+  aeternal:
+    image: aeternity/aepp-middleware:${AETERNAL_TAG}
+    ports:
+      - "8080:80"
+      - "3020:3020"
+    entrypoint: ./docker/wait-for-it.sh node:3013 -- ./aepp-middleware -p -s -w
+    environment:
+      - NODE_URL=node:3013
+      - AESOPHIA_URL=compiler:3080
+      - DATABASE_URL=postgres://aeternal:aeternal@db/aeternal
+      - LOG_CONF=/logs/log.yaml
+    volumes:
+      - ${PWD}/docker/wait-for-it.sh:/app/docker/wait-for-it.sh
+    depends_on:
+      - db
+      - node
+      - compiler
+
+  db:
+    image: postgres:11
+    restart: unless-stopped
+    environment:
+      - POSTGRES_USER=aeternal
+      - POSTGRES_PASSWORD=aeternal
+      - POSTGRES_DB=aeternal
+    expose: [5432]
 
   proxy:
     image: nginx:${NGINX_TAG}
@@ -30,3 +57,5 @@ services:
     volumes:
       - ${PWD}/docker/nginx-default.conf:/etc/nginx/conf.d/default.conf
       - ${PWD}/docker/nginx-cors.conf:/etc/nginx/cors.conf
+    depends_on:
+      - aeternal

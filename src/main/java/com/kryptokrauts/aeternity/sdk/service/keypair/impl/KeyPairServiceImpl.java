@@ -105,7 +105,7 @@ public final class KeyPairServiceImpl implements KeyPairService {
      * always set path for purpose {@link BaseConstants.HD_CHAIN_PURPOSE}, coin {@link
      * BaseConstants.HD_CHAIN_CODE_AETERNITY}
      */
-    List<ChildNumber> pathToDerivedKey = new LinkedList();
+    List<ChildNumber> pathToDerivedKey = new LinkedList<ChildNumber>();
     pathToDerivedKey.addAll(
         Arrays.asList(
             new ChildNumber(BaseConstants.HD_CHAIN_PURPOSE, true),

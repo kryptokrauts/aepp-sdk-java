@@ -5,8 +5,10 @@ import static org.junit.jupiter.api.Assertions.fail;
 
 import io.vertx.core.Vertx;
 import io.vertx.junit5.VertxTestContext;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
+@Disabled
 public class ChainApiTestJunit5 extends BaseTestJunit5 {
 
   @Test

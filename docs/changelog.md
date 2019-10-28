@@ -1,5 +1,39 @@
 # Changelog
 
+## [v2.0.0](https://github.com/kryptokrauts/aepp-sdk-java/releases/tag/v2.0.0)
+
+### Breaking changes and new features
+- [#77](../../../issues/77) integrate middleware `aeternal` and allow to query ÆNS auction related information
+- [#72](../../../issues/72) add method to post transactions with a custom private key 
+- [#70](../../../issues/70) adapt TLD changes (`.chain` instead of `.aet`)
+- [#68](../../../issues/68) refactoring: rename contractBaseUrl to compilerBaseUrl
+- [#65](../../../issues/65) refactoring: allow posting of signed transactions (string)
+- [#64](../../../issues/64) ÆNS: auction-related functionalities
+  - calculate the next minimum fee for a running auction
+- [#63](../../../issues/63) refactoring: dryRun actions
+- [#56](../../../issues/56) Lima related changes:
+  - update to new node version `v5.x.x`
+  - ÆNS auctions:
+     - TLD: `.aet` instead of `.test`
+     - `nameFee` calculation
+     - adapt changes in generation of `commitmentId` and `nameId`
+     - update version of `NameClaimTx`
+  - update to new compiler version `v4.x.x`:
+     - adapt sophia contracts to compile with new version
+  - FATE-VM:
+     - make the compiler-backend configurable (`AEVM` / `FATE`)
+     - introduce `VirtualMachine` enum and add it to the `ServiceConfiguration` so that the services in the SDK use the correct `vmVersion` and `abiVersion` combination and the correct `backend` in the compiler
+- [#44](../../../issues/44) major refactoring:
+  - introduced model classes to be independent from the swagger-generated classes
+  - discarded the `TransactionFactory` -> for each transaction-type a model class was introduced which can be created following the builder-pattern
+  - introduced the `AeternityService` which serves as entrypoint to access other services and needs to be instantiated through the `AeternityServiceFactory` by passing the `AeternityServiceConfiguration` 
+
+### General changes
+- [#60](../../../issues/60) update tuweni to stable release version
+- [#57](../../../issues/57) support contracts and oracles as ÆNS pointers
+- [#49](../../../issues/49) provide guidelines for contributors
+- [#45](../../../issues/45) update of node (`v4.1.0`) and compiler (`v3.2.0`)
+
 ## [v1.2.0](https://github.com/kryptokrauts/aepp-sdk-java/releases/tag/v1.2.0)
 
 ### General changes

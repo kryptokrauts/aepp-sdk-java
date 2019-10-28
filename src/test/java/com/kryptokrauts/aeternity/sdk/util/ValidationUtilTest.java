@@ -10,24 +10,24 @@ import org.junit.jupiter.api.Assertions;
 public class ValidationUtilTest extends BaseTest {
   {
     String domainTooLong =
-        "kryptokrautskryptokrautskryptokrautskryptokrautskryptokrautskryptokrautskryptokrautskryptokrautskryptokrautskryptokrautskryptokrautskryptokrautskryptokrautskryptokrautskryptokrautskryptokrautskryptokrautskryptokrautskryptokrautskryptokrautskryptokra.test";
+        "kryptokrautskryptokrautskryptokrautskryptokrautskryptokrautskryptokrautskryptokrautskryptokrautskryptokrautskryptokrautskryptokrautskryptokrautskryptokrautskryptokrautskryptokrautskryptokrautskryptokrautskryptokrautskryptokrautskryptokrautskryptokr.chain";
     String domainMaxAllowedLength =
-        "kryptokrautskryptokrautskryptokrautskryptokrautskryptokrautskryptokrautskryptokrautskryptokrautskryptokrautskryptokrautskryptokrautskryptokrautskryptokrautskryptokrautskryptokrautskryptokrautskryptokrautskryptokrautskryptokrautskryptokrautskryptokr.test";
+        "kryptokrautskryptokrautskryptokrautskryptokrautskryptokrautskryptokrautskryptokrautskryptokrautskryptokrautskryptokrautskryptokrautskryptokrautskryptokrautskryptokrautskryptokrautskryptokrautskryptokrautskryptokrautskryptokrautskryptokrautskryptok.chain";
 
     describe(
         "AENS Naming System",
         () -> {
           it(
-              "kryptokrauts.ae is not valid",
+              "kryptokrauts.eth is not valid",
               () -> {
-                String domain = "kryptokrauts.ae";
+                String domain = "kryptokrauts.eth";
                 Assertions.assertThrows(
                     InvalidParameterException.class, () -> ValidationUtil.checkNamespace(domain));
               });
           it(
-              "kryptokrauts.test is valid",
+              "kryptokrauts.chain is valid",
               () -> {
-                String domain = "kryptokrauts.test";
+                String domain = "kryptokrauts.chain";
                 Assertions.assertDoesNotThrow(() -> ValidationUtil.checkNamespace(domain));
               });
           it(

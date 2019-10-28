@@ -1,64 +1,25 @@
 package com.kryptokrauts.aeternity.sdk.service.transaction.type.impl;
 
-import com.kryptokrauts.aeternity.generated.api.rxjava.ContractApi;
-import com.kryptokrauts.aeternity.generated.model.ContractCallTx;
+import com.kryptokrauts.aeternity.generated.api.rxjava.ExternalApi;
 import com.kryptokrauts.aeternity.generated.model.UnsignedTx;
 import com.kryptokrauts.aeternity.sdk.constants.SerializationTags;
+import com.kryptokrauts.aeternity.sdk.service.transaction.fee.FeeCalculationModel;
+import com.kryptokrauts.aeternity.sdk.service.transaction.fee.impl.ContractCallFeeCalculationModel;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.AbstractTransaction;
+import com.kryptokrauts.aeternity.sdk.service.transaction.type.model.ContractCallTransactionModel;
 import com.kryptokrauts.aeternity.sdk.util.EncodingUtils;
 import io.reactivex.Single;
-import java.math.BigInteger;
-import lombok.Getter;
 import lombok.NonNull;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import org.apache.tuweni.bytes.Bytes;
 import org.apache.tuweni.rlp.RLP;
 
-@Getter
 @SuperBuilder
 @ToString
-public class ContractCallTransaction extends AbstractTransaction<ContractCallTx> {
+public class ContractCallTransaction extends AbstractTransaction<ContractCallTransactionModel> {
 
-  @NonNull private BigInteger abiVersion;
-  @NonNull private BigInteger amount;
-  @NonNull private String callData;
-  @NonNull private String callerId;
-  @NonNull private String contractId;
-  @NonNull private BigInteger gas;
-  @NonNull private BigInteger gasPrice;
-  @NonNull private BigInteger nonce;
-
-  @NonNull private BigInteger ttl;
-
-  @NonNull private ContractApi contractApi;
-
-  @Override
-  protected Single<UnsignedTx> createInternal() {
-    return contractApi.rxPostContractCall(getApiModel());
-  }
-
-  @Override
-  protected ContractCallTx toModel() {
-    ContractCallTx contractCallTx = new ContractCallTx();
-    contractCallTx.setAbiVersion(abiVersion);
-    contractCallTx.setAmount(amount);
-    contractCallTx.setCallData(callData);
-    contractCallTx.setCallerId(callerId);
-    contractCallTx.setContractId(contractId);
-    contractCallTx.setFee(fee);
-    contractCallTx.setGas(gas);
-    contractCallTx.setGasPrice(gasPrice);
-    contractCallTx.setNonce(nonce);
-    contractCallTx.setTtl(ttl);
-
-    return contractCallTx;
-  }
-
-  @Override
-  protected void validateInput() {
-    // nothing to validate here
-  }
+  @NonNull private ExternalApi externalApi;
 
   @Override
   protected Bytes createRLPEncodedList() {
@@ -66,33 +27,35 @@ public class ContractCallTransaction extends AbstractTransaction<ContractCallTx>
         RLP.encodeList(
             rlpWriter -> {
               rlpWriter.writeInt(SerializationTags.OBJECT_TAG_CONTRACT_CALL_TRANSACTION);
-              rlpWriter.writeInt(SerializationTags.VSN);
+              rlpWriter.writeInt(SerializationTags.VSN_1);
               byte[] callerWithTag =
-                  EncodingUtils.decodeCheckAndTag(this.callerId, SerializationTags.ID_TAG_ACCOUNT);
+                  EncodingUtils.decodeCheckAndTag(
+                      model.getCallerId(), SerializationTags.ID_TAG_ACCOUNT);
               rlpWriter.writeByteArray(callerWithTag);
-              this.checkZeroAndWriteValue(rlpWriter, this.nonce);
+              this.checkZeroAndWriteValue(rlpWriter, model.getNonce());
               byte[] contractWithTag =
                   EncodingUtils.decodeCheckAndTag(
-                      this.contractId, SerializationTags.ID_TAG_CONTRACT);
+                      this.model.getContractId(), SerializationTags.ID_TAG_CONTRACT);
               rlpWriter.writeByteArray(contractWithTag);
-              this.checkZeroAndWriteValue(rlpWriter, this.abiVersion);
-              this.checkZeroAndWriteValue(rlpWriter, this.fee);
-              this.checkZeroAndWriteValue(rlpWriter, this.ttl);
-              this.checkZeroAndWriteValue(rlpWriter, this.amount);
-              this.checkZeroAndWriteValue(rlpWriter, this.gas);
-              this.checkZeroAndWriteValue(rlpWriter, this.gasPrice);
-              rlpWriter.writeByteArray(EncodingUtils.decodeCheckWithIdentifier(this.callData));
+              this.checkZeroAndWriteValue(rlpWriter, model.getVirtualMachine().getAbiVersion());
+              this.checkZeroAndWriteValue(rlpWriter, model.getFee());
+              this.checkZeroAndWriteValue(rlpWriter, model.getTtl());
+              this.checkZeroAndWriteValue(rlpWriter, model.getAmount());
+              this.checkZeroAndWriteValue(rlpWriter, model.getGas());
+              this.checkZeroAndWriteValue(rlpWriter, model.getGasPrice());
+              rlpWriter.writeByteArray(
+                  EncodingUtils.decodeCheckWithIdentifier(model.getCallData()));
             });
     return encodedRlp;
   }
 
-  /**
-   * this method can be used to set a an optional amount which is sent to the contract (refunded if
-   * the execution fails)
-   *
-   * @param optional amount
-   */
-  public void setAmount(BigInteger amount) {
-    this.amount = amount;
+  @Override
+  protected Single<UnsignedTx> createInternal() {
+    return externalApi.rxPostContractCall(model.toApiModel());
+  }
+
+  @Override
+  protected FeeCalculationModel getFeeCalculationModel() {
+    return new ContractCallFeeCalculationModel();
   }
 }

@@ -12,11 +12,11 @@ import com.kryptokrauts.aeternity.sdk.domain.secret.impl.BaseKeyPair;
 import com.kryptokrauts.aeternity.sdk.domain.secret.impl.RawKeyPair;
 import com.kryptokrauts.aeternity.sdk.service.keypair.KeyPairService;
 import com.kryptokrauts.aeternity.sdk.service.keypair.KeyPairServiceFactory;
+import com.kryptokrauts.aeternity.sdk.util.ByteUtils;
 import com.kryptokrauts.aeternity.sdk.util.EncodingType;
 import com.kryptokrauts.aeternity.sdk.util.EncodingUtils;
 import com.kryptokrauts.aeternity.sdk.util.SigningUtil;
 import java.nio.charset.StandardCharsets;
-import org.bouncycastle.pqc.math.linearalgebra.ByteUtils;
 import org.bouncycastle.util.encoders.Hex;
 
 public class GenerationAndSigningTest extends BaseTest {
@@ -363,7 +363,7 @@ public class GenerationAndSigningTest extends BaseTest {
               "commitmentHash generation test",
               () -> {
                 final String kkNamespaceCommitmentId =
-                    "cm_aJBGWWjT65JqviLSexkofr5oEAEuEySNkmghsqxNjGt2WqPW8";
+                    "cm_27G8vARHeEm3Z1KsDwTZ4kTWwdNorDJryAaT5fjtJDcegfDjBQ";
                 final String generatedCommitmentId =
                     EncodingUtils.generateCommitmentHash(BaseTest.KK_NAMESPACE, BaseTest.TEST_SALT);
                 assertEquals(kkNamespaceCommitmentId, generatedCommitmentId);
@@ -406,174 +406,10 @@ public class GenerationAndSigningTest extends BaseTest {
                       (byte) 193,
                       91
                     };
-                final byte[] formattedSalt = EncodingUtils.formatSalt(BaseTest.TEST_SALT);
+                final byte[] formattedSalt =
+                    ByteUtils.leftPad(32, BaseTest.TEST_SALT.toByteArray());
 
                 assertArrayEquals(oneSalt, formattedSalt);
-              });
-          it(
-              "nameId generation test",
-              () -> {
-                final byte[] nameId =
-                    new byte[] {
-                      (byte) 182,
-                      98,
-                      49,
-                      33,
-                      (byte) 170,
-                      (byte) 167,
-                      (byte) 215,
-                      (byte) 180,
-                      62,
-                      (byte) 190,
-                      1,
-                      (byte) 241,
-                      67,
-                      76,
-                      100,
-                      93,
-                      (byte) 243,
-                      101,
-                      (byte) 162,
-                      45,
-                      120,
-                      34,
-                      (byte) 190,
-                      119,
-                      (byte) 255,
-                      (byte) 230,
-                      114,
-                      (byte) 199,
-                      72,
-                      36,
-                      (byte) 190,
-                      (byte) 173
-                    };
-                final byte[] generatedNameId = EncodingUtils.nameId(BaseTest.KK_NAMESPACE);
-
-                assertArrayEquals(nameId, generatedNameId);
-              });
-          it(
-              "test concat nameId and salt",
-              () -> {
-                final byte[] nameIdAndSalt =
-                    new byte[] {
-                      (byte) 182,
-                      (byte) 98,
-                      (byte) 49,
-                      (byte) 33,
-                      (byte) 170,
-                      (byte) 167,
-                      (byte) 215,
-                      (byte) 180,
-                      (byte) 62,
-                      (byte) 190,
-                      (byte) 1,
-                      (byte) 241,
-                      (byte) 67,
-                      (byte) 76,
-                      (byte) 100,
-                      (byte) 93,
-                      (byte) 243,
-                      (byte) 101,
-                      (byte) 162,
-                      (byte) 45,
-                      (byte) 120,
-                      (byte) 34,
-                      (byte) 190,
-                      (byte) 119,
-                      (byte) 255,
-                      (byte) 230,
-                      (byte) 114,
-                      (byte) 199,
-                      (byte) 72,
-                      (byte) 36,
-                      (byte) 190,
-                      (byte) 173,
-                      (byte) 0,
-                      (byte) 0,
-                      (byte) 0,
-                      (byte) 0,
-                      (byte) 0,
-                      (byte) 0,
-                      (byte) 0,
-                      (byte) 0,
-                      (byte) 0,
-                      (byte) 0,
-                      (byte) 0,
-                      (byte) 0,
-                      (byte) 0,
-                      (byte) 0,
-                      (byte) 0,
-                      (byte) 0,
-                      (byte) 0,
-                      (byte) 0,
-                      (byte) 0,
-                      (byte) 0,
-                      (byte) 0,
-                      (byte) 0,
-                      (byte) 0,
-                      (byte) 0,
-                      (byte) 0,
-                      (byte) 9,
-                      (byte) 110,
-                      (byte) 178,
-                      (byte) 148,
-                      (byte) 244,
-                      (byte) 193,
-                      (byte) 91
-                    };
-                final byte[] generatedNameIdAndSalt =
-                    ByteUtils.concatenate(
-                        EncodingUtils.nameId(BaseTest.KK_NAMESPACE),
-                        EncodingUtils.formatSalt(BaseTest.TEST_SALT));
-
-                assertArrayEquals(nameIdAndSalt, generatedNameIdAndSalt);
-              });
-          it(
-              "test concat nameIdSalt and hash",
-              () -> {
-                final byte[] nameIdAndSalt =
-                    new byte[] {
-                      (byte) 75,
-                      (byte) 154,
-                      (byte) 93,
-                      (byte) 216,
-                      (byte) 161,
-                      (byte) 119,
-                      (byte) 45,
-                      (byte) 33,
-                      (byte) 221,
-                      (byte) 255,
-                      (byte) 130,
-                      (byte) 163,
-                      (byte) 136,
-                      (byte) 227,
-                      (byte) 230,
-                      (byte) 90,
-                      (byte) 156,
-                      (byte) 162,
-                      (byte) 245,
-                      (byte) 187,
-                      (byte) 57,
-                      (byte) 193,
-                      (byte) 21,
-                      (byte) 224,
-                      (byte) 40,
-                      (byte) 39,
-                      (byte) 150,
-                      (byte) 225,
-                      (byte) 117,
-                      (byte) 59,
-                      (byte) 167,
-                      (byte) 243
-                    };
-                final byte[] generatedNameIdAndSalt =
-                    EncodingUtils.hash(
-                        ByteUtils.concatenate(
-                            EncodingUtils.nameId(BaseTest.KK_NAMESPACE),
-                            EncodingUtils.formatSalt(BaseTest.TEST_SALT)));
-
-                assertArrayEquals(nameIdAndSalt, generatedNameIdAndSalt);
               });
           it(
               "hash domain and namespace",

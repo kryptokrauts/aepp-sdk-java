@@ -3,9 +3,6 @@ buildscript {
         mavenLocal()
         mavenCentral()
         jcenter()
-        maven {
-            url "https://dl.bintray.com/tuweni/tuweni/"
-        }
     }
     dependencies {
         classpath "io.swagger.codegen.v3:swagger-codegen:3.0.8"
@@ -25,9 +22,6 @@ repositories {
     mavenLocal()
     mavenCentral()
     jcenter()
-    maven {
-        url "https://dl.bintray.com/tuweni/tuweni/"
-    }
 }
 
 version = (Boolean.valueOf(System.getProperty("snapshot")) ? project.version : project.version[0..4])
@@ -42,16 +36,17 @@ ext {
     bintrayKey = System.getProperty("bintray.key")
     buildNumber = System.getProperty("build.number")
 
-    aeternityVersion = "v3.0.1"
-    sophiaCompilerVersion = "v3.0.0"
-
     apiPackageAeternity = "com.kryptokrauts.aeternity.generated.api"
     modelPackageAeternity = "com.kryptokrauts.aeternity.generated.model"
-    swaggerFileAeternity = "${rootDir}/api/swagger_aeternity_${aeternityVersion}.yml"
+    swaggerFileAeternity = "${rootDir}/api/swagger_aeternity.yml"
 
     apiPackageSophiaCompiler = "com.kryptokrauts.sophia.compiler.generated.api"
     modelPackageSophiaCompiler = "com.kryptokrauts.sophia.compiler.generated.model"
-    swaggerFileSophiaCompiler = "${rootDir}/api/swagger_sophia_compiler_${sophiaCompilerVersion}.yml"
+    swaggerFileSophiaCompiler = "${rootDir}/api/swagger_sophia_compiler.yml"
+
+    apiPackageAeternal = "com.kryptokrauts.aeternal.generated.api"
+    modelPackageAeternal = "com.kryptokrauts.aeternal.generated.model"
+    swaggerFileAeternal = "${rootDir}/api/swagger_aeternal.yml"
 
     templateDir = "${rootDir}/api/vertx-templates"
     swaggerAnnotationsVersion = "1.5.22"
@@ -62,7 +57,7 @@ ext {
 
     bouncycastleVersion = "1.61"
     bitcoinjCoreVersion = "0.14.7"
-    tuweniVersion = "0.8.0-20190611234232"
+    tuweniVersion = "0.8.2"
 
     junitVersion = "5.4.2"
     junitPlatformVersion = "1.4.2"
@@ -82,7 +77,6 @@ task generateApiClient {
         configAeternity.setLibrary("vertx")
         configAeternity.setGroupId("${group}")
         configAeternity.setArtifactId("aeternity-client-vertx")
-        configAeternity.setArtifactVersion("${aeternityVersion}")
         configAeternity.setApiPackage("${apiPackageAeternity}")
         configAeternity.setModelPackage("${modelPackageAeternity}")
         configAeternity.setInputSpec(project.swaggerFileAeternity.toString())
@@ -103,7 +97,6 @@ task generateApiClient {
         configSophiaCompiler.setLibrary("vertx")
         configSophiaCompiler.setGroupId("${group}")
         configSophiaCompiler.setArtifactId("sophia-compiler-client-vertx")
-        configSophiaCompiler.setArtifactVersion("${sophiaCompilerVersion}")
         configSophiaCompiler.setApiPackage("${apiPackageSophiaCompiler}")
         configSophiaCompiler.setModelPackage("${modelPackageSophiaCompiler}")
         configSophiaCompiler.setInputSpec(project.swaggerFileSophiaCompiler.toString())
@@ -115,6 +108,26 @@ task generateApiClient {
                 "useTags"    : "true"
         ])
         new DefaultGenerator().opts(configSophiaCompiler.toClientOptInput()).generate()
+
+        def configAeternal = new CodegenConfigurator()
+        configAeternal.setLang("java")
+        configAeternal.setLibrary("vertx")
+        configAeternal.setGroupId("${group}")
+        configAeternal.setArtifactId("aeternal-client-vertx")
+        configAeternal.setApiPackage("${apiPackageAeternal}")
+        configAeternal.setModelPackage("${modelPackageAeternal}")
+        configAeternal.setInputSpec(project.swaggerFileAeternal.toString())
+        configAeternal.setOutputDir(swaggerOutputDir.path)
+        configAeternal.setTemplateDir(project.templateDir)
+        configAeternal.setAdditionalProperties([
+                "dateLibrary": "java8",
+                "title"      : rootProject.name,
+                "useTags"    : "true"
+        ])
+        configAeternal.setTypeMappings([
+                "Integer": "java.math.BigInteger"
+        ])
+        new DefaultGenerator().opts(configAeternal.toClientOptInput()).generate()
 
         // modify UnsignedTx
         ant.replaceregexp(match: '^.*\\b(JsonTypeInfo|JsonSubTypes)\\b.*$', replace: '', flags: 'g', byline: true) {
