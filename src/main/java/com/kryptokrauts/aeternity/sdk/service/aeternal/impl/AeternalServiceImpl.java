@@ -61,7 +61,7 @@ public class AeternalServiceImpl implements AeternalService {
   public boolean blockingIsAuctionActive(String name) {
     ActiveAuctionsResult result = this.blockingGetNameAuctionsActive();
     return result.getActiveAuctionResults().stream()
-        .filter(auction -> auction.getName().equals(name))
+        .filter(auction -> auction.getName().equalsIgnoreCase(name))
         .findAny()
         .isPresent();
   }
