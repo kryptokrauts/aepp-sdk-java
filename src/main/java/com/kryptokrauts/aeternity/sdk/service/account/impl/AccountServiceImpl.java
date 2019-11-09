@@ -23,7 +23,7 @@ public final class AccountServiceImpl implements AccountService {
         .build()
         .blockingGet(
             externalApi.rxGetAccountByPubkey(
-                base58PublicKey.orElse(config.getBaseKeyPair().getPublicKey())));
+                base58PublicKey.orElseGet(() -> config.getBaseKeyPair().getPublicKey())));
   }
 
   @Override
@@ -32,7 +32,7 @@ public final class AccountServiceImpl implements AccountService {
         .build()
         .asyncGet(
             externalApi.rxGetAccountByPubkey(
-                base58PublicKey.orElse(config.getBaseKeyPair().getPublicKey())));
+                base58PublicKey.orElseGet(() -> config.getBaseKeyPair().getPublicKey())));
   }
 
   @Override
