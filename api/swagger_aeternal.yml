@@ -221,7 +221,7 @@ paths:
           description: ''
           headers: {}
           schema:
-            type: object
+            $ref: '#/definitions/ActiveNames'
   "/names/{name}":
     get:
       description: Search for a name
@@ -240,7 +240,7 @@ paths:
           description: ''
           headers: {}
           schema:
-            type: object
+            $ref: '#/definitions/ActiveNames'
   "/names/active":
     get:
       description: Get a list of all the active names
@@ -271,7 +271,7 @@ paths:
           description: ''
           headers: {}
           schema:
-            type: object
+            $ref: '#/definitions/ActiveNames'
   "/names/auctions/active":
     get:
       description: Get a list of all the active name auctions
@@ -314,7 +314,7 @@ paths:
           description: ''
           headers: {}
           schema:
-            $ref: '#/definitions/ActiveAuctions'
+            $ref: '#/definitions/ActiveNameAuctions'
   "/names/auctions/active/count":
     get:
       description: Get a count of all the active name auctions
@@ -357,7 +357,7 @@ paths:
           description: ''
           headers: {}
           schema:
-            type: object
+            $ref: '#/definitions/ActiveNameAuctionsCount'
   "/names/auctions/bids/account/{account}":
     get:
       description: Get bids made by a given account
@@ -737,12 +737,48 @@ definitions:
   UInt:
     type: integer
     minimum: 0
+  EncodedHash:
+    # Base58Check encoded 32-byte hash (key block hash, micro block hash,
+    # root hash, etc)
+    # pattern: "^(kh|mh|bf|bx|bs|th)_[1-9A-HJ-NP-Za-km-z]*$"
+    description: 'Base58Check encoded tagged hash'
+    type: string
   EncodedPubkey:
     # Base58Check encoded 32-byte pubkey (account, contract, oracle, etc)
     # pattern: "^(ak|ok|ct|ch|pp)_[1-9A-HJ-NP-Za-km-z]*$"
     description: 'Base58Check encoded tagged pubkey'
     type: string
-  ActiveAuction:
+  EncodedValue:
+    # Base58Check encoded 32/64-byte value (signature, oracle query id, etc)
+    # pattern: "^(oq|sg|cm|st|nm)_[1-9A-HJ-NP-Za-km-z]*$"
+    description: 'Base58Check encoded tagged value'
+    type: string
+  EncodedByteArray:
+    # Base64Check encoded byte array
+    # pattern: "^(cb|tx|ck|cv|ba|ov|or|pi|ss|cs)_[0-9A-Za-z+/=]*$"
+    description: 'Base64Check encoded tagged byte array'
+    type: string
+  NamePointer:
+    type: object
+    properties:
+      key:
+        type: string
+      id:
+        $ref: '#/definitions/EncodedPubkey'
+    required:
+      - key
+      - id
+  ActiveNameAuctionsCount:
+    type: object
+    properties:
+      count:
+        $ref: '#/definitions/UInt'
+      result:
+        type: string
+    required:
+      - count
+      - result
+  ActiveNameAuction:
     type: object
     properties:
       name:
@@ -753,7 +789,44 @@ definitions:
         $ref: '#/definitions/UInt'
       winning_bidder:
         $ref: '#/definitions/EncodedPubkey'
-  ActiveAuctions:
+    required:
+      - name
+      - expiration
+      - winning_bid
+      - winning_bidder
+  ActiveNameAuctions:
     type: array
     items:
-      $ref: '#/definitions/ActiveAuction'
+      $ref: '#/definitions/ActiveNameAuction'
+  ActiveName:
+    type: object
+    properties:
+      name:
+        type: string
+      name_hash:
+        $ref: '#/definitions/EncodedValue'
+      tx_hash:
+        $ref: '#/definitions/EncodedHash'
+      created_at_height:
+        $ref: '#/definitions/UInt'
+      auction_end_height:
+        $ref: '#/definitions/UInt'
+      owner:
+        $ref: '#/definitions/EncodedPubkey'
+      expires_at:
+        $ref: '#/definitions/UInt'
+      pointers:
+        type: array
+        items:
+          $ref: '#/definitions/NamePointer'
+    required:
+      - name
+      - name_hash
+      - tx_hash
+      - created_at_height
+      - owner
+      - pointers
+  ActiveNames:
+    type: array
+    items:
+      $ref: '#/definitions/ActiveName'

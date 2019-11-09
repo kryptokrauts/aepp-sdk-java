@@ -1,31 +1,27 @@
 package com.kryptokrauts.aeternity.sdk.service.aeternal.domain;
 
-import com.kryptokrauts.aeternal.generated.model.ActiveAuctions;
+import com.kryptokrauts.aeternal.generated.model.ActiveNames;
 import com.kryptokrauts.aeternity.sdk.domain.GenericResultObject;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
-import lombok.Builder.Default;
 import lombok.Getter;
-import lombok.NonNull;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
 @Getter
 @SuperBuilder(toBuilder = true)
 @ToString
-public class ActiveAuctionsResult
-    extends GenericResultObject<ActiveAuctions, ActiveAuctionsResult> {
+public class ActiveNamesResult extends GenericResultObject<ActiveNames, ActiveNamesResult> {
 
-  @NonNull @Default private List<ActiveAuctionResult> activeAuctionResults = new ArrayList<>();
+  private List<ActiveNameResult> activeNameResults;
 
   @Override
-  protected ActiveAuctionsResult map(ActiveAuctions generatedResultObject) {
+  protected ActiveNamesResult map(ActiveNames generatedResultObject) {
     if (generatedResultObject != null)
       return this.toBuilder()
-          .activeAuctionResults(
+          .activeNameResults(
               generatedResultObject.stream()
-                  .map(result -> ActiveAuctionResult.builder().build().map(result))
+                  .map(result -> ActiveNameResult.builder().build().map(result))
                   .collect(Collectors.toList()))
           .build();
     else return this.toBuilder().build();
