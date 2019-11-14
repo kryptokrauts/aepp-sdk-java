@@ -1,5 +1,22 @@
 # Changelog
 
+## [v2.1.0](https://github.com/kryptokrauts/aepp-sdk-java/releases/tag/v2.1.0)
+
+This release ships some fixes and enhancements. Additionally we renamed some attributes and model-classes. If you already used [v2.0.0](https://github.com/kryptokrauts/aepp-sdk-java/releases/tag/v2.0.0) it might be needed to fix these changes.
+
+### Refactoring
+- [#86](../../../issues/86) add "payable" attribute to AccountResult-model
+
+### Fixes
+- [#85](../../../issues/85) AeternalService: fix case-sensitive comparison of domains
+- [#88](../../../issues/88) replace Optional.orElse with Optional.orElseGet in the AccountServiceImpl
+
+### Enhancements
+- [#84](../../../issues/84) add missing ÆNS related AeternalService functionalities
+   - we added the possibility to query for active names
+   and search for a name (which allows to receive e.g. the owner of a name)
+- [#87](../../../issues/87) add support to receive byteCode for given contractId
+
 ## [v2.0.0](https://github.com/kryptokrauts/aepp-sdk-java/releases/tag/v2.0.0)
 
 ### Breaking changes and new features

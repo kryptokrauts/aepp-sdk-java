@@ -68,12 +68,33 @@ public class InfoServiceImpl implements InfoService {
         .blockingGet(this.externalApi.rxGetMicroBlockTransactionsByHash(microBlockHash));
   }
 
+  @Override
+  public String blockingGetContractByteCode(final String contractId) {
+    this.validateContractId(contractId);
+    return this.externalApi.rxGetContractCode(contractId).blockingGet().getBytecode();
+  }
+
+  @Override
+  public Single<String> asnycGetContractByteCode(final String contractId) {
+    this.validateContractId(contractId);
+    return this.externalApi.rxGetContractCode(contractId).map(e -> e.getBytecode());
+  }
+
   private void validateMicroTxHash(final String microBlockHash) {
     ValidationUtil.checkParameters(
         validate -> Optional.ofNullable(microBlockHash.startsWith(ApiIdentifiers.MICRO_BLOCK_HASH)),
         microBlockHash,
         "getMicroBlockTransactions",
         Arrays.asList("microBlockHash", ApiIdentifiers.NAME),
+        ValidationUtil.MISSING_API_IDENTIFIER);
+  }
+
+  private void validateContractId(final String contractId) {
+    ValidationUtil.checkParameters(
+        validate -> Optional.ofNullable(contractId.startsWith(ApiIdentifiers.CONTRACT_PUBKEY)),
+        contractId,
+        "getContract",
+        Arrays.asList("contractId", ApiIdentifiers.NAME),
         ValidationUtil.MISSING_API_IDENTIFIER);
   }
 

@@ -69,4 +69,20 @@ public interface InfoService {
    * @return result for {@link KeyBlockResult}
    */
   KeyBlockResult blockingGetCurrentKeyBlock();
+
+  /**
+   * asynchronously retrieve the contracts byteCode
+   *
+   * @param contractId
+   * @return
+   */
+  Single<String> asnycGetContractByteCode(String contractId);
+
+  /**
+   * synchronously retrieve the contracts byteCode
+   *
+   * @param contractId
+   * @return
+   */
+  String blockingGetContractByteCode(String contractId);
 }

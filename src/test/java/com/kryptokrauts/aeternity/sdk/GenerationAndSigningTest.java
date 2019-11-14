@@ -412,9 +412,9 @@ public class GenerationAndSigningTest extends BaseTest {
                 assertArrayEquals(oneSalt, formattedSalt);
               });
           it(
-              "hash domain and namespace",
+              "hash name and namespace",
               () -> {
-                byte[] generatedHash = EncodingUtils.hash(BaseTest.DOMAIN.getBytes());
+                byte[] generatedHash = EncodingUtils.hash(BaseTest.NAME.getBytes());
                 byte[] kkHash =
                     new byte[] {
                       (byte) 226,

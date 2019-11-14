@@ -132,11 +132,12 @@ public class PaymentSplitterContractTest extends BaseTest {
             DryRunTransactionResult dryRunResult = dryRunResults.getResults().get(0);
             context.assertEquals("ok", dryRunResult.getResult());
 
-            contractCreate
-                .toBuilder()
-                .gas(dryRunResult.getContractCallObject().getGasUsed())
-                .gasPrice(dryRunResult.getContractCallObject().getGasPrice())
-                .build();
+            contractCreate =
+                contractCreate
+                    .toBuilder()
+                    .gas(dryRunResult.getContractCallObject().getGasUsed())
+                    .gasPrice(dryRunResult.getContractCallObject().getGasPrice())
+                    .build();
 
             PostTransactionResult result =
                 aeternityServiceNative.transactions.blockingPostTransaction(contractCreate);
@@ -262,6 +263,110 @@ public class PaymentSplitterContractTest extends BaseTest {
                 balanceRecipient3.add(
                     paymentValue.multiply(BigDecimal.valueOf(0.2)).toBigInteger()),
                 getAccount(initialReceiver3.getPublicKey()).getBalance());
+          } catch (Throwable e) {
+            context.fail(e);
+          }
+        });
+  }
+
+  @Test
+  public void c_callGetTotalAmountSplitted(TestContext context) throws Throwable {
+    this.executeTest(
+        context,
+        t -> {
+          try {
+            BigDecimal paymentValue = UnitConversionUtil.toAettos("0", Unit.AE);
+            String calldata =
+                aeternityServiceNative.compiler.blockingEncodeCalldata(
+                    paymentSplitterSource, "getTotalAmountSplitted", null);
+            _logger.info("Contract ID: " + localDeployedContractId);
+
+            DryRunTransactionResults dryRunResults =
+                this.aeternityServiceNative.transactions.blockingDryRunTransactions(
+                    DryRunRequest.builder()
+                        .build()
+                        .account(
+                            DryRunAccountModel.builder()
+                                .publicKey(baseKeyPair.getPublicKey())
+                                .build())
+                        .transactionInputItem(
+                            ContractCallTransactionModel.builder()
+                                .callData(calldata)
+                                .gas(BigInteger.valueOf(1579000))
+                                .contractId(localDeployedContractId)
+                                .gasPrice(BigInteger.valueOf(BaseConstants.MINIMAL_GAS_PRICE))
+                                .amount(paymentValue.toBigInteger())
+                                .nonce(getNextBaseKeypairNonce())
+                                .callerId(baseKeyPair.getPublicKey())
+                                .ttl(ZERO)
+                                .virtualMachine(targetVM)
+                                .build()));
+
+            _logger.info("callContractAfterDryRunOnLocalNode: " + dryRunResults.toString());
+            context.assertEquals(1, dryRunResults.getResults().size());
+            DryRunTransactionResult dryRunResult = dryRunResults.getResults().get(0);
+            context.assertEquals("ok", dryRunResult.getResult());
+
+            Object decodedValue =
+                decodeCallResult(
+                    paymentSplitterSource,
+                    "getTotalAmountSplitted",
+                    dryRunResult.getContractCallObject().getReturnType(),
+                    dryRunResult.getContractCallObject().getReturnValue());
+
+            System.out.println(decodedValue);
+          } catch (Throwable e) {
+            context.fail(e);
+          }
+        });
+  }
+
+  @Test
+  public void d_callGetOwner(TestContext context) throws Throwable {
+    this.executeTest(
+        context,
+        t -> {
+          try {
+            BigDecimal paymentValue = UnitConversionUtil.toAettos("0", Unit.AE);
+            String calldata =
+                aeternityServiceNative.compiler.blockingEncodeCalldata(
+                    paymentSplitterSource, "getOwner", null);
+            _logger.info("Contract ID: " + localDeployedContractId);
+
+            DryRunTransactionResults dryRunResults =
+                this.aeternityServiceNative.transactions.blockingDryRunTransactions(
+                    DryRunRequest.builder()
+                        .build()
+                        .account(
+                            DryRunAccountModel.builder()
+                                .publicKey(baseKeyPair.getPublicKey())
+                                .build())
+                        .transactionInputItem(
+                            ContractCallTransactionModel.builder()
+                                .callData(calldata)
+                                .gas(BigInteger.valueOf(1579000))
+                                .contractId(localDeployedContractId)
+                                .gasPrice(BigInteger.valueOf(BaseConstants.MINIMAL_GAS_PRICE))
+                                .amount(paymentValue.toBigInteger())
+                                .nonce(getNextBaseKeypairNonce())
+                                .callerId(baseKeyPair.getPublicKey())
+                                .ttl(ZERO)
+                                .virtualMachine(targetVM)
+                                .build()));
+
+            _logger.info("callContractAfterDryRunOnLocalNode: " + dryRunResults.toString());
+            context.assertEquals(1, dryRunResults.getResults().size());
+            DryRunTransactionResult dryRunResult = dryRunResults.getResults().get(0);
+            context.assertEquals("ok", dryRunResult.getResult());
+
+            Object decodedValue =
+                decodeCallResult(
+                    paymentSplitterSource,
+                    "getOwner",
+                    dryRunResult.getContractCallObject().getReturnType(),
+                    dryRunResult.getContractCallObject().getReturnValue());
+
+            System.out.println(decodedValue);
           } catch (Throwable e) {
             context.fail(e);
           }

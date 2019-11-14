@@ -24,11 +24,11 @@ services:
       - "3080:3080"
 
   aeternal:
-    image: aeternity/aepp-middleware:${AETERNAL_TAG}
+    image: aeternity/aeternal:${AETERNAL_TAG}
     ports:
       - "8080:80"
       - "3020:3020"
-    entrypoint: ./docker/wait-for-it.sh node:3013 -- ./aepp-middleware -p -s -w
+    entrypoint: ./docker/wait-for-it.sh node:3013 -- ./aeternal -p -s -w
     environment:
       - NODE_URL=node:3013
       - AESOPHIA_URL=compiler:3080

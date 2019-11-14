@@ -18,6 +18,8 @@ public class AccountResult extends GenericResultObject<Account, AccountResult> {
 
   private BigInteger nonce;
 
+  private boolean payable;
+
   private String kind;
 
   private String gaContractId;
@@ -31,6 +33,7 @@ public class AccountResult extends GenericResultObject<Account, AccountResult> {
           .publicKey(generatedResultObject.getId())
           .balance(generatedResultObject.getBalance())
           .nonce(generatedResultObject.getNonce())
+          .payable(generatedResultObject.isPayable())
           .kind(generatedResultObject.getKind().toString())
           .gaContractId(generatedResultObject.getContractId())
           .gaAuthenticationFunction(generatedResultObject.getAuthFun())

@@ -1,7 +1,7 @@
-package com.kryptokrauts.aeternity.sdk.service.name.domain;
+package com.kryptokrauts.aeternity.sdk.service.aeternal.domain;
 
-import com.kryptokrauts.aeternity.generated.model.NameEntry;
-import com.kryptokrauts.aeternity.generated.model.NamePointer;
+import com.kryptokrauts.aeternal.generated.model.ActiveName;
+import com.kryptokrauts.aeternal.generated.model.NamePointer;
 import com.kryptokrauts.aeternity.sdk.constants.ApiIdentifiers;
 import com.kryptokrauts.aeternity.sdk.domain.GenericResultObject;
 import java.math.BigInteger;
@@ -16,10 +16,15 @@ import lombok.experimental.SuperBuilder;
 @Getter
 @SuperBuilder(toBuilder = true)
 @ToString
-public class NameIdResult extends GenericResultObject<NameEntry, NameIdResult> {
+public class ActiveNameResult extends GenericResultObject<ActiveName, ActiveNameResult> {
 
-  private String id;
-  private BigInteger ttl;
+  private String name;
+  private String nameHash;
+  private String txHash;
+  private BigInteger createdAtHeight;
+  private BigInteger auctionEndHeight;
+  private String owner;
+  private BigInteger expiresAtHeight;
   private List<String> pointers;
 
   public Optional<String> getAccountPointer() {
@@ -39,11 +44,16 @@ public class NameIdResult extends GenericResultObject<NameEntry, NameIdResult> {
   }
 
   @Override
-  protected NameIdResult map(NameEntry generatedResultObject) {
+  protected ActiveNameResult map(ActiveName generatedResultObject) {
     if (generatedResultObject != null)
       return this.toBuilder()
-          .id(generatedResultObject.getId())
-          .ttl(generatedResultObject.getTtl())
+          .name(generatedResultObject.getName())
+          .nameHash(generatedResultObject.getNameHash())
+          .txHash(generatedResultObject.getTxHash())
+          .createdAtHeight(generatedResultObject.getCreatedAtHeight())
+          .auctionEndHeight(generatedResultObject.getAuctionEndHeight())
+          .owner(generatedResultObject.getOwner())
+          .expiresAtHeight(generatedResultObject.getExpiresAt())
           .pointers(getPointers(generatedResultObject.getPointers()))
           .build();
     else return this.toBuilder().build();
@@ -51,7 +61,7 @@ public class NameIdResult extends GenericResultObject<NameEntry, NameIdResult> {
 
   @Override
   protected String getResultObjectClassName() {
-    return NameIdResult.class.getName();
+    return ActiveNameResult.class.getName();
   }
 
   private List<String> getPointers(final List<NamePointer> namePointers) {
