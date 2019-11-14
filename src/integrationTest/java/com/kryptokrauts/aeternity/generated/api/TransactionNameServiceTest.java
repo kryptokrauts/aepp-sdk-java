@@ -201,7 +201,7 @@ public class TransactionNameServiceTest extends BaseTest {
                     .ttl(ZERO)
                     .clientTtl(clientTtl)
                     .nameTtl(nameTtl)
-                    .pointerAddresses(
+                    .pointers(
                         Arrays.asList(
                             accountPointer, contractPointer, channelPointer, oraclePointer))
                     .build();
@@ -426,7 +426,8 @@ public class TransactionNameServiceTest extends BaseTest {
             ActiveNameResult activeNameResult = activeNameResults.stream().findFirst().get();
             _logger.info("ActiveNameResult: {}", activeNameResult);
             // we should be the owner
-            context.assertEquals(activeNameResult.getOwner(), account.getPublicKey());
+            context.assertEquals(account.getPublicKey(), activeNameResult.getOwner());
+            context.assertEquals(nameIdResult.getId(), activeNameResult.getNameHash());
             _logger.info("--------------------- auctionTest ---------------------");
           } catch (Throwable e) {
             context.fail(e);
