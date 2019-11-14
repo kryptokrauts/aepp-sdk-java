@@ -1,6 +1,6 @@
 package com.kryptokrauts.aeternity.sdk.service.aeternal.domain;
 
-import com.kryptokrauts.aeternal.generated.model.ActiveAuction;
+import com.kryptokrauts.aeternal.generated.model.ActiveNameAuction;
 import com.kryptokrauts.aeternity.sdk.domain.GenericResultObject;
 import java.math.BigInteger;
 import lombok.Getter;
@@ -10,7 +10,8 @@ import lombok.experimental.SuperBuilder;
 @Getter
 @SuperBuilder(toBuilder = true)
 @ToString
-public class ActiveAuctionResult extends GenericResultObject<ActiveAuction, ActiveAuctionResult> {
+public class ActiveNameAuctionResult
+    extends GenericResultObject<ActiveNameAuction, ActiveNameAuctionResult> {
 
   private String name;
   private BigInteger expiration;
@@ -18,7 +19,7 @@ public class ActiveAuctionResult extends GenericResultObject<ActiveAuction, Acti
   private String winningBidder;
 
   @Override
-  protected ActiveAuctionResult map(ActiveAuction generatedResultObject) {
+  protected ActiveNameAuctionResult map(ActiveNameAuction generatedResultObject) {
     if (generatedResultObject != null)
       return this.toBuilder()
           .name(generatedResultObject.getName())
@@ -31,6 +32,6 @@ public class ActiveAuctionResult extends GenericResultObject<ActiveAuction, Acti
 
   @Override
   protected String getResultObjectClassName() {
-    return ActiveAuctionResult.class.getName();
+    return ActiveNameAuctionResult.class.getName();
   }
 }

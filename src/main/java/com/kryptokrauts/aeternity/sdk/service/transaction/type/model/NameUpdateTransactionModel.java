@@ -12,7 +12,10 @@ import com.kryptokrauts.aeternity.sdk.service.transaction.type.impl.NameUpdateTr
 import com.kryptokrauts.aeternity.sdk.util.ValidationUtil;
 import com.kryptokrauts.sophia.compiler.generated.api.rxjava.DefaultApi;
 import java.math.BigInteger;
-import java.util.*;
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -33,7 +36,7 @@ public class NameUpdateTransactionModel extends AbstractTransactionModel<NameUpd
   private BigInteger nameTtl;
   private BigInteger clientTtl;
 
-  @Default private List<String> pointerAddresses = new LinkedList<>();
+  @Default private List<String> pointers = new LinkedList<>();
 
   @Override
   public NameUpdateTx toApiModel() {
@@ -50,9 +53,7 @@ public class NameUpdateTransactionModel extends AbstractTransactionModel<NameUpd
   }
 
   public List<NamePointer> getGeneratedPointers() {
-    return pointerAddresses.stream()
-        .map(pointerAddress -> buildNamePointer(pointerAddress))
-        .collect(Collectors.toList());
+    return pointers.stream().map(pointer -> buildNamePointer(pointer)).collect(Collectors.toList());
   }
 
   @Override
@@ -67,7 +68,7 @@ public class NameUpdateTransactionModel extends AbstractTransactionModel<NameUpd
           .nameTtl(castedTx.getNameTtl())
           .clientTtl(castedTx.getClientTtl())
           .ttl(castedTx.getTtl())
-          .pointerAddresses(
+          .pointers(
               castedTx.getPointers().stream()
                   .map(pointer -> pointer.getId())
                   .collect(Collectors.toList()))
@@ -91,19 +92,19 @@ public class NameUpdateTransactionModel extends AbstractTransactionModel<NameUpd
         Arrays.asList("nameId", ApiIdentifiers.NAME),
         ValidationUtil.MISSING_API_IDENTIFIER);
     ValidationUtil.checkParameters(
-        validate -> Optional.ofNullable(areDistinctPointerKeys(pointerAddresses)),
-        pointerAddresses,
+        validate -> Optional.ofNullable(areDistinctPointerKeys(pointers)),
+        pointers,
         "validateUpdateTransaction",
-        Stream.concat(Arrays.asList("pointerAddresses").stream(), pointerAddresses.stream())
+        Stream.concat(Arrays.asList("pointers").stream(), pointers.stream())
             .collect(Collectors.toList()),
         ValidationUtil.DUPLICATE_POINTER_KEY);
-    for (String pointerAddress : pointerAddresses) {
+    for (String pointer : pointers) {
       ValidationUtil.checkParameters(
-          validate -> Optional.ofNullable(isValidPointerAddress(pointerAddress)),
-          pointerAddress,
+          validate -> Optional.ofNullable(isValidPointer(pointer)),
+          pointer,
           "validateUpdateTransaction",
-          Arrays.asList("pointerAddress", pointerAddress),
-          ValidationUtil.INVALID_POINTER_ADDRESS);
+          Arrays.asList("pointer", pointer),
+          ValidationUtil.INVALID_POINTER);
     }
   }
 
@@ -112,25 +113,24 @@ public class NameUpdateTransactionModel extends AbstractTransactionModel<NameUpd
     return NameUpdateTransaction.builder().externalApi(externalApi).model(this).build();
   }
 
-  private boolean areDistinctPointerKeys(List<String> pointerAddresses) {
-    return pointerAddresses.stream().map(p -> getIdentifier(p)).distinct().count()
-        == pointerAddresses.size();
+  private boolean areDistinctPointerKeys(List<String> pointers) {
+    return pointers.stream().map(p -> getIdentifier(p)).distinct().count() == pointers.size();
   }
 
-  private boolean isValidPointerAddress(String pointerAddress) {
-    return AENS.IDENTIFIER_TO_POINTERKEY_MAP.keySet().contains(getIdentifier(pointerAddress));
+  private boolean isValidPointer(String pointer) {
+    return AENS.IDENTIFIER_TO_POINTERKEY_MAP.keySet().contains(getIdentifier(pointer));
   }
 
-  private NamePointer buildNamePointer(String pointerAddress) {
+  private NamePointer buildNamePointer(String pointer) {
     return new NamePointer()
-        .key(AENS.IDENTIFIER_TO_POINTERKEY_MAP.get(getIdentifier(pointerAddress)))
-        .id(pointerAddress);
+        .key(AENS.IDENTIFIER_TO_POINTERKEY_MAP.get(getIdentifier(pointer)))
+        .id(pointer);
   }
 
-  private String getIdentifier(String pointerAddress) {
-    if (pointerAddress == null) {
-      throw new InvalidParameterException("pointerAddress mustn't be null");
+  private String getIdentifier(String pointer) {
+    if (pointer == null) {
+      throw new InvalidParameterException("pointer mustn't be null");
     }
-    return pointerAddress.split("_")[0];
+    return pointer.split("_")[0];
   }
 }

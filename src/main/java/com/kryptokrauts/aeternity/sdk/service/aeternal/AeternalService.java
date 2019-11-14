@@ -1,25 +1,33 @@
 package com.kryptokrauts.aeternity.sdk.service.aeternal;
 
-import com.kryptokrauts.aeternity.sdk.service.aeternal.domain.ActiveAuctionsResult;
+import com.kryptokrauts.aeternity.sdk.service.aeternal.domain.ActiveNameAuctionsCountResult;
+import com.kryptokrauts.aeternity.sdk.service.aeternal.domain.ActiveNameAuctionsResult;
+import com.kryptokrauts.aeternity.sdk.service.aeternal.domain.ActiveNamesResult;
 import com.kryptokrauts.aeternity.sdk.service.aeternal.domain.NameSortBy;
-import java.io.IOException;
 import java.math.BigInteger;
 import java.util.Optional;
 
 public interface AeternalService {
 
-  Object blockingGetStatus();
+  Object blockingGetMdwStatus();
 
-  BigInteger blockingGetNameAuctionsActiveCount() throws IOException;
+  ActiveNameAuctionsCountResult blockingGetActiveNameAuctionsCount();
 
-  ActiveAuctionsResult blockingGetNameAuctionsActive();
+  ActiveNameAuctionsResult blockingGetActiveNameAuctions();
 
-  ActiveAuctionsResult blockingGetNameAuctionsActive(
+  ActiveNameAuctionsResult blockingGetActiveNameAuctions(
       Optional<BigInteger> length,
       Optional<String> reverse,
       Optional<BigInteger> limit,
       Optional<BigInteger> page,
       Optional<NameSortBy> sortBy);
 
-  boolean blockingIsAuctionActive(String name);
+  boolean blockingIsNameAuctionActive(String name);
+
+  ActiveNamesResult blockingGetActiveNames();
+
+  ActiveNamesResult blockingGetActiveNames(
+      Optional<BigInteger> limit, Optional<BigInteger> page, Optional<String> account);
+
+  ActiveNamesResult blockingSearchName(String name);
 }

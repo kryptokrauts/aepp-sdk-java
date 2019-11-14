@@ -1,12 +1,11 @@
 package com.kryptokrauts.aeternity.sdk.service.aeternal.impl;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kryptokrauts.aeternal.generated.api.rxjava.DefaultApi;
 import com.kryptokrauts.aeternity.sdk.service.aeternal.AeternalService;
-import com.kryptokrauts.aeternity.sdk.service.aeternal.domain.ActiveAuctionsResult;
+import com.kryptokrauts.aeternity.sdk.service.aeternal.domain.ActiveNameAuctionsCountResult;
+import com.kryptokrauts.aeternity.sdk.service.aeternal.domain.ActiveNameAuctionsResult;
+import com.kryptokrauts.aeternity.sdk.service.aeternal.domain.ActiveNamesResult;
 import com.kryptokrauts.aeternity.sdk.service.aeternal.domain.NameSortBy;
-import java.io.IOException;
 import java.math.BigInteger;
 import java.util.Optional;
 import lombok.NonNull;
@@ -17,36 +16,32 @@ public class AeternalServiceImpl implements AeternalService {
 
   @NonNull private DefaultApi aeternalApi;
 
-  private ObjectMapper objectMapper = new ObjectMapper();
-
   @Override
-  public Object blockingGetStatus() {
+  public Object blockingGetMdwStatus() {
     return aeternalApi.rxGetMdwStatus().blockingGet();
   }
 
   @Override
-  public BigInteger blockingGetNameAuctionsActiveCount() throws IOException {
-    Object result =
-        aeternalApi.rxGetActiveNameAuctionsCount(null, null, null, null, null).blockingGet();
-    String resultJson = objectMapper.writeValueAsString(result);
-    JsonNode jsonNode = objectMapper.readTree(resultJson);
-    return new BigInteger(jsonNode.get("count").toString());
+  public ActiveNameAuctionsCountResult blockingGetActiveNameAuctionsCount() {
+    return ActiveNameAuctionsCountResult.builder()
+        .build()
+        .blockingGet(aeternalApi.rxGetActiveNameAuctionsCount(null, null, null, null, null));
   }
 
   @Override
-  public ActiveAuctionsResult blockingGetNameAuctionsActive() {
-    return this.blockingGetNameAuctionsActive(
+  public ActiveNameAuctionsResult blockingGetActiveNameAuctions() {
+    return this.blockingGetActiveNameAuctions(
         Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty());
   }
 
   @Override
-  public ActiveAuctionsResult blockingGetNameAuctionsActive(
+  public ActiveNameAuctionsResult blockingGetActiveNameAuctions(
       Optional<BigInteger> length,
       Optional<String> reverse,
       Optional<BigInteger> limit,
       Optional<BigInteger> page,
       Optional<NameSortBy> sortBy) {
-    return ActiveAuctionsResult.builder()
+    return ActiveNameAuctionsResult.builder()
         .build()
         .blockingGet(
             aeternalApi.rxGetActiveNameAuctions(
@@ -58,11 +53,31 @@ public class AeternalServiceImpl implements AeternalService {
   }
 
   @Override
-  public boolean blockingIsAuctionActive(String name) {
-    ActiveAuctionsResult result = this.blockingGetNameAuctionsActive();
-    return result.getActiveAuctionResults().stream()
-        .filter(auction -> auction.getName().equals(name))
+  public boolean blockingIsNameAuctionActive(String name) {
+    ActiveNameAuctionsResult result = this.blockingGetActiveNameAuctions();
+    return result.getActiveNameAuctionResults().stream()
+        .filter(auction -> auction.getName().equalsIgnoreCase(name))
         .findAny()
         .isPresent();
+  }
+
+  @Override
+  public ActiveNamesResult blockingGetActiveNames() {
+    return this.blockingGetActiveNames(Optional.empty(), Optional.empty(), Optional.empty());
+  }
+
+  @Override
+  public ActiveNamesResult blockingGetActiveNames(
+      Optional<BigInteger> limit, Optional<BigInteger> page, Optional<String> account) {
+    return ActiveNamesResult.builder()
+        .build()
+        .blockingGet(
+            aeternalApi.rxGetActiveNames(
+                limit.orElse(null), page.orElse(null), account.orElse(null)));
+  }
+
+  @Override
+  public ActiveNamesResult blockingSearchName(String name) {
+    return ActiveNamesResult.builder().build().blockingGet(aeternalApi.rxSearchName(name));
   }
 }
