@@ -77,6 +77,16 @@ public abstract class GenericResultObject<T, V extends GenericResultObject<?, ?>
       if (e instanceof ApiException) {
         ApiException ex = (ApiException) e;
         return ex.getResponseBody();
+      }
+      if (e instanceof com.kryptokrauts.sophia.compiler.generated.ApiException) {
+        com.kryptokrauts.sophia.compiler.generated.ApiException ex =
+            (com.kryptokrauts.sophia.compiler.generated.ApiException) e;
+        return ex.getResponseBody();
+      }
+      if (e instanceof com.kryptokrauts.aeternal.generated.ApiException) {
+        com.kryptokrauts.aeternal.generated.ApiException ex =
+            (com.kryptokrauts.aeternal.generated.ApiException) e;
+        return ex.getResponseBody();
       } else return determineRootErrorMessage(e.getCause());
     }
     return "Root cause error message cannot be determined";
