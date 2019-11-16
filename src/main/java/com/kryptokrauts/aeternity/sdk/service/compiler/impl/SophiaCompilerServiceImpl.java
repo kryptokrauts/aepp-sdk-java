@@ -1,10 +1,16 @@
 package com.kryptokrauts.aeternity.sdk.service.compiler.impl;
 
+import com.kryptokrauts.aeternity.sdk.domain.StringResultWrapper;
 import com.kryptokrauts.aeternity.sdk.service.ServiceConfiguration;
 import com.kryptokrauts.aeternity.sdk.service.compiler.CompilerService;
 import com.kryptokrauts.aeternity.sdk.service.compiler.domain.ACIResult;
 import com.kryptokrauts.sophia.compiler.generated.api.rxjava.DefaultApi;
-import com.kryptokrauts.sophia.compiler.generated.model.*;
+import com.kryptokrauts.sophia.compiler.generated.model.CompileOpts;
+import com.kryptokrauts.sophia.compiler.generated.model.Contract;
+import com.kryptokrauts.sophia.compiler.generated.model.FunctionCallInput;
+import com.kryptokrauts.sophia.compiler.generated.model.SophiaBinaryData;
+import com.kryptokrauts.sophia.compiler.generated.model.SophiaCallResultInput;
+import com.kryptokrauts.sophia.compiler.generated.model.SophiaJsonData;
 import io.netty.util.internal.StringUtil;
 import io.reactivex.Single;
 import java.util.List;
@@ -22,17 +28,24 @@ public final class SophiaCompilerServiceImpl implements CompilerService {
   @Override
   public Single<String> asyncEncodeCalldata(
       String sourceCode, String function, List<String> arguments) {
-    return this.compilerApi
-        .rxEncodeCalldata(buildFunctionCallInput(sourceCode, function, arguments))
-        .map(calldata -> calldata.getCalldata());
+    return StringResultWrapper.builder()
+        .build()
+        .asyncGet(
+            this.compilerApi
+                .rxEncodeCalldata(buildFunctionCallInput(sourceCode, function, arguments))
+                .map(calldata -> calldata.getCalldata()))
+        .map(stringWrapper -> stringWrapper.getSimpleValue());
   }
 
   @Override
   public String blockingEncodeCalldata(String sourceCode, String function, List<String> arguments) {
-    return this.compilerApi
-        .rxEncodeCalldata(buildFunctionCallInput(sourceCode, function, arguments))
-        .blockingGet()
-        .getCalldata();
+    return StringResultWrapper.builder()
+        .build()
+        .blockingGet(
+            this.compilerApi
+                .rxEncodeCalldata(buildFunctionCallInput(sourceCode, function, arguments))
+                .map(calldata -> calldata.getCalldata()))
+        .getSimpleValue();
   }
 
   private FunctionCallInput buildFunctionCallInput(
@@ -135,17 +148,24 @@ public final class SophiaCompilerServiceImpl implements CompilerService {
 
   @Override
   public Single<String> asyncCompile(String contractCode, String srcFile, Object fileSystem) {
-    return this.compilerApi
-        .rxCompileContract(buildContractBody(contractCode, srcFile, fileSystem))
-        .map(byteCode -> byteCode.getBytecode());
+    return StringResultWrapper.builder()
+        .build()
+        .asyncGet(
+            this.compilerApi
+                .rxCompileContract(buildContractBody(contractCode, srcFile, fileSystem))
+                .map(byteCode -> byteCode.getBytecode()))
+        .map(stringWrapper -> stringWrapper.getSimpleValue());
   }
 
   @Override
   public String blockingCompile(String contractCode, String srcFile, Object fileSystem) {
-    return this.compilerApi
-        .rxCompileContract(buildContractBody(contractCode, srcFile, fileSystem))
-        .blockingGet()
-        .getBytecode();
+    return StringResultWrapper.builder()
+        .build()
+        .blockingGet(
+            this.compilerApi
+                .rxCompileContract(buildContractBody(contractCode, srcFile, fileSystem))
+                .map(bytecode -> bytecode.getBytecode()))
+        .getSimpleValue();
   }
 
   private Contract buildContractBody(String contractCode, String srcFile, Object fileSystem) {
