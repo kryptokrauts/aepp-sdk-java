@@ -1,5 +1,7 @@
 package com.kryptokrauts.aeternity.sdk.domain;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.kryptokrauts.aeternity.generated.ApiException;
 import io.reactivex.Single;
 import lombok.Getter;
@@ -62,10 +64,20 @@ public abstract class GenericResultObject<T, V extends GenericResultObject<?, ?>
     V result = this.map(null);
     result.rootErrorMessage = determineRootErrorMessage(e);
     result.aeAPIErrorMessage = e.getMessage();
+    String prettyErrorMessage = result.getRootErrorMessage();
+    try {
+      ObjectMapper mapper = new ObjectMapper();
+      mapper.enable(SerializationFeature.INDENT_OUTPUT);
+      prettyErrorMessage =
+          mapper
+              .writerWithDefaultPrettyPrinter()
+              .writeValueAsString(mapper.readValue(result.getRootErrorMessage(), Object.class));
+    } catch (Exception e1) {
+    }
     _logger.warn(
         String.format(
-            "Error mapping GenericResultObject to class %s\ncause: %s\nroot cause: %s",
-            getResultObjectClassName(), result.aeAPIErrorMessage, result.rootErrorMessage));
+            "Error mapping GenericResultObject to class %s\ncause: %s\nroot cause:\n%s",
+            getResultObjectClassName(), result.aeAPIErrorMessage, prettyErrorMessage));
     if (_logger.isDebugEnabled()) {
       result.throwable = e;
     }
