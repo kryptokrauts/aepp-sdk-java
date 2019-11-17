@@ -94,7 +94,7 @@ public class InfoServiceImpl implements InfoService {
         validate -> Optional.ofNullable(contractId.startsWith(ApiIdentifiers.CONTRACT_PUBKEY)),
         contractId,
         "getContract",
-        Arrays.asList("contractId", ApiIdentifiers.NAME),
+        Arrays.asList("contractId", ApiIdentifiers.CONTRACT_PUBKEY),
         ValidationUtil.MISSING_API_IDENTIFIER);
   }
 
