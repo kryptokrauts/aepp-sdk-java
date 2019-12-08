@@ -1,5 +1,6 @@
 package com.kryptokrauts.aeternity.sdk.service.compiler.impl;
 
+import com.kryptokrauts.aeternity.sdk.domain.ObjectResultWrapper;
 import com.kryptokrauts.aeternity.sdk.domain.StringResultWrapper;
 import com.kryptokrauts.aeternity.sdk.service.ServiceConfiguration;
 import com.kryptokrauts.aeternity.sdk.service.compiler.CompilerService;
@@ -26,26 +27,25 @@ public final class SophiaCompilerServiceImpl implements CompilerService {
   @NonNull private DefaultApi compilerApi;
 
   @Override
-  public Single<String> asyncEncodeCalldata(
+  public Single<StringResultWrapper> asyncEncodeCalldata(
       String sourceCode, String function, List<String> arguments) {
     return StringResultWrapper.builder()
         .build()
         .asyncGet(
             this.compilerApi
                 .rxEncodeCalldata(buildFunctionCallInput(sourceCode, function, arguments))
-                .map(calldata -> calldata.getCalldata()))
-        .map(stringWrapper -> stringWrapper.getSimpleValue());
+                .map(calldata -> calldata.getCalldata()));
   }
 
   @Override
-  public String blockingEncodeCalldata(String sourceCode, String function, List<String> arguments) {
+  public StringResultWrapper blockingEncodeCalldata(
+      String sourceCode, String function, List<String> arguments) {
     return StringResultWrapper.builder()
         .build()
         .blockingGet(
             this.compilerApi
                 .rxEncodeCalldata(buildFunctionCallInput(sourceCode, function, arguments))
-                .map(calldata -> calldata.getCalldata()))
-        .getSimpleValue();
+                .map(calldata -> calldata.getCalldata()));
   }
 
   private FunctionCallInput buildFunctionCallInput(
@@ -90,10 +90,13 @@ public final class SophiaCompilerServiceImpl implements CompilerService {
   public Object blockingDecodeCallResult(
       String source, String function, String callResult, String callValue) {
     return Optional.ofNullable(
-            this.compilerApi
-                .rxDecodeCallResult(buildDecodeBody(source, function, callResult, callValue))
-                .blockingGet())
-        .orElse(new Object());
+            ObjectResultWrapper.builder()
+                .build()
+                .blockingGet(
+                    this.compilerApi.rxDecodeCallResult(
+                        buildDecodeBody(source, function, callResult, callValue)))
+                .getSimpleValue())
+        .orElse("");
   }
 
   private SophiaBinaryData buildDecodeBody(String calldata, String sophiaType) {
@@ -147,25 +150,25 @@ public final class SophiaCompilerServiceImpl implements CompilerService {
   }
 
   @Override
-  public Single<String> asyncCompile(String contractCode, String srcFile, Object fileSystem) {
+  public Single<StringResultWrapper> asyncCompile(
+      String contractCode, String srcFile, Object fileSystem) {
     return StringResultWrapper.builder()
         .build()
         .asyncGet(
             this.compilerApi
                 .rxCompileContract(buildContractBody(contractCode, srcFile, fileSystem))
-                .map(byteCode -> byteCode.getBytecode()))
-        .map(stringWrapper -> stringWrapper.getSimpleValue());
+                .map(byteCode -> byteCode.getBytecode()));
   }
 
   @Override
-  public String blockingCompile(String contractCode, String srcFile, Object fileSystem) {
+  public StringResultWrapper blockingCompile(
+      String contractCode, String srcFile, Object fileSystem) {
     return StringResultWrapper.builder()
         .build()
         .blockingGet(
             this.compilerApi
                 .rxCompileContract(buildContractBody(contractCode, srcFile, fileSystem))
-                .map(bytecode -> bytecode.getBytecode()))
-        .getSimpleValue();
+                .map(bytecode -> bytecode.getBytecode()));
   }
 
   private Contract buildContractBody(String contractCode, String srcFile, Object fileSystem) {

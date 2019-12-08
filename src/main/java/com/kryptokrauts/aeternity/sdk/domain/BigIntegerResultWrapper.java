@@ -1,5 +1,7 @@
 package com.kryptokrauts.aeternity.sdk.domain;
 
+import java.math.BigInteger;
+
 import lombok.Getter;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
@@ -13,14 +15,14 @@ import lombok.experimental.SuperBuilder;
 @Getter
 @SuperBuilder(toBuilder = true)
 @ToString
-public class StringResultWrapper
+public class BigIntegerResultWrapper
 		extends
-			GenericResultObject<String, StringResultWrapper> {
+			GenericResultObject<BigInteger, BigIntegerResultWrapper> {
 
-	private String result;
+	private BigInteger result;
 
 	@Override
-	protected StringResultWrapper map(String generatedResultObject) {
+	protected BigIntegerResultWrapper map(BigInteger generatedResultObject) {
 		if (generatedResultObject != null)
 			return this.toBuilder().result(generatedResultObject).build();
 		else
