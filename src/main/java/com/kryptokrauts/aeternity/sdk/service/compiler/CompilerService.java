@@ -1,5 +1,6 @@
 package com.kryptokrauts.aeternity.sdk.service.compiler;
 
+import com.kryptokrauts.aeternity.sdk.domain.ObjectResultWrapper;
 import com.kryptokrauts.aeternity.sdk.domain.StringResultWrapper;
 import com.kryptokrauts.aeternity.sdk.service.compiler.domain.ACIResult;
 import io.reactivex.Single;
@@ -48,7 +49,7 @@ public interface CompilerService {
    * @param sophiaType the awaited sophia type
    * @return asynchronous result handler (RxJava Single) for decoded answer as json string
    */
-  Single<Object> asyncDecodeCalldata(String calldata, String sophiaType);
+  Single<ObjectResultWrapper> asyncDecodeCalldata(String calldata, String sophiaType);
 
   /**
    * synchronously decodes a calldata
@@ -57,7 +58,7 @@ public interface CompilerService {
    * @param sophiaType the awaited sophia type
    * @return decoded answer as json string
    */
-  Object blockingDecodeCalldata(String calldata, String sophiaType);
+  ObjectResultWrapper blockingDecodeCalldata(String calldata, String sophiaType);
 
   /**
    * asynchronously decodes callresult of contract-calls
@@ -68,7 +69,7 @@ public interface CompilerService {
    * @param callValue the received value
    * @return the decoded sophia call result
    */
-  Single<Object> asyncDecodeCallResult(
+  Single<ObjectResultWrapper> asyncDecodeCallResult(
       String source, String function, String callResult, String callValue);
 
   /**
@@ -80,7 +81,7 @@ public interface CompilerService {
    * @param callValue the received value
    * @return the decoded sophia call result
    */
-  Object blockingDecodeCallResult(
+  ObjectResultWrapper blockingDecodeCallResult(
       String source, String function, String callResult, String callValue);
 
   /**

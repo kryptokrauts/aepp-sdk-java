@@ -4,6 +4,7 @@ import com.kryptokrauts.aeternity.generated.api.rxjava.ExternalApi;
 import com.kryptokrauts.aeternity.generated.model.Tx;
 import com.kryptokrauts.aeternity.sdk.constants.ApiIdentifiers;
 import com.kryptokrauts.aeternity.sdk.constants.SerializationTags;
+import com.kryptokrauts.aeternity.sdk.domain.StringResultWrapper;
 import com.kryptokrauts.aeternity.sdk.exception.TransactionCreateException;
 import com.kryptokrauts.aeternity.sdk.service.aeternity.AeternityServiceConfiguration;
 import com.kryptokrauts.aeternity.sdk.service.transaction.TransactionService;
@@ -36,18 +37,24 @@ public class TransactionServiceImpl implements TransactionService {
   @Nonnull private DefaultApi compilerApi;
 
   @Override
-  public Single<String> asyncCreateUnsignedTransaction(AbstractTransactionModel<?> tx) {
-    return tx.buildTransaction(externalApi, compilerApi)
-        .createUnsignedTransaction(config.isNativeMode(), config.getMinimalGasPrice())
-        .map(single -> single.getTx());
+  public Single<StringResultWrapper> asyncCreateUnsignedTransaction(
+      AbstractTransactionModel<?> tx) {
+    return StringResultWrapper.builder()
+        .build()
+        .asyncGet(
+            tx.buildTransaction(externalApi, compilerApi)
+                .createUnsignedTransaction(config.isNativeMode(), config.getMinimalGasPrice())
+                .map(single -> single.getTx()));
   }
 
   @Override
-  public String blockingCreateUnsignedTransaction(AbstractTransactionModel<?> tx) {
-    return tx.buildTransaction(externalApi, compilerApi)
-        .createUnsignedTransaction(config.isNativeMode(), config.getMinimalGasPrice())
-        .blockingGet()
-        .getTx();
+  public StringResultWrapper blockingCreateUnsignedTransaction(AbstractTransactionModel<?> tx) {
+    return StringResultWrapper.builder()
+        .build()
+        .blockingGet(
+            tx.buildTransaction(externalApi, compilerApi)
+                .createUnsignedTransaction(config.isNativeMode(), config.getMinimalGasPrice())
+                .map(result -> result.getTx()));
   }
 
   @Override
@@ -64,7 +71,8 @@ public class TransactionServiceImpl implements TransactionService {
             externalApi.rxPostTransaction(
                 createGeneratedTxObject(
                     signTransaction(
-                        asyncCreateUnsignedTransaction(tx).blockingGet(), privateKey))));
+                        asyncCreateUnsignedTransaction(tx).blockingGet().getResult(),
+                        privateKey))));
   }
 
   @Override
@@ -95,7 +103,8 @@ public class TransactionServiceImpl implements TransactionService {
             externalApi.rxPostTransaction(
                 createGeneratedTxObject(
                     signTransaction(
-                        asyncCreateUnsignedTransaction(tx).blockingGet(), privateKey))));
+                        asyncCreateUnsignedTransaction(tx).blockingGet().getResult(),
+                        privateKey))));
   }
 
   @Override
@@ -104,7 +113,7 @@ public class TransactionServiceImpl implements TransactionService {
     byte[] signed =
         EncodingUtils.decodeCheckWithIdentifier(
             signTransaction(
-                asyncCreateUnsignedTransaction(tx).blockingGet(),
+                asyncCreateUnsignedTransaction(tx).blockingGet().getResult(),
                 this.config.getBaseKeyPair().getPrivateKey()));
     return EncodingUtils.hashEncode(signed, ApiIdentifiers.TRANSACTION_HASH);
   }

@@ -59,10 +59,16 @@ public class TransactionNameServiceTest extends BaseTest {
                   .build();
 
           String unsignedTxNative =
-              this.aeternityServiceNative.transactions.blockingCreateUnsignedTransaction(preclaim);
+              this.aeternityServiceNative
+                  .transactions
+                  .blockingCreateUnsignedTransaction(preclaim)
+                  .getResult();
 
           String unsignedTxDebug =
-              this.aeternityServiceDebug.transactions.blockingCreateUnsignedTransaction(preclaim);
+              this.aeternityServiceDebug
+                  .transactions
+                  .blockingCreateUnsignedTransaction(preclaim)
+                  .getResult();
 
           context.assertEquals(unsignedTxDebug, unsignedTxNative);
         });
@@ -106,8 +112,10 @@ public class TransactionNameServiceTest extends BaseTest {
                     .build();
 
             _logger.info(
-                this.aeternityServiceNative.transactions.blockingCreateUnsignedTransaction(
-                    nameClaimTx));
+                this.aeternityServiceNative
+                    .transactions
+                    .blockingCreateUnsignedTransaction(nameClaimTx)
+                    .getResult());
 
             result = this.blockingPostTx(nameClaimTx, Optional.empty());
             _logger.info(
@@ -120,7 +128,8 @@ public class TransactionNameServiceTest extends BaseTest {
                 this.aeternityServiceNative.info.blockingGetTransactionByHash(result.getTxHash());
             context.assertTrue(genericSignedTx.getBlockHeight().intValue() > 0);
             // NameClaimTx typedTx = (NameClaimTx) genericSignedTx.gett
-            // _logger.info("Successfully claimed aens " + typedTx.getName());
+            // _logger.info("Successfully claimed aens " +
+            // typedTx.getName());
             _logger.info("--------------------- postNameClaimTxTest ---------------------");
           } catch (Throwable e) {
             context.fail(e);
@@ -224,7 +233,8 @@ public class TransactionNameServiceTest extends BaseTest {
             context.assertEquals(contractPointer, nameIdResult.getContractPointer().get());
             context.assertEquals(oraclePointer, nameIdResult.getOraclePointer().get());
             BigInteger updatedTTL = nameIdResult.getTtl();
-            // subtract 40000 because initial default ttl is 50000 and updated ttl was 10000
+            // subtract 40000 because initial default ttl is 50000 and
+            // updated ttl was 10000
             int diffTtl = initialTTL.subtract(updatedTTL).intValue();
             context.assertTrue(diffTtl <= 40000);
             if (diffTtl < 40000) {

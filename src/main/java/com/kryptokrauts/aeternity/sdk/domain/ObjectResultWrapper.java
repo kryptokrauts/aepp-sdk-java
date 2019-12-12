@@ -15,12 +15,12 @@ import lombok.experimental.SuperBuilder;
 @ToString
 public class ObjectResultWrapper extends GenericResultObject<Object, ObjectResultWrapper> {
 
-  private Object simpleValue;
+  private Object result;
 
   @Override
   protected ObjectResultWrapper map(Object generatedResultObject) {
     if (generatedResultObject != null)
-      return this.toBuilder().simpleValue(generatedResultObject).build();
+      return this.toBuilder().result(generatedResultObject).build();
     else return this.toBuilder().build();
   }
 

@@ -49,10 +49,14 @@ public class TransactionSpendApiTest extends BaseTest {
               aeternityServiceNative
                   .transactions
                   .asyncCreateUnsignedTransaction(spendTx)
-                  .blockingGet();
+                  .blockingGet()
+                  .getResult();
 
           String unsignedTxDebug =
-              aeternityServiceDebug.transactions.blockingCreateUnsignedTransaction(spendTx);
+              aeternityServiceDebug
+                  .transactions
+                  .blockingCreateUnsignedTransaction(spendTx)
+                  .getResult();
 
           context.assertEquals(unsignedTxDebug, unsignedTxNative);
         });
@@ -126,7 +130,8 @@ public class TransactionSpendApiTest extends BaseTest {
               aeternityServiceNative
                   .transactions
                   .asyncCreateUnsignedTransaction(spendTx)
-                  .blockingGet();
+                  .blockingGet()
+                  .getResult();
 
           String signedTxNative =
               aeternityServiceNative.transactions.signTransaction(

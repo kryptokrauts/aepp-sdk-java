@@ -63,40 +63,49 @@ public final class SophiaCompilerServiceImpl implements CompilerService {
   }
 
   @Override
-  public Single<Object> asyncDecodeCalldata(String calldata, String sophiaType) {
-    return Optional.ofNullable(this.compilerApi.rxDecodeData(buildDecodeBody(calldata, sophiaType)))
-        .orElse(Single.just(new SophiaJsonData()))
-        .map(s -> s.getData());
+  public Single<ObjectResultWrapper> asyncDecodeCalldata(String calldata, String sophiaType) {
+    return ObjectResultWrapper.builder()
+        .build()
+        .asyncGet(
+            this.compilerApi
+                .rxDecodeData(buildDecodeBody(calldata, sophiaType))
+                .map(
+                    decodeResult ->
+                        Optional.ofNullable(decodeResult).orElse(new SophiaJsonData()).getData()));
   }
 
   @Override
-  public Object blockingDecodeCalldata(String calldata, String sophiaType) {
-    return Optional.ofNullable(
-            this.compilerApi.rxDecodeData(buildDecodeBody(calldata, sophiaType)).blockingGet())
-        .orElse(new SophiaJsonData())
-        .getData();
+  public ObjectResultWrapper blockingDecodeCalldata(String calldata, String sophiaType) {
+    return ObjectResultWrapper.builder()
+        .build()
+        .blockingGet(
+            this.compilerApi
+                .rxDecodeData(buildDecodeBody(calldata, sophiaType))
+                .map(
+                    decodeResult ->
+                        Optional.ofNullable(decodeResult).orElse(new SophiaJsonData()).getData()));
   }
 
   @Override
-  public Single<Object> asyncDecodeCallResult(
+  public Single<ObjectResultWrapper> asyncDecodeCallResult(
       String source, String function, String callResult, String callValue) {
-    return Optional.ofNullable(
-            this.compilerApi.rxDecodeCallResult(
-                buildDecodeBody(source, function, callResult, callValue)))
-        .orElse(Single.just(new Object()));
+    return ObjectResultWrapper.builder()
+        .build()
+        .asyncGet(
+            this.compilerApi
+                .rxDecodeCallResult(buildDecodeBody(source, function, callResult, callValue))
+                .map(decodeResult -> Optional.ofNullable(decodeResult).orElse("")));
   }
 
   @Override
-  public Object blockingDecodeCallResult(
+  public ObjectResultWrapper blockingDecodeCallResult(
       String source, String function, String callResult, String callValue) {
-    return Optional.ofNullable(
-            ObjectResultWrapper.builder()
-                .build()
-                .blockingGet(
-                    this.compilerApi.rxDecodeCallResult(
-                        buildDecodeBody(source, function, callResult, callValue)))
-                .getSimpleValue())
-        .orElse("");
+    return ObjectResultWrapper.builder()
+        .build()
+        .blockingGet(
+            this.compilerApi
+                .rxDecodeCallResult(buildDecodeBody(source, function, callResult, callValue))
+                .map(decodeResult -> Optional.ofNullable(decodeResult).orElse("")));
   }
 
   private SophiaBinaryData buildDecodeBody(String calldata, String sophiaType) {

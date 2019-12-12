@@ -5,30 +5,27 @@ import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
 /**
- * this string result wrapper introduces the error handling when returning
- * simple string from node calls
+ * this string result wrapper introduces the error handling when returning simple string from node
+ * calls
  *
  * @author mitch
  */
 @Getter
 @SuperBuilder(toBuilder = true)
 @ToString
-public class StringResultWrapper
-		extends
-			GenericResultObject<String, StringResultWrapper> {
+public class StringResultWrapper extends GenericResultObject<String, StringResultWrapper> {
 
-	private String result;
+  private String result;
 
-	@Override
-	protected StringResultWrapper map(String generatedResultObject) {
-		if (generatedResultObject != null)
-			return this.toBuilder().result(generatedResultObject).build();
-		else
-			return this.toBuilder().build();
-	}
+  @Override
+  protected StringResultWrapper map(String generatedResultObject) {
+    if (generatedResultObject != null)
+      return this.toBuilder().result(generatedResultObject).build();
+    else return this.toBuilder().build();
+  }
 
-	@Override
-	protected String getResultObjectClassName() {
-		return this.getClass().getName();
-	}
+  @Override
+  protected String getResultObjectClassName() {
+    return this.getClass().getName();
+  }
 }
