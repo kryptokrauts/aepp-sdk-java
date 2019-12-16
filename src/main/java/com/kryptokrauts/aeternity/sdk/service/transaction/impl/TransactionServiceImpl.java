@@ -1,11 +1,14 @@
 package com.kryptokrauts.aeternity.sdk.service.transaction.impl;
 
 import com.kryptokrauts.aeternity.generated.api.rxjava.ExternalApi;
+import com.kryptokrauts.aeternity.generated.model.GenericSignedTx;
 import com.kryptokrauts.aeternity.generated.model.Tx;
 import com.kryptokrauts.aeternity.sdk.constants.ApiIdentifiers;
 import com.kryptokrauts.aeternity.sdk.constants.SerializationTags;
 import com.kryptokrauts.aeternity.sdk.domain.StringResultWrapper;
+import com.kryptokrauts.aeternity.sdk.exception.AException;
 import com.kryptokrauts.aeternity.sdk.exception.TransactionCreateException;
+import com.kryptokrauts.aeternity.sdk.exception.TransactionWaitTimeoutExpiredException;
 import com.kryptokrauts.aeternity.sdk.service.aeternity.AeternityServiceConfiguration;
 import com.kryptokrauts.aeternity.sdk.service.transaction.TransactionService;
 import com.kryptokrauts.aeternity.sdk.service.transaction.domain.DryRunRequest;
@@ -82,9 +85,10 @@ public class TransactionServiceImpl implements TransactionService {
 
   @Override
   public PostTransactionResult blockingPostTransaction(String signedTx) {
-    return PostTransactionResult.builder()
-        .build()
-        .blockingGet(externalApi.rxPostTransaction(createGeneratedTxObject(signedTx)));
+    return this.waitUntilTransactionIsMined(
+        PostTransactionResult.builder()
+            .build()
+            .blockingGet(externalApi.rxPostTransaction(createGeneratedTxObject(signedTx))));
   }
 
   @Override
@@ -97,14 +101,15 @@ public class TransactionServiceImpl implements TransactionService {
   @Override
   public PostTransactionResult blockingPostTransaction(
       AbstractTransactionModel<?> tx, String privateKey) throws TransactionCreateException {
-    return PostTransactionResult.builder()
-        .build()
-        .blockingGet(
-            externalApi.rxPostTransaction(
-                createGeneratedTxObject(
-                    signTransaction(
-                        asyncCreateUnsignedTransaction(tx).blockingGet().getResult(),
-                        privateKey))));
+    return this.waitUntilTransactionIsMined(
+        PostTransactionResult.builder()
+            .build()
+            .blockingGet(
+                externalApi.rxPostTransaction(
+                    createGeneratedTxObject(
+                        signTransaction(
+                            asyncCreateUnsignedTransaction(tx).blockingGet().getResult(),
+                            privateKey)))));
   }
 
   @Override
@@ -181,5 +186,47 @@ public class TransactionServiceImpl implements TransactionService {
     Tx tx = new Tx();
     tx.setTx(signedTx);
     return tx;
+  }
+
+  private PostTransactionResult waitUntilTransactionIsMined(
+      PostTransactionResult postTransactionResult) {
+    if (postTransactionResult != null) {
+      String transactionHash = postTransactionResult.getTxHash();
+      int currentBlockHeight = -1;
+      GenericSignedTx minedTransaction = null;
+      int elapsedTrials = 1;
+      while (currentBlockHeight == -1
+          && elapsedTrials < this.config.getNumTrialsToWaitForTxMined()) {
+        minedTransaction = this.externalApi.rxGetTransactionByHash(transactionHash).blockingGet();
+        if (minedTransaction.getBlockHeight().intValue() > 1) {
+          _logger.debug("Transaction is mined - " + minedTransaction.toString());
+          currentBlockHeight = minedTransaction.getBlockHeight().intValue();
+        } else {
+          _logger.info(
+              String.format(
+                  "Transaction not mined yet, checking again in %s seconds (trial %s of %s)",
+                  (this.config.getMillisBetweenTrialsToWaitForTxMined() / 1000),
+                  elapsedTrials,
+                  this.config.getNumTrialsToWaitForTxMined()));
+          try {
+            Thread.sleep(this.config.getMillisBetweenTrialsToWaitForTxMined());
+          } catch (InterruptedException e) {
+            throw new AException(
+                String.format(
+                    "Waiting for transaction %s to be mined was interrupted due to technical error",
+                    transactionHash),
+                e);
+          }
+          elapsedTrials++;
+        }
+      }
+      if (currentBlockHeight == -1) {
+        throw new TransactionWaitTimeoutExpiredException(
+            String.format(
+                "Transaction %s was not mined after %s trials, aborting",
+                transactionHash, elapsedTrials));
+      }
+    }
+    return postTransactionResult;
   }
 }
