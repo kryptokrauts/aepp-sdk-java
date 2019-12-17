@@ -1,6 +1,7 @@
 package com.kryptokrauts.aeternity.sdk.service.aeternal.impl;
 
 import com.kryptokrauts.aeternal.generated.api.rxjava.DefaultApi;
+import com.kryptokrauts.aeternity.sdk.domain.ObjectResultWrapper;
 import com.kryptokrauts.aeternity.sdk.service.aeternal.AeternalService;
 import com.kryptokrauts.aeternity.sdk.service.aeternal.domain.ActiveNameAuctionsCountResult;
 import com.kryptokrauts.aeternity.sdk.service.aeternal.domain.ActiveNameAuctionsResult;
@@ -17,8 +18,8 @@ public class AeternalServiceImpl implements AeternalService {
   @NonNull private DefaultApi aeternalApi;
 
   @Override
-  public Object blockingGetMdwStatus() {
-    return aeternalApi.rxGetMdwStatus().blockingGet();
+  public ObjectResultWrapper blockingGetMdwStatus() {
+    return ObjectResultWrapper.builder().build().blockingGet(aeternalApi.rxGetMdwStatus());
   }
 
   @Override

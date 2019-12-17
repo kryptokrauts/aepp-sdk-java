@@ -71,7 +71,10 @@ public class TransactionChannelsTest extends BaseTest {
                   .nonce(getNextBaseKeypairNonce())
                   .build();
           String txResponse =
-              aeternityServiceNative.transactions.blockingCreateUnsignedTransaction(model);
+              aeternityServiceNative
+                  .transactions
+                  .blockingCreateUnsignedTransaction(model)
+                  .getResult();
           context.assertNotNull(txResponse);
           _logger.info("Channel create tx hash: " + txResponse);
         });

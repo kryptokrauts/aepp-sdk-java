@@ -1,5 +1,7 @@
 package com.kryptokrauts.aeternity.sdk.service.compiler;
 
+import com.kryptokrauts.aeternity.sdk.domain.ObjectResultWrapper;
+import com.kryptokrauts.aeternity.sdk.domain.StringResultWrapper;
 import com.kryptokrauts.aeternity.sdk.service.compiler.domain.ACIResult;
 import io.reactivex.Single;
 import java.util.List;
@@ -12,7 +14,8 @@ public interface CompilerService {
    * @param contractCode the sourcecode of the contract
    * @return asynchronous result handler (RxJava Single) for encoded calldata
    */
-  Single<String> asyncEncodeCalldata(String contractCode, String function, List<String> arguments);
+  Single<StringResultWrapper> asyncEncodeCalldata(
+      String contractCode, String function, List<String> arguments);
 
   /**
    * synchronously gets the encoded calldata for this contractCode
@@ -20,7 +23,8 @@ public interface CompilerService {
    * @param contractCode the sourcecode of the contract
    * @return encoded calldata
    */
-  String blockingEncodeCalldata(String contractCode, String function, List<String> arguments);
+  StringResultWrapper blockingEncodeCalldata(
+      String contractCode, String function, List<String> arguments);
 
   /**
    * asynchronously gets the contract bytecode for this contractCode
@@ -28,7 +32,7 @@ public interface CompilerService {
    * @param contractCode the sourcecode of the contract
    * @return asynchronous result handler (RxJava Single) for byteCode of the compiled contract
    */
-  Single<String> asyncCompile(String contractCode, String srcFile, Object fileSystem);
+  Single<StringResultWrapper> asyncCompile(String contractCode, String srcFile, Object fileSystem);
 
   /**
    * synchronously gets the contract bytecode for this contractCode
@@ -36,7 +40,7 @@ public interface CompilerService {
    * @param contractCode the sourcecode of the contract
    * @return byteCode of the compiled contract
    */
-  String blockingCompile(String contractCode, String srcFile, Object fileSystem);
+  StringResultWrapper blockingCompile(String contractCode, String srcFile, Object fileSystem);
 
   /**
    * asynchronously decodes a calldata
@@ -45,7 +49,7 @@ public interface CompilerService {
    * @param sophiaType the awaited sophia type
    * @return asynchronous result handler (RxJava Single) for decoded answer as json string
    */
-  Single<Object> asyncDecodeCalldata(String calldata, String sophiaType);
+  Single<ObjectResultWrapper> asyncDecodeCalldata(String calldata, String sophiaType);
 
   /**
    * synchronously decodes a calldata
@@ -54,7 +58,7 @@ public interface CompilerService {
    * @param sophiaType the awaited sophia type
    * @return decoded answer as json string
    */
-  Object blockingDecodeCalldata(String calldata, String sophiaType);
+  ObjectResultWrapper blockingDecodeCalldata(String calldata, String sophiaType);
 
   /**
    * asynchronously decodes callresult of contract-calls
@@ -65,7 +69,7 @@ public interface CompilerService {
    * @param callValue the received value
    * @return the decoded sophia call result
    */
-  Single<Object> asyncDecodeCallResult(
+  Single<ObjectResultWrapper> asyncDecodeCallResult(
       String source, String function, String callResult, String callValue);
 
   /**
@@ -77,7 +81,7 @@ public interface CompilerService {
    * @param callValue the received value
    * @return the decoded sophia call result
    */
-  Object blockingDecodeCallResult(
+  ObjectResultWrapper blockingDecodeCallResult(
       String source, String function, String callResult, String callValue);
 
   /**

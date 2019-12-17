@@ -1,5 +1,6 @@
 package com.kryptokrauts.aeternity.sdk.service.info;
 
+import com.kryptokrauts.aeternity.sdk.domain.StringResultWrapper;
 import com.kryptokrauts.aeternity.sdk.service.info.domain.KeyBlockResult;
 import com.kryptokrauts.aeternity.sdk.service.info.domain.TransactionInfoResult;
 import com.kryptokrauts.aeternity.sdk.service.info.domain.TransactionResult;
@@ -76,7 +77,7 @@ public interface InfoService {
    * @param contractId
    * @return
    */
-  Single<String> asnycGetContractByteCode(String contractId);
+  Single<StringResultWrapper> asnycGetContractByteCode(String contractId);
 
   /**
    * synchronously retrieve the contracts byteCode
@@ -84,5 +85,5 @@ public interface InfoService {
    * @param contractId
    * @return
    */
-  String blockingGetContractByteCode(String contractId);
+  StringResultWrapper blockingGetContractByteCode(String contractId);
 }

@@ -12,7 +12,7 @@ public class AeternalServiceTest extends BaseTest {
     this.executeTest(
         context,
         t -> {
-          Object result = this.aeternityServiceNative.aeternal.blockingGetMdwStatus();
+          Object result = this.aeternityServiceNative.aeternal.blockingGetMdwStatus().getResult();
           try {
             _logger.info("aeternal status: {}", objectMapper.writeValueAsString(result));
           } catch (JsonProcessingException e) {

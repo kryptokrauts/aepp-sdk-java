@@ -3,6 +3,7 @@ package com.kryptokrauts.aeternity.generated.api;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kryptokrauts.aeternity.sdk.constants.Network;
 import com.kryptokrauts.aeternity.sdk.constants.VirtualMachine;
+import com.kryptokrauts.aeternity.sdk.domain.ObjectResultWrapper;
 import com.kryptokrauts.aeternity.sdk.domain.secret.impl.BaseKeyPair;
 import com.kryptokrauts.aeternity.sdk.service.account.domain.AccountResult;
 import com.kryptokrauts.aeternity.sdk.service.aeternity.AeternityServiceConfiguration;
@@ -252,8 +253,10 @@ public abstract class BaseTest {
 
   protected String encodeCalldata(
       String contractSourceCode, String contractFunction, List<String> contractFunctionParams) {
-    return this.aeternityServiceNative.compiler.blockingEncodeCalldata(
-        contractSourceCode, contractFunction, contractFunctionParams);
+    return this.aeternityServiceNative
+        .compiler
+        .blockingEncodeCalldata(contractSourceCode, contractFunction, contractFunctionParams)
+        .getResult();
   }
 
   protected JsonObject decodeCalldata(String encodedValue, String sophiaReturnType) {
@@ -262,7 +265,7 @@ public abstract class BaseTest {
             encodedValue, sophiaReturnType));
   }
 
-  protected Object decodeCallResult(
+  protected ObjectResultWrapper decodeCallResult(
       String source, String function, String callResult, String callValue) {
     return this.aeternityServiceNative.compiler.blockingDecodeCallResult(
         source, function, callResult, callValue);

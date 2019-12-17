@@ -1,5 +1,6 @@
 package com.kryptokrauts.aeternity.sdk.service.transaction;
 
+import com.kryptokrauts.aeternity.sdk.domain.StringResultWrapper;
 import com.kryptokrauts.aeternity.sdk.exception.TransactionCreateException;
 import com.kryptokrauts.aeternity.sdk.service.transaction.domain.DryRunRequest;
 import com.kryptokrauts.aeternity.sdk.service.transaction.domain.DryRunTransactionResults;
@@ -27,7 +28,7 @@ public interface TransactionService {
    * @param tx transaction typed model, one of {link AbstractTransaction}
    * @return a single-wrapped unsignedTx object
    */
-  Single<String> asyncCreateUnsignedTransaction(AbstractTransactionModel<?> tx);
+  Single<StringResultWrapper> asyncCreateUnsignedTransaction(AbstractTransactionModel<?> tx);
 
   /**
    * synchronously creates an unsignedTx object for further processing and especially abstracts the
@@ -36,7 +37,7 @@ public interface TransactionService {
    * @param tx transaction typed model, one of {link AbstractTransaction}
    * @return a single-wrapped unsignedTx object
    */
-  String blockingCreateUnsignedTransaction(AbstractTransactionModel<?> tx);
+  StringResultWrapper blockingCreateUnsignedTransaction(AbstractTransactionModel<?> tx);
 
   /**
    * asynchronously dry run unsigned transactions to estimate gas (!) please make sure to use

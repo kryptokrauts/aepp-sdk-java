@@ -13,12 +13,12 @@ import lombok.experimental.SuperBuilder;
 @Getter
 @SuperBuilder(toBuilder = true)
 @ToString
-public class StringResultWrapper extends GenericResultObject<String, StringResultWrapper> {
+public class ObjectResultWrapper extends GenericResultObject<Object, ObjectResultWrapper> {
 
-  private String result;
+  private Object result;
 
   @Override
-  protected StringResultWrapper map(String generatedResultObject) {
+  protected ObjectResultWrapper map(Object generatedResultObject) {
     if (generatedResultObject != null)
       return this.toBuilder().result(generatedResultObject).build();
     else return this.toBuilder().build();
