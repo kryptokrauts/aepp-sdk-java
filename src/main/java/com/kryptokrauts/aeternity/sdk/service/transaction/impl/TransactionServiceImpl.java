@@ -202,12 +202,12 @@ public class TransactionServiceImpl implements TransactionService {
           _logger.debug("Transaction is mined - " + minedTransaction.toString());
           currentBlockHeight = minedTransaction.getBlockHeight().intValue();
         } else {
+          double timeSpan =
+              Double.valueOf(this.config.getMillisBetweenTrialsToWaitForTxMined()) / 1000;
           _logger.info(
               String.format(
-                  "Transaction not mined yet, checking again in %s seconds (trial %s of %s)",
-                  (this.config.getMillisBetweenTrialsToWaitForTxMined() / 1000),
-                  elapsedTrials,
-                  this.config.getNumTrialsToWaitForTxMined()));
+                  "Transaction not mined yet, checking again in %.3f seconds (trial %s of %s)",
+                  timeSpan, elapsedTrials, this.config.getNumTrialsToWaitForTxMined()));
           try {
             Thread.sleep(this.config.getMillisBetweenTrialsToWaitForTxMined());
           } catch (InterruptedException e) {
