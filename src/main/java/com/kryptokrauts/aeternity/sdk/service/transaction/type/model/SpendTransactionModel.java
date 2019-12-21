@@ -3,6 +3,7 @@ package com.kryptokrauts.aeternity.sdk.service.transaction.type.model;
 import com.kryptokrauts.aeternity.generated.api.rxjava.ExternalApi;
 import com.kryptokrauts.aeternity.generated.model.GenericTx;
 import com.kryptokrauts.aeternity.generated.model.SpendTx;
+import com.kryptokrauts.aeternity.sdk.annotations.Mandatory;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.impl.SpendTransaction;
 import com.kryptokrauts.sophia.compiler.generated.api.rxjava.DefaultApi;
 import java.math.BigInteger;
@@ -16,50 +17,50 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder(toBuilder = true)
 @ToString
 public class SpendTransactionModel extends AbstractTransactionModel<SpendTx> {
-  private String sender;
-  private String recipient;
-  private BigInteger amount;
-  @Default private String payload = "";
-  private BigInteger ttl;
-  private BigInteger nonce;
+	private String sender;
+	private String recipient;
+	@Mandatory
+	private BigInteger amount;
+	@Default
+	private String payload = "";
+	private BigInteger ttl;
+	private BigInteger nonce;
 
-  @Override
-  public SpendTx toApiModel() {
-    SpendTx spendTx = new SpendTx();
-    spendTx.setSenderId(this.sender);
-    spendTx.setRecipientId(this.recipient);
-    spendTx.setAmount(this.amount);
-    spendTx.setPayload(this.payload);
-    spendTx.setFee(this.fee);
-    spendTx.setTtl(this.ttl);
-    spendTx.setNonce(this.nonce);
+	@Override
+	public SpendTx toApiModel() {
+		SpendTx spendTx = new SpendTx();
+		spendTx.setSenderId(this.sender);
+		spendTx.setRecipientId(this.recipient);
+		spendTx.setAmount(this.amount);
+		spendTx.setPayload(this.payload);
+		spendTx.setFee(this.fee);
+		spendTx.setTtl(this.ttl);
+		spendTx.setNonce(this.nonce);
 
-    return spendTx;
-  }
+		return spendTx;
+	}
 
-  @Override
-  public Function<GenericTx, SpendTransactionModel> getApiToModelFunction() {
-    return (tx) -> {
-      SpendTx castedTx = (SpendTx) tx;
-      return this.toBuilder()
-          .sender(castedTx.getSenderId())
-          .recipient(castedTx.getRecipientId())
-          .amount(castedTx.getAmount())
-          .payload(castedTx.getPayload())
-          .fee(castedTx.getFee())
-          .nonce(castedTx.getNonce())
-          .ttl(castedTx.getTtl())
-          .build();
-    };
-  }
+	@Override
+	public Function<GenericTx, SpendTransactionModel> getApiToModelFunction() {
+		return (tx) -> {
+			SpendTx castedTx = (SpendTx) tx;
+			return this.toBuilder().sender(castedTx.getSenderId())
+					.recipient(castedTx.getRecipientId())
+					.amount(castedTx.getAmount()).payload(castedTx.getPayload())
+					.fee(castedTx.getFee()).nonce(castedTx.getNonce())
+					.ttl(castedTx.getTtl()).build();
+		};
+	}
 
-  @Override
-  public void validateInput() {
-    // nothing to validate here
-  }
+	@Override
+	public void validateInput() {
+		// nothing to validate here
+	}
 
-  @Override
-  public SpendTransaction buildTransaction(ExternalApi externalApi, DefaultApi compilerApi) {
-    return SpendTransaction.builder().externalApi(externalApi).model(this).build();
-  }
+	@Override
+	public SpendTransaction buildTransaction(ExternalApi externalApi,
+			DefaultApi compilerApi) {
+		return SpendTransaction.builder().externalApi(externalApi).model(this)
+				.build();
+	}
 }
