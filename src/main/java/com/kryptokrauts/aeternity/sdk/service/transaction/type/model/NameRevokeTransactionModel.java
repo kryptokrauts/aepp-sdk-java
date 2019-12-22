@@ -3,6 +3,7 @@ package com.kryptokrauts.aeternity.sdk.service.transaction.type.model;
 import com.kryptokrauts.aeternity.generated.api.rxjava.ExternalApi;
 import com.kryptokrauts.aeternity.generated.model.GenericTx;
 import com.kryptokrauts.aeternity.generated.model.NameRevokeTx;
+import com.kryptokrauts.aeternity.sdk.annotations.Mandatory;
 import com.kryptokrauts.aeternity.sdk.constants.ApiIdentifiers;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.AbstractTransaction;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.impl.NameRevokeTransaction;
@@ -21,10 +22,10 @@ import lombok.experimental.SuperBuilder;
 @ToString
 public class NameRevokeTransactionModel extends AbstractTransactionModel<NameRevokeTx> {
 
-  private String accountId;
-  private BigInteger nonce;
-  private String nameId;
-  private BigInteger ttl;
+  @Mandatory private String accountId;
+  @Mandatory private BigInteger nonce;
+  @Mandatory private String nameId;
+  @Mandatory private BigInteger ttl;
 
   @Override
   public NameRevokeTx toApiModel() {

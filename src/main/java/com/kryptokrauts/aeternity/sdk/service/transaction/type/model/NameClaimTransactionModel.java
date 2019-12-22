@@ -3,6 +3,7 @@ package com.kryptokrauts.aeternity.sdk.service.transaction.type.model;
 import com.kryptokrauts.aeternity.generated.api.rxjava.ExternalApi;
 import com.kryptokrauts.aeternity.generated.model.GenericTx;
 import com.kryptokrauts.aeternity.generated.model.NameClaimTx;
+import com.kryptokrauts.aeternity.sdk.annotations.Mandatory;
 import com.kryptokrauts.aeternity.sdk.constants.AENS;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.AbstractTransaction;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.impl.NameClaimTransaction;
@@ -23,12 +24,13 @@ import lombok.extern.slf4j.Slf4j;
 @ToString
 public class NameClaimTransactionModel extends AbstractTransactionModel<NameClaimTx> {
 
-  private String accountId;
-  private BigInteger nonce;
-  private String name;
-  private BigInteger nameSalt;
+  @Mandatory private String accountId;
+  @Mandatory private BigInteger nonce;
+  @Mandatory private String name;
+  @Mandatory private BigInteger nameSalt;
+  @Mandatory private BigInteger ttl;
+
   private BigInteger nameFee;
-  private BigInteger ttl;
 
   @Override
   public NameClaimTx toApiModel() {
