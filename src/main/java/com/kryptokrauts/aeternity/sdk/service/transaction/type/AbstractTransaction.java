@@ -8,6 +8,7 @@ import com.kryptokrauts.aeternity.sdk.service.transaction.type.model.AbstractTra
 import com.kryptokrauts.aeternity.sdk.util.EncodingUtils;
 import io.reactivex.Single;
 import java.math.BigInteger;
+import java.security.InvalidParameterException;
 import lombok.NonNull;
 import lombok.experimental.SuperBuilder;
 import org.apache.tuweni.bytes.Bytes;
@@ -59,6 +60,11 @@ public abstract class AbstractTransaction<TxModel extends AbstractTransactionMod
    */
   public Single<UnsignedTx> createUnsignedTransaction(boolean nativeMode, long minimalGasPrice) {
     /** before creating the unsigned transaction we validate the input */
+    String field = model.checkMandatoryFields();
+    if (field != null) {
+      throw new InvalidParameterException(
+          "Attribute \"" + field + "\" is mandatory - please set value");
+    }
     model.validateInput();
     if (nativeMode) {
       /** if no fee is given - use default fee to create a tx and get its size */

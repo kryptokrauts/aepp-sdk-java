@@ -3,6 +3,7 @@ package com.kryptokrauts.aeternity.sdk.service.transaction.type.model;
 import com.kryptokrauts.aeternity.generated.api.rxjava.ExternalApi;
 import com.kryptokrauts.aeternity.generated.model.GenericTx;
 import com.kryptokrauts.aeternity.generated.model.SpendTx;
+import com.kryptokrauts.aeternity.sdk.annotations.Mandatory;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.impl.SpendTransaction;
 import com.kryptokrauts.sophia.compiler.generated.api.rxjava.DefaultApi;
 import java.math.BigInteger;
@@ -16,12 +17,12 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder(toBuilder = true)
 @ToString
 public class SpendTransactionModel extends AbstractTransactionModel<SpendTx> {
-  private String sender;
-  private String recipient;
-  private BigInteger amount;
+  @Mandatory private String sender;
+  @Mandatory private String recipient;
+  @Mandatory private BigInteger amount;
   @Default private String payload = "";
-  private BigInteger ttl;
-  private BigInteger nonce;
+  @Mandatory private BigInteger ttl;
+  @Mandatory private BigInteger nonce;
 
   @Override
   public SpendTx toApiModel() {
