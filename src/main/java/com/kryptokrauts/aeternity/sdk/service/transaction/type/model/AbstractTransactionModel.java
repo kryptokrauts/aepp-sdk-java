@@ -20,7 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 public abstract class AbstractTransactionModel<GeneratedTxModel> {
 
   /** the fee is automatically calculated but can also be set manually */
-  @Mandatory protected BigInteger fee;
+  protected BigInteger fee;
 
   /**
    * this method needs to be implemented for testing purposes (non native mode) and returns the
