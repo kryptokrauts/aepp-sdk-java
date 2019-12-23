@@ -339,13 +339,14 @@ public class TransactionContractsTest extends BaseTest {
                   .getResult();
 
           // post the signed contract call tx
+          BigInteger nonceToVerifyHash = getNextBaseKeypairNonce();
           PostTransactionResult result =
               this.aeternityServiceNative.transactions.blockingPostTransaction(
-                  createCallContractModel(getNextBaseKeypairNonce(), callData, null));
+                  createCallContractModel(nonceToVerifyHash, callData, null));
           context.assertEquals(
               result.getTxHash(),
               this.aeternityServiceNative.transactions.computeTxHash(
-                  createCallContractModel(getNextBaseKeypairNonce(), callData, null)));
+                  createCallContractModel(nonceToVerifyHash, callData, null)));
           _logger.info("CreateContractTx hash: " + result.getTxHash());
 
           // get the tx info object to resolve the result
