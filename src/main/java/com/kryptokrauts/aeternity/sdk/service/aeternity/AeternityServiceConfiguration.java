@@ -16,4 +16,8 @@ public class AeternityServiceConfiguration extends ServiceConfiguration {
   @Default private Network network = Network.TESTNET;
 
   @Default private long minimalGasPrice = BaseConstants.MINIMAL_GAS_PRICE;
+
+  @Default private int numTrialsToWaitForTxMined = 60;
+
+  @Default private long millisBetweenTrialsToWaitForTxMined = 1000l;
 }
