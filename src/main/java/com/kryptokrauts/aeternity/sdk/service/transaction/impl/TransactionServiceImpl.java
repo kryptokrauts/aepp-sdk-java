@@ -118,7 +118,7 @@ public class TransactionServiceImpl implements TransactionService {
     byte[] signed =
         EncodingUtils.decodeCheckWithIdentifier(
             signTransaction(
-                asyncCreateUnsignedTransaction(tx).blockingGet().getResult(),
+                blockingCreateUnsignedTransaction(tx).getResult(),
                 this.config.getBaseKeyPair().getPrivateKey()));
     return EncodingUtils.hashEncode(signed, ApiIdentifiers.TRANSACTION_HASH);
   }
