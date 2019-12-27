@@ -8,7 +8,7 @@ import java.util.function.Function;
 
 public class ValidationUtil {
 
-  public static final int NAME_MAX_LENGHT = 253;
+  public static final int NAME_MAX_LENGTH = 253;
 
   public static final String LIST_NOT_SAME_SIZE = "Lists don't have the same size";
 
@@ -22,7 +22,7 @@ public class ValidationUtil {
       "Parameter does not start with expected APIIdentifier.";
 
   public static final String NAMESPACE_EXCEEDS_LIMIT =
-      String.format("Domainname exceeds %s char limit.", NAME_MAX_LENGHT);
+      String.format("Domainname exceeds %s char limit.", NAME_MAX_LENGTH);
 
   public static final List<String> ALLOWED_NAMESPACES = Arrays.asList("chain");
 
@@ -85,7 +85,7 @@ public class ValidationUtil {
         ValidationUtil.NAMESPACE_INVALID);
 
     checkParameters(
-        validate -> Optional.ofNullable(name.length() <= NAME_MAX_LENGHT),
+        validate -> Optional.ofNullable(name.length() <= NAME_MAX_LENGTH),
         name,
         "checkNamespace",
         Arrays.asList("name"),
