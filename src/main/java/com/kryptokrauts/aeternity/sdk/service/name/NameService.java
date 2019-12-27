@@ -9,7 +9,7 @@ public interface NameService {
   /**
    * asynchronously returns the nameid object for given aens name
    *
-   * @param name
+   * @param name the AENS name
    * @return asynchronous result handler (RxJava Single) for {@link KeyBlockResult}
    */
   public Single<NameIdResult> asyncGetNameId(String name);
@@ -17,7 +17,7 @@ public interface NameService {
   /**
    * synchronously returns the nameid object for given aens name
    *
-   * @param name
+   * @param name the AENS name
    * @return result of {@link NameIdResult}
    */
   public NameIdResult blockingGetNameId(String name);

@@ -12,7 +12,8 @@ buildscript {
 plugins {
     id "com.jfrog.artifactory" version "4.8.1"
     id "com.jfrog.bintray" version "1.8.4"
-    id 'com.github.sherter.google-java-format' version '0.8'
+    id "com.github.sherter.google-java-format" version "0.8"
+    id "maven"
     id "maven-publish"
     id "jacoco"
     id "java"

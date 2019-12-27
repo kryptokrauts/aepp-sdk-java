@@ -9,7 +9,7 @@ import java.lang.annotation.Target;
 /**
  * this annotation indicates, that a field of a transaction model is mandatory and must contain a
  * value. the annotation is validated before constructing the RLP array in {@link
- * AbstractTransaction.createUnsignedTransaction}
+ * AbstractTransaction#createUnsignedTransaction(boolean, long)}
  *
  * @author mitch
  */

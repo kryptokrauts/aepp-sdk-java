@@ -12,6 +12,8 @@ public interface CompilerService {
    * asynchronously gets the encoded calldata for this contractCode
    *
    * @param contractCode the sourcecode of the contract
+   * @param function the name of the function to call
+   * @param arguments the params that should be passed to the function
    * @return asynchronous result handler (RxJava Single) for encoded calldata
    */
   Single<StringResultWrapper> asyncEncodeCalldata(
@@ -21,6 +23,8 @@ public interface CompilerService {
    * synchronously gets the encoded calldata for this contractCode
    *
    * @param contractCode the sourcecode of the contract
+   * @param function the name of the function to call
+   * @param arguments the params that should be passed to the function
    * @return encoded calldata
    */
   StringResultWrapper blockingEncodeCalldata(
@@ -30,6 +34,8 @@ public interface CompilerService {
    * asynchronously gets the contract bytecode for this contractCode
    *
    * @param contractCode the sourcecode of the contract
+   * @param srcFile untested compileOpts value: set null
+   * @param fileSystem untested compileOpts value: set null
    * @return asynchronous result handler (RxJava Single) for byteCode of the compiled contract
    */
   Single<StringResultWrapper> asyncCompile(String contractCode, String srcFile, Object fileSystem);
@@ -38,6 +44,8 @@ public interface CompilerService {
    * synchronously gets the contract bytecode for this contractCode
    *
    * @param contractCode the sourcecode of the contract
+   * @param srcFile untested compileOpts value: set null
+   * @param fileSystem untested compileOpts value: set null
    * @return byteCode of the compiled contract
    */
   StringResultWrapper blockingCompile(String contractCode, String srcFile, Object fileSystem);
@@ -89,6 +97,8 @@ public interface CompilerService {
    * https://github.com/aeternity/aesophia/blob/master/docs/aeso_aci.md
    *
    * @param contractCode the sourcecode of the contract
+   * @param srcFile untested compileOpts value: set null
+   * @param fileSystem untested compileOpts value: set null
    * @return asynchronous result handler (RxJava Single) for {@link ACIResult}
    */
   Single<ACIResult> asyncGenerateACI(String contractCode, String srcFile, Object fileSystem);
@@ -98,7 +108,9 @@ public interface CompilerService {
    * https://github.com/aeternity/aesophia/blob/master/docs/aeso_aci.md
    *
    * @param contractCode the sourcecode of the contract
-   * @return result of {@linkACIResult}
+   * @param srcFile untested compileOpts value: set null
+   * @param fileSystem untested compileOpts value: set null
+   * @return result of {@link ACIResult}
    */
   ACIResult blockingGenerateACI(String contractCode, String srcFile, Object fileSystem);
 }
