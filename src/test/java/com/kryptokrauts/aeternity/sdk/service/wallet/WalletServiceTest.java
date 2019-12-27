@@ -1,4 +1,4 @@
-package com.kryptokrauts.aeternity.sdk.service;
+package com.kryptokrauts.aeternity.sdk.service.wallet;
 
 import com.greghaskins.spectrum.Spectrum;
 import com.kryptokrauts.aeternity.sdk.BaseTest;
@@ -7,8 +7,6 @@ import com.kryptokrauts.aeternity.sdk.domain.secret.impl.RawKeyPair;
 import com.kryptokrauts.aeternity.sdk.exception.AException;
 import com.kryptokrauts.aeternity.sdk.service.keypair.KeyPairService;
 import com.kryptokrauts.aeternity.sdk.service.keypair.KeyPairServiceFactory;
-import com.kryptokrauts.aeternity.sdk.service.wallet.WalletService;
-import com.kryptokrauts.aeternity.sdk.service.wallet.WalletServiceFactory;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import org.apache.commons.io.IOUtils;
