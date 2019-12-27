@@ -17,8 +17,8 @@ public final class CryptoUtils {
   /**
    * generate a securely randomed salt of given size
    *
-   * @param size
-   * @return
+   * @param size (in bytes) of the salt
+   * @return salt as bytearray
    */
   public static final byte[] generateSalt(int size) {
     byte[] salt = new byte[size];
@@ -31,11 +31,7 @@ public final class CryptoUtils {
     return new BigInteger(1, generateSalt(8));
   }
 
-  /**
-   * returns a initialized SecureRandom object
-   *
-   * @return
-   */
+  /** @return an initialized SecureRandom object */
   public static final SecureRandom getSecureRandom() {
     return secureRandom;
   }
@@ -43,8 +39,8 @@ public final class CryptoUtils {
   /**
    * Extract CipherParameters from given privateKey
    *
-   * @param privateKey
-   * @return
+   * @param privateKey (Hex string)
+   * @return CipherParameters from given privateKey
    */
   public static CipherParameters privateKeyCipherParamsFromHex(final String privateKey) {
     final String privateKey32;
@@ -59,8 +55,8 @@ public final class CryptoUtils {
   /**
    * extract CipherParameters from given publicKey
    *
-   * @param publicKey
-   * @return
+   * @param publicKey (Hex string)
+   * @return CipherParameters of the publicKey
    */
   public static CipherParameters publicKeyCipherParamsFromHex(final String publicKey) {
     return new Ed25519PublicKeyParameters(Hex.decode(publicKey), 0);

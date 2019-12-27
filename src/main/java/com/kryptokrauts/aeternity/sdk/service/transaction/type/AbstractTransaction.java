@@ -20,7 +20,7 @@ import org.slf4j.LoggerFactory;
  * this abstract class is the base of all transactions and wraps the calculation of transaction fees
  * by using a default fee, generating the RLP and gaining the byte size of the transaction
  *
- * @param <TxModel>
+ * @param <TxModel> a TransactionModel class that extends {@link AbstractTransactionModel}
  */
 @SuperBuilder
 public abstract class AbstractTransaction<TxModel extends AbstractTransactionModel<?>> {
@@ -29,7 +29,11 @@ public abstract class AbstractTransaction<TxModel extends AbstractTransactionMod
 
   @NonNull protected TxModel model;
 
-  /** fee calculation model for this transaction type, one of {@link FeeCalculationModel} */
+  /**
+   * fee calculation model for this transaction type, one of {@link FeeCalculationModel}
+   *
+   * @return instance of the {@link FeeCalculationModel} to use for fee calculation
+   */
   protected FeeCalculationModel getFeeCalculationModel() {
     return new BaseFeeCalculationModel();
   }
@@ -45,6 +49,7 @@ public abstract class AbstractTransaction<TxModel extends AbstractTransactionMod
   /**
    * this method needs to be implemented for testing purposes (non native mode)
    *
+   * @param <T> type that extends {@link UnsignedTx}
    * @return a single-wrapped unsignedTx object
    */
   protected abstract <T extends UnsignedTx> Single<T> createInternal();
@@ -95,10 +100,11 @@ public abstract class AbstractTransaction<TxModel extends AbstractTransactionMod
   }
 
   /**
-   * check if value is 0 -> if so, serialize as byte, otherwise serialize value as BigInteger
+   * check if value is 0 <br>
+   * if so, serialize as byte, otherwise serialize value as BigInteger
    *
-   * @param rlpWriter
-   * @param value
+   * @param rlpWriter instance of {@link RLPWriter}
+   * @param value the value to check for {@link BigInteger#ZERO}
    */
   protected void checkZeroAndWriteValue(RLPWriter rlpWriter, BigInteger value) {
     if (BigInteger.ZERO.equals(value)) {

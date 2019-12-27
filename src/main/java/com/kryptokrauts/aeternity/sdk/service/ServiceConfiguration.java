@@ -26,7 +26,7 @@ import org.slf4j.LoggerFactory;
  * {@literal @}Getter
  * {@literal @}Builder( builderMethodName = "configure", buildMethodName =
  * "compile" )
- * public class <Servicename>ServiceConfiguration implements
+ * public class [Servicename]ServiceConfiguration implements
  * ServiceConfiguration
  * </pre>
  *
@@ -34,7 +34,7 @@ import org.slf4j.LoggerFactory;
  *
  * <pre>
  * {@literal @}Builder.Default
- * <type> paramName = "value";
+ * [type] paramName = "value";
  * </pre>
  *
  * examples see {@link WalletServiceConfiguration}

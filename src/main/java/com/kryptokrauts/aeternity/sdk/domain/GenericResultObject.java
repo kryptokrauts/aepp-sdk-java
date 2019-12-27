@@ -32,8 +32,9 @@ public abstract class GenericResultObject<T, V extends GenericResultObject<?, ?>
   /**
    * execute a blocking call and return mapped result
    *
-   * @param generatedResultObjectSingle
-   * @return
+   * @param generatedResultObjectSingle the {@link Single} of a result object of a generated api
+   *     model class
+   * @return the mapped result object
    */
   public V blockingGet(Single<T> generatedResultObjectSingle) {
     try {
@@ -46,8 +47,9 @@ public abstract class GenericResultObject<T, V extends GenericResultObject<?, ?>
   /**
    * execute an async call and return a mapped single
    *
-   * @param generatedResultObjectSingle
-   * @return
+   * @param generatedResultObjectSingle the {@link Single} of a result object of a generated api
+   *     model class
+   * @return a {@link Single} of the mapped result object
    */
   public Single<V> asyncGet(Single<T> generatedResultObjectSingle) {
     return generatedResultObjectSingle.map(
