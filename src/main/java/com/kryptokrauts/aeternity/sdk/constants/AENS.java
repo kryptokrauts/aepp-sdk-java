@@ -63,16 +63,6 @@ public interface AENS {
         }
       };
 
-  Map<String, Integer> POINTER_SERIALIZATION_MAP =
-      new HashMap<String, Integer>() {
-        {
-          put(AENS.POINTER_KEY_ACCOUNT, SerializationTags.ID_TAG_ACCOUNT);
-          put(AENS.POINTER_KEY_ORACLE, SerializationTags.ID_TAG_ORACLE);
-          put(AENS.POINTER_KEY_CONTRACT, SerializationTags.ID_TAG_CONTRACT);
-          put(AENS.POINTER_KEY_CHANNEL, SerializationTags.ID_TAG_CHANNEL);
-        }
-      };
-
   /**
    * returns the time that is needed to wait until a claim becomes final for a given domain <br>
    * the avery keyblock-time is 3 minutes

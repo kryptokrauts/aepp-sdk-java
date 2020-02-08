@@ -15,20 +15,6 @@ import org.junit.Test;
 public class CompilerServiceTest extends BaseTest {
 
   @Test
-  public void testCompileContract(TestContext context) {
-    this.executeTest(
-        context,
-        t -> {
-          String byteCode =
-              this.aeternityServiceNative
-                  .compiler
-                  .blockingCompile(TestConstants.testContractSourceCode, null, null)
-                  .getResult();
-          context.assertEquals(TestConstants.testContractByteCode, byteCode);
-        });
-  }
-
-  @Test
   public void testCompileContractCall(TestContext context) {
     this.executeTest(
         context,

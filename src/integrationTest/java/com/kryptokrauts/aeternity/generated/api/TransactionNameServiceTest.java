@@ -142,12 +142,12 @@ public class TransactionNameServiceTest extends BaseTest {
    * @throws Throwable
    */
   @Test
-  public void postUpdateTxTest(TestContext context) {
+  public void postUpdateAndSpendTxTest(TestContext context) {
     this.executeTest(
         context,
         t -> {
           try {
-            _logger.info("--------------------- postUpdateTxTest ---------------------");
+            _logger.info("--------------------- postUpdateAndSpendTxTest ---------------------");
             BigInteger salt = CryptoUtils.generateNamespaceSalt();
             String domain = TestConstants.DOMAIN + random.nextInt() + TestConstants.NAMESPACE;
 
@@ -196,7 +196,8 @@ public class TransactionNameServiceTest extends BaseTest {
             BigInteger nameTtl = BigInteger.valueOf(10000l);
             BigInteger clientTtl = BigInteger.valueOf(50l);
 
-            String accountPointer = baseKeyPair.getPublicKey();
+            BaseKeyPair recipient = keyPairService.generateBaseKeyPair();
+            String accountPointer = recipient.getPublicKey();
             // fake other allowed pointers
             String contractPointer = baseKeyPair.getContractPK();
             String channelPointer = baseKeyPair.getPublicKey().replace("ak_", "ch_");
@@ -243,7 +244,26 @@ public class TransactionNameServiceTest extends BaseTest {
                       "Diff of Ttl is %s, this happens when meanwhile new blocks are mined",
                       diffTtl));
             }
-            _logger.info("--------------------- postUpdateTxTest ---------------------");
+            BigInteger aettos = new BigInteger("1000000000000000000");
+            SpendTransactionModel spendTx =
+                SpendTransactionModel.builder()
+                    .sender(this.baseKeyPair.getPublicKey())
+                    .recipient(nameIdResult.getId())
+                    .amount(aettos)
+                    .payload("send to AENS name test")
+                    .ttl(ZERO)
+                    .nonce(getNextBaseKeypairNonce())
+                    .build();
+            PostTransactionResult txResponse =
+                aeternityServiceNative.transactions.blockingPostTransaction(spendTx);
+            _logger.info("SpendTx hash: " + txResponse.getTxHash());
+            waitForTxMined(txResponse.getTxHash());
+            AccountResult recipientAccount =
+                this.aeternityServiceNative.accounts.blockingGetAccount(
+                    Optional.of(accountPointer));
+            _logger.info("Account result for recipient {}", recipientAccount);
+            context.assertEquals(aettos, recipientAccount.getBalance());
+            _logger.info("--------------------- postUpdateAndSpendTxTest ---------------------");
           } catch (Throwable e) {
             context.fail(e);
           }
@@ -435,8 +455,8 @@ public class TransactionNameServiceTest extends BaseTest {
             }
             ActiveNameResult activeNameResult = activeNameResults.stream().findFirst().get();
             _logger.info("ActiveNameResult: {}", activeNameResult);
-            // we should be the owner
-            context.assertEquals(account.getPublicKey(), activeNameResult.getOwner());
+            // kpNextClaimer should be the owner
+            context.assertEquals(kpNextClaimer.getPublicKey(), activeNameResult.getOwner());
             context.assertEquals(nameIdResult.getId(), activeNameResult.getNameHash());
             _logger.info("--------------------- auctionTest ---------------------");
           } catch (Throwable e) {

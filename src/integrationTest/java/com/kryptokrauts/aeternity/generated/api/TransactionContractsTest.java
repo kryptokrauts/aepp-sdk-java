@@ -371,8 +371,9 @@ public class TransactionContractsTest extends BaseTest {
   @Ignore // specific testcase we don't want to run each time
   public void deployContractNativeOnTestNetworkTest(TestContext context)
       throws TransactionCreateException {
-    baseKeyPair =
-        keyPairService.generateBaseKeyPairFromSecret(TestConstants.testnetAccountPrivateKey);
+    // needs to be set before executing the test
+    String privateKey = "";
+    baseKeyPair = keyPairService.generateBaseKeyPairFromSecret(privateKey);
 
     AeternityService testnetService =
         new AeternityService(

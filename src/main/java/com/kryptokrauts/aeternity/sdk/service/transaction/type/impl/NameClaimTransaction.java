@@ -2,11 +2,13 @@ package com.kryptokrauts.aeternity.sdk.service.transaction.type.impl;
 
 import com.kryptokrauts.aeternity.generated.api.rxjava.ExternalApi;
 import com.kryptokrauts.aeternity.generated.model.UnsignedTx;
+import com.kryptokrauts.aeternity.sdk.constants.ApiIdentifiers;
 import com.kryptokrauts.aeternity.sdk.constants.SerializationTags;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.AbstractTransaction;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.model.NameClaimTransactionModel;
 import com.kryptokrauts.aeternity.sdk.util.EncodingUtils;
 import io.reactivex.Single;
+import java.util.Arrays;
 import lombok.NonNull;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
@@ -32,7 +34,7 @@ public class NameClaimTransaction extends AbstractTransaction<NameClaimTransacti
               rlpWriter.writeInt(SerializationTags.VSN_2);
               byte[] accountIdWithTag =
                   EncodingUtils.decodeCheckAndTag(
-                      model.getAccountId(), SerializationTags.ID_TAG_ACCOUNT);
+                      model.getAccountId(), Arrays.asList(ApiIdentifiers.ACCOUNT_PUBKEY));
               rlpWriter.writeByteArray(accountIdWithTag);
               this.checkZeroAndWriteValue(rlpWriter, model.getNonce());
               rlpWriter.writeString(model.getName());

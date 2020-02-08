@@ -2,11 +2,13 @@ package com.kryptokrauts.aeternity.sdk.service.transaction.type.impl;
 
 import com.kryptokrauts.aeternity.generated.api.rxjava.ExternalApi;
 import com.kryptokrauts.aeternity.generated.model.UnsignedTx;
+import com.kryptokrauts.aeternity.sdk.constants.ApiIdentifiers;
 import com.kryptokrauts.aeternity.sdk.constants.SerializationTags;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.AbstractTransaction;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.model.SpendTransactionModel;
 import com.kryptokrauts.aeternity.sdk.util.EncodingUtils;
 import io.reactivex.Single;
+import java.util.Arrays;
 import lombok.NonNull;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
@@ -33,10 +35,15 @@ public class SpendTransaction extends AbstractTransaction<SpendTransactionModel>
               rlpWriter.writeInt(SerializationTags.VSN_1);
               byte[] senderWithTag =
                   EncodingUtils.decodeCheckAndTag(
-                      model.getSender(), SerializationTags.ID_TAG_ACCOUNT);
+                      model.getSender(), Arrays.asList(ApiIdentifiers.ACCOUNT_PUBKEY));
               byte[] recipientWithTag =
                   EncodingUtils.decodeCheckAndTag(
-                      model.getRecipient(), SerializationTags.ID_TAG_ACCOUNT);
+                      model.getRecipient(),
+                      Arrays.asList(
+                          ApiIdentifiers.ACCOUNT_PUBKEY,
+                          ApiIdentifiers.CONTRACT_PUBKEY,
+                          ApiIdentifiers.ORACLE_PUBKEY,
+                          ApiIdentifiers.NAME));
               rlpWriter.writeByteArray(senderWithTag);
               rlpWriter.writeByteArray(recipientWithTag);
               this.checkZeroAndWriteValue(rlpWriter, model.getAmount());
