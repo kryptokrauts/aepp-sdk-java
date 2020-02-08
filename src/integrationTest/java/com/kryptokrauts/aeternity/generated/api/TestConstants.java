@@ -5,11 +5,7 @@ import java.util.List;
 
 public interface TestConstants {
 
-  /** @see https://testnet.contracts.aepps.com/ */
-  String testnetAccountPrivateKey =
-      "a7a695f999b1872acb13d5b63a830a8ee060ba688a478a08c6e65dfad8a01cd70bb4ed7927f97b51e1bcb5e1340d12335b2a2b12c8bc5221d63c4bcb39d41e61";
-
-  String aeternalTestnetURL = "https://testnet.aeternal.io/";
+  String aeternalTestnetURL = "https://testnet.aeternal.io";
 
   String testnetURL = "https://sdk-testnet.aepps.com";
 

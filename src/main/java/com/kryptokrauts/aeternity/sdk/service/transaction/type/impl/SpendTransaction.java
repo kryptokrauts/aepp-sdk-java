@@ -2,6 +2,7 @@ package com.kryptokrauts.aeternity.sdk.service.transaction.type.impl;
 
 import com.kryptokrauts.aeternity.generated.api.rxjava.ExternalApi;
 import com.kryptokrauts.aeternity.generated.model.UnsignedTx;
+import com.kryptokrauts.aeternity.sdk.constants.ApiIdentifiers;
 import com.kryptokrauts.aeternity.sdk.constants.SerializationTags;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.AbstractTransaction;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.model.SpendTransactionModel;
@@ -36,7 +37,8 @@ public class SpendTransaction extends AbstractTransaction<SpendTransactionModel>
                       model.getSender(), SerializationTags.ID_TAG_ACCOUNT);
               byte[] recipientWithTag =
                   EncodingUtils.decodeCheckAndTag(
-                      model.getRecipient(), SerializationTags.ID_TAG_ACCOUNT);
+                      model.getRecipient(),
+                      this.determineSerializationTagOfRecipient(model.getRecipient()));
               rlpWriter.writeByteArray(senderWithTag);
               rlpWriter.writeByteArray(recipientWithTag);
               this.checkZeroAndWriteValue(rlpWriter, model.getAmount());
@@ -46,5 +48,24 @@ public class SpendTransaction extends AbstractTransaction<SpendTransactionModel>
               rlpWriter.writeByteArray(model.getPayload().getBytes());
             });
     return encodedRlp;
+  }
+
+  private int determineSerializationTagOfRecipient(String recipient) {
+    String[] splitted = recipient.split("_");
+    if (splitted.length != 2) {
+      throw new IllegalArgumentException("input has wrong format");
+    }
+    switch (splitted[0]) {
+      case ApiIdentifiers.ACCOUNT_PUBKEY:
+        return SerializationTags.ID_TAG_ACCOUNT;
+      case ApiIdentifiers.CONTRACT_PUBKEY:
+        return SerializationTags.ID_TAG_CONTRACT;
+      case ApiIdentifiers.ORACLE_PUBKEY:
+        return SerializationTags.ID_TAG_ORACLE;
+      case ApiIdentifiers.NAME:
+        return SerializationTags.ID_TAG_NAME;
+      default:
+        throw new IllegalArgumentException("illegal identifier: " + splitted[0]);
+    }
   }
 }
