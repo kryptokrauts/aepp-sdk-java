@@ -8,6 +8,7 @@ import com.kryptokrauts.aeternity.sdk.service.transaction.type.AbstractTransacti
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.model.SpendTransactionModel;
 import com.kryptokrauts.aeternity.sdk.util.EncodingUtils;
 import io.reactivex.Single;
+import java.util.Arrays;
 import lombok.NonNull;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
@@ -34,11 +35,15 @@ public class SpendTransaction extends AbstractTransaction<SpendTransactionModel>
               rlpWriter.writeInt(SerializationTags.VSN_1);
               byte[] senderWithTag =
                   EncodingUtils.decodeCheckAndTag(
-                      model.getSender(), SerializationTags.ID_TAG_ACCOUNT);
+                      model.getSender(), Arrays.asList(ApiIdentifiers.ACCOUNT_PUBKEY));
               byte[] recipientWithTag =
                   EncodingUtils.decodeCheckAndTag(
                       model.getRecipient(),
-                      this.determineSerializationTagOfRecipient(model.getRecipient()));
+                      Arrays.asList(
+                          ApiIdentifiers.ACCOUNT_PUBKEY,
+                          ApiIdentifiers.CONTRACT_PUBKEY,
+                          ApiIdentifiers.ORACLE_PUBKEY,
+                          ApiIdentifiers.NAME));
               rlpWriter.writeByteArray(senderWithTag);
               rlpWriter.writeByteArray(recipientWithTag);
               this.checkZeroAndWriteValue(rlpWriter, model.getAmount());
@@ -48,24 +53,5 @@ public class SpendTransaction extends AbstractTransaction<SpendTransactionModel>
               rlpWriter.writeByteArray(model.getPayload().getBytes());
             });
     return encodedRlp;
-  }
-
-  private int determineSerializationTagOfRecipient(String recipient) {
-    String[] splitted = recipient.split("_");
-    if (splitted.length != 2) {
-      throw new IllegalArgumentException("input has wrong format");
-    }
-    switch (splitted[0]) {
-      case ApiIdentifiers.ACCOUNT_PUBKEY:
-        return SerializationTags.ID_TAG_ACCOUNT;
-      case ApiIdentifiers.CONTRACT_PUBKEY:
-        return SerializationTags.ID_TAG_CONTRACT;
-      case ApiIdentifiers.ORACLE_PUBKEY:
-        return SerializationTags.ID_TAG_ORACLE;
-      case ApiIdentifiers.NAME:
-        return SerializationTags.ID_TAG_NAME;
-      default:
-        throw new IllegalArgumentException("illegal identifier: " + splitted[0]);
-    }
   }
 }

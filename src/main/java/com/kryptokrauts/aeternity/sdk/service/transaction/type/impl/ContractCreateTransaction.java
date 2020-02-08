@@ -2,6 +2,7 @@ package com.kryptokrauts.aeternity.sdk.service.transaction.type.impl;
 
 import com.kryptokrauts.aeternity.generated.api.rxjava.ExternalApi;
 import com.kryptokrauts.aeternity.generated.model.CreateContractUnsignedTx;
+import com.kryptokrauts.aeternity.sdk.constants.ApiIdentifiers;
 import com.kryptokrauts.aeternity.sdk.constants.SerializationTags;
 import com.kryptokrauts.aeternity.sdk.service.transaction.fee.FeeCalculationModel;
 import com.kryptokrauts.aeternity.sdk.service.transaction.fee.impl.ContractCreateFeeCalculationModel;
@@ -12,6 +13,7 @@ import io.reactivex.Single;
 import java.io.ByteArrayOutputStream;
 import java.math.BigInteger;
 import java.nio.ByteBuffer;
+import java.util.Arrays;
 import lombok.NonNull;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
@@ -38,7 +40,7 @@ public class ContractCreateTransaction extends AbstractTransaction<ContractCreat
               rlpWriter.writeInt(SerializationTags.VSN_1);
               byte[] ownerWithTag =
                   EncodingUtils.decodeCheckAndTag(
-                      model.getOwnerId(), SerializationTags.ID_TAG_ACCOUNT);
+                      model.getOwnerId(), Arrays.asList(ApiIdentifiers.ACCOUNT_PUBKEY));
               rlpWriter.writeByteArray(ownerWithTag);
               this.checkZeroAndWriteValue(rlpWriter, model.getNonce());
               rlpWriter.writeByteArray(

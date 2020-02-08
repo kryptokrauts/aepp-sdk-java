@@ -13,6 +13,7 @@ import com.kryptokrauts.aeternity.sdk.domain.secret.impl.RawKeyPair;
 import com.kryptokrauts.aeternity.sdk.exception.EncodingNotSupportedException;
 import java.math.BigInteger;
 import java.util.Arrays;
+import java.util.List;
 import lombok.experimental.UtilityClass;
 import org.bitcoinj.core.AddressFormatException;
 import org.bitcoinj.core.Base58;
@@ -146,13 +147,61 @@ public final class EncodingUtils {
 
   /**
    * @param input the input to decode
-   * @param serializationTag see {@link SerializationTags}
+   * @param allowedIdentifiers the apiIdentifiers allowed (if null or empty all known identifiers
+   *     are allowed)
    * @return the decoded bytearray
    */
-  public static final byte[] decodeCheckAndTag(final String input, final int serializationTag) {
-    byte[] tag = BigInteger.valueOf(serializationTag).toByteArray();
+  public static final byte[] decodeCheckAndTag(
+      final String input, final List<String> allowedIdentifiers) {
+    byte[] tag = determineSerializationTag(input, allowedIdentifiers);
     byte[] decoded = EncodingUtils.decodeCheckWithIdentifier(input);
     return ByteUtils.concatenate(tag, decoded);
+  }
+
+  /**
+   * @param input the input to decode
+   * @return the decoded bytearray
+   */
+  public static final byte[] decodeCheckAndTag(final String input) {
+    return decodeCheckAndTag(input, null);
+  }
+
+  private byte[] determineSerializationTag(
+      final String input, final List<String> allowedIdentifiers) {
+    String[] splitted = input.split("_");
+    if (splitted.length != 2) {
+      throw new IllegalArgumentException("input has wrong format");
+    }
+    String identifier = splitted[0];
+    if (allowedIdentifiers != null && !allowedIdentifiers.isEmpty()) {
+      if (!allowedIdentifiers.contains(identifier)) {
+        throw new IllegalArgumentException("illegal identifier: " + identifier);
+      }
+    }
+    int tag;
+    switch (identifier) {
+      case ApiIdentifiers.ACCOUNT_PUBKEY:
+        tag = SerializationTags.ID_TAG_ACCOUNT;
+        break;
+      case ApiIdentifiers.NAME:
+        tag = SerializationTags.ID_TAG_NAME;
+        break;
+      case ApiIdentifiers.COMMITMENT:
+        tag = SerializationTags.ID_TAG_COMMITMENT;
+        break;
+      case ApiIdentifiers.ORACLE_PUBKEY:
+        tag = SerializationTags.ID_TAG_ORACLE;
+        break;
+      case ApiIdentifiers.CONTRACT_PUBKEY:
+        tag = SerializationTags.ID_TAG_CONTRACT;
+        break;
+      case ApiIdentifiers.CHANNEL:
+        tag = SerializationTags.ID_TAG_CHANNEL;
+        break;
+      default:
+        throw new IllegalArgumentException("unknown identifier: " + identifier);
+    }
+    return BigInteger.valueOf(tag).toByteArray();
   }
 
   private static final String encodeBase58Check(final byte[] input) {
