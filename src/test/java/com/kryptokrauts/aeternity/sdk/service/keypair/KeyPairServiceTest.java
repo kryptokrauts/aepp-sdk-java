@@ -1,4 +1,4 @@
-package com.kryptokrauts.aeternity.sdk.keypair;
+package com.kryptokrauts.aeternity.sdk.service.keypair;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -7,9 +7,6 @@ import com.kryptokrauts.aeternity.sdk.BaseTest;
 import com.kryptokrauts.aeternity.sdk.domain.secret.impl.BaseKeyPair;
 import com.kryptokrauts.aeternity.sdk.domain.secret.impl.MnemonicKeyPair;
 import com.kryptokrauts.aeternity.sdk.exception.AException;
-import com.kryptokrauts.aeternity.sdk.service.keypair.KeyPairService;
-import com.kryptokrauts.aeternity.sdk.service.keypair.KeyPairServiceConfiguration;
-import com.kryptokrauts.aeternity.sdk.service.keypair.KeyPairServiceFactory;
 import com.kryptokrauts.aeternity.sdk.util.EncodingUtils;
 import java.util.Arrays;
 import java.util.List;
