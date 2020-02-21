@@ -85,10 +85,14 @@ public class TransactionServiceImpl implements TransactionService {
 
   @Override
   public PostTransactionResult blockingPostTransaction(String signedTx) {
-    return this.waitUntilTransactionIsMined(
+    PostTransactionResult postTransactionResult =
         PostTransactionResult.builder()
             .build()
-            .blockingGet(externalApi.rxPostTransaction(createGeneratedTxObject(signedTx))));
+            .blockingGet(externalApi.rxPostTransaction(createGeneratedTxObject(signedTx)));
+    if (this.config.isWaitForTxIncludedInBlockEnabled()) {
+      return this.waitUntilTransactionIsIncludedInBlock(postTransactionResult);
+    }
+    return postTransactionResult;
   }
 
   @Override
@@ -101,7 +105,7 @@ public class TransactionServiceImpl implements TransactionService {
   @Override
   public PostTransactionResult blockingPostTransaction(
       AbstractTransactionModel<?> tx, String privateKey) throws TransactionCreateException {
-    return this.waitUntilTransactionIsMined(
+    PostTransactionResult postTransactionResult =
         PostTransactionResult.builder()
             .build()
             .blockingGet(
@@ -109,7 +113,11 @@ public class TransactionServiceImpl implements TransactionService {
                     createGeneratedTxObject(
                         signTransaction(
                             asyncCreateUnsignedTransaction(tx).blockingGet().getResult(),
-                            privateKey)))));
+                            privateKey))));
+    if (this.config.isWaitForTxIncludedInBlockEnabled()) {
+      return this.waitUntilTransactionIsIncludedInBlock(postTransactionResult);
+    }
+    return postTransactionResult;
   }
 
   @Override
@@ -188,32 +196,33 @@ public class TransactionServiceImpl implements TransactionService {
     return tx;
   }
 
-  private PostTransactionResult waitUntilTransactionIsMined(
+  private PostTransactionResult waitUntilTransactionIsIncludedInBlock(
       PostTransactionResult postTransactionResult) {
     if (postTransactionResult != null) {
       String transactionHash = postTransactionResult.getTxHash();
       int currentBlockHeight = -1;
-      GenericSignedTx minedTransaction = null;
+      GenericSignedTx includedTransaction = null;
       int elapsedTrials = 1;
       while (currentBlockHeight == -1
-          && elapsedTrials < this.config.getNumTrialsToWaitForTxMined()) {
-        minedTransaction = this.externalApi.rxGetTransactionByHash(transactionHash).blockingGet();
-        if (minedTransaction.getBlockHeight().intValue() > 1) {
-          _logger.debug("Transaction is mined - " + minedTransaction.toString());
-          currentBlockHeight = minedTransaction.getBlockHeight().intValue();
+          && elapsedTrials < this.config.getNumTrialsToWaitForTxIncludedInBlock()) {
+        includedTransaction =
+            this.externalApi.rxGetTransactionByHash(transactionHash).blockingGet();
+        if (includedTransaction.getBlockHeight().intValue() > 1) {
+          _logger.debug("Transaction is included in a block - " + includedTransaction.toString());
+          currentBlockHeight = includedTransaction.getBlockHeight().intValue();
         } else {
           double timeSpan =
-              Double.valueOf(this.config.getMillisBetweenTrialsToWaitForTxMined()) / 1000;
+              Double.valueOf(this.config.getMillisBetweenTrialsToWaitForTxIncludedInBlock()) / 1000;
           _logger.info(
               String.format(
-                  "Transaction not mined yet, checking again in %.3f seconds (trial %s of %s)",
-                  timeSpan, elapsedTrials, this.config.getNumTrialsToWaitForTxMined()));
+                  "Transaction not included in a block yet, checking again in %.3f seconds (trial %s of %s)",
+                  timeSpan, elapsedTrials, this.config.getNumTrialsToWaitForTxIncludedInBlock()));
           try {
-            Thread.sleep(this.config.getMillisBetweenTrialsToWaitForTxMined());
+            Thread.sleep(this.config.getMillisBetweenTrialsToWaitForTxIncludedInBlock());
           } catch (InterruptedException e) {
             throw new AException(
                 String.format(
-                    "Waiting for transaction %s to be mined was interrupted due to technical error",
+                    "Waiting for transaction %s to be included in a block was interrupted due to technical error",
                     transactionHash),
                 e);
           }
@@ -223,7 +232,7 @@ public class TransactionServiceImpl implements TransactionService {
       if (currentBlockHeight == -1) {
         throw new TransactionWaitTimeoutExpiredException(
             String.format(
-                "Transaction %s was not mined after %s trials, aborting",
+                "Transaction %s was not included in a block after %s trials, aborting",
                 transactionHash, elapsedTrials));
       }
     }

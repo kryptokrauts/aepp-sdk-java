@@ -17,7 +17,9 @@ public class AeternityServiceConfiguration extends ServiceConfiguration {
 
   @Default private long minimalGasPrice = BaseConstants.MINIMAL_GAS_PRICE;
 
-  @Default private int numTrialsToWaitForTxMined = 60;
+  @Default private boolean waitForTxIncludedInBlockEnabled = true;
 
-  @Default private long millisBetweenTrialsToWaitForTxMined = 1000l;
+  @Default private int numTrialsToWaitForTxIncludedInBlock = 60;
+
+  @Default private long millisBetweenTrialsToWaitForTxIncludedInBlock = 1000l;
 }
