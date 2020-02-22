@@ -1,5 +1,25 @@
 # Changelog
 
+## [v2.2.0](https://github.com/kryptokrauts/aepp-sdk-java/releases/tag/v2.2.0)
+
+This release ships some fixes and enhancements.
+
+### Fixes
+- [#91](../../../issues/91) show exception details on compiler and aeternal errors
+- [#95](../../../issues/95) fix default values in BaseConstants
+
+### Enhancements
+- [#96](../../../issues/96) add ResultWrapper for standard java types returned from service calls to omit exceptions being ignored
+- [#97](../../../issues/97) introduce configurable way to wait for tx being included in a block
+  - this is currently covered by the following properties and only relevant in `blockingPostTransaction` calls
+    - `waitForTxIncludedInBlockEnabled` (default=true)
+    - `numTrialsToWaitForTxIncludedInBlock` (default=60)
+    - `millisBetweenTrialsToWaitForTxIncludedInBlock` (default=1000)
+  - there is an [open issue](../../../issues/107) that will cover the functionality to wait an amount of confirmations (keyblocks) to consider a transaction being mined
+- [#98](../../../issues/98) provide a (more) user-friendly way to handle unit conversions
+  - we introduced a `UnitConversionService`-Interface with a `DefaultUnitConversionService`-Implementation that makes it a bit easier to handle conversions from `AE` to `aettos` or custom tokens that may have less decimals
+- [#99](../../../issues/99) prevent exceptions for TxModel classes
+
 ## [v2.1.0](https://github.com/kryptokrauts/aepp-sdk-java/releases/tag/v2.1.0)
 
 This release ships some fixes and enhancements. Additionally we renamed some attributes and model-classes. If you already used [v2.0.0](https://github.com/kryptokrauts/aepp-sdk-java/releases/tag/v2.0.0) it might be needed to fix these changes.

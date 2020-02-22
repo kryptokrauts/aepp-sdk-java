@@ -15,14 +15,6 @@ Licensed under the [ISC License](LICENSE)
 
 ## Support us
 
-If you like this project we would appreciate your support:
+If you like this project we would appreciate your support. You can find multiple ways to support us here:
 
-- [ak_5z1fmzTKR1GA1P7qiLDCC1s3V7AK2RRpNbXqUhfHQbUeg7mmV](https://explorer.aepps.com/#/account/ak_5z1fmzTKR1GA1P7qiLDCC1s3V7AK2RRpNbXqUhfHQbUeg7mmV)
-
-## Contributors
-
-Everybody is welcome to contribute to this project.
-
-Contributors so far:
-- [Marco Walz](https://github.com/marc0olo)
-- [Michel Meier](https://github.com/mitch-lbw)
+- https://kryptokrauts.com/support/
