@@ -2,6 +2,7 @@ package com.kryptokrauts.aeternity.sdk.service.transaction;
 
 import com.kryptokrauts.aeternity.sdk.domain.StringResultWrapper;
 import com.kryptokrauts.aeternity.sdk.exception.TransactionCreateException;
+import com.kryptokrauts.aeternity.sdk.service.info.domain.TransactionResult;
 import com.kryptokrauts.aeternity.sdk.service.transaction.domain.DryRunRequest;
 import com.kryptokrauts.aeternity.sdk.service.transaction.domain.DryRunTransactionResults;
 import com.kryptokrauts.aeternity.sdk.service.transaction.domain.PostTransactionResult;
@@ -125,4 +126,26 @@ public interface TransactionService {
    * @return asynchronous result handler (RxJava Single) for {@link PostTransactionResult}
    */
   Single<PostTransactionResult> asyncPostTransaction(String signedTx);
+
+  /**
+   * asynchronously wait for a transaction to be confirmed
+   *
+   * <p>the number of keyblocks to consider the transaction confirmed is defined in the property
+   * numOfConfirmations of the {@link
+   * com.kryptokrauts.aeternity.sdk.service.aeternity.AeternityServiceConfiguration} (default 10)
+   *
+   * @param postTransactionResult the {@link PostTransactionResult} object to be confirmed
+   * @return the actual {@link TransactionResult} of the transaction at the confirmation height
+   */
+  Single<TransactionResult> waitForConfirmation(PostTransactionResult postTransactionResult);
+
+  /**
+   * asynchronously wait for a transaction to be confirmed
+   *
+   * @param postTransactionResult the {@link PostTransactionResult} object to be confirmed
+   * @param numOfConfirmations the number of keyblocks needed to consider the transaction confirmed
+   * @return the actual {@link TransactionResult} of the transaction at the confirmation height
+   */
+  Single<TransactionResult> waitForConfirmation(
+      PostTransactionResult postTransactionResult, int numOfConfirmations);
 }

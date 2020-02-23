@@ -10,6 +10,8 @@ import com.kryptokrauts.aeternity.sdk.exception.AException;
 import com.kryptokrauts.aeternity.sdk.exception.TransactionCreateException;
 import com.kryptokrauts.aeternity.sdk.exception.TransactionWaitTimeoutExpiredException;
 import com.kryptokrauts.aeternity.sdk.service.aeternity.AeternityServiceConfiguration;
+import com.kryptokrauts.aeternity.sdk.service.info.InfoService;
+import com.kryptokrauts.aeternity.sdk.service.info.domain.TransactionResult;
 import com.kryptokrauts.aeternity.sdk.service.transaction.TransactionService;
 import com.kryptokrauts.aeternity.sdk.service.transaction.domain.DryRunRequest;
 import com.kryptokrauts.aeternity.sdk.service.transaction.domain.DryRunTransactionResults;
@@ -20,7 +22,9 @@ import com.kryptokrauts.aeternity.sdk.util.EncodingUtils;
 import com.kryptokrauts.aeternity.sdk.util.SigningUtil;
 import com.kryptokrauts.sophia.compiler.generated.api.rxjava.DefaultApi;
 import io.reactivex.Single;
+import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
+import java.util.concurrent.TimeUnit;
 import javax.annotation.Nonnull;
 import lombok.RequiredArgsConstructor;
 import org.apache.tuweni.bytes.Bytes;
@@ -38,6 +42,8 @@ public class TransactionServiceImpl implements TransactionService {
   @Nonnull private ExternalApi externalApi;
 
   @Nonnull private DefaultApi compilerApi;
+
+  @Nonnull private InfoService infoService;
 
   @Override
   public Single<StringResultWrapper> asyncCreateUnsignedTransaction(
@@ -158,6 +164,53 @@ public class TransactionServiceImpl implements TransactionService {
     return DryRunTransactionResults.builder()
         .build()
         .blockingGet(this.externalApi.rxDryRunTxs(input.toGeneratedModel()));
+  }
+
+  @Override
+  public Single<TransactionResult> waitForConfirmation(
+      PostTransactionResult postTransactionResult) {
+    return this.waitForConfirmation(postTransactionResult, this.config.getNumOfConfirmations());
+  }
+
+  @Override
+  public Single<TransactionResult> waitForConfirmation(
+      PostTransactionResult postTransactionResult, int numOfConfirmations) {
+    final BigInteger[] heights = new BigInteger[2];
+    final boolean setConfirmationHeight[] = {true};
+    return infoService
+        .asyncGetCurrentKeyBlock()
+        .doOnSuccess(
+            keyBlockResult -> {
+              heights[0] = keyBlockResult.getHeight(); // currentHeight
+              if (setConfirmationHeight[0]) {
+                heights[1] =
+                    keyBlockResult
+                        .getHeight()
+                        .add(BigInteger.valueOf(numOfConfirmations)); // confirmationHeight
+                _logger.info(
+                    String.format(
+                        "waiting %s keyblocks beginning at height %s to wait for confirmation of tx: %s",
+                        numOfConfirmations, heights[0], postTransactionResult.getTxHash()));
+                setConfirmationHeight[0] = false;
+              }
+              _logger.debug(
+                  String.format(
+                      "waiting for confirmation - current height: %s - confirmation height: %s - tx: %s",
+                      heights[0], heights[1], postTransactionResult.getTxHash()));
+            })
+        .delay(config.getMillisBetweenTrailsToWaitForConfirmation(), TimeUnit.MILLISECONDS)
+        .repeatUntil(() -> heights[0].compareTo(heights[1]) >= 0)
+        // TODO .map() is called each time. how can we make sure it is only called AFTER
+        // repeatUntil() condition is met?
+        .map(
+            keyBlockResult -> {
+              if (heights[0].compareTo(heights[1]) >= 0) {
+                _logger.info("getTxByHash ...");
+                return infoService.blockingGetTransactionByHash(postTransactionResult.getTxHash());
+              }
+              return TransactionResult.builder().build();
+            })
+        .lastOrError();
   }
 
   /**
