@@ -21,6 +21,7 @@ import com.kryptokrauts.aeternity.sdk.util.ByteUtils;
 import com.kryptokrauts.aeternity.sdk.util.EncodingUtils;
 import com.kryptokrauts.aeternity.sdk.util.SigningUtil;
 import com.kryptokrauts.sophia.compiler.generated.api.rxjava.DefaultApi;
+import io.reactivex.Flowable;
 import io.reactivex.Single;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
@@ -200,17 +201,17 @@ public class TransactionServiceImpl implements TransactionService {
             })
         .delay(config.getMillisBetweenTrailsToWaitForConfirmation(), TimeUnit.MILLISECONDS)
         .repeatUntil(() -> heights[0].compareTo(heights[1]) >= 0)
-        // TODO .map() is called each time. how can we make sure it is only called AFTER
-        // repeatUntil() condition is met?
-        .map(
+        .switchMap(
             keyBlockResult -> {
+              // get transaction only if current height >= confirmationHeight
               if (heights[0].compareTo(heights[1]) >= 0) {
-                _logger.info("getTxByHash ...");
-                return infoService.blockingGetTransactionByHash(postTransactionResult.getTxHash());
+                return infoService
+                    .asyncGetTransactionByHash(postTransactionResult.getTxHash())
+                    .toFlowable();
               }
-              return TransactionResult.builder().build();
+              return Flowable.empty();
             })
-        .lastOrError();
+        .singleOrError();
   }
 
   /**
