@@ -5,6 +5,7 @@ import com.kryptokrauts.aeternity.generated.model.GenericTx;
 import com.kryptokrauts.aeternity.generated.model.SpendTx;
 import com.kryptokrauts.aeternity.sdk.annotations.Mandatory;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.impl.SpendTransaction;
+import com.kryptokrauts.aeternity.sdk.util.EncodingUtils;
 import com.kryptokrauts.sophia.compiler.generated.api.rxjava.DefaultApi;
 import java.math.BigInteger;
 import java.util.function.Function;
@@ -21,6 +22,7 @@ public class SpendTransactionModel extends AbstractTransactionModel<SpendTx> {
   @Mandatory private String recipient;
   @Mandatory private BigInteger amount;
   @Default private String payload = "";
+  private String payloadDecoded;
   @Mandatory private BigInteger ttl;
   @Mandatory private BigInteger nonce;
 
@@ -47,6 +49,8 @@ public class SpendTransactionModel extends AbstractTransactionModel<SpendTx> {
           .recipient(castedTx.getRecipientId())
           .amount(castedTx.getAmount())
           .payload(castedTx.getPayload())
+          .payloadDecoded(
+              new String(EncodingUtils.decodeCheckWithIdentifier(castedTx.getPayload())))
           .fee(castedTx.getFee())
           .nonce(castedTx.getNonce())
           .ttl(castedTx.getTtl())

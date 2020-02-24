@@ -134,18 +134,26 @@ public interface TransactionService {
    * numOfConfirmations of the {@link
    * com.kryptokrauts.aeternity.sdk.service.aeternity.AeternityServiceConfiguration} (default 10)
    *
-   * @param postTransactionResult the {@link PostTransactionResult} object to be confirmed
+   * @param txHash the tx-hash of the transaction to be confirmed
    * @return the actual {@link TransactionResult} of the transaction at the confirmation height
+   *     <p>Note:
+   *     <p>- check getRootErrorMessage(): if a rootErrorMessage is present the transaction is
+   *     probably not mined.
+   *     <p>- check getBlockHeight(): if the blockHeight is -1 it means the transaction isn't mined.
    */
-  Single<TransactionResult> waitForConfirmation(PostTransactionResult postTransactionResult);
+  Single<TransactionResult> asyncWaitForConfirmation(String txHash);
 
   /**
    * asynchronously wait for a transaction to be confirmed
    *
-   * @param postTransactionResult the {@link PostTransactionResult} object to be confirmed
-   * @param numOfConfirmations the number of keyblocks needed to consider the transaction confirmed
+   * @param txHash the tx-hash of the transaction to be confirmed
+   * @param numOfConfirmations the amount of keyblocks required to consider a transaction to be
+   *     confirmed/mined
    * @return the actual {@link TransactionResult} of the transaction at the confirmation height
+   *     <p>Note:
+   *     <p>- check getRootErrorMessage(): if a rootErrorMessage is present the transaction is
+   *     probably not mined.
+   *     <p>- check getBlockHeight():if the blockHeight is -1 it means the transaction isn't mined.
    */
-  Single<TransactionResult> waitForConfirmation(
-      PostTransactionResult postTransactionResult, int numOfConfirmations);
+  Single<TransactionResult> asyncWaitForConfirmation(String txHash, int numOfConfirmations);
 }

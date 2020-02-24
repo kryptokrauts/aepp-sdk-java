@@ -1,5 +1,6 @@
 package com.kryptokrauts.aeternity.sdk.service.transaction.impl;
 
+import com.kryptokrauts.aeternity.generated.ApiException;
 import com.kryptokrauts.aeternity.generated.api.rxjava.ExternalApi;
 import com.kryptokrauts.aeternity.generated.model.GenericSignedTx;
 import com.kryptokrauts.aeternity.generated.model.Tx;
@@ -168,14 +169,13 @@ public class TransactionServiceImpl implements TransactionService {
   }
 
   @Override
-  public Single<TransactionResult> waitForConfirmation(
-      PostTransactionResult postTransactionResult) {
-    return this.waitForConfirmation(postTransactionResult, this.config.getNumOfConfirmations());
+  public Single<TransactionResult> asyncWaitForConfirmation(final String txHash) {
+    return this.asyncWaitForConfirmation(txHash, this.config.getNumOfConfirmations());
   }
 
   @Override
-  public Single<TransactionResult> waitForConfirmation(
-      PostTransactionResult postTransactionResult, int numOfConfirmations) {
+  public Single<TransactionResult> asyncWaitForConfirmation(
+      final String txHash, final int numOfConfirmations) {
     final BigInteger[] heights = new BigInteger[2];
     final boolean setConfirmationHeight[] = {true};
     return infoService
@@ -191,13 +191,13 @@ public class TransactionServiceImpl implements TransactionService {
                 _logger.info(
                     String.format(
                         "waiting %s keyblocks beginning at height %s to wait for confirmation of tx: %s",
-                        numOfConfirmations, heights[0], postTransactionResult.getTxHash()));
+                        numOfConfirmations, heights[0], txHash));
                 setConfirmationHeight[0] = false;
               }
               _logger.debug(
                   String.format(
                       "waiting for confirmation - current height: %s - confirmation height: %s - tx: %s",
-                      heights[0], heights[1], postTransactionResult.getTxHash()));
+                      heights[0], heights[1], txHash));
             })
         .delay(config.getMillisBetweenTrailsToWaitForConfirmation(), TimeUnit.MILLISECONDS)
         .repeatUntil(() -> heights[0].compareTo(heights[1]) >= 0)
@@ -206,8 +206,22 @@ public class TransactionServiceImpl implements TransactionService {
               // get transaction only if current height >= confirmationHeight
               if (heights[0].compareTo(heights[1]) >= 0) {
                 return infoService
-                    .asyncGetTransactionByHash(postTransactionResult.getTxHash())
-                    .toFlowable();
+                    .asyncGetTransactionByHash(txHash)
+                    .toFlowable()
+                    .onErrorReturn(
+                        throwable -> {
+                          if (throwable instanceof ApiException) {
+                            return TransactionResult.builder()
+                                .hash(txHash)
+                                .aeAPIErrorMessage(throwable.getMessage())
+                                .rootErrorMessage(((ApiException) throwable).getResponseBody())
+                                .build();
+                          }
+                          return TransactionResult.builder()
+                              .hash(txHash)
+                              .rootErrorMessage(throwable.getMessage())
+                              .build();
+                        });
               }
               return Flowable.empty();
             })
