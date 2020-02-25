@@ -1,10 +1,17 @@
 package com.kryptokrauts.aeternity.sdk.service.compiler.impl;
 
+import com.kryptokrauts.aeternity.sdk.domain.ObjectResultWrapper;
+import com.kryptokrauts.aeternity.sdk.domain.StringResultWrapper;
 import com.kryptokrauts.aeternity.sdk.service.ServiceConfiguration;
 import com.kryptokrauts.aeternity.sdk.service.compiler.CompilerService;
 import com.kryptokrauts.aeternity.sdk.service.compiler.domain.ACIResult;
 import com.kryptokrauts.sophia.compiler.generated.api.rxjava.DefaultApi;
-import com.kryptokrauts.sophia.compiler.generated.model.*;
+import com.kryptokrauts.sophia.compiler.generated.model.CompileOpts;
+import com.kryptokrauts.sophia.compiler.generated.model.Contract;
+import com.kryptokrauts.sophia.compiler.generated.model.FunctionCallInput;
+import com.kryptokrauts.sophia.compiler.generated.model.SophiaBinaryData;
+import com.kryptokrauts.sophia.compiler.generated.model.SophiaCallResultInput;
+import com.kryptokrauts.sophia.compiler.generated.model.SophiaJsonData;
 import io.netty.util.internal.StringUtil;
 import io.reactivex.Single;
 import java.util.List;
@@ -20,19 +27,25 @@ public final class SophiaCompilerServiceImpl implements CompilerService {
   @NonNull private DefaultApi compilerApi;
 
   @Override
-  public Single<String> asyncEncodeCalldata(
+  public Single<StringResultWrapper> asyncEncodeCalldata(
       String sourceCode, String function, List<String> arguments) {
-    return this.compilerApi
-        .rxEncodeCalldata(buildFunctionCallInput(sourceCode, function, arguments))
-        .map(calldata -> calldata.getCalldata());
+    return StringResultWrapper.builder()
+        .build()
+        .asyncGet(
+            this.compilerApi
+                .rxEncodeCalldata(buildFunctionCallInput(sourceCode, function, arguments))
+                .map(calldata -> calldata.getCalldata()));
   }
 
   @Override
-  public String blockingEncodeCalldata(String sourceCode, String function, List<String> arguments) {
-    return this.compilerApi
-        .rxEncodeCalldata(buildFunctionCallInput(sourceCode, function, arguments))
-        .blockingGet()
-        .getCalldata();
+  public StringResultWrapper blockingEncodeCalldata(
+      String sourceCode, String function, List<String> arguments) {
+    return StringResultWrapper.builder()
+        .build()
+        .blockingGet(
+            this.compilerApi
+                .rxEncodeCalldata(buildFunctionCallInput(sourceCode, function, arguments))
+                .map(calldata -> calldata.getCalldata()));
   }
 
   private FunctionCallInput buildFunctionCallInput(
@@ -50,37 +63,49 @@ public final class SophiaCompilerServiceImpl implements CompilerService {
   }
 
   @Override
-  public Single<Object> asyncDecodeCalldata(String calldata, String sophiaType) {
-    return Optional.ofNullable(this.compilerApi.rxDecodeData(buildDecodeBody(calldata, sophiaType)))
-        .orElse(Single.just(new SophiaJsonData()))
-        .map(s -> s.getData());
+  public Single<ObjectResultWrapper> asyncDecodeCalldata(String calldata, String sophiaType) {
+    return ObjectResultWrapper.builder()
+        .build()
+        .asyncGet(
+            this.compilerApi
+                .rxDecodeData(buildDecodeBody(calldata, sophiaType))
+                .map(
+                    decodeResult ->
+                        Optional.ofNullable(decodeResult).orElse(new SophiaJsonData()).getData()));
   }
 
   @Override
-  public Object blockingDecodeCalldata(String calldata, String sophiaType) {
-    return Optional.ofNullable(
-            this.compilerApi.rxDecodeData(buildDecodeBody(calldata, sophiaType)).blockingGet())
-        .orElse(new SophiaJsonData())
-        .getData();
+  public ObjectResultWrapper blockingDecodeCalldata(String calldata, String sophiaType) {
+    return ObjectResultWrapper.builder()
+        .build()
+        .blockingGet(
+            this.compilerApi
+                .rxDecodeData(buildDecodeBody(calldata, sophiaType))
+                .map(
+                    decodeResult ->
+                        Optional.ofNullable(decodeResult).orElse(new SophiaJsonData()).getData()));
   }
 
   @Override
-  public Single<Object> asyncDecodeCallResult(
+  public Single<ObjectResultWrapper> asyncDecodeCallResult(
       String source, String function, String callResult, String callValue) {
-    return Optional.ofNullable(
-            this.compilerApi.rxDecodeCallResult(
-                buildDecodeBody(source, function, callResult, callValue)))
-        .orElse(Single.just(new Object()));
-  }
-
-  @Override
-  public Object blockingDecodeCallResult(
-      String source, String function, String callResult, String callValue) {
-    return Optional.ofNullable(
+    return ObjectResultWrapper.builder()
+        .build()
+        .asyncGet(
             this.compilerApi
                 .rxDecodeCallResult(buildDecodeBody(source, function, callResult, callValue))
-                .blockingGet())
-        .orElse(new Object());
+                .map(decodeResult -> Optional.ofNullable(decodeResult).orElse("")));
+  }
+
+  @Override
+  public ObjectResultWrapper blockingDecodeCallResult(
+      String source, String function, String callResult, String callValue) {
+    return ObjectResultWrapper.builder()
+        .build()
+        .blockingGet(
+            this.compilerApi
+                .rxDecodeCallResult(buildDecodeBody(source, function, callResult, callValue))
+                .map(decodeResult -> Optional.ofNullable(decodeResult).orElse("")));
   }
 
   private SophiaBinaryData buildDecodeBody(String calldata, String sophiaType) {
@@ -134,18 +159,25 @@ public final class SophiaCompilerServiceImpl implements CompilerService {
   }
 
   @Override
-  public Single<String> asyncCompile(String contractCode, String srcFile, Object fileSystem) {
-    return this.compilerApi
-        .rxCompileContract(buildContractBody(contractCode, srcFile, fileSystem))
-        .map(byteCode -> byteCode.getBytecode());
+  public Single<StringResultWrapper> asyncCompile(
+      String contractCode, String srcFile, Object fileSystem) {
+    return StringResultWrapper.builder()
+        .build()
+        .asyncGet(
+            this.compilerApi
+                .rxCompileContract(buildContractBody(contractCode, srcFile, fileSystem))
+                .map(byteCode -> byteCode.getBytecode()));
   }
 
   @Override
-  public String blockingCompile(String contractCode, String srcFile, Object fileSystem) {
-    return this.compilerApi
-        .rxCompileContract(buildContractBody(contractCode, srcFile, fileSystem))
-        .blockingGet()
-        .getBytecode();
+  public StringResultWrapper blockingCompile(
+      String contractCode, String srcFile, Object fileSystem) {
+    return StringResultWrapper.builder()
+        .build()
+        .blockingGet(
+            this.compilerApi
+                .rxCompileContract(buildContractBody(contractCode, srcFile, fileSystem))
+                .map(bytecode -> bytecode.getBytecode()));
   }
 
   private Contract buildContractBody(String contractCode, String srcFile, Object fileSystem) {

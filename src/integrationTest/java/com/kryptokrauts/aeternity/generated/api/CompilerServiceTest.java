@@ -1,6 +1,7 @@
 package com.kryptokrauts.aeternity.generated.api;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.kryptokrauts.aeternity.sdk.domain.ObjectResultWrapper;
 import com.kryptokrauts.aeternity.sdk.service.compiler.domain.ACIResult;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.unit.TestContext;
@@ -14,27 +15,18 @@ import org.junit.Test;
 public class CompilerServiceTest extends BaseTest {
 
   @Test
-  public void testCompileContract(TestContext context) {
-    this.executeTest(
-        context,
-        t -> {
-          String byteCode =
-              this.aeternityServiceNative.compiler.blockingCompile(
-                  TestConstants.testContractSourceCode, null, null);
-          context.assertEquals(TestConstants.testContractByteCode, byteCode);
-        });
-  }
-
-  @Test
   public void testCompileContractCall(TestContext context) {
     this.executeTest(
         context,
         t -> {
           String calldata =
-              this.aeternityServiceNative.compiler.blockingEncodeCalldata(
-                  TestConstants.testContractSourceCode,
-                  TestConstants.testContractFunction,
-                  TestConstants.testContractFunctionParams);
+              this.aeternityServiceNative
+                  .compiler
+                  .blockingEncodeCalldata(
+                      TestConstants.testContractSourceCode,
+                      TestConstants.testContractFunction,
+                      TestConstants.testContractFunctionParams)
+                  .getResult();
           context.assertEquals(TestConstants.encodedServiceCall, calldata);
         });
   }
@@ -45,16 +37,16 @@ public class CompilerServiceTest extends BaseTest {
         context,
         t -> {
           try {
-            Object callData =
+            ObjectResultWrapper callData =
                 this.aeternityServiceNative.compiler.blockingDecodeCalldata(
                     TestConstants.encodedServiceCallAnswer, "int");
-            _logger.info(callData.toString());
+            _logger.info(callData.getResult().toString());
             context.assertEquals(
                 new ObjectMapper()
                     .readValue(TestConstants.serviceCallAnswerJSON, Map.class)
                     .get("value")
                     .toString(),
-                JsonObject.mapFrom(callData).getInteger("value").toString());
+                JsonObject.mapFrom(callData.getResult()).getInteger("value").toString());
           } catch (IOException e) {
             context.fail(e);
           }
@@ -67,8 +59,10 @@ public class CompilerServiceTest extends BaseTest {
         context,
         t -> {
           String calldata =
-              this.aeternityServiceNative.compiler.blockingEncodeCalldata(
-                  TestConstants.testContractSourceCode, "init", null);
+              this.aeternityServiceNative
+                  .compiler
+                  .blockingEncodeCalldata(TestConstants.testContractSourceCode, "init", null)
+                  .getResult();
           context.assertEquals(TestConstants.testContractCallData, calldata);
         });
   }

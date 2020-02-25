@@ -5,6 +5,7 @@ import com.kryptokrauts.aeternity.generated.model.GenericTx;
 import com.kryptokrauts.aeternity.generated.model.OracleQueryTx;
 import com.kryptokrauts.aeternity.generated.model.RelativeTTL;
 import com.kryptokrauts.aeternity.generated.model.TTL;
+import com.kryptokrauts.aeternity.sdk.annotations.Mandatory;
 import com.kryptokrauts.aeternity.sdk.service.oracle.domain.OracleTTLType;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.AbstractTransaction;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.impl.OracleQueryTransaction;
@@ -20,15 +21,15 @@ import lombok.experimental.SuperBuilder;
 @ToString
 public class OracleQueryTransactionModel extends AbstractTransactionModel<OracleQueryTx> {
 
-  private String senderId;
-  private String oracleId;
-  private BigInteger nonce;
-  private String query;
-  private BigInteger queryFee;
-  private BigInteger queryTtl;
-  private OracleTTLType queryTtlType;
-  private BigInteger responseTtl;
-  private BigInteger ttl;
+  @Mandatory private String senderId;
+  @Mandatory private String oracleId;
+  @Mandatory private BigInteger nonce;
+  @Mandatory private String query;
+  @Mandatory private BigInteger queryFee;
+  @Mandatory private BigInteger queryTtl;
+  @Mandatory private OracleTTLType queryTtlType;
+  @Mandatory private BigInteger responseTtl;
+  @Mandatory private BigInteger ttl;
 
   @Override
   public OracleQueryTx toApiModel() {

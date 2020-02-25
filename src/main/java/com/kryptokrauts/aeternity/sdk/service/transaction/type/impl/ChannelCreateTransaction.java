@@ -2,6 +2,7 @@ package com.kryptokrauts.aeternity.sdk.service.transaction.type.impl;
 
 import com.kryptokrauts.aeternity.generated.api.rxjava.ExternalApi;
 import com.kryptokrauts.aeternity.generated.model.UnsignedTx;
+import com.kryptokrauts.aeternity.sdk.constants.ApiIdentifiers;
 import com.kryptokrauts.aeternity.sdk.constants.SerializationTags;
 import com.kryptokrauts.aeternity.sdk.service.transaction.fee.FeeCalculationModel;
 import com.kryptokrauts.aeternity.sdk.service.transaction.fee.impl.ChannelForceProgressFeeCalculationModel;
@@ -9,6 +10,7 @@ import com.kryptokrauts.aeternity.sdk.service.transaction.type.AbstractTransacti
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.model.ChannelCreateTransactionModel;
 import com.kryptokrauts.aeternity.sdk.util.EncodingUtils;
 import io.reactivex.Single;
+import java.util.Arrays;
 import lombok.NonNull;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
@@ -35,12 +37,12 @@ public class ChannelCreateTransaction extends AbstractTransaction<ChannelCreateT
               rlpWriter.writeInt(SerializationTags.VSN_1);
               byte[] initiatorIdWithTag =
                   EncodingUtils.decodeCheckAndTag(
-                      model.getInitiator(), SerializationTags.ID_TAG_ACCOUNT);
+                      model.getInitiator(), Arrays.asList(ApiIdentifiers.ACCOUNT_PUBKEY));
               rlpWriter.writeByteArray(initiatorIdWithTag);
               this.checkZeroAndWriteValue(rlpWriter, model.getInitiatorAmount());
               byte[] responderIdWithTag =
                   EncodingUtils.decodeCheckAndTag(
-                      model.getResponder(), SerializationTags.ID_TAG_ACCOUNT);
+                      model.getResponder(), Arrays.asList(ApiIdentifiers.ACCOUNT_PUBKEY));
               rlpWriter.writeByteArray(responderIdWithTag);
               this.checkZeroAndWriteValue(rlpWriter, model.getResponderAmount());
               this.checkZeroAndWriteValue(rlpWriter, model.getChannelReserve());

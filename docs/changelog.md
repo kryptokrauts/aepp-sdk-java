@@ -1,5 +1,33 @@
 # Changelog
 
+## [v2.2.0](https://github.com/kryptokrauts/aepp-sdk-java/releases/tag/v2.2.0)
+
+This release ships some fixes and enhancements.
+
+### Fixes
+- [#91](../../../issues/91) show exception details on compiler and aeternal errors
+- [#95](../../../issues/95) fix default values in BaseConstants
+
+### Enhancements
+- [#96](../../../issues/96) add ResultWrapper for standard java types returned from service calls to omit exceptions being ignored
+- [#97](../../../issues/97) introduce configurable way to wait for tx being included in a block
+  - this is currently covered by the following properties and only relevant in `blockingPostTransaction` calls
+    - `waitForTxIncludedInBlockEnabled` (default=true)
+    - `numTrialsToWaitForTxIncludedInBlock` (default=60)
+    - `millisBetweenTrialsToWaitForTxIncludedInBlock` (default=1000)
+- [#98](../../../issues/98) provide a (more) user-friendly way to handle unit conversions
+  - we introduced a `UnitConversionService`-Interface with a `DefaultUnitConversionService`-Implementation that makes it a bit easier to handle conversions from `AE` to `aettos` or custom tokens that may have less decimals
+- [#99](../../../issues/99) prevent exceptions for TxModel classes
+- [#107](../../../issues/107) wait for confirmation of transaction
+  - now it is possible to wait for a transaction to be confirmed
+  - this is an asynchronous operation and can be configured through the following properties:
+    - `numOfConfirmations` (default=10)
+        - the number of confirmations (KeyBlocks) until a transaction is considered confirmed
+        - this value can also be explicitly set as method parameter
+    - `millisBetweenTrailsToWaitForConfirmation` (default=10000)
+- [#111](../../../issues/111) add "payloadDecoded" attribute to SpendTransactionModel
+  - now the payload for a SpendTx is automatically decoded
+
 ## [v2.1.0](https://github.com/kryptokrauts/aepp-sdk-java/releases/tag/v2.1.0)
 
 This release ships some fixes and enhancements. Additionally we renamed some attributes and model-classes. If you already used [v2.0.0](https://github.com/kryptokrauts/aepp-sdk-java/releases/tag/v2.0.0) it might be needed to fix these changes.

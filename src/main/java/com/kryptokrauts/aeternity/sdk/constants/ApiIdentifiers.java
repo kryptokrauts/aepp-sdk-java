@@ -7,7 +7,7 @@ import java.util.List;
 public interface ApiIdentifiers {
 
   // API identifiers
-  // https://github.com/aeternity/protocol/blob/master/epoch/api/api_encoding.md#encoding-scheme-for-api-identifiers-and-byte-arrays
+  // https://github.com/aeternity/protocol/blob/master/node/api/api_encoding.md#encoding-scheme-for-api-identifiers-and-byte-arrays
 
   // base58
   String ACCOUNT_PUBKEY = "ak"; // base58 Account pubkey
@@ -55,6 +55,8 @@ public interface ApiIdentifiers {
 
   String TRANSACTION = "tx"; // base64 Transaction
 
+  String BYTE_ARRAY = "ba"; // base64 byte array
+
   // Indentifiers with base58
   String[] IDENTIFIERS_B58 = {
     ACCOUNT_PUBKEY,
@@ -78,13 +80,14 @@ public interface ApiIdentifiers {
 
   // Indentifiers with base64
   String[] IDENTIFIERS_B64 = {
+    BYTE_ARRAY,
     CONTRACT_BYTE_ARRAY,
     ORACLE_RESPONSE,
     ORACLE_QUERY,
     PROOF_OF_INCLUSION,
     STATE_TREES,
     STATE,
-    TRANSACTION
+    TRANSACTION,
   };
 
   List<String> IDENTIFIERS_B64_LIST = new LinkedList<String>(Arrays.asList(IDENTIFIERS_B64));

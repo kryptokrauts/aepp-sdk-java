@@ -14,10 +14,10 @@ public interface AccountService {
    *
    * <p>using Base58 encoding, see {@link EncodingType}, {@link EncodingUtils}
    *
-   * @param the publicKey encoded
+   * @param base58PublicKey the encoded publicKey (ak_...)
    * @return the account wrapped in a single {@link AccountResult}
    */
-  AccountResult blockingGetAccount(Optional<String> publicKey);
+  AccountResult blockingGetAccount(Optional<String> base58PublicKey);
 
   /**
    * asynchronously get the account
@@ -25,7 +25,7 @@ public interface AccountService {
    * <p>import io.reactivex.Single; using Base58 encoding, see {@link EncodingType}, {@link
    * EncodingUtils}
    *
-   * @param the publicKey encoded
+   * @param base58PublicKey the encoded publicKey (ak_...)
    * @return asynchronous result handler (RxJava Single) for {@link AccountResult}
    */
   Single<AccountResult> asyncGetAccount(Optional<String> base58PublicKey);
@@ -36,7 +36,7 @@ public interface AccountService {
    * <p>import io.reactivex.Single; using Base58 encoding, see {@link EncodingType}, {@link
    * EncodingUtils}
    *
-   * @param the publicKey encoded
+   * @param base58PublicKey the encoded publicKey (ak_...)
    * @return next nonce
    */
   Single<BigInteger> asyncGetNextBaseKeypairNonce(Optional<String> base58PublicKey);
@@ -47,7 +47,7 @@ public interface AccountService {
    * <p>import io.reactivex.Single; using Base58 encoding, see {@link EncodingType}, {@link
    * EncodingUtils}
    *
-   * @param the publicKey encoded
+   * @param base58PublicKey the encoded publicKey (ak_...)
    * @return next nonce
    */
   BigInteger blockingGetNextBaseKeypairNonce(Optional<String> base58PublicKey);

@@ -2,6 +2,7 @@ package com.kryptokrauts.aeternity.sdk.service.transaction.type.impl;
 
 import com.kryptokrauts.aeternity.generated.api.rxjava.ExternalApi;
 import com.kryptokrauts.aeternity.generated.model.UnsignedTx;
+import com.kryptokrauts.aeternity.sdk.constants.ApiIdentifiers;
 import com.kryptokrauts.aeternity.sdk.constants.SerializationTags;
 import com.kryptokrauts.aeternity.sdk.service.transaction.fee.FeeCalculationModel;
 import com.kryptokrauts.aeternity.sdk.service.transaction.fee.impl.OracleFeeCalculationModel;
@@ -10,6 +11,7 @@ import com.kryptokrauts.aeternity.sdk.service.transaction.type.model.OracleQuery
 import com.kryptokrauts.aeternity.sdk.util.EncodingUtils;
 import io.reactivex.Single;
 import java.math.BigInteger;
+import java.util.Arrays;
 import lombok.NonNull;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
@@ -36,12 +38,12 @@ public class OracleQueryTransaction extends AbstractTransaction<OracleQueryTrans
               rlpWriter.writeInt(SerializationTags.VSN_1);
               byte[] senderIdWithTag =
                   EncodingUtils.decodeCheckAndTag(
-                      model.getSenderId(), SerializationTags.ID_TAG_ACCOUNT);
+                      model.getSenderId(), Arrays.asList(ApiIdentifiers.ACCOUNT_PUBKEY));
               rlpWriter.writeByteArray(senderIdWithTag);
               this.checkZeroAndWriteValue(rlpWriter, model.getNonce());
               byte[] oracleIdWithTag =
                   EncodingUtils.decodeCheckAndTag(
-                      model.getOracleId(), SerializationTags.ID_TAG_ORACLE);
+                      model.getOracleId(), Arrays.asList(ApiIdentifiers.ORACLE_PUBKEY));
               rlpWriter.writeByteArray(oracleIdWithTag);
               rlpWriter.writeByteArray(model.getQuery().getBytes());
               this.checkZeroAndWriteValue(rlpWriter, model.getQueryFee());

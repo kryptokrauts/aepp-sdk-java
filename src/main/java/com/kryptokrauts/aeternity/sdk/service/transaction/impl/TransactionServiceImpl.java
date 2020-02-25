@@ -1,11 +1,18 @@
 package com.kryptokrauts.aeternity.sdk.service.transaction.impl;
 
+import com.kryptokrauts.aeternity.generated.ApiException;
 import com.kryptokrauts.aeternity.generated.api.rxjava.ExternalApi;
+import com.kryptokrauts.aeternity.generated.model.GenericSignedTx;
 import com.kryptokrauts.aeternity.generated.model.Tx;
 import com.kryptokrauts.aeternity.sdk.constants.ApiIdentifiers;
 import com.kryptokrauts.aeternity.sdk.constants.SerializationTags;
+import com.kryptokrauts.aeternity.sdk.domain.StringResultWrapper;
+import com.kryptokrauts.aeternity.sdk.exception.AException;
 import com.kryptokrauts.aeternity.sdk.exception.TransactionCreateException;
+import com.kryptokrauts.aeternity.sdk.exception.TransactionWaitTimeoutExpiredException;
 import com.kryptokrauts.aeternity.sdk.service.aeternity.AeternityServiceConfiguration;
+import com.kryptokrauts.aeternity.sdk.service.info.InfoService;
+import com.kryptokrauts.aeternity.sdk.service.info.domain.TransactionResult;
 import com.kryptokrauts.aeternity.sdk.service.transaction.TransactionService;
 import com.kryptokrauts.aeternity.sdk.service.transaction.domain.DryRunRequest;
 import com.kryptokrauts.aeternity.sdk.service.transaction.domain.DryRunTransactionResults;
@@ -15,8 +22,11 @@ import com.kryptokrauts.aeternity.sdk.util.ByteUtils;
 import com.kryptokrauts.aeternity.sdk.util.EncodingUtils;
 import com.kryptokrauts.aeternity.sdk.util.SigningUtil;
 import com.kryptokrauts.sophia.compiler.generated.api.rxjava.DefaultApi;
+import io.reactivex.Flowable;
 import io.reactivex.Single;
+import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
+import java.util.concurrent.TimeUnit;
 import javax.annotation.Nonnull;
 import lombok.RequiredArgsConstructor;
 import org.apache.tuweni.bytes.Bytes;
@@ -35,19 +45,27 @@ public class TransactionServiceImpl implements TransactionService {
 
   @Nonnull private DefaultApi compilerApi;
 
+  @Nonnull private InfoService infoService;
+
   @Override
-  public Single<String> asyncCreateUnsignedTransaction(AbstractTransactionModel<?> tx) {
-    return tx.buildTransaction(externalApi, compilerApi)
-        .createUnsignedTransaction(config.isNativeMode(), config.getMinimalGasPrice())
-        .map(single -> single.getTx());
+  public Single<StringResultWrapper> asyncCreateUnsignedTransaction(
+      AbstractTransactionModel<?> tx) {
+    return StringResultWrapper.builder()
+        .build()
+        .asyncGet(
+            tx.buildTransaction(externalApi, compilerApi)
+                .createUnsignedTransaction(config.isNativeMode(), config.getMinimalGasPrice())
+                .map(single -> single.getTx()));
   }
 
   @Override
-  public String blockingCreateUnsignedTransaction(AbstractTransactionModel<?> tx) {
-    return tx.buildTransaction(externalApi, compilerApi)
-        .createUnsignedTransaction(config.isNativeMode(), config.getMinimalGasPrice())
-        .blockingGet()
-        .getTx();
+  public StringResultWrapper blockingCreateUnsignedTransaction(AbstractTransactionModel<?> tx) {
+    return StringResultWrapper.builder()
+        .build()
+        .blockingGet(
+            tx.buildTransaction(externalApi, compilerApi)
+                .createUnsignedTransaction(config.isNativeMode(), config.getMinimalGasPrice())
+                .map(result -> result.getTx()));
   }
 
   @Override
@@ -64,7 +82,8 @@ public class TransactionServiceImpl implements TransactionService {
             externalApi.rxPostTransaction(
                 createGeneratedTxObject(
                     signTransaction(
-                        asyncCreateUnsignedTransaction(tx).blockingGet(), privateKey))));
+                        asyncCreateUnsignedTransaction(tx).blockingGet().getResult(),
+                        privateKey))));
   }
 
   @Override
@@ -74,9 +93,14 @@ public class TransactionServiceImpl implements TransactionService {
 
   @Override
   public PostTransactionResult blockingPostTransaction(String signedTx) {
-    return PostTransactionResult.builder()
-        .build()
-        .blockingGet(externalApi.rxPostTransaction(createGeneratedTxObject(signedTx)));
+    PostTransactionResult postTransactionResult =
+        PostTransactionResult.builder()
+            .build()
+            .blockingGet(externalApi.rxPostTransaction(createGeneratedTxObject(signedTx)));
+    if (this.config.isWaitForTxIncludedInBlockEnabled()) {
+      return this.waitUntilTransactionIsIncludedInBlock(postTransactionResult);
+    }
+    return postTransactionResult;
   }
 
   @Override
@@ -89,13 +113,19 @@ public class TransactionServiceImpl implements TransactionService {
   @Override
   public PostTransactionResult blockingPostTransaction(
       AbstractTransactionModel<?> tx, String privateKey) throws TransactionCreateException {
-    return PostTransactionResult.builder()
-        .build()
-        .blockingGet(
-            externalApi.rxPostTransaction(
-                createGeneratedTxObject(
-                    signTransaction(
-                        asyncCreateUnsignedTransaction(tx).blockingGet(), privateKey))));
+    PostTransactionResult postTransactionResult =
+        PostTransactionResult.builder()
+            .build()
+            .blockingGet(
+                externalApi.rxPostTransaction(
+                    createGeneratedTxObject(
+                        signTransaction(
+                            asyncCreateUnsignedTransaction(tx).blockingGet().getResult(),
+                            privateKey))));
+    if (this.config.isWaitForTxIncludedInBlockEnabled()) {
+      return this.waitUntilTransactionIsIncludedInBlock(postTransactionResult);
+    }
+    return postTransactionResult;
   }
 
   @Override
@@ -104,7 +134,7 @@ public class TransactionServiceImpl implements TransactionService {
     byte[] signed =
         EncodingUtils.decodeCheckWithIdentifier(
             signTransaction(
-                asyncCreateUnsignedTransaction(tx).blockingGet(),
+                blockingCreateUnsignedTransaction(tx).getResult(),
                 this.config.getBaseKeyPair().getPrivateKey()));
     return EncodingUtils.hashEncode(signed, ApiIdentifiers.TRANSACTION_HASH);
   }
@@ -136,6 +166,66 @@ public class TransactionServiceImpl implements TransactionService {
     return DryRunTransactionResults.builder()
         .build()
         .blockingGet(this.externalApi.rxDryRunTxs(input.toGeneratedModel()));
+  }
+
+  @Override
+  public Single<TransactionResult> asyncWaitForConfirmation(final String txHash) {
+    return this.asyncWaitForConfirmation(txHash, this.config.getNumOfConfirmations());
+  }
+
+  @Override
+  public Single<TransactionResult> asyncWaitForConfirmation(
+      final String txHash, final int numOfConfirmations) {
+    final BigInteger[] heights = new BigInteger[2];
+    final boolean setConfirmationHeight[] = {true};
+    return infoService
+        .asyncGetCurrentKeyBlock()
+        .doOnSuccess(
+            keyBlockResult -> {
+              heights[0] = keyBlockResult.getHeight(); // currentHeight
+              if (setConfirmationHeight[0]) {
+                heights[1] =
+                    keyBlockResult
+                        .getHeight()
+                        .add(BigInteger.valueOf(numOfConfirmations)); // confirmationHeight
+                _logger.info(
+                    String.format(
+                        "waiting %s keyblocks beginning at height %s to wait for confirmation of tx: %s",
+                        numOfConfirmations, heights[0], txHash));
+                setConfirmationHeight[0] = false;
+              }
+              _logger.debug(
+                  String.format(
+                      "waiting for confirmation - current height: %s - confirmation height: %s - tx: %s",
+                      heights[0], heights[1], txHash));
+            })
+        .delay(config.getMillisBetweenTrailsToWaitForConfirmation(), TimeUnit.MILLISECONDS)
+        .repeatUntil(() -> heights[0].compareTo(heights[1]) >= 0)
+        .switchMap(
+            keyBlockResult -> {
+              // get transaction only if current height >= confirmationHeight
+              if (heights[0].compareTo(heights[1]) >= 0) {
+                return infoService
+                    .asyncGetTransactionByHash(txHash)
+                    .toFlowable()
+                    .onErrorReturn(
+                        throwable -> {
+                          if (throwable instanceof ApiException) {
+                            return TransactionResult.builder()
+                                .hash(txHash)
+                                .aeAPIErrorMessage(throwable.getMessage())
+                                .rootErrorMessage(((ApiException) throwable).getResponseBody())
+                                .build();
+                          }
+                          return TransactionResult.builder()
+                              .hash(txHash)
+                              .rootErrorMessage(throwable.getMessage())
+                              .build();
+                        });
+              }
+              return Flowable.empty();
+            })
+        .singleOrError();
   }
 
   /**
@@ -172,5 +262,48 @@ public class TransactionServiceImpl implements TransactionService {
     Tx tx = new Tx();
     tx.setTx(signedTx);
     return tx;
+  }
+
+  private PostTransactionResult waitUntilTransactionIsIncludedInBlock(
+      PostTransactionResult postTransactionResult) {
+    if (postTransactionResult != null) {
+      String transactionHash = postTransactionResult.getTxHash();
+      int currentBlockHeight = -1;
+      GenericSignedTx includedTransaction = null;
+      int elapsedTrials = 1;
+      while (currentBlockHeight == -1
+          && elapsedTrials < this.config.getNumTrialsToWaitForTxIncludedInBlock()) {
+        includedTransaction =
+            this.externalApi.rxGetTransactionByHash(transactionHash).blockingGet();
+        if (includedTransaction.getBlockHeight().intValue() > 1) {
+          _logger.debug("Transaction is included in a block - " + includedTransaction.toString());
+          currentBlockHeight = includedTransaction.getBlockHeight().intValue();
+        } else {
+          double timeSpan =
+              Double.valueOf(this.config.getMillisBetweenTrialsToWaitForTxIncludedInBlock()) / 1000;
+          _logger.info(
+              String.format(
+                  "Transaction not included in a block yet, checking again in %.3f seconds (trial %s of %s)",
+                  timeSpan, elapsedTrials, this.config.getNumTrialsToWaitForTxIncludedInBlock()));
+          try {
+            Thread.sleep(this.config.getMillisBetweenTrialsToWaitForTxIncludedInBlock());
+          } catch (InterruptedException e) {
+            throw new AException(
+                String.format(
+                    "Waiting for transaction %s to be included in a block was interrupted due to technical error",
+                    transactionHash),
+                e);
+          }
+          elapsedTrials++;
+        }
+      }
+      if (currentBlockHeight == -1) {
+        throw new TransactionWaitTimeoutExpiredException(
+            String.format(
+                "Transaction %s was not included in a block after %s trials, aborting",
+                transactionHash, elapsedTrials));
+      }
+    }
+    return postTransactionResult;
   }
 }

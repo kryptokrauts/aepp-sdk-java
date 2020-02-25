@@ -3,6 +3,7 @@ package com.kryptokrauts.aeternity.sdk.service.transaction.type.model;
 import com.kryptokrauts.aeternity.generated.api.rxjava.ExternalApi;
 import com.kryptokrauts.aeternity.generated.model.GenericTx;
 import com.kryptokrauts.aeternity.generated.model.NamePreclaimTx;
+import com.kryptokrauts.aeternity.sdk.annotations.Mandatory;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.AbstractTransaction;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.impl.NamePreclaimTransaction;
 import com.kryptokrauts.aeternity.sdk.util.EncodingUtils;
@@ -19,13 +20,13 @@ import lombok.experimental.SuperBuilder;
 @ToString
 public class NamePreclaimTransactionModel extends AbstractTransactionModel<NamePreclaimTx> {
 
-  private String accountId;
-  private String name; // will be used to generate the commitmentId
-  private BigInteger salt; // will be used to generate the commitmentId
+  @Mandatory private String accountId;
+  @Mandatory private String name; // will be used to generate the commitmentId
+  @Mandatory private BigInteger salt; // will be used to generate the commitmentId
 
-  private BigInteger nonce;
+  @Mandatory private BigInteger nonce;
 
-  private BigInteger ttl;
+  @Mandatory private BigInteger ttl;
 
   @Override
   public NamePreclaimTx toApiModel() {

@@ -13,6 +13,7 @@ import com.kryptokrauts.aeternity.sdk.domain.secret.impl.RawKeyPair;
 import com.kryptokrauts.aeternity.sdk.exception.EncodingNotSupportedException;
 import java.math.BigInteger;
 import java.util.Arrays;
+import java.util.List;
 import lombok.experimental.UtilityClass;
 import org.bitcoinj.core.AddressFormatException;
 import org.bitcoinj.core.Base58;
@@ -28,10 +29,11 @@ public final class EncodingUtils {
   /**
    * encode input with encoding determined from given identifier String
    *
-   * @param input
-   * @param identifier see @{@link ApiIdentifiers}
-   * @return
-   * @throws EncodingNotSupportedException
+   * @param input the input to encode
+   * @param identifier see {@link ApiIdentifiers}
+   * @return base58 or base64 encoded string
+   * @throws EncodingNotSupportedException if the encoding type cannot be determined for some reason
+   * @throws IllegalArgumentException if the identifier is unknown
    */
   public static final String encodeCheck(final byte[] input, String identifier)
       throws IllegalArgumentException, EncodingNotSupportedException {
@@ -55,13 +57,17 @@ public final class EncodingUtils {
   /**
    * encode input with given encodingType
    *
-   * @param input
-   * @param encodingType
-   * @return
-   * @throws EncodingNotSupportedException
+   * @param input the input to encode
+   * @param encodingType see {@link EncodingType}
+   * @return base58 or base64 encoded string
+   * @throws EncodingNotSupportedException if the encodingType is not supported
+   * @throws IllegalArgumentException if the encodingType is null
    */
   public static final String encodeCheck(final byte[] input, EncodingType encodingType)
       throws EncodingNotSupportedException {
+    if (encodingType == null) {
+      throw new IllegalArgumentException("encodingType mustn't be null");
+    }
     switch (encodingType) {
       case BASE58:
         return encodeBase58Check(input);
@@ -76,8 +82,9 @@ public final class EncodingUtils {
   /**
    * decode input which is combined of the identifier and the encoded string (e.g. ak_[encoded])
    *
-   * @param input
-   * @return
+   * @param input the encoded string to decode
+   * @return the decoded bytearray
+   * @throws IllegalArgumentException if the input has a wrong/unexpected format
    */
   public static final byte[] decodeCheckWithIdentifier(final String input)
       throws IllegalArgumentException {
@@ -93,10 +100,10 @@ public final class EncodingUtils {
   /**
    * decode input with encoding determined from given identifier String
    *
-   * @param input
+   * @param input the encoded string to decode
    * @param identifier see @{@link ApiIdentifiers}
-   * @return
-   * @throws EncodingNotSupportedException
+   * @return the decoded bytearray
+   * @throws EncodingNotSupportedException if the encoding type cannot be determined for some reason
    */
   private static final byte[] decodeCheck(final String input, String identifier)
       throws EncodingNotSupportedException {
@@ -116,13 +123,17 @@ public final class EncodingUtils {
   /**
    * decode input with given encodingType
    *
-   * @param input
-   * @param encodingType
-   * @return
-   * @throws EncodingNotSupportedException
+   * @param input the input to decode
+   * @param encodingType see {@link EncodingType}
+   * @return the decoded bytearray
+   * @throws EncodingNotSupportedException if the encodingType is not supported
+   * @throws IllegalArgumentException if the encodingType is null
    */
   public static final byte[] decodeCheck(final String input, EncodingType encodingType)
       throws EncodingNotSupportedException {
+    if (encodingType == null) {
+      throw new IllegalArgumentException("encodingType mustn't be null");
+    }
     switch (encodingType) {
       case BASE58:
         return decodeBase58Check(input);
@@ -135,14 +146,62 @@ public final class EncodingUtils {
   }
 
   /**
-   * @param input
-   * @param serializationTag see {@link SerializationTags}
-   * @return
+   * @param input the input to decode
+   * @param allowedIdentifiers the apiIdentifiers allowed (if null or empty all known identifiers
+   *     are allowed)
+   * @return the decoded bytearray
    */
-  public static final byte[] decodeCheckAndTag(final String input, final int serializationTag) {
-    byte[] tag = BigInteger.valueOf(serializationTag).toByteArray();
+  public static final byte[] decodeCheckAndTag(
+      final String input, final List<String> allowedIdentifiers) {
+    byte[] tag = determineSerializationTag(input, allowedIdentifiers);
     byte[] decoded = EncodingUtils.decodeCheckWithIdentifier(input);
     return ByteUtils.concatenate(tag, decoded);
+  }
+
+  /**
+   * @param input the input to decode
+   * @return the decoded bytearray
+   */
+  public static final byte[] decodeCheckAndTag(final String input) {
+    return decodeCheckAndTag(input, null);
+  }
+
+  private byte[] determineSerializationTag(
+      final String input, final List<String> allowedIdentifiers) {
+    String[] splitted = input.split("_");
+    if (splitted.length != 2) {
+      throw new IllegalArgumentException("input has wrong format");
+    }
+    String identifier = splitted[0];
+    if (allowedIdentifiers != null && !allowedIdentifiers.isEmpty()) {
+      if (!allowedIdentifiers.contains(identifier)) {
+        throw new IllegalArgumentException("illegal identifier: " + identifier);
+      }
+    }
+    int tag;
+    switch (identifier) {
+      case ApiIdentifiers.ACCOUNT_PUBKEY:
+        tag = SerializationTags.ID_TAG_ACCOUNT;
+        break;
+      case ApiIdentifiers.NAME:
+        tag = SerializationTags.ID_TAG_NAME;
+        break;
+      case ApiIdentifiers.COMMITMENT:
+        tag = SerializationTags.ID_TAG_COMMITMENT;
+        break;
+      case ApiIdentifiers.ORACLE_PUBKEY:
+        tag = SerializationTags.ID_TAG_ORACLE;
+        break;
+      case ApiIdentifiers.CONTRACT_PUBKEY:
+        tag = SerializationTags.ID_TAG_CONTRACT;
+        break;
+      case ApiIdentifiers.CHANNEL:
+        tag = SerializationTags.ID_TAG_CHANNEL;
+        break;
+      default:
+        throw new IllegalArgumentException("unknown identifier: " + identifier);
+    }
+    return BigInteger.valueOf(tag).toByteArray();
   }
 
   private static final String encodeBase58Check(final byte[] input) {
@@ -162,8 +221,6 @@ public final class EncodingUtils {
   }
 
   private static final byte[] decodeBase64Check(String base64encoded) {
-    // TODO logic copied from Base58.decodeChecked -> can this be reused
-    // here?
     byte[] decoded = Base64.decode(base64encoded);
     if (decoded.length < 4) throw new AddressFormatException("Input too short");
     byte[] data = Arrays.copyOfRange(decoded, 0, decoded.length - 4);
@@ -177,8 +234,9 @@ public final class EncodingUtils {
   /**
    * check if the given address has the correct length
    *
-   * @param address
-   * @return
+   * @param address base58 encoded aeternity address (ak_...)
+   * @return true if the address is valid <br>
+   *     false if the address is invalid
    */
   public static final boolean isAddressValid(final String address) {
     boolean isValid;
@@ -192,7 +250,7 @@ public final class EncodingUtils {
   }
 
   /**
-   * @param base58CheckAddress
+   * @param base58CheckAddress base58 encoded aeternity address (ak_...)
    * @return the readable public key as hex
    */
   public static final String addressToHex(final String base58CheckAddress) {

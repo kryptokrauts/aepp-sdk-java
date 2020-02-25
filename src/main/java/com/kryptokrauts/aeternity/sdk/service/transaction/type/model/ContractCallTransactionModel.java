@@ -3,6 +3,7 @@ package com.kryptokrauts.aeternity.sdk.service.transaction.type.model;
 import com.kryptokrauts.aeternity.generated.api.rxjava.ExternalApi;
 import com.kryptokrauts.aeternity.generated.model.ContractCallTx;
 import com.kryptokrauts.aeternity.generated.model.GenericTx;
+import com.kryptokrauts.aeternity.sdk.annotations.Mandatory;
 import com.kryptokrauts.aeternity.sdk.constants.VirtualMachine;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.AbstractTransaction;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.impl.ContractCallTransaction;
@@ -19,15 +20,15 @@ import lombok.experimental.SuperBuilder;
 @ToString
 public class ContractCallTransactionModel extends AbstractTransactionModel<ContractCallTx> {
 
-  @Default private BigInteger amount = BigInteger.ZERO;
-  private String callData;
-  private String callerId;
-  private String contractId;
-  private BigInteger gas;
-  private BigInteger gasPrice;
-  private BigInteger nonce;
-  private BigInteger ttl;
-  private VirtualMachine virtualMachine;
+  @Mandatory @Default private BigInteger amount = BigInteger.ZERO;
+  @Mandatory private String callData;
+  @Mandatory private String callerId;
+  @Mandatory private String contractId;
+  @Mandatory private BigInteger gas;
+  @Mandatory private BigInteger gasPrice;
+  @Mandatory private BigInteger nonce;
+  @Mandatory private BigInteger ttl;
+  @Mandatory private VirtualMachine virtualMachine;
 
   @Override
   public ContractCallTx toApiModel() {

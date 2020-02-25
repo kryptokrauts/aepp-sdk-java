@@ -3,12 +3,14 @@ package com.kryptokrauts.aeternity.generated.api;
 import com.kryptokrauts.aeternity.sdk.domain.secret.impl.BaseKeyPair;
 import com.kryptokrauts.aeternity.sdk.exception.TransactionCreateException;
 import com.kryptokrauts.aeternity.sdk.service.account.domain.AccountResult;
+import com.kryptokrauts.aeternity.sdk.service.info.domain.TransactionResult;
 import com.kryptokrauts.aeternity.sdk.service.transaction.domain.PostTransactionResult;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.model.SpendTransactionModel;
+import io.reactivex.Single;
+import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
 import java.math.BigInteger;
 import java.util.Optional;
-import org.bouncycastle.crypto.CryptoException;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
@@ -49,10 +51,14 @@ public class TransactionSpendApiTest extends BaseTest {
               aeternityServiceNative
                   .transactions
                   .asyncCreateUnsignedTransaction(spendTx)
-                  .blockingGet();
+                  .blockingGet()
+                  .getResult();
 
           String unsignedTxDebug =
-              aeternityServiceDebug.transactions.blockingCreateUnsignedTransaction(spendTx);
+              aeternityServiceDebug
+                  .transactions
+                  .blockingCreateUnsignedTransaction(spendTx)
+                  .getResult();
 
           context.assertEquals(unsignedTxDebug, unsignedTxNative);
         });
@@ -126,7 +132,8 @@ public class TransactionSpendApiTest extends BaseTest {
               aeternityServiceNative
                   .transactions
                   .asyncCreateUnsignedTransaction(spendTx)
-                  .blockingGet();
+                  .blockingGet()
+                  .getResult();
 
           String signedTxNative =
               aeternityServiceNative.transactions.signTransaction(
@@ -148,7 +155,7 @@ public class TransactionSpendApiTest extends BaseTest {
 
   @Test
   public void postSpendSelfSignTxTestWithModel(TestContext context)
-      throws CryptoException, TransactionCreateException {
+      throws TransactionCreateException {
     this.executeTest(
         context,
         t -> {
@@ -176,8 +183,7 @@ public class TransactionSpendApiTest extends BaseTest {
   }
 
   @Test
-  public void postSpendTxWithModelAndPK(TestContext context)
-      throws CryptoException, TransactionCreateException {
+  public void postSpendTxWithModelAndPK(TestContext context) throws TransactionCreateException {
     this.executeTest(
         context,
         t -> {
@@ -225,6 +231,99 @@ public class TransactionSpendApiTest extends BaseTest {
                 recipientAccountBalance
                     - recipientAccountSendAmount
                     - spendTx.getFee().longValue());
+          } catch (Throwable e) {
+            context.fail(e);
+          }
+        });
+  }
+
+  @Test
+  public void waitForConfirmationSucceedsTest(TestContext context)
+      throws TransactionCreateException {
+    this.executeTest(
+        context,
+        t -> {
+          try {
+            Async async = context.async();
+            BaseKeyPair recipient = keyPairService.generateBaseKeyPair();
+            SpendTransactionModel spendTx =
+                SpendTransactionModel.builder()
+                    .sender(this.baseKeyPair.getPublicKey())
+                    .recipient(recipient.getPublicKey())
+                    .amount(new BigInteger("1000000000000000000"))
+                    .payload("wait for confirmation works =)")
+                    .ttl(ZERO)
+                    .nonce(getNextBaseKeypairNonce())
+                    .build();
+            Single<PostTransactionResult> postTransactionResultSingle =
+                aeternityServiceNative.transactions.asyncPostTransaction(spendTx);
+            postTransactionResultSingle.subscribe(
+                postTransactionResult -> {
+                  _logger.info("SpendTx hash: " + postTransactionResult.getTxHash());
+                  Single<TransactionResult> transactionResultSingle =
+                      aeternityServiceNative.transactions.asyncWaitForConfirmation(
+                          postTransactionResult.getTxHash());
+                  transactionResultSingle.subscribe(
+                      transactionResult -> {
+                        _logger.info(transactionResult.toString());
+                        if (transactionResult.getRootErrorMessage() != null
+                            || transactionResult.getBlockHeight().intValue() == -1) {
+                          context.fail();
+                        }
+                        async.complete();
+                      },
+                      throwable -> {
+                        context.fail(throwable);
+                      });
+                },
+                throwable -> {
+                  context.fail(throwable);
+                });
+
+          } catch (Throwable e) {
+            context.fail(e);
+          }
+        });
+  }
+
+  @Test
+  public void waitForConfirmationFailsTest(TestContext context) throws TransactionCreateException {
+    this.executeTest(
+        context,
+        t -> {
+          try {
+            Async async = context.async();
+            BaseKeyPair recipient = keyPairService.generateBaseKeyPair();
+            SpendTransactionModel spendTx =
+                SpendTransactionModel.builder()
+                    .sender(this.baseKeyPair.getPublicKey())
+                    .recipient(recipient.getPublicKey())
+                    .amount(new BigInteger("1000000000000000000"))
+                    .payload("wait for confirmation fails :-(")
+                    .ttl(ZERO)
+                    .nonce(getNextBaseKeypairNonce())
+                    .build();
+            String computedTxHash = aeternityServiceNative.transactions.computeTxHash(spendTx);
+            _logger.info("Computed txHash: " + computedTxHash);
+            Single<TransactionResult> transactionResultSingle =
+                aeternityServiceNative.transactions.asyncWaitForConfirmation(computedTxHash);
+            transactionResultSingle.subscribe(
+                transactionResult -> {
+                  _logger.info(transactionResult.toString());
+                  if (transactionResult.getRootErrorMessage() != null
+                      || transactionResult.getAeAPIErrorMessage() != null
+                      || transactionResult.getBlockHeight().intValue() == -1) {
+                    // we expect the tx to be not existent in the network as it got never published
+                    _logger.info("root error: " + transactionResult.getRootErrorMessage());
+                    _logger.info("api error: " + transactionResult.getAeAPIErrorMessage());
+                    async.complete();
+                  } else {
+                    context.fail();
+                  }
+                },
+                throwable -> {
+                  context.fail(throwable);
+                });
           } catch (Throwable e) {
             context.fail(e);
           }

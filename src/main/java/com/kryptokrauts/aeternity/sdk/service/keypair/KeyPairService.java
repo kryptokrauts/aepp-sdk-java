@@ -22,13 +22,13 @@ public interface KeyPairService {
   RawKeyPair generateRawKeyPair();
 
   /**
-   * @param privateKey
+   * @param privateKey encoded privateKey
    * @return a base58 encoded keypair
    */
   BaseKeyPair generateBaseKeyPairFromSecret(String privateKey);
 
   /**
-   * @param privateKey
+   * @param privateKey private key (hex)
    * @return a raw keypair
    */
   RawKeyPair generateRawKeyPairFromSecret(String privateKey);
@@ -36,14 +36,14 @@ public interface KeyPairService {
   /**
    * encrypts the privateKey using the given password
    *
-   * @param password
-   * @param binaryKey
-   * @return
-   * @throws NoSuchPaddingException
-   * @throws IllegalBlockSizeException
-   * @throws BadPaddingException
-   * @throws NoSuchAlgorithmException
-   * @throws InvalidKeyException
+   * @param password the password to use to encrypt the binaryKey
+   * @param binaryKey binary privateKey
+   * @return byte array of the encrypted privateKey
+   * @throws NoSuchPaddingException {@link NoSuchPaddingException}
+   * @throws IllegalBlockSizeException {@link IllegalBlockSizeException}
+   * @throws BadPaddingException {@link BadPaddingException}
+   * @throws NoSuchAlgorithmException {@link NoSuchAlgorithmException}
+   * @throws InvalidKeyException {@link InvalidKeyException}
    */
   byte[] encryptPrivateKey(String password, byte[] binaryKey)
       throws NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException,
@@ -52,14 +52,14 @@ public interface KeyPairService {
   /**
    * encrypts the publicKey using the given password
    *
-   * @param password
-   * @param binaryKey
-   * @return
-   * @throws NoSuchPaddingException
-   * @throws IllegalBlockSizeException
-   * @throws BadPaddingException
-   * @throws NoSuchAlgorithmException
-   * @throws InvalidKeyException
+   * @param password the password to use to encrypt the binaryKey
+   * @param binaryKey binary publicKey
+   * @return byte array of the encrypted publicKey
+   * @throws NoSuchPaddingException {@link NoSuchPaddingException}
+   * @throws IllegalBlockSizeException {@link IllegalBlockSizeException}
+   * @throws BadPaddingException {@link BadPaddingException}
+   * @throws NoSuchAlgorithmException {@link NoSuchAlgorithmException}
+   * @throws InvalidKeyException {@link InvalidKeyException}
    */
   byte[] encryptPublicKey(String password, byte[] binaryKey)
       throws NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException,
@@ -68,15 +68,15 @@ public interface KeyPairService {
   /**
    * decrypts the privateKey using the given password
    *
-   * @param password
-   * @param encryptedBinaryKey
-   * @return
-   * @throws NoSuchPaddingException
-   * @throws UnsupportedEncodingException
-   * @throws IllegalBlockSizeException
-   * @throws BadPaddingException
-   * @throws NoSuchAlgorithmException
-   * @throws InvalidKeyException
+   * @param password the password to use to decrypt the privateKey
+   * @param encryptedBinaryKey byte array of the encrypted binary privateKey
+   * @return the decrypted binary privateKey
+   * @throws NoSuchPaddingException {@link NoSuchPaddingException}
+   * @throws UnsupportedEncodingException {@link UnsupportedEncodingException}
+   * @throws IllegalBlockSizeException {@link IllegalBlockSizeException}
+   * @throws BadPaddingException {@link BadPaddingException}
+   * @throws NoSuchAlgorithmException {@link NoSuchAlgorithmException}
+   * @throws InvalidKeyException {@link InvalidKeyException}
    */
   byte[] decryptPrivateKey(String password, byte[] encryptedBinaryKey)
       throws NoSuchPaddingException, UnsupportedEncodingException, IllegalBlockSizeException,
@@ -85,14 +85,14 @@ public interface KeyPairService {
   /**
    * decrypts the publicKey using the given password
    *
-   * @param password
-   * @param encryptedBinaryKey
-   * @return
-   * @throws NoSuchPaddingException
-   * @throws IllegalBlockSizeException
-   * @throws BadPaddingException
-   * @throws NoSuchAlgorithmException
-   * @throws InvalidKeyException
+   * @param password the password to use to decrypt the publicKey
+   * @param encryptedBinaryKey byte array of the encrypted binary publicKey
+   * @return the decrypted binary publicKey
+   * @throws NoSuchPaddingException {@link NoSuchPaddingException}
+   * @throws IllegalBlockSizeException {@link IllegalBlockSizeException}
+   * @throws BadPaddingException {@link BadPaddingException}
+   * @throws NoSuchAlgorithmException {@link NoSuchAlgorithmException}
+   * @throws InvalidKeyException {@link InvalidKeyException}
    */
   byte[] decryptPublicKey(String password, byte[] encryptedBinaryKey)
       throws NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException,
@@ -101,14 +101,14 @@ public interface KeyPairService {
   /**
    * encrypts the public and private key of the given rawKeyPair using the given password
    *
-   * @param keyPairRaw
-   * @param password
+   * @param keyPairRaw the {@link RawKeyPair}
+   * @param password the password to use to encrypt the raw KeyPair
    * @return a rawKeyPair object containing the encrypted byte arrays
-   * @throws IllegalBlockSizeException
-   * @throws InvalidKeyException
-   * @throws BadPaddingException
-   * @throws NoSuchAlgorithmException
-   * @throws NoSuchPaddingException
+   * @throws IllegalBlockSizeException {@link IllegalBlockSizeException}
+   * @throws InvalidKeyException {@link InvalidKeyException}
+   * @throws BadPaddingException {@link BadPaddingException}
+   * @throws NoSuchAlgorithmException {@link NoSuchAlgorithmException}
+   * @throws NoSuchPaddingException {@link NoSuchPaddingException}
    */
   RawKeyPair encryptRawKeyPair(RawKeyPair keyPairRaw, String password)
       throws IllegalBlockSizeException, InvalidKeyException, BadPaddingException,
@@ -122,17 +122,18 @@ public interface KeyPairService {
    * @param mnemonicSeedPassword password or null which is used to seed the list of mnemonics
    * @return keypair with private and public key as well as the generated list of mnemonic seed
    *     words
-   * @throws KeyPairGenerationException
+   * @throws AException in case of an error
    */
   MnemonicKeyPair generateMasterMnemonicKeyPair(String mnemonicSeedPassword) throws AException;
 
   /**
    * recover keypair from given mnemonic seed word list with given seed password
    *
-   * @param mnemonicSeedWords
-   * @param mnemonicSeedPassword
-   * @return
-   * @throws AException
+   * @param mnemonicSeedWords the words to recover the keypair(s)
+   * @param mnemonicSeedPassword the password that procects the keypair(s) generated with the seed
+   *     phrase
+   * @return instance of {@link MnemonicKeyPair}
+   * @throws AException in case of an error
    */
   MnemonicKeyPair recoverMasterMnemonicKeyPair(
       List<String> mnemonicSeedWords, String mnemonicSeedPassword) throws AException;
@@ -151,7 +152,7 @@ public interface KeyPairService {
    *     from the coin level, appended subsequently
    * @return a new mnemonic object containing the derived child key according to the hierarchical
    *     tree
-   * @throws AException
+   * @throws AException in case of an error
    */
   MnemonicKeyPair generateDerivedKey(
       MnemonicKeyPair mnemonicKeyPair, boolean hardened, ChildNumber... derivationPath)

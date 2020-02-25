@@ -2,12 +2,13 @@ package com.kryptokrauts.aeternity.sdk.service.transaction.type.impl;
 
 import com.kryptokrauts.aeternity.generated.api.rxjava.ExternalApi;
 import com.kryptokrauts.aeternity.generated.model.UnsignedTx;
-import com.kryptokrauts.aeternity.sdk.constants.AENS;
+import com.kryptokrauts.aeternity.sdk.constants.ApiIdentifiers;
 import com.kryptokrauts.aeternity.sdk.constants.SerializationTags;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.AbstractTransaction;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.model.NameUpdateTransactionModel;
 import com.kryptokrauts.aeternity.sdk.util.EncodingUtils;
 import io.reactivex.Single;
+import java.util.Arrays;
 import lombok.NonNull;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
@@ -34,11 +35,12 @@ public class NameUpdateTransaction extends AbstractTransaction<NameUpdateTransac
               rlpWriter.writeInt(SerializationTags.VSN_1);
               byte[] accountIdWithTag =
                   EncodingUtils.decodeCheckAndTag(
-                      model.getAccountId(), SerializationTags.ID_TAG_ACCOUNT);
+                      model.getAccountId(), Arrays.asList(ApiIdentifiers.ACCOUNT_PUBKEY));
               rlpWriter.writeByteArray(accountIdWithTag);
               this.checkZeroAndWriteValue(rlpWriter, model.getNonce());
               byte[] nameIdWithTag =
-                  EncodingUtils.decodeCheckAndTag(model.getNameId(), SerializationTags.ID_TAG_NAME);
+                  EncodingUtils.decodeCheckAndTag(
+                      model.getNameId(), Arrays.asList(ApiIdentifiers.NAME));
               rlpWriter.writeByteArray(nameIdWithTag);
               this.checkZeroAndWriteValue(rlpWriter, model.getNameTtl());
               rlpWriter.writeList(
@@ -50,7 +52,11 @@ public class NameUpdateTransaction extends AbstractTransaction<NameUpdateTransac
                           byte[] pointerWithTag =
                               EncodingUtils.decodeCheckAndTag(
                                   namePointer.getId(),
-                                  AENS.POINTER_SERIALIZATION_MAP.get(namePointer.getKey()));
+                                  Arrays.asList(
+                                      ApiIdentifiers.ACCOUNT_PUBKEY,
+                                      ApiIdentifiers.CONTRACT_PUBKEY,
+                                      ApiIdentifiers.CHANNEL,
+                                      ApiIdentifiers.ORACLE_PUBKEY));
                           innerWriter.writeByteArray(pointerWithTag);
                         });
                   });
