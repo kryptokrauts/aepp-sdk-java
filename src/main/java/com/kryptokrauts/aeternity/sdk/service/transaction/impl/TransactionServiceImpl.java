@@ -1,5 +1,6 @@
 package com.kryptokrauts.aeternity.sdk.service.transaction.impl;
 
+import com.kryptokrauts.aeternity.generated.ApiException;
 import com.kryptokrauts.aeternity.generated.api.rxjava.ExternalApi;
 import com.kryptokrauts.aeternity.generated.model.GenericSignedTx;
 import com.kryptokrauts.aeternity.generated.model.Tx;
@@ -10,6 +11,8 @@ import com.kryptokrauts.aeternity.sdk.exception.AException;
 import com.kryptokrauts.aeternity.sdk.exception.TransactionCreateException;
 import com.kryptokrauts.aeternity.sdk.exception.TransactionWaitTimeoutExpiredException;
 import com.kryptokrauts.aeternity.sdk.service.aeternity.AeternityServiceConfiguration;
+import com.kryptokrauts.aeternity.sdk.service.info.InfoService;
+import com.kryptokrauts.aeternity.sdk.service.info.domain.TransactionResult;
 import com.kryptokrauts.aeternity.sdk.service.transaction.TransactionService;
 import com.kryptokrauts.aeternity.sdk.service.transaction.domain.DryRunRequest;
 import com.kryptokrauts.aeternity.sdk.service.transaction.domain.DryRunTransactionResults;
@@ -19,8 +22,11 @@ import com.kryptokrauts.aeternity.sdk.util.ByteUtils;
 import com.kryptokrauts.aeternity.sdk.util.EncodingUtils;
 import com.kryptokrauts.aeternity.sdk.util.SigningUtil;
 import com.kryptokrauts.sophia.compiler.generated.api.rxjava.DefaultApi;
+import io.reactivex.Flowable;
 import io.reactivex.Single;
+import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
+import java.util.concurrent.TimeUnit;
 import javax.annotation.Nonnull;
 import lombok.RequiredArgsConstructor;
 import org.apache.tuweni.bytes.Bytes;
@@ -38,6 +44,8 @@ public class TransactionServiceImpl implements TransactionService {
   @Nonnull private ExternalApi externalApi;
 
   @Nonnull private DefaultApi compilerApi;
+
+  @Nonnull private InfoService infoService;
 
   @Override
   public Single<StringResultWrapper> asyncCreateUnsignedTransaction(
@@ -158,6 +166,66 @@ public class TransactionServiceImpl implements TransactionService {
     return DryRunTransactionResults.builder()
         .build()
         .blockingGet(this.externalApi.rxDryRunTxs(input.toGeneratedModel()));
+  }
+
+  @Override
+  public Single<TransactionResult> asyncWaitForConfirmation(final String txHash) {
+    return this.asyncWaitForConfirmation(txHash, this.config.getNumOfConfirmations());
+  }
+
+  @Override
+  public Single<TransactionResult> asyncWaitForConfirmation(
+      final String txHash, final int numOfConfirmations) {
+    final BigInteger[] heights = new BigInteger[2];
+    final boolean setConfirmationHeight[] = {true};
+    return infoService
+        .asyncGetCurrentKeyBlock()
+        .doOnSuccess(
+            keyBlockResult -> {
+              heights[0] = keyBlockResult.getHeight(); // currentHeight
+              if (setConfirmationHeight[0]) {
+                heights[1] =
+                    keyBlockResult
+                        .getHeight()
+                        .add(BigInteger.valueOf(numOfConfirmations)); // confirmationHeight
+                _logger.info(
+                    String.format(
+                        "waiting %s keyblocks beginning at height %s to wait for confirmation of tx: %s",
+                        numOfConfirmations, heights[0], txHash));
+                setConfirmationHeight[0] = false;
+              }
+              _logger.debug(
+                  String.format(
+                      "waiting for confirmation - current height: %s - confirmation height: %s - tx: %s",
+                      heights[0], heights[1], txHash));
+            })
+        .delay(config.getMillisBetweenTrailsToWaitForConfirmation(), TimeUnit.MILLISECONDS)
+        .repeatUntil(() -> heights[0].compareTo(heights[1]) >= 0)
+        .switchMap(
+            keyBlockResult -> {
+              // get transaction only if current height >= confirmationHeight
+              if (heights[0].compareTo(heights[1]) >= 0) {
+                return infoService
+                    .asyncGetTransactionByHash(txHash)
+                    .toFlowable()
+                    .onErrorReturn(
+                        throwable -> {
+                          if (throwable instanceof ApiException) {
+                            return TransactionResult.builder()
+                                .hash(txHash)
+                                .aeAPIErrorMessage(throwable.getMessage())
+                                .rootErrorMessage(((ApiException) throwable).getResponseBody())
+                                .build();
+                          }
+                          return TransactionResult.builder()
+                              .hash(txHash)
+                              .rootErrorMessage(throwable.getMessage())
+                              .build();
+                        });
+              }
+              return Flowable.empty();
+            })
+        .singleOrError();
   }
 
   /**

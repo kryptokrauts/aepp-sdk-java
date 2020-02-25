@@ -2,6 +2,7 @@ package com.kryptokrauts.aeternity.sdk.service.transaction;
 
 import com.kryptokrauts.aeternity.sdk.domain.StringResultWrapper;
 import com.kryptokrauts.aeternity.sdk.exception.TransactionCreateException;
+import com.kryptokrauts.aeternity.sdk.service.info.domain.TransactionResult;
 import com.kryptokrauts.aeternity.sdk.service.transaction.domain.DryRunRequest;
 import com.kryptokrauts.aeternity.sdk.service.transaction.domain.DryRunTransactionResults;
 import com.kryptokrauts.aeternity.sdk.service.transaction.domain.PostTransactionResult;
@@ -125,4 +126,34 @@ public interface TransactionService {
    * @return asynchronous result handler (RxJava Single) for {@link PostTransactionResult}
    */
   Single<PostTransactionResult> asyncPostTransaction(String signedTx);
+
+  /**
+   * asynchronously wait for a transaction to be confirmed
+   *
+   * <p>the number of keyblocks to consider the transaction confirmed is defined in the property
+   * numOfConfirmations of the {@link
+   * com.kryptokrauts.aeternity.sdk.service.aeternity.AeternityServiceConfiguration} (default 10)
+   *
+   * @param txHash the tx-hash of the transaction to be confirmed
+   * @return the actual {@link TransactionResult} of the transaction at the confirmation height
+   *     <p>Note:
+   *     <p>- check getRootErrorMessage(): if a rootErrorMessage is present the transaction is
+   *     probably not mined.
+   *     <p>- check getBlockHeight(): if the blockHeight is -1 it means the transaction isn't mined.
+   */
+  Single<TransactionResult> asyncWaitForConfirmation(String txHash);
+
+  /**
+   * asynchronously wait for a transaction to be confirmed
+   *
+   * @param txHash the tx-hash of the transaction to be confirmed
+   * @param numOfConfirmations the amount of keyblocks required to consider a transaction to be
+   *     confirmed/mined
+   * @return the actual {@link TransactionResult} of the transaction at the confirmation height
+   *     <p>Note:
+   *     <p>- check getRootErrorMessage(): if a rootErrorMessage is present the transaction is
+   *     probably not mined.
+   *     <p>- check getBlockHeight():if the blockHeight is -1 it means the transaction isn't mined.
+   */
+  Single<TransactionResult> asyncWaitForConfirmation(String txHash, int numOfConfirmations);
 }

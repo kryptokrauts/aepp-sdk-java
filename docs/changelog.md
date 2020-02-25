@@ -15,10 +15,18 @@ This release ships some fixes and enhancements.
     - `waitForTxIncludedInBlockEnabled` (default=true)
     - `numTrialsToWaitForTxIncludedInBlock` (default=60)
     - `millisBetweenTrialsToWaitForTxIncludedInBlock` (default=1000)
-  - there is an [open issue](../../../issues/107) that will cover the functionality to wait an amount of confirmations (keyblocks) to consider a transaction being mined
 - [#98](../../../issues/98) provide a (more) user-friendly way to handle unit conversions
   - we introduced a `UnitConversionService`-Interface with a `DefaultUnitConversionService`-Implementation that makes it a bit easier to handle conversions from `AE` to `aettos` or custom tokens that may have less decimals
 - [#99](../../../issues/99) prevent exceptions for TxModel classes
+- [#107](../../../issues/107) wait for confirmation of transaction
+  - now it is possible to wait for a transaction to be confirmed
+  - this is an asynchronous operation and can be configured through the following properties:
+    - `numOfConfirmations` (default=10)
+        - the number of confirmations (KeyBlocks) until a transaction is considered confirmed
+        - this value can also be explicitly set as method parameter
+    - `millisBetweenTrailsToWaitForConfirmation` (default=10000)
+- [#111](../../../issues/111) add "payloadDecoded" attribute to SpendTransactionModel
+  - now the payload for a SpendTx is automatically decoded
 
 ## [v2.1.0](https://github.com/kryptokrauts/aepp-sdk-java/releases/tag/v2.1.0)
 

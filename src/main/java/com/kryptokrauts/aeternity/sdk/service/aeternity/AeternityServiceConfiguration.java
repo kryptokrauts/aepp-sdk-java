@@ -22,4 +22,8 @@ public class AeternityServiceConfiguration extends ServiceConfiguration {
   @Default private int numTrialsToWaitForTxIncludedInBlock = 60;
 
   @Default private long millisBetweenTrialsToWaitForTxIncludedInBlock = 1000l;
+
+  @Default private int numOfConfirmations = 10;
+
+  @Default private long millisBetweenTrailsToWaitForConfirmation = 10000l;
 }

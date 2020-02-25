@@ -103,6 +103,7 @@ public abstract class BaseTest {
                     .baseKeyPair(baseKeyPair)
                     .vertx(vertx)
                     .targetVM(targetVM)
+                    .millisBetweenTrailsToWaitForConfirmation(500l)
                     .compile());
     aeternityServiceDebug =
         new AeternityServiceFactory()

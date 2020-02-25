@@ -26,7 +26,7 @@ public abstract class AbstractTransactionModel<GeneratedTxModel> {
    * this method needs to be implemented for testing purposes (non native mode) and returns the
    * generated tx model from the transaction fields
    *
-   * @return one of {@link com.kryptokrauts.aeternity.generated.model}
+   * @return one of {@link com.kryptokrauts.aeternity.sdk.service.transaction.type.model}
    */
   public abstract GeneratedTxModel toApiModel();
 
