@@ -5,6 +5,10 @@ import java.math.BigDecimal;
 /**
  * This class can be used to convert AE to and from different units. code adapted from
  * https://github.com/web3j/web3j/blob/master/utils/src/main/java/org/web3j/utils/Convert.java
+ *
+ * <p>we recommend to use the {@link
+ * com.kryptokrauts.aeternity.sdk.service.unit.UnitConversionService} - especially for converting
+ * units of FungibleTokens - instead
  */
 public final class UnitConversionUtil {
   private UnitConversionUtil() {}

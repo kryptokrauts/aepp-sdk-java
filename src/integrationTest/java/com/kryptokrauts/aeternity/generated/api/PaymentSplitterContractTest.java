@@ -76,6 +76,8 @@ public class PaymentSplitterContractTest extends BaseTest {
   private String generateMapParam(Map<String, Integer> recipientConditions) {
     Set<String> recipientConditionSet = new HashSet<>();
     recipientConditions.forEach((k, v) -> recipientConditionSet.add("[" + k + "] = " + v));
+    System.out.println(
+        "{" + recipientConditionSet.stream().collect(Collectors.joining(", ")) + "}");
     return "{" + recipientConditionSet.stream().collect(Collectors.joining(", ")) + "}";
   }
 
@@ -86,11 +88,18 @@ public class PaymentSplitterContractTest extends BaseTest {
         t -> {
           try {
             String byteCode =
-                this.aeternityServiceNative.compiler.blockingCompile(
-                    paymentSplitterSource, null, null);
+                this.aeternityServiceNative
+                    .compiler
+                    .blockingCompile(paymentSplitterSource, null, null)
+                    .getResult();
             String callData =
-                this.aeternityServiceNative.compiler.blockingEncodeCalldata(
-                    paymentSplitterSource, "init", Arrays.asList(generateMapParam(initialWeights)));
+                this.aeternityServiceNative
+                    .compiler
+                    .blockingEncodeCalldata(
+                        paymentSplitterSource,
+                        "init",
+                        Arrays.asList(generateMapParam(initialWeights)))
+                    .getResult();
 
             _logger.info("contract bytecode: " + byteCode);
             _logger.info("contract calldata: " + callData);
@@ -113,8 +122,10 @@ public class PaymentSplitterContractTest extends BaseTest {
                     .build();
 
             String unsignedTx =
-                aeternityServiceNative.transactions.blockingCreateUnsignedTransaction(
-                    contractCreate);
+                aeternityServiceNative
+                    .transactions
+                    .blockingCreateUnsignedTransaction(contractCreate)
+                    .getResult();
             _logger.info("Unsigned Tx - hash - dryRun: " + unsignedTx);
 
             DryRunTransactionResults dryRunResults =
@@ -167,7 +178,8 @@ public class PaymentSplitterContractTest extends BaseTest {
             BigInteger balanceRecipient1;
             BigInteger balanceRecipient2;
             BigInteger balanceRecipient3;
-            // if one of the accounts wasn't active we get an error and know that the
+            // if one of the accounts wasn't active we get an error and know
+            // that the
             // accounts don't have any balance
             balanceRecipient1 =
                 Optional.ofNullable(getAccount(initialReceiver1.getPublicKey()).getBalance())
@@ -181,8 +193,10 @@ public class PaymentSplitterContractTest extends BaseTest {
 
             BigDecimal paymentValue = UnitConversionUtil.toAettos("1", Unit.AE);
             String calldata =
-                aeternityServiceNative.compiler.blockingEncodeCalldata(
-                    paymentSplitterSource, "payAndSplit", null);
+                aeternityServiceNative
+                    .compiler
+                    .blockingEncodeCalldata(paymentSplitterSource, "payAndSplit", null)
+                    .getResult();
             _logger.info("Contract ID: " + localDeployedContractId);
 
             DryRunTransactionResults dryRunResults =
@@ -237,7 +251,8 @@ public class PaymentSplitterContractTest extends BaseTest {
                 aeternityServiceNative.transactions.computeTxHash(contractAfterDryRun));
             _logger.info("CreateContractTx hash: " + postTransactionResult.getTxHash());
 
-            // we wait until the tx is available and the payment should have been splitted
+            // we wait until the tx is available and the payment should have
+            // been splitted
             TransactionInfoResult txInfoObject =
                 waitForTxInfoObject(postTransactionResult.getTxHash());
             _logger.info(
@@ -277,8 +292,10 @@ public class PaymentSplitterContractTest extends BaseTest {
           try {
             BigDecimal paymentValue = UnitConversionUtil.toAettos("0", Unit.AE);
             String calldata =
-                aeternityServiceNative.compiler.blockingEncodeCalldata(
-                    paymentSplitterSource, "getTotalAmountSplitted", null);
+                aeternityServiceNative
+                    .compiler
+                    .blockingEncodeCalldata(paymentSplitterSource, "getTotalAmountSplitted", null)
+                    .getResult();
             _logger.info("Contract ID: " + localDeployedContractId);
 
             DryRunTransactionResults dryRunResults =
@@ -329,8 +346,10 @@ public class PaymentSplitterContractTest extends BaseTest {
           try {
             BigDecimal paymentValue = UnitConversionUtil.toAettos("0", Unit.AE);
             String calldata =
-                aeternityServiceNative.compiler.blockingEncodeCalldata(
-                    paymentSplitterSource, "getOwner", null);
+                aeternityServiceNative
+                    .compiler
+                    .blockingEncodeCalldata(paymentSplitterSource, "getOwner", null)
+                    .getResult();
             _logger.info("Contract ID: " + localDeployedContractId);
 
             DryRunTransactionResults dryRunResults =
@@ -397,6 +416,6 @@ public class PaymentSplitterContractTest extends BaseTest {
             .virtualMachine(targetVM)
             .build();
 
-    return aeternityServiceNative.transactions.blockingCreateUnsignedTransaction(model);
+    return aeternityServiceNative.transactions.blockingCreateUnsignedTransaction(model).getResult();
   }
 }

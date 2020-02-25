@@ -2,6 +2,7 @@ package com.kryptokrauts.aeternity.sdk.service.transaction.type.impl;
 
 import com.kryptokrauts.aeternity.generated.api.rxjava.ExternalApi;
 import com.kryptokrauts.aeternity.generated.model.UnsignedTx;
+import com.kryptokrauts.aeternity.sdk.constants.ApiIdentifiers;
 import com.kryptokrauts.aeternity.sdk.constants.SerializationTags;
 import com.kryptokrauts.aeternity.sdk.service.transaction.fee.FeeCalculationModel;
 import com.kryptokrauts.aeternity.sdk.service.transaction.fee.impl.ContractCallFeeCalculationModel;
@@ -9,6 +10,7 @@ import com.kryptokrauts.aeternity.sdk.service.transaction.type.AbstractTransacti
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.model.ContractCallTransactionModel;
 import com.kryptokrauts.aeternity.sdk.util.EncodingUtils;
 import io.reactivex.Single;
+import java.util.Arrays;
 import lombok.NonNull;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
@@ -30,12 +32,12 @@ public class ContractCallTransaction extends AbstractTransaction<ContractCallTra
               rlpWriter.writeInt(SerializationTags.VSN_1);
               byte[] callerWithTag =
                   EncodingUtils.decodeCheckAndTag(
-                      model.getCallerId(), SerializationTags.ID_TAG_ACCOUNT);
+                      model.getCallerId(), Arrays.asList(ApiIdentifiers.ACCOUNT_PUBKEY));
               rlpWriter.writeByteArray(callerWithTag);
               this.checkZeroAndWriteValue(rlpWriter, model.getNonce());
               byte[] contractWithTag =
                   EncodingUtils.decodeCheckAndTag(
-                      this.model.getContractId(), SerializationTags.ID_TAG_CONTRACT);
+                      this.model.getContractId(), Arrays.asList(ApiIdentifiers.CONTRACT_PUBKEY));
               rlpWriter.writeByteArray(contractWithTag);
               this.checkZeroAndWriteValue(rlpWriter, model.getVirtualMachine().getAbiVersion());
               this.checkZeroAndWriteValue(rlpWriter, model.getFee());

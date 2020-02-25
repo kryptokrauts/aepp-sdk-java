@@ -57,12 +57,13 @@ public class AeternityService {
         new com.kryptokrauts.aeternal.generated.api.rxjava.DefaultApi(
             new com.kryptokrauts.aeternal.generated.api.DefaultApiImpl(
                 config.getAeternalApiClient()));
-    this.transactions = new TransactionServiceImpl(this.config, this.externalApi, this.compilerApi);
     this.accounts = new AccountServiceImpl(this.config, this.externalApi);
     this.compiler = new SophiaCompilerServiceImpl(this.config, this.compilerApi);
     this.aeternal = new AeternalServiceImpl(this.aeternalApi);
     this.info = new InfoServiceImpl(this.config, this.externalApi);
     this.names = new NameServiceImpl(this.config, this.externalApi);
     this.oracles = new OracleServiceImpl(this.config, this.externalApi);
+    this.transactions =
+        new TransactionServiceImpl(this.config, this.externalApi, this.compilerApi, this.info);
   }
 }

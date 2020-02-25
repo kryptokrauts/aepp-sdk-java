@@ -1,6 +1,6 @@
 package com.kryptokrauts.aeternity.sdk.exception;
 
-public class AException extends Exception {
+public class AException extends RuntimeException {
 
   public AException() {}
 

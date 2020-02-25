@@ -68,8 +68,8 @@ public class DryRunRequest extends GenericInputObject<DryRunInput> {
   /**
    * Add transaction input item using custom model
    *
-   * @param inputModel
-   * @return
+   * @param inputModel instance of {@link DryRunInputItemModel}
+   * @return instance of {@link DryRunRequest}
    */
   public DryRunRequest transactionInputItem(DryRunInputItemModel inputModel) {
     this.txInputs.add(inputModel);
@@ -79,8 +79,8 @@ public class DryRunRequest extends GenericInputObject<DryRunInput> {
   /**
    * Add transaction input item using unsigned tx string
    *
-   * @param unsignedTx
-   * @return
+   * @param unsignedTx unsigned tx string
+   * @return instance of {@link DryRunRequest}
    */
   public DryRunRequest transactionInputItem(String unsignedTx) {
     this.txInputs.add(DryRunInputItemModel.builder().tx(unsignedTx).build());
@@ -90,8 +90,8 @@ public class DryRunRequest extends GenericInputObject<DryRunInput> {
   /**
    * Add transaction input item using contract call model
    *
-   * @param contractCallModel
-   * @return
+   * @param contractCallModel instance of {@link ContractCallTransactionModel}
+   * @return instance of {@link DryRunRequest}
    */
   public DryRunRequest transactionInputItem(ContractCallTransactionModel contractCallModel) {
     if (contractCallModel != null) {

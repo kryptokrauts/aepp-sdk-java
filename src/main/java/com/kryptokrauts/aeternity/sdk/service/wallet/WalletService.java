@@ -15,7 +15,7 @@ public interface WalletService {
    * @param walletName the name of the keystore wallet
    * @return encrypts the keypair using the given walletPassword an returns a JSON derived from
    *     {@link Keystore}
-   * @throws AException
+   * @throws AException if an error occurs
    */
   String generateKeystore(RawKeyPair rawKeyPair, String walletPassword, String walletName)
       throws AException;
@@ -25,13 +25,13 @@ public interface WalletService {
    *
    * @param json the keystore JSON derived from {@link Keystore}
    * @param walletPassword the symmetric password used to create the keystore
-   * @return
-   * @throws AException
+   * @return private key (binary)
+   * @throws AException if an error occurs
    */
   byte[] recoverPrivateKeyFromKeystore(String json, String walletPassword) throws AException;
 
   /**
-   * @param rawKeyPair
+   * @param rawKeyPair instance of {@link RawKeyPair}
    * @return base58 encoded human readable publicKey
    */
   String getPublicKey(RawKeyPair rawKeyPair);
@@ -39,9 +39,9 @@ public interface WalletService {
   /**
    * stores public key and mnemonic seed words (but not the password!) as JSON
    *
-   * @param mnemonicKeyPair
-   * @return the JSON keystore
-   * @throws AException
+   * @param mnemonicKeyPair instance of {@link MnemonicKeyPair}
+   * @return the JSON keystore as string
+   * @throws AException if an error occurs
    */
   String createHDKeystore(MnemonicKeyPair mnemonicKeyPair) throws AException;
 }

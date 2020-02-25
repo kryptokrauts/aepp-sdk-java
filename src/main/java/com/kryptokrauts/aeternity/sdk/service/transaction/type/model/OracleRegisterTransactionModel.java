@@ -4,6 +4,7 @@ import com.kryptokrauts.aeternity.generated.api.rxjava.ExternalApi;
 import com.kryptokrauts.aeternity.generated.model.GenericTx;
 import com.kryptokrauts.aeternity.generated.model.OracleRegisterTx;
 import com.kryptokrauts.aeternity.generated.model.TTL;
+import com.kryptokrauts.aeternity.sdk.annotations.Mandatory;
 import com.kryptokrauts.aeternity.sdk.service.oracle.domain.OracleTTLType;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.AbstractTransaction;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.impl.OracleRegisterTransaction;
@@ -19,15 +20,15 @@ import lombok.experimental.SuperBuilder;
 @ToString
 public class OracleRegisterTransactionModel extends AbstractTransactionModel<OracleRegisterTx> {
 
-  private String accountId;
-  private BigInteger abiVersion;
-  private BigInteger nonce;
-  private BigInteger oracleTtl;
-  private OracleTTLType oracleTtlType;
-  private BigInteger queryFee;
-  private String queryFormat;
-  private String responseFormat;
-  private BigInteger ttl;
+  @Mandatory private String accountId;
+  @Mandatory private BigInteger abiVersion;
+  @Mandatory private BigInteger nonce;
+  @Mandatory private BigInteger oracleTtl;
+  @Mandatory private OracleTTLType oracleTtlType;
+  @Mandatory private BigInteger queryFee;
+  @Mandatory private String queryFormat;
+  @Mandatory private String responseFormat;
+  @Mandatory private BigInteger ttl;
 
   @Override
   public OracleRegisterTx toApiModel() {

@@ -10,8 +10,8 @@ public class ByteUtils {
   /**
    * concatenate multiple bytearrays
    *
-   * @param bytes
-   * @return
+   * @param bytes multiple bytearrays to concatenate
+   * @return a single, concatenated bytearray
    */
   public static final byte[] concatenate(byte[]... bytes) {
     int size = 0;
@@ -28,9 +28,9 @@ public class ByteUtils {
   /**
    * add leading zeros to given byte array
    *
-   * @param length
-   * @param data
-   * @return
+   * @param length the length the bytearray should have
+   * @param data bytearray to add leading zeros to
+   * @return left-padded bytearray
    */
   public static final byte[] leftPad(final int length, final byte[] data) {
     int fill = length - data.length;
@@ -47,9 +47,9 @@ public class ByteUtils {
   /**
    * add trailing zeros to given byte array
    *
-   * @param length
-   * @param data
-   * @return
+   * @param length the length the bytearray should have
+   * @param data bytearray to add trailing zeros to
+   * @return right-padded bytearray
    */
   public static final byte[] rightPad(final int length, final byte[] data) {
     int fill = length - data.length;

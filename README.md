@@ -1,5 +1,13 @@
-# aepp-sdk-java
-A community developed Java SDK to interact with the æternity blockchain powered by [kryptokrauts.com](https://kryptokrauts.com)!
+<p align="center">
+  <a href="https://kryptokrauts.com">
+    <img alt="kryptokrauts" src="https://kryptokrauts.com/img/logo.svg" width="60" />
+  </a>
+</p>
+<h1 align="center">
+  kryptokrauts.com
+</h1>
+
+The **aepp-sdk-java** is a community developed Java SDK to interact with the æternity blockchain.
 
 ## Latest release
  [ ![Download](https://api.bintray.com/packages/kryptokrauts/maven/aepp-sdk-java/images/download.svg) ](https://bintray.com/kryptokrauts/maven/aepp-sdk-java/_latestVersion)
@@ -15,14 +23,6 @@ Licensed under the [ISC License](LICENSE)
 
 ## Support us
 
-If you like this project we would appreciate your support:
+If you like this project we would appreciate your support. You can find multiple ways to support us here:
 
-- [ak_5z1fmzTKR1GA1P7qiLDCC1s3V7AK2RRpNbXqUhfHQbUeg7mmV](https://explorer.aepps.com/#/account/ak_5z1fmzTKR1GA1P7qiLDCC1s3V7AK2RRpNbXqUhfHQbUeg7mmV)
-
-## Contributors
-
-Everybody is welcome to contribute to this project.
-
-Contributors so far:
-- [Marco Walz](https://github.com/marc0olo)
-- [Michel Meier](https://github.com/mitch-lbw)
+- https://kryptokrauts.com/support

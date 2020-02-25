@@ -1,5 +1,6 @@
 package com.kryptokrauts.aeternity.sdk.service.aeternal;
 
+import com.kryptokrauts.aeternity.sdk.domain.ObjectResultWrapper;
 import com.kryptokrauts.aeternity.sdk.service.aeternal.domain.ActiveNameAuctionsCountResult;
 import com.kryptokrauts.aeternity.sdk.service.aeternal.domain.ActiveNameAuctionsResult;
 import com.kryptokrauts.aeternity.sdk.service.aeternal.domain.ActiveNamesResult;
@@ -9,7 +10,7 @@ import java.util.Optional;
 
 public interface AeternalService {
 
-  Object blockingGetMdwStatus();
+  ObjectResultWrapper blockingGetMdwStatus();
 
   ActiveNameAuctionsCountResult blockingGetActiveNameAuctionsCount();
 

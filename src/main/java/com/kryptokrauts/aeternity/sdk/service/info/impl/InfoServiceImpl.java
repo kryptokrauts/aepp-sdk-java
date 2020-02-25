@@ -2,6 +2,7 @@ package com.kryptokrauts.aeternity.sdk.service.info.impl;
 
 import com.kryptokrauts.aeternity.generated.api.rxjava.ExternalApi;
 import com.kryptokrauts.aeternity.sdk.constants.ApiIdentifiers;
+import com.kryptokrauts.aeternity.sdk.domain.StringResultWrapper;
 import com.kryptokrauts.aeternity.sdk.service.aeternity.AeternityServiceConfiguration;
 import com.kryptokrauts.aeternity.sdk.service.info.InfoService;
 import com.kryptokrauts.aeternity.sdk.service.info.domain.KeyBlockResult;
@@ -69,15 +70,25 @@ public class InfoServiceImpl implements InfoService {
   }
 
   @Override
-  public String blockingGetContractByteCode(final String contractId) {
+  public StringResultWrapper blockingGetContractByteCode(final String contractId) {
     this.validateContractId(contractId);
-    return this.externalApi.rxGetContractCode(contractId).blockingGet().getBytecode();
+    return StringResultWrapper.builder()
+        .build()
+        .blockingGet(
+            this.externalApi
+                .rxGetContractCode(contractId)
+                .map(contactCode -> contactCode.getBytecode()));
   }
 
   @Override
-  public Single<String> asnycGetContractByteCode(final String contractId) {
+  public Single<StringResultWrapper> asnycGetContractByteCode(final String contractId) {
     this.validateContractId(contractId);
-    return this.externalApi.rxGetContractCode(contractId).map(e -> e.getBytecode());
+    return StringResultWrapper.builder()
+        .build()
+        .asyncGet(
+            this.externalApi
+                .rxGetContractCode(contractId)
+                .map(contactCode -> contactCode.getBytecode()));
   }
 
   private void validateMicroTxHash(final String microBlockHash) {
@@ -94,7 +105,7 @@ public class InfoServiceImpl implements InfoService {
         validate -> Optional.ofNullable(contractId.startsWith(ApiIdentifiers.CONTRACT_PUBKEY)),
         contractId,
         "getContract",
-        Arrays.asList("contractId", ApiIdentifiers.NAME),
+        Arrays.asList("contractId", ApiIdentifiers.CONTRACT_PUBKEY),
         ValidationUtil.MISSING_API_IDENTIFIER);
   }
 

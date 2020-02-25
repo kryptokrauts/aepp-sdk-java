@@ -8,7 +8,7 @@ import java.util.function.Function;
 
 public class ValidationUtil {
 
-  public static final int DOMAIN_NAME_MAX_LENGHT = 253;
+  public static final int NAME_MAX_LENGTH = 253;
 
   public static final String LIST_NOT_SAME_SIZE = "Lists don't have the same size";
 
@@ -22,7 +22,7 @@ public class ValidationUtil {
       "Parameter does not start with expected APIIdentifier.";
 
   public static final String NAMESPACE_EXCEEDS_LIMIT =
-      String.format("Domainname exceeds %s char limit.", DOMAIN_NAME_MAX_LENGHT);
+      String.format("Domainname exceeds %s char limit.", NAME_MAX_LENGTH);
 
   public static final List<String> ALLOWED_NAMESPACES = Arrays.asList("chain");
 
@@ -69,27 +69,26 @@ public class ValidationUtil {
   }
 
   /**
-   * validate the given domainName
+   * validate the given name
    *
-   * @param domainName
+   * @param name the AENS name to validate
    */
-  public static void checkNamespace(String domainName) {
-    String[] domainSplit = domainName.split("\\.");
+  public static void checkNamespace(String name) {
+    String[] nameSplit = name.split("\\.");
 
     checkParameters(
         validate ->
-            Optional.ofNullable(
-                domainSplit.length == 2 && ALLOWED_NAMESPACES.contains(domainSplit[1])),
-        domainName,
+            Optional.ofNullable(nameSplit.length == 2 && ALLOWED_NAMESPACES.contains(nameSplit[1])),
+        name,
         "checkNamespace",
-        Arrays.asList("domainName"),
+        Arrays.asList("name"),
         ValidationUtil.NAMESPACE_INVALID);
 
     checkParameters(
-        validate -> Optional.ofNullable(domainName.length() <= DOMAIN_NAME_MAX_LENGHT),
-        domainName,
+        validate -> Optional.ofNullable(name.length() <= NAME_MAX_LENGTH),
+        name,
         "checkNamespace",
-        Arrays.asList("domainName"),
+        Arrays.asList("name"),
         ValidationUtil.NAMESPACE_EXCEEDS_LIMIT);
   }
 }

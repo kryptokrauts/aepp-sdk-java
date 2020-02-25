@@ -5,6 +5,7 @@ import com.kryptokrauts.aeternity.generated.model.GenericTx;
 import com.kryptokrauts.aeternity.generated.model.OracleRespondTx;
 import com.kryptokrauts.aeternity.generated.model.RelativeTTL;
 import com.kryptokrauts.aeternity.generated.model.RelativeTTL.TypeEnum;
+import com.kryptokrauts.aeternity.sdk.annotations.Mandatory;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.AbstractTransaction;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.impl.OracleRespondTransaction;
 import com.kryptokrauts.sophia.compiler.generated.api.rxjava.DefaultApi;
@@ -19,12 +20,12 @@ import lombok.experimental.SuperBuilder;
 @ToString
 public class OracleRespondTransactionModel extends AbstractTransactionModel<OracleRespondTx> {
 
-  private String oracleId;
-  private String queryId;
-  private BigInteger nonce;
-  private String response;
-  private BigInteger responseTtl;
-  private BigInteger ttl;
+  @Mandatory private String oracleId;
+  @Mandatory private String queryId;
+  @Mandatory private BigInteger nonce;
+  @Mandatory private String response;
+  @Mandatory private BigInteger responseTtl;
+  @Mandatory private BigInteger ttl;
 
   @Override
   public OracleRespondTx toApiModel() {

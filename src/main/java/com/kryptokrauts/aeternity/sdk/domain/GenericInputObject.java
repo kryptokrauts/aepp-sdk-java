@@ -12,8 +12,8 @@ import lombok.ToString;
 public abstract class GenericInputObject<T> {
 
   /**
-   * maps the wrapped model to generated API model and validates the input before it is passed to
-   * the function call
+   * validates and maps the wrapped model to generated API model and validates the input before it
+   * is passed to the function call
    *
    * @return the mapped generated API model class
    */
@@ -25,7 +25,7 @@ public abstract class GenericInputObject<T> {
   /**
    * map to API model method implemented by the specific input model class
    *
-   * @return
+   * @return the API input model
    */
   protected abstract T mapToModel();
 

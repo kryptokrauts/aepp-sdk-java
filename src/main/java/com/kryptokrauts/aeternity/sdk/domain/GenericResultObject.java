@@ -1,5 +1,7 @@
 package com.kryptokrauts.aeternity.sdk.domain;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.kryptokrauts.aeternity.generated.ApiException;
 import io.reactivex.Single;
 import lombok.Getter;
@@ -30,8 +32,9 @@ public abstract class GenericResultObject<T, V extends GenericResultObject<?, ?>
   /**
    * execute a blocking call and return mapped result
    *
-   * @param generatedResultObjectSingle
-   * @return
+   * @param generatedResultObjectSingle the {@link Single} of a result object of a generated api
+   *     model class
+   * @return the mapped result object
    */
   public V blockingGet(Single<T> generatedResultObjectSingle) {
     try {
@@ -44,8 +47,9 @@ public abstract class GenericResultObject<T, V extends GenericResultObject<?, ?>
   /**
    * execute an async call and return a mapped single
    *
-   * @param generatedResultObjectSingle
-   * @return
+   * @param generatedResultObjectSingle the {@link Single} of a result object of a generated api
+   *     model class
+   * @return a {@link Single} of the mapped result object
    */
   public Single<V> asyncGet(Single<T> generatedResultObjectSingle) {
     return generatedResultObjectSingle.map(
@@ -62,10 +66,20 @@ public abstract class GenericResultObject<T, V extends GenericResultObject<?, ?>
     V result = this.map(null);
     result.rootErrorMessage = determineRootErrorMessage(e);
     result.aeAPIErrorMessage = e.getMessage();
+    String prettyErrorMessage = result.getRootErrorMessage();
+    try {
+      ObjectMapper mapper = new ObjectMapper();
+      mapper.enable(SerializationFeature.INDENT_OUTPUT);
+      prettyErrorMessage =
+          mapper
+              .writerWithDefaultPrettyPrinter()
+              .writeValueAsString(mapper.readValue(result.getRootErrorMessage(), Object.class));
+    } catch (Exception e1) {
+    }
     _logger.warn(
         String.format(
-            "Error mapping GenericResultObject to class %s\ncause: %s\nroot cause: %s",
-            getResultObjectClassName(), result.aeAPIErrorMessage, result.rootErrorMessage));
+            "Error mapping GenericResultObject to class %s\ncause: %s\nroot cause:\n%s",
+            getResultObjectClassName(), result.aeAPIErrorMessage, prettyErrorMessage));
     if (_logger.isDebugEnabled()) {
       result.throwable = e;
     }
@@ -76,6 +90,16 @@ public abstract class GenericResultObject<T, V extends GenericResultObject<?, ?>
     if (e != null) {
       if (e instanceof ApiException) {
         ApiException ex = (ApiException) e;
+        return ex.getResponseBody();
+      }
+      if (e instanceof com.kryptokrauts.sophia.compiler.generated.ApiException) {
+        com.kryptokrauts.sophia.compiler.generated.ApiException ex =
+            (com.kryptokrauts.sophia.compiler.generated.ApiException) e;
+        return ex.getResponseBody();
+      }
+      if (e instanceof com.kryptokrauts.aeternal.generated.ApiException) {
+        com.kryptokrauts.aeternal.generated.ApiException ex =
+            (com.kryptokrauts.aeternal.generated.ApiException) e;
         return ex.getResponseBody();
       } else return determineRootErrorMessage(e.getCause());
     }

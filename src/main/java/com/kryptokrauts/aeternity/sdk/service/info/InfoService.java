@@ -1,5 +1,6 @@
 package com.kryptokrauts.aeternity.sdk.service.info;
 
+import com.kryptokrauts.aeternity.sdk.domain.StringResultWrapper;
 import com.kryptokrauts.aeternity.sdk.service.info.domain.KeyBlockResult;
 import com.kryptokrauts.aeternity.sdk.service.info.domain.TransactionInfoResult;
 import com.kryptokrauts.aeternity.sdk.service.info.domain.TransactionResult;
@@ -11,7 +12,7 @@ public interface InfoService {
   /**
    * asynchronously get the transaction object for given tx hash
    *
-   * @param txHash
+   * @param txHash the hash of a specific transaction
    * @return asynchronous result handler (RxJava Single) for {@link TransactionResult}
    */
   Single<TransactionResult> asyncGetTransactionByHash(String txHash);
@@ -19,7 +20,7 @@ public interface InfoService {
   /**
    * synchronously get the transaction object for given tx hash
    *
-   * @param txHash
+   * @param txHash the hash of a specific transaction
    * @return result of {@link TransactionResult}
    */
   TransactionResult blockingGetTransactionByHash(String txHash);
@@ -27,7 +28,7 @@ public interface InfoService {
   /**
    * asynchronously gets the information object for given tx hash
    *
-   * @param txHash
+   * @param txHash the hash of a specific transaction
    * @return asynchronous result handler (RxJava Single) for {@link TransactionInfoResult}
    */
   Single<TransactionInfoResult> asyncGetTransactionInfoByHash(String txHash);
@@ -35,7 +36,7 @@ public interface InfoService {
   /**
    * synchronously gets the information object for given tx hash
    *
-   * @param txHash
+   * @param txHash the hash of a specific transaction
    * @return result of {@link TransactionResult}
    */
   TransactionInfoResult blockingGetTransactionInfoByHash(String txHash);
@@ -43,7 +44,7 @@ public interface InfoService {
   /**
    * asynchronously get transaction object for given microblock tx hash
    *
-   * @param microBlockHash
+   * @param microBlockHash the hash of a specific MicroBlock
    * @return asynchronous result handler (RxJava Single) for {@link TransactionResults}
    */
   Single<TransactionResults> asyncGetMicroBlockTransactions(String microBlockHash);
@@ -51,7 +52,7 @@ public interface InfoService {
   /**
    * synchronously get transaction object for given microblock tx hash
    *
-   * @param microBlockHash
+   * @param microBlockHash the hash of a specific MicroBlock
    * @return result for {@link TransactionResults}
    */
   TransactionResults blockingGetMicroBlockTransactions(String microBlockHash);
@@ -73,16 +74,16 @@ public interface InfoService {
   /**
    * asynchronously retrieve the contracts byteCode
    *
-   * @param contractId
-   * @return
+   * @param contractId the id of a specific contract
+   * @return instance of {@link StringResultWrapper}
    */
-  Single<String> asnycGetContractByteCode(String contractId);
+  Single<StringResultWrapper> asnycGetContractByteCode(String contractId);
 
   /**
    * synchronously retrieve the contracts byteCode
    *
-   * @param contractId
-   * @return
+   * @param contractId the id of a specific contract
+   * @return instance of {@link StringResultWrapper}
    */
-  String blockingGetContractByteCode(String contractId);
+  StringResultWrapper blockingGetContractByteCode(String contractId);
 }
