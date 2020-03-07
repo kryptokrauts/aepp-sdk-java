@@ -15,6 +15,7 @@ import com.kryptokrauts.sophia.compiler.generated.model.SophiaJsonData;
 import io.netty.util.internal.StringUtil;
 import io.reactivex.Single;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -28,28 +29,30 @@ public final class SophiaCompilerServiceImpl implements CompilerService {
 
   @Override
   public Single<StringResultWrapper> asyncEncodeCalldata(
-      String sourceCode, String function, List<String> arguments) {
+      String sourceCode, String function, List<String> arguments, Map<String, String> fileSystem) {
     return StringResultWrapper.builder()
         .build()
         .asyncGet(
             this.compilerApi
-                .rxEncodeCalldata(buildFunctionCallInput(sourceCode, function, arguments))
+                .rxEncodeCalldata(
+                    buildFunctionCallInput(sourceCode, function, arguments, fileSystem))
                 .map(calldata -> calldata.getCalldata()));
   }
 
   @Override
   public StringResultWrapper blockingEncodeCalldata(
-      String sourceCode, String function, List<String> arguments) {
+      String sourceCode, String function, List<String> arguments, Map<String, String> fileSystem) {
     return StringResultWrapper.builder()
         .build()
         .blockingGet(
             this.compilerApi
-                .rxEncodeCalldata(buildFunctionCallInput(sourceCode, function, arguments))
+                .rxEncodeCalldata(
+                    buildFunctionCallInput(sourceCode, function, arguments, fileSystem))
                 .map(calldata -> calldata.getCalldata()));
   }
 
   private FunctionCallInput buildFunctionCallInput(
-      String sourceCode, String function, List<String> arguments) {
+      String sourceCode, String function, List<String> arguments, Map<String, String> fileSystem) {
     FunctionCallInput body = new FunctionCallInput();
     body.source(sourceCode);
     body.function(function);
@@ -58,7 +61,8 @@ public final class SophiaCompilerServiceImpl implements CompilerService {
         body.addArgumentsItem(argument);
       }
     }
-    body.options(new CompileOpts().backend(config.getTargetVM().getBackendEnum()));
+    body.options(
+        new CompileOpts().fileSystem(fileSystem).backend(config.getTargetVM().getBackendEnum()));
     return body;
   }
 
@@ -88,23 +92,33 @@ public final class SophiaCompilerServiceImpl implements CompilerService {
 
   @Override
   public Single<ObjectResultWrapper> asyncDecodeCallResult(
-      String source, String function, String callResult, String callValue) {
+      String source,
+      String function,
+      String callResult,
+      String callValue,
+      Map<String, String> fileSystem) {
     return ObjectResultWrapper.builder()
         .build()
         .asyncGet(
             this.compilerApi
-                .rxDecodeCallResult(buildDecodeBody(source, function, callResult, callValue))
+                .rxDecodeCallResult(
+                    buildDecodeBody(source, function, callResult, callValue, fileSystem))
                 .map(decodeResult -> Optional.ofNullable(decodeResult).orElse("")));
   }
 
   @Override
   public ObjectResultWrapper blockingDecodeCallResult(
-      String source, String function, String callResult, String callValue) {
+      String source,
+      String function,
+      String callResult,
+      String callValue,
+      Map<String, String> fileSystem) {
     return ObjectResultWrapper.builder()
         .build()
         .blockingGet(
             this.compilerApi
-                .rxDecodeCallResult(buildDecodeBody(source, function, callResult, callValue))
+                .rxDecodeCallResult(
+                    buildDecodeBody(source, function, callResult, callValue, fileSystem))
                 .map(decodeResult -> Optional.ofNullable(decodeResult).orElse("")));
   }
 
@@ -116,7 +130,11 @@ public final class SophiaCompilerServiceImpl implements CompilerService {
   }
 
   private SophiaCallResultInput buildDecodeBody(
-      String source, String function, String callResult, String callValue) {
+      String source,
+      String function,
+      String callResult,
+      String callValue,
+      Map<String, String> fileSystem) {
     SophiaCallResultInput body = new SophiaCallResultInput();
     body.setSource(source);
     body.setFunction(function);
@@ -124,6 +142,7 @@ public final class SophiaCompilerServiceImpl implements CompilerService {
     body.setCallValue(callValue);
     CompileOpts compileOpts = new CompileOpts();
     compileOpts.setBackend(config.getTargetVM().getBackendEnum());
+    compileOpts.setFileSystem(fileSystem);
     body.setOptions(compileOpts);
     return body;
   }
