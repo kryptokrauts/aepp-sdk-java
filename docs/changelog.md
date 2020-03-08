@@ -1,5 +1,13 @@
 # Changelog
 
+## [v2.2.1](https://github.com/kryptokrauts/aepp-sdk-java/releases/tag/v2.2.1)
+
+This release ships an enhancement.
+
+### Enhancements
+- [#116](../../../issues/116) support includes for compiling, deploying and calling contracts
+  - we identified this was missing when developing the [contraect-maven-plugin](https://github.com/kryptokrauts/contraect-maven-plugin)
+
 ## [v2.2.0](https://github.com/kryptokrauts/aepp-sdk-java/releases/tag/v2.2.0)
 
 This release ships some fixes and enhancements.
