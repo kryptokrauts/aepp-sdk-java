@@ -15,11 +15,40 @@ public interface CompilerService {
    * @param contractCode the sourcecode of the contract
    * @param function the name of the function to call
    * @param arguments the params that should be passed to the function
+   * @return asynchronous result handler (RxJava Single) for encoded calldata * @deprecated use
+   *     {@link asyncEncodeCalldata(String contractCode, String function, List<String> arguments,
+   *     Map<String, String> fileSystem)} instead. this method will be removed in future releases
+   */
+  @Deprecated
+  Single<StringResultWrapper> asyncEncodeCalldata(
+      String contractCode, String function, List<String> arguments);
+
+  /**
+   * asynchronously gets the encoded calldata for this contractCode
+   *
+   * @param contractCode the sourcecode of the contract
+   * @param function the name of the function to call
+   * @param arguments the params that should be passed to the function
    * @param fileSystem map with libraryName and code which is passed to the compiler
    * @return asynchronous result handler (RxJava Single) for encoded calldata
    */
   Single<StringResultWrapper> asyncEncodeCalldata(
       String contractCode, String function, List<String> arguments, Map<String, String> fileSystem);
+
+  /**
+   * synchronously gets the encoded calldata for this contractCode
+   *
+   * @param contractCode the sourcecode of the contract
+   * @param function the name of the function to call
+   * @param arguments the params that should be passed to the function
+   * @return encoded calldata
+   * @deprecated use {@link blockingEncodeCalldata(String contractCode, String function,
+   *     List<String> arguments, Map<String, String> fileSystem)} instead. this method will be
+   *     removed in future releases
+   */
+  @Deprecated
+  StringResultWrapper blockingEncodeCalldata(
+      String contractCode, String function, List<String> arguments);
 
   /**
    * synchronously gets the encoded calldata for this contractCode
@@ -79,6 +108,23 @@ public interface CompilerService {
    * @param callResult the received resultType (ok | error | revert)
    * @param callValue the received value
    * @return the decoded sophia call result
+   * @deprecated use {@link asyncDecodeCallResult(String source, String function, String callResult,
+   *     String callValue, Map<String, String> fileSystem)} instead. this method will be removed in
+   *     future releases
+   */
+  @Deprecated
+  Single<ObjectResultWrapper> asyncDecodeCallResult(
+      String source, String function, String callResult, String callValue);
+
+  /**
+   * asynchronously decodes callresult of contract-calls
+   *
+   * @param source the contract source
+   * @param function the called function
+   * @param callResult the received resultType (ok | error | revert)
+   * @param callValue the received value
+   * @param fileSystem map with libraryName and code which is passed to the compiler
+   * @return the decoded sophia call result
    */
   Single<ObjectResultWrapper> asyncDecodeCallResult(
       String source,
@@ -94,6 +140,23 @@ public interface CompilerService {
    * @param function the called function
    * @param callResult the received resultType (ok | error | revert)
    * @param callValue the received value
+   * @return the decoded sophia call result
+   * @deprecated use {@link blockingDecodeCallResult(String source, String function, String
+   *     callResult, String callValue, Map<String, String> fileSystem)} instead. this method will be
+   *     removed in future releases
+   */
+  @Deprecated
+  ObjectResultWrapper blockingDecodeCallResult(
+      String source, String function, String callResult, String callValue);
+
+  /**
+   * synchronously decodes callresult of contract-calls
+   *
+   * @param source the contract source
+   * @param function the called function
+   * @param callResult the received resultType (ok | error | revert)
+   * @param callValue the received value
+   * @param fileSystem map with libraryName and code which is passed to the compiler
    * @return the decoded sophia call result
    */
   ObjectResultWrapper blockingDecodeCallResult(
