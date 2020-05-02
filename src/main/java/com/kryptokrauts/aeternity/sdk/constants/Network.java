@@ -5,9 +5,7 @@ package com.kryptokrauts.aeternity.sdk.constants;
  * https://github.com/aeternity/protocol/blob/master/consensus/consensus.md#transaction-signature
  */
 public enum Network {
-  DEVNET("ae_devnet"),
-  TESTNET("ae_uat"),
-  MAINNET("ae_mainnet");
+  DEVNET("ae_devnet"), TESTNET("ae_uat"), MAINNET("ae_mainnet");
 
   private String id;
 
@@ -17,5 +15,10 @@ public enum Network {
 
   public String getId() {
     return id;
+  }
+
+  public Network withId(String networkId) {
+    this.id = networkId;
+    return this;
   }
 }
