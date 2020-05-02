@@ -12,7 +12,7 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum VirtualMachine {
   AEVM(BigInteger.ONE, BigInteger.valueOf(6), CompileOpts.BackendEnum.AEVM), FATE(
-      BigInteger.valueOf(3), BigInteger.valueOf(5), CompileOpts.BackendEnum.FATE);
+      BigInteger.valueOf(3), BigInteger.valueOf(7), CompileOpts.BackendEnum.FATE);
 
   @Getter
   private BigInteger abiVersion;
