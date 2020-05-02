@@ -1,7 +1,7 @@
 package com.kryptokrauts.aeternity.sdk.constants;
 
-import java.math.BigInteger;
 import com.kryptokrauts.sophia.compiler.generated.model.CompileOpts;
+import java.math.BigInteger;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -11,15 +11,12 @@ import lombok.Getter;
  */
 @AllArgsConstructor
 public enum VirtualMachine {
-  AEVM(BigInteger.ONE, BigInteger.valueOf(6), CompileOpts.BackendEnum.AEVM), FATE(
-      BigInteger.valueOf(3), BigInteger.valueOf(7), CompileOpts.BackendEnum.FATE);
+  AEVM(BigInteger.ONE, BigInteger.valueOf(6), CompileOpts.BackendEnum.AEVM),
+  FATE(BigInteger.valueOf(3), BigInteger.valueOf(7), CompileOpts.BackendEnum.FATE);
 
-  @Getter
-  private BigInteger abiVersion;
-  @Getter
-  private BigInteger vmVersion;
-  @Getter
-  private CompileOpts.BackendEnum backendEnum;
+  @Getter private BigInteger abiVersion;
+  @Getter private BigInteger vmVersion;
+  @Getter private CompileOpts.BackendEnum backendEnum;
 
   public static VirtualMachine getVirtualMachine(BigInteger abiVersion) {
     if (AEVM.getAbiVersion().equals(abiVersion)) {
