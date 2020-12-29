@@ -23,7 +23,6 @@ chain:
     "2": 2
     "3": 4
     "4": 6
-    "5": 8
 
 mining:
   autostart: true

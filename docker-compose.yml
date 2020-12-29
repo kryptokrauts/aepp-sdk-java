@@ -19,7 +19,7 @@ services:
       - ${PWD}/docker/accounts_test.json:/home/aeternity/node/data/aecore/.genesis/accounts_test.json
 
   compiler:
-    image: marc0olo/aesophia_http:${SOPHIA_COMPILER_TAG}
+    image: aeternity/aesophia_http:${SOPHIA_COMPILER_TAG}
     ports:
       - "3080:3080"
 
