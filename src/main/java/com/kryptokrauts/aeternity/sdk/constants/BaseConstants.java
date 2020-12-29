@@ -20,7 +20,7 @@ public interface BaseConstants {
   // average time between key-blocks in minutes
   long KEY_BLOCK_INTERVAL = 3;
 
-  String AETERNITY_MESSAGE_PREFIX = "æternity Signed Message:\n";
+  String AETERNITY_MESSAGE_PREFIX = "aeternity Signed Message:\n";
 
   int MAX_MESSAGE_LENGTH = 0xFD;
 

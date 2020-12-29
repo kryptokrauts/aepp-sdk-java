@@ -29,7 +29,7 @@ public class SigningUtil {
 
   public static final byte[] signMessage(final String message, final String privateKey)
       throws CryptoException {
-    return sign(messageToBinary(message), privateKey);
+    return sign(EncodingUtils.hash(messageToBinary(message)), privateKey);
   }
 
   public static final boolean verify(
@@ -48,7 +48,7 @@ public class SigningUtil {
 
   public static final boolean verifyMessage(
       final String message, final byte[] signature, final String publicKey) {
-    return verify(messageToBinary(message), signature, publicKey);
+    return verify(EncodingUtils.hash(messageToBinary(message)), signature, publicKey);
   }
 
   private static final byte[] messageToBinary(final String message) {
