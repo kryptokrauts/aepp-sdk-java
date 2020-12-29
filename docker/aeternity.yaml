@@ -16,14 +16,6 @@ keys:
   peer_password: "top secret"
   dir: ./keys
 
-#chain:
-#  persist: true
-#  hard_forks:
-#    "1": 0
-#    "2": 2
-#    "3": 4
-#    "4": 6
-
 mining:
   autostart: true
   beneficiary: "ak_twR4h7dEcUtc2iSEDv8kB7UFJJDGiEDQCXr85C3fYF8FdVdyo"

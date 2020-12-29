@@ -58,7 +58,10 @@ public abstract class BaseTest {
 
   private static final String INDAEX_BASE_URL = "INDAEX_BASE_URL";
 
-  protected static final VirtualMachine targetVM = VirtualMachine.FATE;
+  protected static final VirtualMachine targetVM =
+      VirtualMachine.FATE
+          .withVmVersion(BigInteger.valueOf(7))
+          .withAbiVersion(BigInteger.valueOf(3));
 
   protected KeyPairService keyPairService;
 
@@ -98,7 +101,7 @@ public abstract class BaseTest {
                     .baseUrl(getAeternityBaseUrl())
                     .compilerBaseUrl(getCompilerBaseUrl())
                     .indaexBaseUrl(getIndaexBaseUrl())
-                    .network(Network.LOCAL_IRIS_NETWORK)
+                    .network(Network.DEVNET.withId("local_iris_testnet"))
                     .nativeMode(true)
                     .baseKeyPair(baseKeyPair)
                     .vertx(vertx)
@@ -112,7 +115,7 @@ public abstract class BaseTest {
                     .baseUrl(getAeternityBaseUrl())
                     .compilerBaseUrl(getCompilerBaseUrl())
                     .indaexBaseUrl(getIndaexBaseUrl())
-                    .network(Network.LOCAL_IRIS_NETWORK)
+                    .network(Network.DEVNET.withId("local_iris_testnet"))
                     .nativeMode(false)
                     .baseKeyPair(baseKeyPair)
                     .vertx(vertx)
