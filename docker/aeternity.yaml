@@ -16,13 +16,13 @@ keys:
   peer_password: "top secret"
   dir: ./keys
 
-chain:
-  persist: true
-  hard_forks:
-    "1": 0
-    "2": 2
-    "3": 4
-    "4": 6
+#chain:
+#  persist: true
+#  hard_forks:
+#    "1": 0
+#    "2": 2
+#    "3": 4
+#    "4": 6
 
 mining:
   autostart: true
@@ -36,7 +36,7 @@ mining:
       edge_bits: 15
 
 fork_management:
-  network_id: ae_devnet
+  network_id: local_iris_testnet
 
 logging:
   level: debug

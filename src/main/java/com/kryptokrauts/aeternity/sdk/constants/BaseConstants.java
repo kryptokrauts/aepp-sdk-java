@@ -33,6 +33,6 @@ public interface BaseConstants {
   // the default testnet compiler url
   String DEFAULT_TESTNET_COMPILER_URL = "https://compiler.aepps.com";
 
-  // the default testnet compiler url
-  String DEFAULT_TESTNET_AETERNAL_URL = "https://testnet.aeternal.io";
+  // the default testnet indaex url
+  String DEFAULT_TESTNET_INDAEX_URL = "https://testnet.aeternal.io/mdw";
 }

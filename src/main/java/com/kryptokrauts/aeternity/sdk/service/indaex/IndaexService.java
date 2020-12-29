@@ -1,4 +1,3 @@
-package com.kryptokrauts.aeternity.sdk.service.aeternal;
+package com.kryptokrauts.aeternity.sdk.service.indaex;
 
-public interface IndaexService {
-}
+public interface IndaexService {}

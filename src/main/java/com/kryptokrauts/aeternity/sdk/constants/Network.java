@@ -5,6 +5,7 @@ package com.kryptokrauts.aeternity.sdk.constants;
  * https://github.com/aeternity/protocol/blob/master/consensus/consensus.md#transaction-signature
  */
 public enum Network {
+  LOCAL_IRIS_NETWORK("local_iris_testnet"),
   DEVNET("ae_devnet"),
   TESTNET("ae_uat"),
   MAINNET("ae_mainnet");

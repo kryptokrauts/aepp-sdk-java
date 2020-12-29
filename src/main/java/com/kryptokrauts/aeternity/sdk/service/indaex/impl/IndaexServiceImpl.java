@@ -1,12 +1,12 @@
-package com.kryptokrauts.aeternity.sdk.service.aeternal.impl;
+package com.kryptokrauts.aeternity.sdk.service.indaex.impl;
 
-import com.kryptokrauts.aeternal.generated.api.rxjava.DefaultApi;
-import com.kryptokrauts.aeternity.sdk.service.aeternal.IndaexService;
+import com.kryptokrauts.aeternity.sdk.service.indaex.IndaexService;
+import com.kryptokrauts.indaex.generated.api.rxjava.MiddlewareApi;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 public class IndaexServiceImpl implements IndaexService {
 
-  @NonNull private DefaultApi indaexApi;
+  @NonNull private MiddlewareApi indaexApi;
 }

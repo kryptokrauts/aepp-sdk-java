@@ -1,4 +1,4 @@
-package com.kryptokrauts.aeternity.sdk.service.aeternal.domain;
+package com.kryptokrauts.aeternity.sdk.service.indaex.domain;
 
 public enum NameSortBy {
   NAME("name"),

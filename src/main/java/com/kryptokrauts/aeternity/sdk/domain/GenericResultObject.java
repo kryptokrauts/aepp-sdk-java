@@ -97,9 +97,9 @@ public abstract class GenericResultObject<T, V extends GenericResultObject<?, ?>
             (com.kryptokrauts.sophia.compiler.generated.ApiException) e;
         return ex.getResponseBody();
       }
-      if (e instanceof com.kryptokrauts.aeternal.generated.ApiException) {
-        com.kryptokrauts.aeternal.generated.ApiException ex =
-            (com.kryptokrauts.aeternal.generated.ApiException) e;
+      if (e instanceof com.kryptokrauts.indaex.generated.ApiException) {
+        com.kryptokrauts.indaex.generated.ApiException ex =
+            (com.kryptokrauts.indaex.generated.ApiException) e;
         return ex.getResponseBody();
       } else return determineRootErrorMessage(e.getCause());
     }
