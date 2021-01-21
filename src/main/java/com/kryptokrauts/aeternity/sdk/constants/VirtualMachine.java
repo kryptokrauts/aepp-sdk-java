@@ -24,4 +24,14 @@ public enum VirtualMachine {
     }
     return FATE;
   }
+
+  public VirtualMachine withVmVersion(BigInteger vmVersion) {
+    this.vmVersion = vmVersion;
+    return this;
+  }
+
+  public VirtualMachine withAbiVersion(BigInteger abiVersion) {
+    this.abiVersion = abiVersion;
+    return this;
+  }
 }
