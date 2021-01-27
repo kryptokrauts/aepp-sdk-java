@@ -49,6 +49,7 @@ paths:
       description: 'Get the top block (either key or micro block)'
       produces:
         - application/json
+      parameters: []
       responses:
         '200':
           description: 'Successful operation'
@@ -67,6 +68,7 @@ paths:
       description: 'Get the current key block'
       produces:
         - application/json
+      parameters: []
       responses:
         '200':
           description: 'Successful operation'
@@ -85,6 +87,7 @@ paths:
       description: 'Get the hash of the current key block'
       produces:
         - application/json
+      parameters: []
       responses:
         '200':
           description: 'Successful operation'
@@ -106,6 +109,7 @@ paths:
       description: 'Get the height of the current key block'
       produces:
         - application/json
+      parameters: []
       responses:
         '200':
           description: 'Successful operation'
@@ -127,6 +131,7 @@ paths:
       description: 'Get the pending key block'
       produces:
         - application/json
+      parameters: []
       responses:
         '200':
           description: 'Successful operation'
@@ -180,7 +185,14 @@ paths:
       produces:
         - application/json
       parameters:
-        - $ref: '#/parameters/HeightIn'
+        - in: path
+          name: height
+          description: 'The height'
+          required: true
+          # UInt64
+          type: integer
+          minimum: 0
+          maximum: 18446744073709551615
       responses:
         '200':
           description: 'Successful operation'
@@ -355,6 +367,7 @@ paths:
       description: 'Get the current generation'
       produces:
         - application/json
+      parameters: []
       responses:
         '200':
           description: 'Successful operation'
@@ -404,7 +417,14 @@ paths:
       produces:
         - application/json
       parameters:
-        - $ref: '#/parameters/HeightIn'
+        - in: path
+          name: height
+          description: 'The height'
+          required: true
+          # UInt64
+          type: integer
+          minimum: 0
+          maximum: 18446744073709551615
       responses:
         '200':
           description: 'Successful operation'
@@ -461,7 +481,14 @@ paths:
           # Encoded account pubkey 'ak_...'
           # pattern: "^ak_[1-9A-HJ-NP-Za-km-z]*$"
           type: string
-        - $ref: '#/parameters/HeightIn'
+        - in: path
+          name: height
+          description: 'The height'
+          required: true
+          # UInt64
+          type: integer
+          minimum: 0
+          maximum: 18446744073709551615
       responses:
         '200':
           description: 'Successful operation'
@@ -686,34 +713,6 @@ paths:
           description: 'Contract not found'
           schema:
             $ref: '#/definitions/Error'
-  /contracts/{pubkey}/store:
-    get:
-      tags:
-        - external
-        - contract
-      operationId: GetContractStore
-      description: 'Get contract store by pubkey'
-      produces:
-        - application/json
-      parameters:
-        - in: path
-          name: pubkey
-          description: 'The pubkey of the contract'
-          required: true
-          # Encoded contract pubkey 'ct_...'
-          # pattern: "^ct_[1-9A-HJ-NP-Za-km-z]*$"
-          type: string
-      responses:
-        '200':
-          description: 'Contract Store'
-          schema:
-            $ref: '#/definitions/ContractStore'
-        '400':
-          description: 'Invalid pubkey'
-          schema:
-            $ref: '#/definitions/Error'
-        '404':
-          description: 'Contract not found'
   /contracts/{pubkey}/poi:
     get:
       tags:
@@ -928,6 +927,7 @@ paths:
       description: 'Get peer public key'
       produces:
         - application/json
+      parameters: []
       responses:
         '200':
           description: 'Successful operation'
@@ -942,6 +942,7 @@ paths:
       description: 'Get the status of a node'
       produces:
         - application/json
+      parameters: []
       responses:
         '200':
           description: 'Successful operation'
@@ -1546,6 +1547,7 @@ paths:
       description: 'Get pending transactions'
       produces:
         - application/json
+      parameters: []
       responses:
         '200':
           description: 'Successful operation'
@@ -1568,7 +1570,13 @@ paths:
           description: 'Name'
           required: true
           type: string
-        - $ref: '#/parameters/SaltIn'
+        - in: query
+          name: salt
+          description: 'Salt'
+          required: true
+          # UInt
+          type: integer
+          minimum: 0
       responses:
         '200':
           description: 'Successful operation'
@@ -1609,6 +1617,7 @@ paths:
       description: 'Get node''s public key'
       produces:
         - application/json
+      parameters: []
       responses:
         '200':
           description: 'Successful operation'
@@ -1629,6 +1638,7 @@ paths:
       description: 'Get node Peers'
       produces:
         - application/json
+      parameters: []
       responses:
         '200':
           description: successful operation
@@ -1645,7 +1655,7 @@ paths:
         - internal
         - debug
       operationId: 'DryRunTxs'
-      description: 'Dry-run transactions on top of a given block. Supports SpendTx, ContractCreateTx and ContractCallTx'
+      description: 'Dry-run transactions on top of a given block. Supports all TXs except GAMetaTx, PayingForTx and OffchainTx'
       consumes:
         - application/json
       produces:
@@ -1677,7 +1687,14 @@ paths:
       produces:
         - application/json
       parameters:
-        - $ref: '#/parameters/HeightIn'
+        - in: path
+          name: height
+          description: 'The height'
+          required: true
+          # UInt64
+          type: integer
+          minimum: 0
+          maximum: 18446744073709551615
       responses:
         '200':
           description: Total token supply at height divided in categories
@@ -1688,28 +1705,6 @@ paths:
           schema:
             $ref: '#/definitions/Error'
 
-##
-## Parameters
-##
-
-parameters:
-  HeightIn:
-    in: path
-    name: height
-    description: 'The height'
-    required: true
-    # UInt64
-    type: integer
-    minimum: 0
-    maximum: 18446744073709551615
-  SaltIn:
-    in: query
-    name: salt
-    description: 'Salt'
-    required: true
-    # UInt
-    type: integer
-    minimum: 0
 
 ##
 ## Definitions
@@ -2138,6 +2133,8 @@ definitions:
     properties:
       id:
         $ref: '#/definitions/EncodedValue'
+      owner:
+        $ref: '#/definitions/EncodedPubkey'
       ttl:
         $ref: '#/definitions/UInt64'
       pointers:
@@ -2640,6 +2637,8 @@ definitions:
         type: string
       peer_count:
         $ref: '#/definitions/UInt32'
+      peer_connections:
+        $ref: '#/definitions/PeerConnections'
       pending_transactions_count:
         $ref: '#/definitions/UInt32'
       network_id:
@@ -2660,6 +2659,7 @@ definitions:
       - node_version
       - node_revision
       - peer_count
+      - peer_connections
       - pending_transactions_count
       - network_id
       - peer_pubkey
@@ -2669,12 +2669,26 @@ definitions:
     type: object
     properties:
       version:
+        description: 'Protocol version (can include protocol activated by miner signalling)'
         $ref: '#/definitions/UInt32'
       effective_at_height:
+        description: 'Height at which protocol becomes active'
         $ref: '#/definitions/UInt64'
     required:
       - version
       - effective_at_height
+  PeerConnections:
+    type: object
+    properties:
+      inbound:
+        description: 'Number of inbound peer connections'
+        $ref: '#/definitions/UInt32'
+      outbound:
+        description: 'Number of outbound peer connections'
+        $ref: '#/definitions/UInt32'
+    required:
+      - inbound
+      - outbound
   GenericSignedTx:
     type: object
     properties:
@@ -2828,20 +2842,6 @@ definitions:
       - active
       - referrer_ids
       - deposit
-  ContractStore:
-    type: object
-    properties:
-      store:
-        type: array
-        items:
-          type: object
-          properties:
-            key:
-              type: string
-            value:
-              $ref: '#/definitions/EncodedByteArray'
-    required:
-      - store
   ByteCode:
     type: object
     properties:
@@ -2864,6 +2864,10 @@ definitions:
         description: Txs
         items:
           $ref: '#/definitions/DryRunInputItem'
+      tx_events:
+        type: boolean
+        default: false
+        description: 'Collect and return on-chain tx events that would result from the call'
     required:
       - txs
   DryRunInputItem:
@@ -2898,6 +2902,8 @@ definitions:
   DryRunCallContext:
     type: object
     properties:
+      tx:
+        $ref: '#/definitions/EncodedByteArray'
       tx_hash:
         $ref: '#/definitions/EncodedHash'
       stateful:
@@ -2921,6 +2927,11 @@ definitions:
         description: results
         items:
           $ref: '#/definitions/DryRunResult'
+      tx_events:
+        type: array
+        description: 'on-chain tx events'
+        items:
+          $ref: '#/definitions/TxEvent'
     required:
       - results
   DryRunResult:
@@ -2937,6 +2948,8 @@ definitions:
     required:
       - type
       - result
+  TxEvent:
+    type: object
   Peer:
     type: string
     description: 'Aeternity node'

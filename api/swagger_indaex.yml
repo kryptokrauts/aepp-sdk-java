@@ -1,21 +1,14 @@
-swagger: "2.0"
+swagger: '2.0'
 info:
   description: API for [Aeternity Middleware](https://github.com/aeternity/ae_mdw)
-  version: "1.0"
+  version: '1.0'
   title: Aeternity Middleware
-basePath: /
-schemes:
-  - http
-consumes:
-  - application/json
-produces:
-  - application/json
 paths:
   /block/{hash}:
     get:
       tags:
         - Middleware
-      summary: ""
+      summary: ''
       description: Get block information by given key/micro block hash.
       operationId: get_block_by_hash
       produces:
@@ -28,10 +21,10 @@ paths:
           type: string
           x-example: kh_uoTGwc4HPzEW9qmiQR1zmVVdHmzU6YmnVvdFe6HvybJJRj7V6
       responses:
-        "200":
+        '200':
           description: Returns block information by given key/micro block hash.
           schema: {}
-        "400":
+        '400':
           description: Bad request.
           schema: {}
       deprecated: false
@@ -39,7 +32,7 @@ paths:
     get:
       tags:
         - Middleware
-      summary: ""
+      summary: ''
       description: Get key block information by given key block index(height).
       operationId: get_block_by_kbi
       produces:
@@ -52,10 +45,10 @@ paths:
           type: integer
           x-example: 305000
       responses:
-        "200":
+        '200':
           description: Returns key block information by given key block index(height).
           schema: {}
-        "400":
+        '400':
           description: Bad request.
           schema: {}
       deprecated: false
@@ -63,7 +56,7 @@ paths:
     get:
       tags:
         - Middleware
-      summary: ""
+      summary: ''
       description: Get micro block information by given key block index(height) and micro block index.
       operationId: get_block_by_kbi_and_mbi
       produces:
@@ -82,10 +75,10 @@ paths:
           type: integer
           x-example: 4
       responses:
-        "200":
+        '200':
           description: Returns micro block information by given key block index(height) and micro block index.
           schema: {}
-        "400":
+        '400':
           description: Bad request.
           schema: {}
       deprecated: false
@@ -93,7 +86,7 @@ paths:
     get:
       tags:
         - Middleware
-      summary: ""
+      summary: ''
       description: Get multiple generations.
       operationId: get_blocks
       produces:
@@ -116,10 +109,10 @@ paths:
           format: int32
           x-example: 1
       responses:
-        "200":
+        '200':
           description: Returns multiple generations.
           schema: {}
-        "400":
+        '400':
           description: Bad request.
           schema: {}
       deprecated: false
@@ -127,7 +120,7 @@ paths:
     get:
       tags:
         - Middleware
-      summary: ""
+      summary: ''
       description: Get information for given name or encoded hash.
       operationId: get_name_by_id
       produces:
@@ -140,10 +133,34 @@ paths:
           type: string
           x-example: wwwbeaconoidcom.chain
       responses:
-        "200":
+        '200':
           description: Returns information for given name.
           schema: {}
-        "400":
+        '400':
+          description: Bad request.
+          schema: {}
+      deprecated: false
+  /name/auction/{id}:
+    get:
+      tags:
+        - Middleware
+      summary: ''
+      operationId: get_name_auction_by_id
+      produces:
+        - application/json
+      parameters:
+        - name: id
+          in: path
+          description: The name or encoded hash.
+          required: true
+          type: string
+          x-example: wwwbeaconoidcom.chain
+      responses:
+        '200':
+          description: Returns information for given name.
+          schema:
+            $ref: '#/definitions/NameAuction'
+        '400':
           description: Bad request.
           schema: {}
       deprecated: false
@@ -151,7 +168,7 @@ paths:
     get:
       tags:
         - Middleware
-      summary: ""
+      summary: ''
       description: Get all active and inactive names, except those in auction.
       operationId: get_all_names
       produces:
@@ -194,10 +211,10 @@ paths:
           format: int32
           x-example: 10
       responses:
-        "200":
+        '200':
           description: Returns information for active and inactive names.
           schema: {}
-        "400":
+        '400':
           description: Bad request.
           schema: {}
       deprecated: false
@@ -205,7 +222,7 @@ paths:
     get:
       tags:
         - Middleware
-      summary: ""
+      summary: ''
       description: Get active names.
       operationId: get_active_names
       produces:
@@ -248,10 +265,10 @@ paths:
           format: int32
           x-example: 10
       responses:
-        "200":
+        '200':
           description: Returns information for active names.
           schema: {}
-        "400":
+        '400':
           description: Bad request.
           schema: {}
       deprecated: false
@@ -259,7 +276,7 @@ paths:
     get:
       tags:
         - Middleware
-      summary: ""
+      summary: ''
       description: Get all auctions.
       operationId: get_all_auctions
       produces:
@@ -302,10 +319,11 @@ paths:
           format: int32
           x-example: 10
       responses:
-        "200":
+        '200':
           description: Returns information for all auctions.
-          schema: {}
-        "400":
+          schema:
+            $ref: '#/definitions/NameAuctions'
+        '400':
           description: Bad request.
           schema: {}
       deprecated: false
@@ -313,7 +331,7 @@ paths:
     get:
       tags:
         - Middleware
-      summary: ""
+      summary: ''
       description: Get names pointing to a particular pubkey.
       operationId: get_pointees_by_id
       produces:
@@ -326,10 +344,10 @@ paths:
           type: string
           x-example: ak_2HNsyfhFYgByVq8rzn7q4hRbijsa8LP1VN192zZwGm1JRYnB5C
       responses:
-        "200":
+        '200':
           description: Returns names pointing to a particular pubkey, partitioned into active and inactive sets.
           schema: {}
-        "400":
+        '400':
           description: Bad request.
           schema: {}
       deprecated: false
@@ -337,7 +355,7 @@ paths:
     get:
       tags:
         - Middleware
-      summary: ""
+      summary: ''
       description: Get pointers for given name.
       operationId: get_pointers_by_id
       produces:
@@ -350,10 +368,10 @@ paths:
           type: string
           x-example: wwwbeaconoidcom.chain
       responses:
-        "200":
+        '200':
           description: Returns just pointers for given name.
           schema: {}
-        "400":
+        '400':
           description: Bad request.
           schema: {}
       deprecated: false
@@ -361,22 +379,23 @@ paths:
     get:
       tags:
         - Middleware
-      summary: ""
+      summary: ''
       description: Get middleware status.
       operationId: get_status
       produces:
         - application/json
       parameters: []
       responses:
-        "200":
+        '200':
           description: Returns the status of the MDW.
-          schema: {}
+          schema:
+            $ref: '#/definitions/Status'
       deprecated: false
   /tx/{hash}:
     get:
       tags:
         - Middleware
-      summary: ""
+      summary: ''
       description: Get a transaction by a given hash.
       operationId: get_tx_by_hash
       produces:
@@ -389,10 +408,10 @@ paths:
           type: string
           x-example: th_zATv7B4RHS45GamShnWgjkvcrQfZUWQkZ8gk1RD4m2uWLJKnq
       responses:
-        "200":
+        '200':
           description: Returns the transaction.
           schema: {}
-        "400":
+        '400':
           description: Bad request.
           schema: {}
       deprecated: false
@@ -400,7 +419,7 @@ paths:
     get:
       tags:
         - Middleware
-      summary: ""
+      summary: ''
       description: Get a transaction by a given index.
       operationId: get_tx_by_index
       produces:
@@ -413,13 +432,13 @@ paths:
           type: integer
           x-example: 10000000
       responses:
-        "200":
+        '200':
           description: Returns the transaction.
           schema: {}
-        "400":
+        '400':
           description: Bad request.
           schema: {}
-        "404":
+        '404':
           description: Not found.
           schema: {}
       deprecated: false
@@ -427,14 +446,14 @@ paths:
     get:
       tags:
         - Middleware
-      summary: ""
+      summary: ''
       description: Get count of transactions at the current height.
       operationId: get_current_tx_count
       produces:
         - application/json
       parameters: []
       responses:
-        "200":
+        '200':
           description: Returns count of all transactions at the current height.
           schema: {}
       deprecated: false
@@ -442,7 +461,7 @@ paths:
     get:
       tags:
         - Middleware
-      summary: ""
+      summary: ''
       description: Get transactions count and its type for given aeternity ID.
       operationId: get_tx_count_by_id
       produces:
@@ -455,10 +474,10 @@ paths:
           type: string
           x-example: ak_g5vQK6beY3vsTJHH7KBusesyzq9WMdEYorF8VyvZURXTjLnxT
       responses:
-        "200":
+        '200':
           description: Returns transactions count and its type for given aeternity ID.
           schema: {}
-        "400":
+        '400':
           description: Bad request.
           schema: {}
       deprecated: false
@@ -466,7 +485,7 @@ paths:
     get:
       tags:
         - Middleware
-      summary: ""
+      summary: ''
       description: Get a transactions from beginning or end of the chain. More [info](https://github.com/aeternity/ae_mdw#transaction-querying).
       operationId: get_txs_by_direction
       produces:
@@ -587,10 +606,10 @@ paths:
           type: string
           x-example: ak_r7wvMxmhnJ3cMp75D8DUnxNiAvXs8qcdfbJ1gUWfH8Ufrx2A2
       responses:
-        "200":
+        '200':
           description: Returns result regarding the according criteria.
           schema: {}
-        "400":
+        '400':
           description: Bad request.
           schema: {}
       deprecated: false
@@ -598,7 +617,7 @@ paths:
     get:
       tags:
         - Middleware
-      summary: ""
+      summary: ''
       description: Get a transactions bounded by scope/range.
       operationId: get_txs_by_scope_type_range
       produces:
@@ -713,11 +732,144 @@ paths:
           type: string
           x-example: 0-265354
       responses:
-        "200":
+        '200':
           description: Returns result regarding the according criteria.
           schema: {}
-        "400":
+        '400':
           description: Bad request.
           schema: {}
       deprecated: false
-definitions: {}
+definitions:
+  Status:
+    type: object
+    properties:
+      mdw_height:
+        type: integer
+      mdw_synced:
+        type: boolean
+      mdw_tx_index:
+        type: integer
+      mdw_version:
+        type: string
+      node_height:
+        type: integer
+      node_progress:
+        type: number
+      node_syncing:
+        type: boolean
+      node_version:
+        type: string
+  NameClaimDetail:
+    type: object
+    properties:
+      block_hash:
+        type: string
+      block_height:
+        type: integer
+      hash:
+        type: string
+      micro_index:
+        type: integer
+      micro_time:
+        type: integer
+      signatures:
+        type: array
+        items:
+          type: string
+      tx:
+        $ref: '#/definitions/NameClaimTx'
+      tx_index:
+        type: integer
+  NameClaimTx:
+    type: object
+    properties:
+      account_id:
+        type: string
+      fee:
+        type: integer
+      name:
+        type: string
+      name_fee:
+        type: integer
+      name_id:
+        type: string
+      name_salt:
+        type: integer
+      nonce:
+        type: integer
+      type:
+        type: string
+      version:
+        type: integer
+  NameAuctionInfo:
+    type: object
+    properties:
+      auction_end:
+        type: integer
+      bids:
+        type: array
+        items:
+          type: integer
+      last_bid:
+        $ref: '#/definitions/NameClaimDetail'
+  NameInfo:
+    type: object
+    properties:
+      active_from:
+        type: integer
+      auction_timeout:
+        type: integer
+      claims:
+        type: array
+        items:
+          type: integer
+      expire_height:
+        type: integer
+      ownership:
+        type: object
+        properties:
+          current:
+            type: string
+          original:
+            type: string
+      pointers:
+        type: object
+        additionalProperties:
+          type: string
+      revoke:
+        type: integer
+      transfers:
+        type: array
+        items:
+          type: integer
+      updates:
+        type: array
+        items:
+          type: integer
+  NameAuction:
+    type: object
+    properties:
+      active:
+        type: boolean
+      hash:
+        type: string
+      info:
+        $ref: '#/definitions/NameAuctionInfo'
+      name:
+        type: string
+      previous:
+        type: array
+        items:
+          $ref: '#/definitions/NameInfo'
+      status:
+        type: string
+        enum: [auction, name]
+  NameAuctions:
+    type: object
+    properties:
+      data:
+        type: array
+        items:
+          $ref: '#/definitions/NameAuction'
+      next:
+        type: string

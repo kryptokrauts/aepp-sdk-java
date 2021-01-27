@@ -1,20 +1,20 @@
 version: '3'
 services:
   node:
-    image: marc0olo/indaex
+    image: kryptokrauts/aeternity:${AETERNITY_TAG}
     ports:
       - "3113:3113" # node internal api
       - "3013:3013" # node external api
       - "3014:3014" # node websocket
-      - "4000:4000" # mdw default port
-      - "4001:4001" # mdw websocket default port
+      - "4000:4000" # indaex default port
+      - "4001:4001" # indaex websocket default port
     volumes:
       - ${PWD}/docker/aeternity.yaml:/home/aeternity/node/local/rel/aeternity/aeternity.yaml
       - ${PWD}/docker/keys/node:/home/aeternity/node/local/rel/aeternity/keys
       - ${PWD}/docker/accounts_test.json:/home/aeternity/node/local/rel/aeternity/data/aecore/.genesis/accounts_test.json
 
   compiler:
-    image: marc0olo/aesophia_http:${SOPHIA_COMPILER_TAG}
+    image: aeternity/aesophia_http:${SOPHIA_COMPILER_TAG}
     ports:
       - "3080:3080"
 

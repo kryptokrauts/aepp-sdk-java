@@ -1,5 +1,6 @@
 package com.kryptokrauts.aeternity.generated.api;
 
+import com.kryptokrauts.aeternity.sdk.service.indaex.domain.StatusResult;
 import io.vertx.ext.unit.TestContext;
 import org.junit.Test;
 
@@ -10,14 +11,9 @@ public class IndaexServiceTest extends BaseTest {
     this.executeTest(
         context,
         t -> {
-          //          Object result =
-          // this.aeternityServiceNative.aeternal.blockingGetMdwStatus().getResult();
-          //          try {
-          //            _logger.info("aeternal status: {}",
-          // objectMapper.writeValueAsString(result));
-          //          } catch (JsonProcessingException e) {
-          //            context.fail(e);
-          //          }
+          StatusResult statusResult = this.aeternityServiceNative.indaex.blockingGetStatus();
+          _logger.info(statusResult.toString());
+          context.assertEquals("5.6.4", statusResult.getNodeVersion());
         });
   }
 
