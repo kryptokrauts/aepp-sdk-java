@@ -45,9 +45,9 @@ ext {
     modelPackageSophiaCompiler = "com.kryptokrauts.sophia.compiler.generated.model"
     swaggerFileSophiaCompiler = "${rootDir}/api/swagger_sophia_compiler.yml"
 
-    apiPackageAeternal = "com.kryptokrauts.aeternal.generated.api"
-    modelPackageAeternal = "com.kryptokrauts.aeternal.generated.model"
-    swaggerFileAeternal = "${rootDir}/api/swagger_aeternal.yml"
+    apiPackageIndaex = "com.kryptokrauts.indaex.generated.api"
+    modelPackageIndaex = "com.kryptokrauts.indaex.generated.model"
+    swaggerFileIndaex = "${rootDir}/api/swagger_indaex.yml"
 
     templateDir = "${rootDir}/api/vertx-templates"
     swaggerAnnotationsVersion = "1.5.22"
@@ -110,25 +110,25 @@ task generateApiClient {
         ])
         new DefaultGenerator().opts(configSophiaCompiler.toClientOptInput()).generate()
 
-        def configAeternal = new CodegenConfigurator()
-        configAeternal.setLang("java")
-        configAeternal.setLibrary("vertx")
-        configAeternal.setGroupId("${group}")
-        configAeternal.setArtifactId("aeternal-client-vertx")
-        configAeternal.setApiPackage("${apiPackageAeternal}")
-        configAeternal.setModelPackage("${modelPackageAeternal}")
-        configAeternal.setInputSpec(project.swaggerFileAeternal.toString())
-        configAeternal.setOutputDir(swaggerOutputDir.path)
-        configAeternal.setTemplateDir(project.templateDir)
-        configAeternal.setAdditionalProperties([
+        def configIndaex = new CodegenConfigurator()
+        configIndaex.setLang("java")
+        configIndaex.setLibrary("vertx")
+        configIndaex.setGroupId("${group}")
+        configIndaex.setArtifactId("indaex-client-vertx")
+        configIndaex.setApiPackage("${apiPackageIndaex}")
+        configIndaex.setModelPackage("${modelPackageIndaex}")
+        configIndaex.setInputSpec(project.swaggerFileIndaex.toString())
+        configIndaex.setOutputDir(swaggerOutputDir.path)
+        configIndaex.setTemplateDir(project.templateDir)
+        configIndaex.setAdditionalProperties([
                 "dateLibrary": "java8",
                 "title"      : rootProject.name,
                 "useTags"    : "true"
         ])
-        configAeternal.setTypeMappings([
+        configIndaex.setTypeMappings([
                 "Integer": "java.math.BigInteger"
         ])
-        new DefaultGenerator().opts(configAeternal.toClientOptInput()).generate()
+        new DefaultGenerator().opts(configIndaex.toClientOptInput()).generate()
 
         // modify UnsignedTx
         ant.replaceregexp(match: '^.*\\b(JsonTypeInfo|JsonSubTypes)\\b.*$', replace: '', flags: 'g', byline: true) {

@@ -26,10 +26,7 @@ public class ValidationUtil {
 
   public static final List<String> ALLOWED_NAMESPACES = Arrays.asList("chain");
 
-  public static final String INVALID_POINTER = "Pointer is not valid.";
-
-  public static final String DUPLICATE_POINTER_KEY =
-      "For each pointer key only one value may be provided. The list of pointers contains duplicate value-types.";
+  public static final String INVALID_STANDARD_POINTER = "Invalid value for a default pointer key.";
 
   public static final String NAME_FEE_TOO_LOW =
       "The provided nameFee is too low. Minimum '%s' is required.";

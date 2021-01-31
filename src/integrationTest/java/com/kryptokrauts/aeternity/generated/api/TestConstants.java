@@ -36,7 +36,7 @@ public interface TestConstants {
 
   int NUM_TRIALS_DEFAULT = 60;
 
-  String DOMAIN = "kryptokrauts";
+  String NAME = "kryptokrauts";
 
   String NAMESPACE = ".chain";
 

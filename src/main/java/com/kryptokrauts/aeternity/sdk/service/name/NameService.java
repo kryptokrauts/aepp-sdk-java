@@ -1,7 +1,7 @@
 package com.kryptokrauts.aeternity.sdk.service.name;
 
 import com.kryptokrauts.aeternity.sdk.service.info.domain.KeyBlockResult;
-import com.kryptokrauts.aeternity.sdk.service.name.domain.NameIdResult;
+import com.kryptokrauts.aeternity.sdk.service.name.domain.NameEntryResult;
 import io.reactivex.Single;
 
 public interface NameService {
@@ -12,13 +12,13 @@ public interface NameService {
    * @param name the AENS name
    * @return asynchronous result handler (RxJava Single) for {@link KeyBlockResult}
    */
-  public Single<NameIdResult> asyncGetNameId(String name);
+  Single<NameEntryResult> asyncGetNameId(String name);
 
   /**
    * synchronously returns the nameid object for given aens name
    *
    * @param name the AENS name
-   * @return result of {@link NameIdResult}
+   * @return result of {@link NameEntryResult}
    */
-  public NameIdResult blockingGetNameId(String name);
+  NameEntryResult blockingGetNameId(String name);
 }
