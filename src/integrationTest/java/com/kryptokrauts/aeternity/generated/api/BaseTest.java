@@ -1,6 +1,5 @@
 package com.kryptokrauts.aeternity.generated.api;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kryptokrauts.aeternity.sdk.constants.Network;
 import com.kryptokrauts.aeternity.sdk.constants.VirtualMachine;
 import com.kryptokrauts.aeternity.sdk.domain.ObjectResultWrapper;
@@ -66,8 +65,6 @@ public abstract class BaseTest {
 
   protected AeternityService aeternityServiceDebug;
 
-  protected ObjectMapper objectMapper = new ObjectMapper();
-
   BaseKeyPair baseKeyPair;
 
   @Rule
@@ -98,7 +95,7 @@ public abstract class BaseTest {
                     .baseUrl(getAeternityBaseUrl())
                     .compilerBaseUrl(getCompilerBaseUrl())
                     .indaexBaseUrl(getIndaexBaseUrl())
-                    .network(Network.DEVNET.withId("local_lima_testnet"))
+                    .network(Network.LOCAL_LIMA_NETWORK)
                     .nativeMode(true)
                     .baseKeyPair(baseKeyPair)
                     .vertx(vertx)
@@ -112,7 +109,7 @@ public abstract class BaseTest {
                     .baseUrl(getAeternityBaseUrl())
                     .compilerBaseUrl(getCompilerBaseUrl())
                     .indaexBaseUrl(getIndaexBaseUrl())
-                    .network(Network.DEVNET.withId("local_lima_testnet"))
+                    .network(Network.LOCAL_LIMA_NETWORK)
                     .nativeMode(false)
                     .baseKeyPair(baseKeyPair)
                     .vertx(vertx)
