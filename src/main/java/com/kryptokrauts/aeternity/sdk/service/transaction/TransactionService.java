@@ -22,6 +22,9 @@ public interface TransactionService {
    */
   String signTransaction(String unsignedTx, String privateKey) throws TransactionCreateException;
 
+  /** wrap into a signed tx with empty list of signatures (to be used for Generalized Accounts) */
+  String wrapSignedTransactionForGA(String unsignedTx);
+
   /**
    * asynchronously creates an unsignedTx object for further processing and especially abstracts the
    * fee calculation for this transaction

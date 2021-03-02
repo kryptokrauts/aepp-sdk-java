@@ -106,7 +106,7 @@ public final class EncodingUtils {
    * @return the decoded bytearray
    * @throws EncodingNotSupportedException if the encoding type cannot be determined for some reason
    */
-  private static final byte[] decodeCheck(final String input, String identifier)
+  public static final byte[] decodeCheck(final String input, String identifier)
       throws EncodingNotSupportedException {
     if (identifier != null && identifier.trim().length() > 0) {
       // determine encoding from given identifier
