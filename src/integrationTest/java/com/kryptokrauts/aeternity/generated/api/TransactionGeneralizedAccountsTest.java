@@ -20,7 +20,6 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Optional;
 import java.util.Random;
 import org.junit.Test;
 
@@ -35,8 +34,7 @@ public class TransactionGeneralizedAccountsTest extends BaseTest {
         context,
         t -> {
           gaTestKeyPair = keyPairService.generateBaseKeyPair();
-          AccountResult account =
-              this.aeternityServiceNative.accounts.blockingGetAccount(Optional.empty());
+          AccountResult account = this.aeternityServiceNative.accounts.blockingGetAccount();
           BigInteger amount = unitConversionService.toSmallestUnit(BigDecimal.TEN);
           BigInteger nonce = account.getNonce().add(ONE);
           SpendTransactionModel spendTx =
@@ -50,8 +48,7 @@ public class TransactionGeneralizedAccountsTest extends BaseTest {
                   .build();
           aeternityServiceNative.transactions.blockingPostTransaction(spendTx);
           AccountResult gaTestAccount =
-              this.aeternityServiceNative.accounts.blockingGetAccount(
-                  Optional.of(gaTestKeyPair.getPublicKey()));
+              this.aeternityServiceNative.accounts.blockingGetAccount(gaTestKeyPair.getPublicKey());
           _logger.info("account: {}", gaTestAccount);
           context.assertEquals("basic", gaTestAccount.getKind());
 
@@ -122,8 +119,7 @@ public class TransactionGeneralizedAccountsTest extends BaseTest {
           _logger.info("gaAttachTx result: {}", result);
 
           gaTestAccount =
-              this.aeternityServiceNative.accounts.blockingGetAccount(
-                  Optional.of(gaTestKeyPair.getPublicKey()));
+              this.aeternityServiceNative.accounts.blockingGetAccount(gaTestKeyPair.getPublicKey());
           _logger.info("account: {}", gaTestAccount);
           context.assertEquals("generalized", gaTestAccount.getKind());
 
@@ -168,7 +164,7 @@ public class TransactionGeneralizedAccountsTest extends BaseTest {
           AccountResult otherRecipientAcc =
               this.aeternityServiceNative
                   .accounts
-                  .asyncGetAccount(Optional.of(otherRecipient.getPublicKey()))
+                  .asyncGetAccount(otherRecipient.getPublicKey())
                   .blockingGet();
           _logger.info("otherRecipientAcc : {}", otherRecipientAcc);
           context.assertEquals(amount, otherRecipientAcc.getBalance());

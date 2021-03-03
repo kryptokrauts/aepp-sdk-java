@@ -10,7 +10,6 @@ import io.reactivex.Single;
 import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
 import java.math.BigInteger;
-import java.util.Optional;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
@@ -72,8 +71,7 @@ public class TransactionSpendApiTest extends BaseTest {
 
           // get the currents accounts nonce in case a transaction is already
           // created and increase it by one
-          AccountResult account =
-              this.aeternityServiceNative.accounts.blockingGetAccount(Optional.empty());
+          AccountResult account = this.aeternityServiceNative.accounts.blockingGetAccount();
 
           BaseKeyPair kp = keyPairService.generateBaseKeyPair();
           String recipient = kp.getPublicKey();
@@ -109,8 +107,7 @@ public class TransactionSpendApiTest extends BaseTest {
     this.executeTest(
         context,
         t -> {
-          AccountResult account =
-              this.aeternityServiceNative.accounts.blockingGetAccount(Optional.empty());
+          AccountResult account = this.aeternityServiceNative.accounts.blockingGetAccount();
 
           BaseKeyPair kp = keyPairService.generateBaseKeyPair();
           String recipient = kp.getPublicKey();
@@ -203,8 +200,7 @@ public class TransactionSpendApiTest extends BaseTest {
             _logger.info("SpendTx hash: " + txResponse.getTxHash());
             waitForTxMined(txResponse.getTxHash());
             AccountResult recipientAccount =
-                this.aeternityServiceNative.accounts.blockingGetAccount(
-                    Optional.of(recipient.getPublicKey()));
+                this.aeternityServiceNative.accounts.blockingGetAccount(recipient.getPublicKey());
             _logger.info("Account result for recipient {}", recipientAccount);
             // now send amount back
             long recipientAccountBalance = recipientAccount.getBalance().longValue();
@@ -224,8 +220,7 @@ public class TransactionSpendApiTest extends BaseTest {
             _logger.info("SpendTx hash: " + txResponse.getTxHash());
             waitForTxMined(txResponse.getTxHash());
             recipientAccount =
-                this.aeternityServiceNative.accounts.blockingGetAccount(
-                    Optional.of(recipient.getPublicKey()));
+                this.aeternityServiceNative.accounts.blockingGetAccount(recipient.getPublicKey());
             context.assertEquals(
                 recipientAccount.getBalance().longValue(),
                 recipientAccountBalance

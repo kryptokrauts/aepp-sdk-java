@@ -5,9 +5,18 @@ import com.kryptokrauts.aeternity.sdk.util.EncodingType;
 import com.kryptokrauts.aeternity.sdk.util.EncodingUtils;
 import io.reactivex.Single;
 import java.math.BigInteger;
-import java.util.Optional;
 
 public interface AccountService {
+
+  /**
+   * synchronously get the account
+   *
+   * <p>using the account for the KeyPair defined in the {@link
+   * com.kryptokrauts.aeternity.sdk.service.ServiceConfiguration}
+   *
+   * @return the account wrapped in a single {@link AccountResult}
+   */
+  AccountResult blockingGetAccount();
 
   /**
    * synchronously get the account
@@ -17,7 +26,17 @@ public interface AccountService {
    * @param base58PublicKey the encoded publicKey (ak_...)
    * @return the account wrapped in a single {@link AccountResult}
    */
-  AccountResult blockingGetAccount(Optional<String> base58PublicKey);
+  AccountResult blockingGetAccount(String base58PublicKey);
+
+  /**
+   * asynchronously get the account
+   *
+   * <p>using the account for the KeyPair defined in the {@link
+   * com.kryptokrauts.aeternity.sdk.service.ServiceConfiguration}
+   *
+   * @return asynchronous result handler (RxJava Single) for {@link AccountResult}
+   */
+  Single<AccountResult> asyncGetAccount();
 
   /**
    * asynchronously get the account
@@ -28,7 +47,17 @@ public interface AccountService {
    * @param base58PublicKey the encoded publicKey (ak_...)
    * @return asynchronous result handler (RxJava Single) for {@link AccountResult}
    */
-  Single<AccountResult> asyncGetAccount(Optional<String> base58PublicKey);
+  Single<AccountResult> asyncGetAccount(String base58PublicKey);
+
+  /**
+   * asynchronously given accounts next nonce
+   *
+   * <p>using the account for the KeyPair defined in the {@link
+   * com.kryptokrauts.aeternity.sdk.service.ServiceConfiguration}
+   *
+   * @return next nonce
+   */
+  Single<BigInteger> asyncGetNextBaseKeypairNonce();
 
   /**
    * asynchronously given accounts next nonce
@@ -39,7 +68,17 @@ public interface AccountService {
    * @param base58PublicKey the encoded publicKey (ak_...)
    * @return next nonce
    */
-  Single<BigInteger> asyncGetNextBaseKeypairNonce(Optional<String> base58PublicKey);
+  Single<BigInteger> asyncGetNextBaseKeypairNonce(String base58PublicKey);
+
+  /**
+   * synchronously given accounts next nonce
+   *
+   * <p>using the account for the KeyPair defined in the {@link
+   * com.kryptokrauts.aeternity.sdk.service.ServiceConfiguration}
+   *
+   * @return next nonce
+   */
+  BigInteger blockingGetNextBaseKeypairNonce();
 
   /**
    * synchronously given accounts next nonce
@@ -50,5 +89,5 @@ public interface AccountService {
    * @param base58PublicKey the encoded publicKey (ak_...)
    * @return next nonce
    */
-  BigInteger blockingGetNextBaseKeypairNonce(Optional<String> base58PublicKey);
+  BigInteger blockingGetNextBaseKeypairNonce(String base58PublicKey);
 }

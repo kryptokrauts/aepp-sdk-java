@@ -55,7 +55,7 @@ public class TransactionOraclesTest extends BaseTest {
                     .ttl(ZERO)
                     .nonce(getNextBaseKeypairNonce())
                     .build();
-            PostTransactionResult postResult = this.blockingPostTx(spendTx, Optional.empty());
+            PostTransactionResult postResult = this.blockingPostTx(spendTx);
             _logger.info(postResult.getTxHash());
           } catch (Throwable e) {
             context.fail(e);
@@ -88,7 +88,7 @@ public class TransactionOraclesTest extends BaseTest {
                     .build();
 
             PostTransactionResult postResult =
-                this.blockingPostTx(oracleRegisterTx, Optional.of(oracleAccount.getPrivateKey()));
+                this.blockingPostTx(oracleRegisterTx, oracleAccount.getPrivateKey());
             _logger.info(postResult.getTxHash());
           } catch (Throwable e) {
             context.fail(e);
@@ -117,7 +117,7 @@ public class TransactionOraclesTest extends BaseTest {
                     .build();
 
             PostTransactionResult postResult =
-                this.blockingPostTx(oracleQueryTx, Optional.of(baseKeyPair.getPrivateKey()));
+                this.blockingPostTx(oracleQueryTx, baseKeyPair.getPrivateKey());
             _logger.info(postResult.getTxHash());
             queryId = EncodingUtils.queryId(baseKeyPair.getPublicKey(), nonce, oracleId);
             OracleQueryResult oracleQuery =
@@ -164,7 +164,7 @@ public class TransactionOraclesTest extends BaseTest {
                     .build();
 
             PostTransactionResult postResult =
-                this.blockingPostTx(oracleRespondTx, Optional.of(oracleAccount.getPrivateKey()));
+                this.blockingPostTx(oracleRespondTx, oracleAccount.getPrivateKey());
             _logger.info(postResult.getTxHash());
           } catch (Throwable e) {
             context.fail(e);
@@ -190,7 +190,7 @@ public class TransactionOraclesTest extends BaseTest {
                     .build();
 
             PostTransactionResult postResult =
-                this.blockingPostTx(oracleExtendTx, Optional.of(oracleAccount.getPrivateKey()));
+                this.blockingPostTx(oracleExtendTx, oracleAccount.getPrivateKey());
             _logger.info(postResult.getTxHash());
 
             RegisteredOracleResult registeredOracle =

@@ -7,14 +7,17 @@ import com.kryptokrauts.aeternity.sdk.service.indaex.domain.NameAuctionsResult;
 import com.kryptokrauts.aeternity.sdk.service.info.domain.TransactionResult;
 import com.kryptokrauts.aeternity.sdk.service.name.domain.NameEntryResult;
 import com.kryptokrauts.aeternity.sdk.service.transaction.domain.PostTransactionResult;
-import com.kryptokrauts.aeternity.sdk.service.transaction.type.model.*;
+import com.kryptokrauts.aeternity.sdk.service.transaction.type.model.NameClaimTransactionModel;
+import com.kryptokrauts.aeternity.sdk.service.transaction.type.model.NamePreclaimTransactionModel;
+import com.kryptokrauts.aeternity.sdk.service.transaction.type.model.NameRevokeTransactionModel;
+import com.kryptokrauts.aeternity.sdk.service.transaction.type.model.NameUpdateTransactionModel;
+import com.kryptokrauts.aeternity.sdk.service.transaction.type.model.SpendTransactionModel;
 import com.kryptokrauts.aeternity.sdk.util.CryptoUtils;
 import com.kryptokrauts.aeternity.sdk.util.EncodingUtils;
 import com.kryptokrauts.aeternity.sdk.util.UnitConversionUtil;
 import io.vertx.ext.unit.TestContext;
 import java.math.BigInteger;
 import java.util.HashMap;
-import java.util.Optional;
 import java.util.Random;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
@@ -89,7 +92,7 @@ public class TransactionNameServiceTest extends BaseTest {
                     .ttl(ZERO)
                     .build();
 
-            PostTransactionResult result = this.blockingPostTx(namePreclaimTx, Optional.empty());
+            PostTransactionResult result = this.blockingPostTx(namePreclaimTx);
             _logger.info("NamePreclaimTx hash: " + result.getTxHash());
             context.assertEquals(
                 result.getTxHash(),
@@ -110,7 +113,7 @@ public class TransactionNameServiceTest extends BaseTest {
                     .blockingCreateUnsignedTransaction(nameClaimTx)
                     .getResult());
 
-            result = this.blockingPostTx(nameClaimTx, Optional.empty());
+            result = this.blockingPostTx(nameClaimTx);
             _logger.info(
                 String.format(
                     "Using namespace %s and salt %s for committmentId %s",
@@ -154,8 +157,7 @@ public class TransactionNameServiceTest extends BaseTest {
                     .ttl(ZERO)
                     .build();
 
-            PostTransactionResult namePreclaimResult =
-                this.blockingPostTx(namePreclaimTx, Optional.empty());
+            PostTransactionResult namePreclaimResult = this.blockingPostTx(namePreclaimTx);
             _logger.info("NamePreclaimTx hash: " + namePreclaimResult.getTxHash());
 
             context.assertEquals(
@@ -170,8 +172,7 @@ public class TransactionNameServiceTest extends BaseTest {
                     .nonce(getNextBaseKeypairNonce())
                     .ttl(ZERO)
                     .build();
-            PostTransactionResult nameClaimResult =
-                this.blockingPostTx(nameClaimTx, Optional.empty());
+            PostTransactionResult nameClaimResult = this.blockingPostTx(nameClaimTx);
             _logger.info(
                 String.format(
                     "Using namespace %s and salt %s for committmentId %s",
@@ -216,8 +217,7 @@ public class TransactionNameServiceTest extends BaseTest {
                         })
                     .build();
 
-            PostTransactionResult nameUpdateResult =
-                this.blockingPostTx(nameUpdateTx, Optional.empty());
+            PostTransactionResult nameUpdateResult = this.blockingPostTx(nameUpdateTx);
 
             context.assertEquals(
                 nameUpdateResult.getTxHash(),
@@ -259,8 +259,7 @@ public class TransactionNameServiceTest extends BaseTest {
             _logger.info("SpendTx hash: " + txResponse.getTxHash());
             waitForTxMined(txResponse.getTxHash());
             AccountResult recipientAccount =
-                this.aeternityServiceNative.accounts.blockingGetAccount(
-                    Optional.of(accountPointer));
+                this.aeternityServiceNative.accounts.blockingGetAccount(accountPointer);
             _logger.info("Account result for recipient {}", recipientAccount);
             context.assertEquals(aettos, recipientAccount.getBalance());
             _logger.info("--------------------- postUpdateAndSpendTxTest ---------------------");
@@ -291,8 +290,7 @@ public class TransactionNameServiceTest extends BaseTest {
                     .ttl(ZERO)
                     .build();
 
-            PostTransactionResult nameRevokeResult =
-                this.blockingPostTx(nameRevokeTx, Optional.empty());
+            PostTransactionResult nameRevokeResult = this.blockingPostTx(nameRevokeTx);
             _logger.info("NameRevokeTx hash: " + nameRevokeResult.getTxHash());
 
             context.assertEquals(
@@ -342,8 +340,7 @@ public class TransactionNameServiceTest extends BaseTest {
                     .nonce(getNextBaseKeypairNonce())
                     .ttl(ZERO)
                     .build();
-            PostTransactionResult namePreclaimResult =
-                this.blockingPostTx(namePreclaimTx, Optional.empty());
+            PostTransactionResult namePreclaimResult = this.blockingPostTx(namePreclaimTx);
             _logger.info("NamePreclaimTx hash: {}", namePreclaimResult.getTxHash());
             context.assertEquals(
                 namePreclaimResult.getTxHash(),
@@ -372,8 +369,7 @@ public class TransactionNameServiceTest extends BaseTest {
                 "current nameFee: {} Æ",
                 UnitConversionUtil.fromAettos(
                     currentNameFee.toString(), UnitConversionUtil.Unit.AE));
-            PostTransactionResult nameClaimResult =
-                this.blockingPostTx(nameClaimTx, Optional.empty());
+            PostTransactionResult nameClaimResult = this.blockingPostTx(nameClaimTx);
             _logger.info(
                 String.format(
                     "Using namespace %s and salt %s for committmentId %s",
@@ -417,8 +413,7 @@ public class TransactionNameServiceTest extends BaseTest {
                 UnitConversionUtil.fromAettos(nextNameFee.toString(), UnitConversionUtil.Unit.AE));
 
             /** create and fund other account to claim the same name with nextNameFee */
-            AccountResult account =
-                this.aeternityServiceNative.accounts.blockingGetAccount(Optional.empty());
+            AccountResult account = this.aeternityServiceNative.accounts.blockingGetAccount();
             BaseKeyPair kpNextClaimer = keyPairService.generateBaseKeyPair();
             String recipient = kpNextClaimer.getPublicKey();
             BigInteger amount =
@@ -432,14 +427,14 @@ public class TransactionNameServiceTest extends BaseTest {
                     .ttl(ZERO)
                     .nonce(nonce)
                     .build();
-            PostTransactionResult txResponse = this.blockingPostTx(spendTx, Optional.empty());
+            PostTransactionResult txResponse = this.blockingPostTx(spendTx);
             _logger.info("SpendTx hash: " + txResponse.getTxHash());
             context.assertEquals(
                 txResponse.getTxHash(), aeternityServiceNative.transactions.computeTxHash(spendTx));
 
             /** get funded account and create next nameClaimTx */
             AccountResult otherAccount =
-                this.aeternityServiceNative.accounts.blockingGetAccount(Optional.of(recipient));
+                this.aeternityServiceNative.accounts.blockingGetAccount(recipient);
             NameClaimTransactionModel nextNameClaimTx =
                 nameClaimTx
                     .toBuilder()
@@ -449,7 +444,7 @@ public class TransactionNameServiceTest extends BaseTest {
                     .nameSalt(BigInteger.ZERO)
                     .build();
             PostTransactionResult result =
-                this.blockingPostTx(nextNameClaimTx, Optional.of(kpNextClaimer.getPrivateKey()));
+                this.blockingPostTx(nextNameClaimTx, kpNextClaimer.getPrivateKey());
             TransactionResult transactionResult = waitForTxMined(result.getTxHash());
             _logger.info("next claimTx result: {}", transactionResult);
             BigInteger finalBlockHeight =
