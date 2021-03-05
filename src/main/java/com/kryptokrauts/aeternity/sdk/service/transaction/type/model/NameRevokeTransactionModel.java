@@ -11,7 +11,6 @@ import com.kryptokrauts.aeternity.sdk.util.ValidationUtil;
 import com.kryptokrauts.sophia.compiler.generated.api.rxjava.DefaultApi;
 import java.math.BigInteger;
 import java.util.Arrays;
-import java.util.Optional;
 import java.util.function.Function;
 import lombok.Getter;
 import lombok.ToString;
@@ -55,13 +54,13 @@ public class NameRevokeTransactionModel extends AbstractTransactionModel<NameRev
   public void validateInput() {
     // Validate parameters
     ValidationUtil.checkParameters(
-        validate -> Optional.ofNullable(nameId != null),
+        validate -> nameId != null,
         nameId,
         "validateRevokeTransaction",
         Arrays.asList("nameId"),
         ValidationUtil.PARAMETER_IS_NULL);
     ValidationUtil.checkParameters(
-        validate -> Optional.ofNullable(nameId.startsWith(ApiIdentifiers.NAME)),
+        validate -> nameId.startsWith(ApiIdentifiers.NAME),
         nameId,
         "validateRevokeTransaction",
         Arrays.asList("nameId", ApiIdentifiers.NAME),

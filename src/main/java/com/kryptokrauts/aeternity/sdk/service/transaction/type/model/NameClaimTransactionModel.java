@@ -11,7 +11,6 @@ import com.kryptokrauts.aeternity.sdk.util.ValidationUtil;
 import com.kryptokrauts.sophia.compiler.generated.api.rxjava.DefaultApi;
 import java.math.BigInteger;
 import java.util.Arrays;
-import java.util.Optional;
 import java.util.function.Function;
 import lombok.Getter;
 import lombok.ToString;
@@ -66,7 +65,7 @@ public class NameClaimTransactionModel extends AbstractTransactionModel<NameClai
     ValidationUtil.checkNamespace(this.name);
     BigInteger minimumNameFee = AENS.INITIAL_NAME_LENGTH_FEE_MAP.get(this.getNameLength());
     ValidationUtil.checkParameters(
-        validate -> Optional.ofNullable(this.getNameFee().compareTo(minimumNameFee) != -1),
+        validate -> this.getNameFee().compareTo(minimumNameFee) != -1,
         this.nameFee,
         "validateNameClaimTransaction",
         Arrays.asList("nameFee", this.getNameFee().toString()),

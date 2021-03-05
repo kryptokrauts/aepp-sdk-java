@@ -3,7 +3,6 @@ package com.kryptokrauts.aeternity.sdk.util;
 import com.kryptokrauts.aeternity.sdk.exception.InvalidParameterException;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 import java.util.function.Function;
 
 public class ValidationUtil {
@@ -34,21 +33,20 @@ public class ValidationUtil {
   /**
    * encapsule validation of given parameters
    *
-   * @param validationMethod the validation method to apply on the object, which should return an
-   *     optional of boolean
+   * @param validationMethod the validation method to apply on the object, which should return a
+   *     boolean
    * @param objectToValidate the object to validate
    * @param methodName the method, where the validation takes places
    * @param parameters the parameter(s) which are validated
-   * @param cause optional message for detailled explanation of the validation error
+   * @param cause optional message for detailed explanation of the validation error
    */
   public static void checkParameters(
-      Function<Object, Optional<Boolean>> validationMethod,
+      Function<Object, Boolean> validationMethod,
       Object objectToValidate,
       String methodName,
       List<String> parameters,
       Object... cause) {
-    if (validationMethod.apply(objectToValidate).orElseGet(() -> Boolean.FALSE).booleanValue()
-        == false) {
+    if (validationMethod.apply(objectToValidate) == false) {
       String causeMessage = "";
       if (cause != null) {
         if (cause.length > 1) {
@@ -74,15 +72,14 @@ public class ValidationUtil {
     String[] nameSplit = name.split("\\.");
 
     checkParameters(
-        validate ->
-            Optional.ofNullable(nameSplit.length == 2 && ALLOWED_NAMESPACES.contains(nameSplit[1])),
+        validate -> nameSplit.length == 2 && ALLOWED_NAMESPACES.contains(nameSplit[1]),
         name,
         "checkNamespace",
         Arrays.asList("name"),
         ValidationUtil.NAMESPACE_INVALID);
 
     checkParameters(
-        validate -> Optional.ofNullable(name.length() <= NAME_MAX_LENGTH),
+        validate -> name.length() <= NAME_MAX_LENGTH,
         name,
         "checkNamespace",
         Arrays.asList("name"),

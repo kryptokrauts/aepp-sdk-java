@@ -5,11 +5,9 @@ import com.kryptokrauts.aeternity.sdk.service.aeternity.AeternityServiceConfigur
 import com.kryptokrauts.aeternity.sdk.service.oracle.OracleService;
 import com.kryptokrauts.aeternity.sdk.service.oracle.domain.OracleQueriesResult;
 import com.kryptokrauts.aeternity.sdk.service.oracle.domain.OracleQueryResult;
-import com.kryptokrauts.aeternity.sdk.service.oracle.domain.QueryType;
+import com.kryptokrauts.aeternity.sdk.service.oracle.domain.QueryParams;
 import com.kryptokrauts.aeternity.sdk.service.oracle.domain.RegisteredOracleResult;
 import io.reactivex.Single;
-import java.math.BigInteger;
-import java.util.Optional;
 import javax.annotation.Nonnull;
 import lombok.RequiredArgsConstructor;
 
@@ -35,31 +33,38 @@ public class OracleServiceImpl implements OracleService {
   }
 
   @Override
+  public Single<OracleQueriesResult> asyncGetOracleQueries(String publicKey) {
+    return asyncGetOracleQueries(publicKey, QueryParams.builder().build());
+  }
+
+  @Override
   public Single<OracleQueriesResult> asyncGetOracleQueries(
-      String pubkey, Optional<String> from, Optional<BigInteger> limit, Optional<QueryType> type) {
+      String publicKey, QueryParams queryParams) {
     return OracleQueriesResult.builder()
         .build()
         .asyncGet(
             externalApi.rxGetOracleQueriesByPubkey(
-                pubkey,
-                from.orElse(null),
-                limit.orElse(null),
-                type.orElse(QueryType.OPEN).toString()));
+                publicKey,
+                queryParams.getFrom(),
+                queryParams.getLimit(),
+                queryParams.getQueryType().toString()));
   }
 
-  public OracleQueriesResult blockingGetOracleQueries(
-      String publicKey,
-      Optional<String> from,
-      Optional<BigInteger> limit,
-      Optional<QueryType> type) {
+  @Override
+  public OracleQueriesResult blockingGetOracleQueries(String publicKey) {
+    return blockingGetOracleQueries(publicKey, QueryParams.builder().build());
+  }
+
+  @Override
+  public OracleQueriesResult blockingGetOracleQueries(String publicKey, QueryParams queryParams) {
     return OracleQueriesResult.builder()
         .build()
         .blockingGet(
             externalApi.rxGetOracleQueriesByPubkey(
                 publicKey,
-                from.orElse(null),
-                limit.orElse(null),
-                type.orElse(QueryType.OPEN).toString()));
+                queryParams.getFrom(),
+                queryParams.getLimit(),
+                queryParams.getQueryType().toString()));
   }
 
   @Override
