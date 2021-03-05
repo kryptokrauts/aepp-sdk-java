@@ -146,6 +146,14 @@ configurations {
     sharedCompile
 }
 
+configurations.all {
+    resolutionStrategy.eachDependency { details ->
+        if (details.requested.group == 'io.netty') {
+            details.useVersion "4.1.34.Final"
+        }
+    }
+}
+
 sourceSets {
     swagger {
         java {
