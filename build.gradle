@@ -2,7 +2,6 @@ buildscript {
     repositories {
         mavenLocal()
         mavenCentral()
-        jcenter()
     }
     dependencies {
         classpath "io.swagger.codegen.v3:swagger-codegen:3.0.8"
@@ -10,9 +9,8 @@ buildscript {
 }
 
 plugins {
-    id "com.jfrog.artifactory" version "4.8.1"
-    id "com.jfrog.bintray" version "1.8.4"
     id "com.github.sherter.google-java-format" version "0.8"
+    id "io.github.gradle-nexus.publish-plugin" version "1.0.0"
     id "maven"
     id "maven-publish"
     id "jacoco"
@@ -22,10 +20,8 @@ plugins {
 repositories {
     mavenLocal()
     mavenCentral()
-    jcenter()
 }
 
-version = (Boolean.valueOf(System.getProperty("snapshot")) ? project.version : project.version[0..4])
 sourceCompatibility = JavaVersion.VERSION_1_8
 
 googleJavaFormat {
@@ -33,10 +29,6 @@ googleJavaFormat {
 }
 
 ext {
-    bintrayUser = System.getProperty("bintray.user")
-    bintrayKey = System.getProperty("bintray.key")
-    buildNumber = System.getProperty("build.number")
-
     apiPackageAeternity = "com.kryptokrauts.aeternity.generated.api"
     modelPackageAeternity = "com.kryptokrauts.aeternity.generated.model"
     swaggerFileAeternity = "${rootDir}/api/swagger_aeternity.yml"
@@ -311,7 +303,7 @@ publishing {
             version project.version
             pom.withXml {
                 def root = asNode()
-                root.appendNode("description", "A community developed Java SDK to interact with the æternity blockchain")
+                root.appendNode("description", "a community developed Java SDK to interact with the æternity blockchain")
                 root.appendNode("name", "${project.name}")
                 root.appendNode("url", "https://github.com/${organization}/${project.name}")
                 root.children().last() + pomConfig
@@ -320,63 +312,8 @@ publishing {
     }
 }
 
-artifactory {
-    contextUrl = "https://oss.jfrog.org"
-    publish {
-        repository {
-            repoKey = "oss-snapshot-local"
-            username = bintrayUser
-            password = bintrayKey
-        }
-        defaults {
-            publications("mavenPublication")
-            publishArtifacts = true
-            publishPom = true
-            properties = [
-                    "build.number": buildNumber,
-                    "build.name"  : "${project.name}"
-            ]
-            publishBuildInfo = false // no permission atm
-        }
-    }
-    resolve {
-        repoKey = "jcenter"
-    }
-    clientConfig.info.setBuildNumber(buildNumber)
-    clientConfig.info.setBuildName("${project.name}")
-}
-
-bintray {
-    user = bintrayUser
-    key = bintrayKey
-    publications = ["mavenPublication"]
-
-    pkg {
-        repo = "maven"
-        name = project.name
-        userOrg = "${organization}"
-        desc = "A community developed Java SDK to interact with the æternity blockchain"
-        websiteUrl = "https://github.com/${organization}/${project.name}"
-        issueTrackerUrl = "https://github.com/${organization}/${project.name}/issues"
-        vcsUrl = "https://github.com:${organization}/${project.name}.git"
-        licenses = ["ISC"]
-        labels = ["${organization}", "java", "sdk", "blockchain", "aeternity", "crypto"]
-        publicDownloadNumbers = true
-
-        githubRepo = "kryptokrauts/aepp-sdk-java"
-        githubReleaseNotesFile = "docs/changelog.md"
-
-        version {
-            name = project.version
-            vcsTag = "v${project.version}"
-            released = new Date()
-        }
-    }
-    publish = true
-}
-
-task printVersion {
-    doLast {
-        println project.version
+nexusPublishing {
+    repositories {
+        sonatype()
     }
 }

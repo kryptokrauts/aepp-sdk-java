@@ -12,12 +12,12 @@ public interface CompilerService {
   /**
    * asynchronously gets the encoded calldata for this contractCode
    *
+   * @deprecated use {@link CompilerService#asyncEncodeCalldata(String, String, List, Map)} instead.
+   *     this method will be removed in future releases
    * @param contractCode the sourcecode of the contract
    * @param function the name of the function to call
    * @param arguments the params that should be passed to the function
-   * @return asynchronous result handler (RxJava Single) for encoded calldata * @deprecated use
-   *     {@link asyncEncodeCalldata(String contractCode, String function, List<String> arguments,
-   *     Map<String, String> fileSystem)} instead. this method will be removed in future releases
+   * @return asynchronous result handler (RxJava Single) for encoded calldata
    */
   @Deprecated
   Single<StringResultWrapper> asyncEncodeCalldata(
@@ -38,13 +38,12 @@ public interface CompilerService {
   /**
    * synchronously gets the encoded calldata for this contractCode
    *
+   * @deprecated use {@link CompilerService#blockingEncodeCalldata(String, String, List, Map)}
+   *     instead. this method will be removed in future releases
    * @param contractCode the sourcecode of the contract
    * @param function the name of the function to call
    * @param arguments the params that should be passed to the function
    * @return encoded calldata
-   * @deprecated use {@link blockingEncodeCalldata(String contractCode, String function,
-   *     List<String> arguments, Map<String, String> fileSystem)} instead. this method will be
-   *     removed in future releases
    */
   @Deprecated
   StringResultWrapper blockingEncodeCalldata(
@@ -103,14 +102,13 @@ public interface CompilerService {
   /**
    * asynchronously decodes callresult of contract-calls
    *
+   * @deprecated use {@link CompilerService#asyncDecodeCallResult(String, String, String, String,
+   *     Map)} instead. this method will be removed in future releases
    * @param source the contract source
    * @param function the called function
    * @param callResult the received resultType (ok | error | revert)
    * @param callValue the received value
    * @return the decoded sophia call result
-   * @deprecated use {@link asyncDecodeCallResult(String source, String function, String callResult,
-   *     String callValue, Map<String, String> fileSystem)} instead. this method will be removed in
-   *     future releases
    */
   @Deprecated
   Single<ObjectResultWrapper> asyncDecodeCallResult(
@@ -136,14 +134,13 @@ public interface CompilerService {
   /**
    * synchronously decodes callresult of contract-calls
    *
+   * @deprecated use {@link CompilerService#blockingDecodeCallResult(String, String, String, String,
+   *     Map)} instead. this method will be removed in future releases
    * @param source the contract source
    * @param function the called function
    * @param callResult the received resultType (ok | error | revert)
    * @param callValue the received value
    * @return the decoded sophia call result
-   * @deprecated use {@link blockingDecodeCallResult(String source, String function, String
-   *     callResult, String callValue, Map<String, String> fileSystem)} instead. this method will be
-   *     removed in future releases
    */
   @Deprecated
   ObjectResultWrapper blockingDecodeCallResult(

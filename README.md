@@ -7,10 +7,13 @@
   kryptokrauts.com
 </h1>
 
+## aepp-sdk-java
+<a href='https://github.com/kryptokrauts/aepp-sdk-java/actions?query=workflow%3ASnapshot'><img src='https://github.com/kryptokrauts/aepp-sdk-java/workflows/Snapshot/badge.svg'></a>
+[![codecov.io](http://codecov.io/github/kryptokrauts/aepp-sdk-java/coverage.svg?branch=3.x)](https://codecov.io/gh/kryptokrauts/aepp-sdk-java/branch/3.x)
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.kryptokrauts/aepp-sdk-java/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.kryptokrauts/aepp-sdk-java)
+ 
 The **aepp-sdk-java** is a community developed Java SDK to interact with the æternity blockchain.
 
-## Latest release
- [ ![Download](https://api.bintray.com/packages/kryptokrauts/maven/aepp-sdk-java/images/download.svg) ](https://bintray.com/kryptokrauts/maven/aepp-sdk-java/_latestVersion)
  - [changelog](docs/changelog.md)
 
 ## Documentation
