@@ -5,22 +5,21 @@ import static com.kryptokrauts.aeternity.sdk.constants.ApiIdentifiers.IDENTIFIER
 import static com.kryptokrauts.aeternity.sdk.constants.BaseConstants.PREFIX_ZERO_X;
 import static com.kryptokrauts.aeternity.sdk.util.EncodingType.BASE58;
 import static com.kryptokrauts.aeternity.sdk.util.EncodingType.BASE64;
-
-import com.kryptokrauts.aeternity.sdk.constants.ApiIdentifiers;
-import com.kryptokrauts.aeternity.sdk.constants.SerializationTags;
-import com.kryptokrauts.aeternity.sdk.domain.secret.impl.BaseKeyPair;
-import com.kryptokrauts.aeternity.sdk.domain.secret.impl.RawKeyPair;
-import com.kryptokrauts.aeternity.sdk.exception.EncodingNotSupportedException;
 import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.List;
-import lombok.experimental.UtilityClass;
 import org.bitcoinj.core.AddressFormatException;
 import org.bitcoinj.core.Base58;
 import org.bitcoinj.core.Sha256Hash;
 import org.bouncycastle.crypto.digests.Blake2bDigest;
 import org.bouncycastle.util.encoders.Base64;
 import org.bouncycastle.util.encoders.Hex;
+import com.kryptokrauts.aeternity.sdk.constants.ApiIdentifiers;
+import com.kryptokrauts.aeternity.sdk.constants.SerializationTags;
+import com.kryptokrauts.aeternity.sdk.domain.secret.impl.Account;
+import com.kryptokrauts.aeternity.sdk.domain.secret.impl.RawKeyPair;
+import com.kryptokrauts.aeternity.sdk.exception.EncodingNotSupportedException;
+import lombok.experimental.UtilityClass;
 
 /** this util class provides all encoding related methods */
 @UtilityClass
@@ -148,11 +147,11 @@ public final class EncodingUtils {
   /**
    * @param input the input to decode
    * @param allowedIdentifiers the apiIdentifiers allowed (if null or empty all known identifiers
-   *     are allowed)
+   *        are allowed)
    * @return the decoded bytearray
    */
-  public static final byte[] decodeCheckAndTag(
-      final String input, final List<String> allowedIdentifiers) {
+  public static final byte[] decodeCheckAndTag(final String input,
+      final List<String> allowedIdentifiers) {
     byte[] tag = determineSerializationTag(input, allowedIdentifiers);
     byte[] decoded = EncodingUtils.decodeCheckWithIdentifier(input);
     return ByteUtils.concatenate(tag, decoded);
@@ -166,8 +165,8 @@ public final class EncodingUtils {
     return decodeCheckAndTag(input, null);
   }
 
-  private byte[] determineSerializationTag(
-      final String input, final List<String> allowedIdentifiers) {
+  private byte[] determineSerializationTag(final String input,
+      final List<String> allowedIdentifiers) {
     String[] splitted = input.split("_");
     if (splitted.length != 2) {
       throw new IllegalArgumentException("input has wrong format");
@@ -222,7 +221,8 @@ public final class EncodingUtils {
 
   private static final byte[] decodeBase64Check(String base64encoded) {
     byte[] decoded = Base64.decode(base64encoded);
-    if (decoded.length < 4) throw new AddressFormatException("Input too short");
+    if (decoded.length < 4)
+      throw new AddressFormatException("Input too short");
     byte[] data = Arrays.copyOfRange(decoded, 0, decoded.length - 4);
     byte[] checksum = Arrays.copyOfRange(decoded, decoded.length - 4, decoded.length);
     byte[] actualChecksum = Arrays.copyOfRange(Sha256Hash.hashTwice(data), 0, 4);
@@ -236,7 +236,7 @@ public final class EncodingUtils {
    *
    * @param address base58 encoded aeternity address (ak_...)
    * @return true if the address is valid <br>
-   *     false if the address is invalid
+   *         false if the address is invalid
    */
   public static final boolean isAddressValid(final String address) {
     boolean isValid;
@@ -254,9 +254,8 @@ public final class EncodingUtils {
    * @return the readable public key as hex
    */
   public static final String addressToHex(final String base58CheckAddress) {
-    return PREFIX_ZERO_X
-        + Hex.toHexString(
-            decodeBase58Check(assertedType(base58CheckAddress, ApiIdentifiers.ACCOUNT_PUBKEY)));
+    return PREFIX_ZERO_X + Hex.toHexString(
+        decodeBase58Check(assertedType(base58CheckAddress, ApiIdentifiers.ACCOUNT_PUBKEY)));
   }
 
   private static final String assertedType(final String data, final String type) {
@@ -280,11 +279,11 @@ public final class EncodingUtils {
     return hash;
   }
 
-  public static BaseKeyPair createBaseKeyPair(final RawKeyPair rawKeyPair) {
+  public static Account createAccount(final RawKeyPair rawKeyPair) {
     String privateKey =
         Hex.toHexString(rawKeyPair.getPrivateKey()) + Hex.toHexString(rawKeyPair.getPublicKey());
     String publicKey = encodeCheck(rawKeyPair.getPublicKey(), ApiIdentifiers.ACCOUNT_PUBKEY);
-    return BaseKeyPair.builder().privateKey(privateKey).publicKey(publicKey).build();
+    return Account.builder().privateKey(privateKey).address(publicKey).build();
   }
 
   public static String generateCommitmentHash(final String name, final BigInteger salt) {
@@ -301,10 +300,8 @@ public final class EncodingUtils {
    */
   public static String queryId(String senderId, BigInteger nonce, String oracleId) {
     return hashEncode(
-        ByteUtils.concatenate(
-            decodeCheckWithIdentifier(senderId),
-            ByteUtils.leftPad(32, nonce.toByteArray()),
-            decodeCheckWithIdentifier(oracleId)),
+        ByteUtils.concatenate(decodeCheckWithIdentifier(senderId),
+            ByteUtils.leftPad(32, nonce.toByteArray()), decodeCheckWithIdentifier(oracleId)),
         ApiIdentifiers.ORACLE_QUERY_ID);
   }
 }

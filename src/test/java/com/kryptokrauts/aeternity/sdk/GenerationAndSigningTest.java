@@ -8,7 +8,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import com.kryptokrauts.aeternity.sdk.constants.ApiIdentifiers;
-import com.kryptokrauts.aeternity.sdk.domain.secret.impl.BaseKeyPair;
+import com.kryptokrauts.aeternity.sdk.domain.secret.impl.Account;
 import com.kryptokrauts.aeternity.sdk.domain.secret.impl.RawKeyPair;
 import com.kryptokrauts.aeternity.sdk.service.keypair.KeyPairService;
 import com.kryptokrauts.aeternity.sdk.service.keypair.KeyPairServiceFactory;
@@ -184,7 +184,7 @@ public class GenerationAndSigningTest extends BaseTest {
                 it(
                     "generates an account key pair",
                     () -> {
-                      BaseKeyPair keyPair = keypairService.generateBaseKeyPair();
+                      Account keyPair = keypairService.generateBaseKeyPair();
                       assertNotNull(keyPair);
                       assertTrue(EncodingUtils.isAddressValid(keyPair.getPublicKey()));
                       assertTrue(keyPair.getPublicKey().startsWith("ak_"));
@@ -251,7 +251,7 @@ public class GenerationAndSigningTest extends BaseTest {
                     () -> {
                       final String beneficiaryPub =
                           "ak_twR4h7dEcUtc2iSEDv8kB7UFJJDGiEDQCXr85C3fYF8FdVdyo";
-                      final BaseKeyPair keyPair =
+                      final Account keyPair =
                           keypairService.generateBaseKeyPairFromSecret(
                               "79816BBF860B95600DDFABF9D81FEE81BDB30BE823B17D80B9E48BE0A7015ADF");
                       assertEquals(beneficiaryPub, keyPair.getPublicKey());

@@ -2,23 +2,11 @@ package com.kryptokrauts.aeternity.sdk.service.keypair.impl;
 
 import static com.kryptokrauts.aeternity.sdk.util.ByteUtils.leftPad;
 import static com.kryptokrauts.aeternity.sdk.util.ByteUtils.rightPad;
-
-import com.google.common.collect.ImmutableList;
-import com.kryptokrauts.aeternity.sdk.constants.ApiIdentifiers;
-import com.kryptokrauts.aeternity.sdk.constants.BaseConstants;
-import com.kryptokrauts.aeternity.sdk.domain.secret.impl.BaseKeyPair;
-import com.kryptokrauts.aeternity.sdk.domain.secret.impl.MnemonicKeyPair;
-import com.kryptokrauts.aeternity.sdk.domain.secret.impl.RawKeyPair;
-import com.kryptokrauts.aeternity.sdk.exception.AException;
-import com.kryptokrauts.aeternity.sdk.service.keypair.KeyPairService;
-import com.kryptokrauts.aeternity.sdk.service.keypair.KeyPairServiceConfiguration;
-import com.kryptokrauts.aeternity.sdk.util.CryptoUtils;
-import com.kryptokrauts.aeternity.sdk.util.EncodingUtils;
+import java.nio.ByteBuffer;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.Arrays;
-import java.util.LinkedList;
 import java.util.List;
 import javax.annotation.Nonnull;
 import javax.crypto.BadPaddingException;
@@ -27,12 +15,8 @@ import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
-import lombok.RequiredArgsConstructor;
 import org.bitcoinj.core.Sha256Hash;
-import org.bitcoinj.crypto.ChildNumber;
-import org.bitcoinj.crypto.DeterministicHierarchy;
-import org.bitcoinj.crypto.DeterministicKey;
-import org.bitcoinj.crypto.HDKeyDerivation;
+import org.bitcoinj.crypto.HDUtils;
 import org.bitcoinj.crypto.MnemonicCode;
 import org.bouncycastle.crypto.AsymmetricCipherKeyPair;
 import org.bouncycastle.crypto.generators.Ed25519KeyPairGenerator;
@@ -42,6 +26,18 @@ import org.bouncycastle.crypto.params.Ed25519PublicKeyParameters;
 import org.bouncycastle.util.encoders.Hex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import com.kryptokrauts.aeternity.sdk.constants.ApiIdentifiers;
+import com.kryptokrauts.aeternity.sdk.constants.BaseConstants;
+import com.kryptokrauts.aeternity.sdk.domain.secret.impl.Account;
+import com.kryptokrauts.aeternity.sdk.domain.secret.impl.DeterministicHierarchy;
+import com.kryptokrauts.aeternity.sdk.domain.secret.impl.MnemonicKeyPair;
+import com.kryptokrauts.aeternity.sdk.domain.secret.impl.RawKeyPair;
+import com.kryptokrauts.aeternity.sdk.exception.AException;
+import com.kryptokrauts.aeternity.sdk.service.keypair.KeyPairService;
+import com.kryptokrauts.aeternity.sdk.service.keypair.KeyPairServiceConfiguration;
+import com.kryptokrauts.aeternity.sdk.util.CryptoUtils;
+import com.kryptokrauts.aeternity.sdk.util.EncodingUtils;
+import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 public final class KeyPairServiceImpl implements KeyPairService {
@@ -49,7 +45,8 @@ public final class KeyPairServiceImpl implements KeyPairService {
 
   private static final SecureRandom secureRandom = new SecureRandom();
 
-  @Nonnull private KeyPairServiceConfiguration config;
+  @Nonnull
+  private KeyPairServiceConfiguration config;
 
   @Override
   public MnemonicKeyPair generateMasterMnemonicKeyPair(String mnemonicSeedPassword)
@@ -70,82 +67,104 @@ public final class KeyPairServiceImpl implements KeyPairService {
   }
 
   @Override
-  public MnemonicKeyPair recoverMasterMnemonicKeyPair(
-      List<String> mnemonicSeedWords, String mnemonicSeedPassword) throws AException {
+  public MnemonicKeyPair recoverMasterMnemonicKeyPair(List<String> mnemonicSeedWords,
+      String mnemonicSeedPassword) throws AException {
 
     if (mnemonicSeedPassword == null) {
       mnemonicSeedPassword = "";
     }
     // generate the seed from words and password
     byte[] seed = MnemonicCode.toSeed(mnemonicSeedWords, mnemonicSeedPassword);
-    // generate the master key from the seed using bitcoinj implementation of hd
-    // wallets
-    DeterministicKey master = HDKeyDerivation.createMasterPrivateKey(seed);
-    RawKeyPair generatedKeyPair = generateRawKeyPairFromSecret(master.getPrivateKeyAsHex());
 
-    return new MnemonicKeyPair(
-        generatedKeyPair, mnemonicSeedWords, new DeterministicHierarchy(master));
+    MnemonicKeyPair masterMnenomicKeypair =
+        new MnemonicKeyPair(this.generateMasterKeyFromSeed(seed), mnemonicSeedWords);
+
+    /**
+     * following the BIP32 specification create the following derivation path: purpose (44) -> coin
+     * (457) -> account (0=master) -> external chain -> child address. The hierarchical tree has the
+     * following structure m'/44'/457'/(i = child number)'/0'/0'
+     */
+    masterMnenomicKeypair.getDeterministicHierarchy()
+        .addAccount(deriveChild(BaseConstants.HD_CHAIN_PURPOSE,
+            masterMnenomicKeypair.getDeterministicHierarchy().getMasterKey()));
+    masterMnenomicKeypair.getDeterministicHierarchy()
+        .addChain(deriveChild(BaseConstants.HD_CHAIN_CODE_AETERNITY,
+            masterMnenomicKeypair.getDeterministicHierarchy().getAccountKeypair()));
+    deriveNextAddress(masterMnenomicKeypair);
+    return masterMnenomicKeypair;
+  }
+
+  private RawKeyPair generateMasterKeyFromSeed(byte[] seed) {
+    byte[] i = HDUtils.hmacSha512("ed25519 seed".getBytes(), seed);
+
+    byte[] masterKey = Arrays.copyOfRange(i, 0, 32);
+    byte[] chainCode = Arrays.copyOfRange(i, 32, 64);
+
+    return new RawKeyPair(chainCode, masterKey);
+  }
+
+  /**
+   * derives a child from given parent at position index
+   *
+   * @param index the index number of the child to derive
+   * @param parent keypair to derive from
+   * @return derive child
+   */
+  private RawKeyPair deriveChild(int index, RawKeyPair parent) {
+    ByteBuffer buffer = ByteBuffer.allocate(37);
+    buffer.put((byte) 0);
+
+    byte[] privateKey32 = parent.getPrivateKey();
+    if (privateKey32.length == 64) {
+      privateKey32 = Arrays.copyOfRange(privateKey32, 0, 32);
+    }
+    buffer.put(privateKey32);
+    // we always generate a hardened key
+    buffer.putInt(index + 0x80000000);
+
+    byte[] I = HDUtils.hmacSha512(parent.getPublicKey(), buffer.array());
+    // chaincode
+    byte[] il = Arrays.copyOfRange(I, 0, 32);
+    // private key
+    byte[] ir = Arrays.copyOfRange(I, 32, 64);
+
+    print(il, ir);
+
+    return new RawKeyPair(ir, il);
+  }
+
+  public String byteToHex(byte[] key) {
+    return new String(Hex.encode(key));
+  }
+
+  public void print(byte[] il, byte[] ir) {
+    System.out.println("Child private key: " + byteToHex(il));
+    System.out.println("Child chaincode: " + byteToHex(ir));
+
+    Account bkp = generateBaseKeyPairFromSecret(byteToHex(il));
+
+    System.out.println("Private key for address: " + bkp.getPrivateKey());
+    System.out.println("Public key for address: " + bkp.getAddress() + "\n");
+  }
+
+  public MnemonicKeyPair deriveNextAddress(MnemonicKeyPair mnemonicKeyPair) throws AException {
+    RawKeyPair miKeypair =
+        deriveChild(mnemonicKeyPair.getDeterministicHierarchy().getNextChildIndex(),
+            mnemonicKeyPair.getDeterministicHierarchy().getChainKeypair());
+    RawKeyPair mi0Keypair = deriveChild(DeterministicHierarchy.ADDRESS_INDEX_DEFAULT, miKeypair);
+    RawKeyPair mi00Keypair = deriveChild(DeterministicHierarchy.ADDRESS_INDEX_DEFAULT, mi0Keypair);
+    mnemonicKeyPair.getDeterministicHierarchy().addNextAddress(miKeypair, mi0Keypair, mi00Keypair);
+    return mnemonicKeyPair;
   }
 
   @Override
-  public MnemonicKeyPair generateDerivedKey(
-      MnemonicKeyPair mnemonicKeyPair, boolean hardened, ChildNumber... derivationPath)
-      throws AException {
-    DeterministicKey master = mnemonicKeyPair.getDeterministicHierarchy().getRootKey();
-    // check if we really have the masterKey at hand
-    if (master.getDepth() != 0) {
-      throw new AException("Given mnemonicKeyPair object does not contain the master key");
-    }
-    /**
-     * following the BIP32 specification create the following tree purpose -> coin -> account ->
-     * external chain -> child address
-     */
-
-    /**
-     * always set path for purpose {@link BaseConstants.HD_CHAIN_PURPOSE}, coin {@link
-     * BaseConstants.HD_CHAIN_CODE_AETERNITY}
-     */
-    List<ChildNumber> pathToDerivedKey = new LinkedList<ChildNumber>();
-    pathToDerivedKey.addAll(
-        Arrays.asList(
-            new ChildNumber(BaseConstants.HD_CHAIN_PURPOSE, true),
-            new ChildNumber(BaseConstants.HD_CHAIN_CODE_AETERNITY, true)));
-
-    /** if no arguments are given, set default account and external chain (0h, 0h) */
-    if (derivationPath == null || derivationPath.length == 0) {
-      pathToDerivedKey.addAll(Arrays.asList(new ChildNumber(0, true), new ChildNumber(0, true)));
-      /** in case arguments are given - add warning */
-    } else {
-      _logger.warn(
-          String.format(
-              "You are using a custom key derivation path - this will be appended to m/%sh/%sh",
-              BaseConstants.HD_CHAIN_PURPOSE, BaseConstants.HD_CHAIN_CODE_AETERNITY));
-      pathToDerivedKey.addAll(Arrays.asList(derivationPath));
-    }
-
-    DeterministicKey nextChildDeterministicKey =
-        mnemonicKeyPair
-            .getDeterministicHierarchy()
-            .deriveNextChild(ImmutableList.copyOf(pathToDerivedKey), false, true, hardened);
-
-    // derive a new child
-    RawKeyPair childRawKeyPair =
-        generateRawKeyPairFromSecret(nextChildDeterministicKey.getPrivateKeyAsHex());
-
-    return new MnemonicKeyPair(
-        childRawKeyPair,
-        mnemonicKeyPair.getMnemonicSeedWords(),
-        new DeterministicHierarchy(nextChildDeterministicKey));
-  }
-
-  @Override
-  public BaseKeyPair generateBaseKeyPair() {
+  public Account generateBaseKeyPair() {
     RawKeyPair rawKeyPair = generateKeyPairInternal();
     byte[] publicKey = rawKeyPair.getPublicKey();
     byte[] privateKey = rawKeyPair.getPrivateKey();
     String aePublicKey = EncodingUtils.encodeCheck(publicKey, ApiIdentifiers.ACCOUNT_PUBKEY);
     String privateKeyHex = Hex.toHexString(privateKey) + Hex.toHexString(publicKey);
-    return BaseKeyPair.builder().publicKey(aePublicKey).privateKey(privateKeyHex).build();
+    return Account.builder().address(aePublicKey).privateKey(privateKeyHex).build();
   }
 
   @Override
@@ -157,7 +176,7 @@ public final class KeyPairServiceImpl implements KeyPairService {
   }
 
   @Override
-  public BaseKeyPair generateBaseKeyPairFromSecret(String privateKey) {
+  public Account generateBaseKeyPairFromSecret(String privateKey) {
     final String privateKey32;
     if (privateKey.length() == 128) {
       privateKey32 = privateKey.substring(0, 64);
@@ -171,7 +190,7 @@ public final class KeyPairServiceImpl implements KeyPairService {
     byte[] privateBinary = privateKeyParams.getEncoded();
     String aePublicKey = EncodingUtils.encodeCheck(publicBinary, ApiIdentifiers.ACCOUNT_PUBKEY);
     String privateKeyHex = Hex.toHexString(privateBinary) + Hex.toHexString(publicBinary);
-    return BaseKeyPair.builder().publicKey(aePublicKey).privateKey(privateKeyHex).build();
+    return Account.builder().address(aePublicKey).privateKey(privateKeyHex).build();
   }
 
   /**
@@ -211,46 +230,44 @@ public final class KeyPairServiceImpl implements KeyPairService {
   @Override
   public final byte[] encryptPrivateKey(final String password, final byte[] binaryKey)
       throws NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException,
-          NoSuchAlgorithmException, InvalidKeyException {
+      NoSuchAlgorithmException, InvalidKeyException {
     return encryptKey(password, leftPad(64, binaryKey));
   }
 
   @Override
   public final byte[] encryptPublicKey(final String password, final byte[] binaryKey)
       throws NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException,
-          NoSuchAlgorithmException, InvalidKeyException {
+      NoSuchAlgorithmException, InvalidKeyException {
     return encryptKey(password, rightPad(32, binaryKey));
   }
 
   @Override
   public final byte[] decryptPrivateKey(final String password, final byte[] encryptedBinaryKey)
       throws NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException,
-          NoSuchAlgorithmException, InvalidKeyException {
+      NoSuchAlgorithmException, InvalidKeyException {
     return decryptKey(password, encryptedBinaryKey);
   }
 
   @Override
   public final byte[] decryptPublicKey(final String password, final byte[] encryptedBinaryKey)
       throws NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException,
-          NoSuchAlgorithmException, InvalidKeyException {
+      NoSuchAlgorithmException, InvalidKeyException {
     return Arrays.copyOfRange(decryptKey(password, encryptedBinaryKey), 0, 32);
   }
 
   @Override
   public RawKeyPair encryptRawKeyPair(final RawKeyPair keyPairRaw, final String password)
       throws IllegalBlockSizeException, InvalidKeyException, BadPaddingException,
-          NoSuchAlgorithmException, NoSuchPaddingException {
+      NoSuchAlgorithmException, NoSuchPaddingException {
     byte[] encryptedPublicKey = encryptPublicKey(password, keyPairRaw.getPublicKey());
     byte[] encryptedPrivateKey = encryptPrivateKey(password, keyPairRaw.getPrivateKey());
-    return RawKeyPair.builder()
-        .publicKey(encryptedPublicKey)
-        .privateKey(encryptedPrivateKey)
+    return RawKeyPair.builder().publicKey(encryptedPublicKey).privateKey(encryptedPrivateKey)
         .build();
   }
 
   private final byte[] encryptKey(final String password, final byte[] binaryData)
       throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException,
-          IllegalBlockSizeException, BadPaddingException {
+      IllegalBlockSizeException, BadPaddingException {
     byte[] hashedPassword = Sha256Hash.hash(password.getBytes());
     Cipher cipher = Cipher.getInstance(config.getCipherAlgorithm());
     SecretKey secretKey = new SecretKeySpec(hashedPassword, config.getSecretKeySpec());
@@ -260,7 +277,7 @@ public final class KeyPairServiceImpl implements KeyPairService {
 
   private final byte[] decryptKey(final String password, final byte[] encryptedBinaryData)
       throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException,
-          BadPaddingException, IllegalBlockSizeException {
+      BadPaddingException, IllegalBlockSizeException {
     byte[] hashedPassword = Sha256Hash.hash(password.getBytes());
     Cipher cipher = Cipher.getInstance(config.getCipherAlgorithm());
     SecretKey secretKey = new SecretKeySpec(hashedPassword, config.getSecretKeySpec());

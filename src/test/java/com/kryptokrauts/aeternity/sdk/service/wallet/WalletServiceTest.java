@@ -2,7 +2,7 @@ package com.kryptokrauts.aeternity.sdk.service.wallet;
 
 import com.greghaskins.spectrum.Spectrum;
 import com.kryptokrauts.aeternity.sdk.BaseTest;
-import com.kryptokrauts.aeternity.sdk.domain.secret.impl.BaseKeyPair;
+import com.kryptokrauts.aeternity.sdk.domain.secret.impl.Account;
 import com.kryptokrauts.aeternity.sdk.domain.secret.impl.RawKeyPair;
 import com.kryptokrauts.aeternity.sdk.exception.AException;
 import com.kryptokrauts.aeternity.sdk.service.keypair.KeyPairService;
@@ -55,7 +55,7 @@ public class WalletServiceTest extends BaseTest {
                 String keystore = IOUtils.toString(inputStream, StandardCharsets.UTF_8.toString());
                 byte[] privateKey =
                     walletService.recoverPrivateKeyFromKeystore(keystore, walletFileSecret);
-                BaseKeyPair keyPair =
+                Account keyPair =
                     keypairService.generateBaseKeyPairFromSecret(Hex.toHexString(privateKey));
                 Assertions.assertEquals(expectedPubKey, keyPair.getPublicKey());
               });

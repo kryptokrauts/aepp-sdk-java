@@ -1,6 +1,6 @@
 package com.kryptokrauts.aeternity.sdk.service.keypair;
 
-import com.kryptokrauts.aeternity.sdk.domain.secret.impl.BaseKeyPair;
+import com.kryptokrauts.aeternity.sdk.domain.secret.impl.Account;
 import com.kryptokrauts.aeternity.sdk.domain.secret.impl.MnemonicKeyPair;
 import com.kryptokrauts.aeternity.sdk.domain.secret.impl.RawKeyPair;
 import com.kryptokrauts.aeternity.sdk.exception.AException;
@@ -11,12 +11,11 @@ import java.util.List;
 import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
-import org.bitcoinj.crypto.ChildNumber;
 
 public interface KeyPairService {
 
   /** @return a base58 encoded keypair */
-  BaseKeyPair generateBaseKeyPair();
+  Account generateBaseKeyPair();
 
   /** @return a byte arrayed keypair */
   RawKeyPair generateRawKeyPair();
@@ -25,7 +24,7 @@ public interface KeyPairService {
    * @param privateKey encoded privateKey
    * @return a base58 encoded keypair
    */
-  BaseKeyPair generateBaseKeyPairFromSecret(String privateKey);
+  Account generateBaseKeyPairFromSecret(String privateKey);
 
   /**
    * @param privateKey private key (hex)
@@ -139,22 +138,14 @@ public interface KeyPairService {
       List<String> mnemonicSeedWords, String mnemonicSeedPassword) throws AException;
 
   /**
-   * get a key derived from the master key passed within the mnemonicKeyPair the derived keys are
-   * generated according to the deterministic tree stated in <a
+   * derives the next hardened key. The derived keys are generated according to the deterministic
+   * tree saved within the given menomincKeyPair stated in <a
    * href=https://github.com/bitcoin/bips/blob/master/bip-0032.mediawiki#Master_key_generation>BIP32</a>
    *
-   * @param mnemonicKeyPair mnemonicKeyPair containing the masterKey
-   * @param hardened Given a hardened key, it is not possible to derive a child public key if you
-   *     know only the hardened public key. For Further information see BIP32 and {@link
-   *     ChildNumber}
-   * @param derivationPath a custom path for derivating child key. this path will be appended to the
-   *     aeternity base path "m/44h/457h" and has to be passed as list of ChildNumbers, beginning
-   *     from the coin level, appended subsequently
-   * @return a new mnemonic object containing the derived child key according to the hierarchical
-   *     tree
+   * @param mnemonicKeyPair mnemonicKeyPair containing the deterministic tree of keys necessary for
+   *     derivation
+   * @return a new mnemonic object containing the derived child key
    * @throws AException in case of an error
    */
-  MnemonicKeyPair generateDerivedKey(
-      MnemonicKeyPair mnemonicKeyPair, boolean hardened, ChildNumber... derivationPath)
-      throws AException;
+  MnemonicKeyPair deriveNextAddress(MnemonicKeyPair mnemonicKeyPair) throws AException;
 }

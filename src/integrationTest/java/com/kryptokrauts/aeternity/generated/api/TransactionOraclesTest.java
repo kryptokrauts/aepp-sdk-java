@@ -1,6 +1,6 @@
 package com.kryptokrauts.aeternity.generated.api;
 
-import com.kryptokrauts.aeternity.sdk.domain.secret.impl.BaseKeyPair;
+import com.kryptokrauts.aeternity.sdk.domain.secret.impl.Account;
 import com.kryptokrauts.aeternity.sdk.service.oracle.domain.OracleQueriesResult;
 import com.kryptokrauts.aeternity.sdk.service.oracle.domain.OracleQueryResult;
 import com.kryptokrauts.aeternity.sdk.service.oracle.domain.OracleTTLType;
@@ -25,7 +25,7 @@ import org.junit.runners.MethodSorters;
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class TransactionOraclesTest extends BaseTest {
 
-  static BaseKeyPair oracleAccount;
+  static Account oracleAccount;
 
   static String oracleId;
   static String queryId;

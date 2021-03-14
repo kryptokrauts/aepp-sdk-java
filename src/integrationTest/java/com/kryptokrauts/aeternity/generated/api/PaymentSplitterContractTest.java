@@ -1,7 +1,7 @@
 package com.kryptokrauts.aeternity.generated.api;
 
 import com.kryptokrauts.aeternity.sdk.constants.BaseConstants;
-import com.kryptokrauts.aeternity.sdk.domain.secret.impl.BaseKeyPair;
+import com.kryptokrauts.aeternity.sdk.domain.secret.impl.Account;
 import com.kryptokrauts.aeternity.sdk.service.info.domain.TransactionInfoResult;
 import com.kryptokrauts.aeternity.sdk.service.keypair.KeyPairServiceFactory;
 import com.kryptokrauts.aeternity.sdk.service.transaction.domain.DryRunAccountModel;
@@ -37,9 +37,9 @@ public class PaymentSplitterContractTest extends BaseTest {
   static String paymentSplitterSource;
   static String localDeployedContractId;
 
-  static BaseKeyPair initialReceiver1;
-  static BaseKeyPair initialReceiver2;
-  static BaseKeyPair initialReceiver3;
+  static Account initialReceiver1;
+  static Account initialReceiver2;
+  static Account initialReceiver3;
 
   static Map<String, Integer> initialWeights = new HashMap<>();
 

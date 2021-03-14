@@ -1,6 +1,6 @@
 package com.kryptokrauts.aeternity.generated.api;
 
-import com.kryptokrauts.aeternity.sdk.domain.secret.impl.BaseKeyPair;
+import com.kryptokrauts.aeternity.sdk.domain.secret.impl.Account;
 import com.kryptokrauts.aeternity.sdk.exception.TransactionCreateException;
 import com.kryptokrauts.aeternity.sdk.service.account.domain.AccountResult;
 import com.kryptokrauts.aeternity.sdk.service.info.domain.TransactionResult;
@@ -75,7 +75,7 @@ public class TransactionSpendApiTest extends BaseTest {
           AccountResult account =
               this.aeternityServiceNative.accounts.blockingGetAccount(Optional.empty());
 
-          BaseKeyPair kp = keyPairService.generateBaseKeyPair();
+          Account kp = keyPairService.generateBaseKeyPair();
           String recipient = kp.getPublicKey();
           BigInteger amount = new BigInteger("1000000000000000000");
           String payload = "payload";
@@ -112,7 +112,7 @@ public class TransactionSpendApiTest extends BaseTest {
           AccountResult account =
               this.aeternityServiceNative.accounts.blockingGetAccount(Optional.empty());
 
-          BaseKeyPair kp = keyPairService.generateBaseKeyPair();
+          Account kp = keyPairService.generateBaseKeyPair();
           String recipient = kp.getPublicKey();
           BigInteger amount = new BigInteger("1000000000000000000");
           String payload = "payload";
@@ -160,7 +160,7 @@ public class TransactionSpendApiTest extends BaseTest {
         context,
         t -> {
           try {
-            BaseKeyPair recipient = keyPairService.generateBaseKeyPair();
+            Account recipient = keyPairService.generateBaseKeyPair();
             SpendTransactionModel spendTx =
                 SpendTransactionModel.builder()
                     .sender(this.baseKeyPair.getPublicKey())
@@ -188,7 +188,7 @@ public class TransactionSpendApiTest extends BaseTest {
         context,
         t -> {
           try {
-            BaseKeyPair recipient = keyPairService.generateBaseKeyPair();
+            Account recipient = keyPairService.generateBaseKeyPair();
             SpendTransactionModel spendTx =
                 SpendTransactionModel.builder()
                     .sender(this.baseKeyPair.getPublicKey())
@@ -245,7 +245,7 @@ public class TransactionSpendApiTest extends BaseTest {
         t -> {
           try {
             Async async = context.async();
-            BaseKeyPair recipient = keyPairService.generateBaseKeyPair();
+            Account recipient = keyPairService.generateBaseKeyPair();
             SpendTransactionModel spendTx =
                 SpendTransactionModel.builder()
                     .sender(this.baseKeyPair.getPublicKey())
@@ -293,7 +293,7 @@ public class TransactionSpendApiTest extends BaseTest {
         t -> {
           try {
             Async async = context.async();
-            BaseKeyPair recipient = keyPairService.generateBaseKeyPair();
+            Account recipient = keyPairService.generateBaseKeyPair();
             SpendTransactionModel spendTx =
                 SpendTransactionModel.builder()
                     .sender(this.baseKeyPair.getPublicKey())

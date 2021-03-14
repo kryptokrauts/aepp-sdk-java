@@ -1,7 +1,7 @@
 package com.kryptokrauts.aeternity.generated.api;
 
 import com.kryptokrauts.aeternity.sdk.constants.AENS;
-import com.kryptokrauts.aeternity.sdk.domain.secret.impl.BaseKeyPair;
+import com.kryptokrauts.aeternity.sdk.domain.secret.impl.Account;
 import com.kryptokrauts.aeternity.sdk.service.account.domain.AccountResult;
 import com.kryptokrauts.aeternity.sdk.service.aeternal.domain.ActiveNameAuctionsCountResult;
 import com.kryptokrauts.aeternity.sdk.service.aeternal.domain.ActiveNameResult;
@@ -196,7 +196,7 @@ public class TransactionNameServiceTest extends BaseTest {
             BigInteger nameTtl = BigInteger.valueOf(10000l);
             BigInteger clientTtl = BigInteger.valueOf(50l);
 
-            BaseKeyPair recipient = keyPairService.generateBaseKeyPair();
+            Account recipient = keyPairService.generateBaseKeyPair();
             String accountPointer = recipient.getPublicKey();
             // fake other allowed pointers
             String contractPointer = baseKeyPair.getContractPK();
@@ -398,7 +398,7 @@ public class TransactionNameServiceTest extends BaseTest {
             /** create and fund other account to claim the same name with nextNameFee */
             AccountResult account =
                 this.aeternityServiceNative.accounts.blockingGetAccount(Optional.empty());
-            BaseKeyPair kpNextClaimer = keyPairService.generateBaseKeyPair();
+            Account kpNextClaimer = keyPairService.generateBaseKeyPair();
             String recipient = kpNextClaimer.getPublicKey();
             BigInteger amount =
                 UnitConversionUtil.toAettos("50", UnitConversionUtil.Unit.AE).toBigInteger();
