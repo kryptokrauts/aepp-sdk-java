@@ -12,7 +12,10 @@ import com.kryptokrauts.aeternity.sdk.service.transaction.type.impl.NameUpdateTr
 import com.kryptokrauts.aeternity.sdk.util.ValidationUtil;
 import com.kryptokrauts.sophia.compiler.generated.api.rxjava.DefaultApi;
 import java.math.BigInteger;
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import lombok.Builder.Default;
@@ -78,19 +81,19 @@ public class NameUpdateTransactionModel extends AbstractTransactionModel<NameUpd
   public void validateInput() {
     // Validate parameters
     ValidationUtil.checkParameters(
-        validate -> Optional.ofNullable(nameId != null),
+        validate -> nameId != null,
         nameId,
         "validateNameUpdateTransaction",
-        Arrays.asList("'nullcheck'"),
+        Arrays.asList("nameId"),
         ValidationUtil.PARAMETER_IS_NULL);
     ValidationUtil.checkParameters(
-        validate -> Optional.ofNullable(nameId.startsWith(ApiIdentifiers.NAME)),
+        validate -> nameId.startsWith(ApiIdentifiers.NAME),
         nameId,
         "validateNameUpdateTransaction",
         Arrays.asList("nameId"),
         ValidationUtil.MISSING_API_IDENTIFIER);
     ValidationUtil.checkParameters(
-        validate -> Optional.ofNullable(checkDefaultPointerTypes(pointers)),
+        validate -> checkDefaultPointerTypes(pointers),
         pointers,
         "validateNameUpdateTransaction",
         Arrays.asList("pointers"),

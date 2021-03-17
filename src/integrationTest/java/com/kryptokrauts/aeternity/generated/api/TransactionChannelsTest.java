@@ -9,7 +9,6 @@ import com.kryptokrauts.aeternity.sdk.util.UnitConversionUtil;
 import com.kryptokrauts.aeternity.sdk.util.UnitConversionUtil.Unit;
 import io.vertx.ext.unit.TestContext;
 import java.math.BigInteger;
-import java.util.Optional;
 import org.junit.Before;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
@@ -43,7 +42,7 @@ public class TransactionChannelsTest extends BaseTest {
                     .ttl(ZERO)
                     .nonce(getNextBaseKeypairNonce())
                     .build();
-            PostTransactionResult txResponse = this.blockingPostTx(spendTx, Optional.empty());
+            PostTransactionResult txResponse = this.blockingPostTx(spendTx);
             context.assertNotNull(txResponse);
           } catch (Throwable e) {
             context.fail(e);

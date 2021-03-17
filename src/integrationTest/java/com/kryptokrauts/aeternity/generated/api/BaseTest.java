@@ -26,7 +26,6 @@ import io.vertx.ext.unit.junit.Timeout;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
 import java.math.BigInteger;
 import java.util.List;
-import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 import javax.naming.ConfigurationException;
@@ -165,7 +164,10 @@ public abstract class BaseTest {
   }
 
   protected AccountResult getAccount(String publicKey) {
-    return aeternityServiceNative.accounts.blockingGetAccount(Optional.ofNullable(publicKey));
+    if (publicKey == null) {
+      return aeternityServiceNative.accounts.blockingGetAccount();
+    }
+    return aeternityServiceNative.accounts.blockingGetAccount(publicKey);
   }
 
   protected TransactionInfoResult waitForTxInfoObject(String txHash) throws Throwable {
@@ -174,11 +176,17 @@ public abstract class BaseTest {
         TransactionInfoResult.class);
   }
 
-  protected PostTransactionResult blockingPostTx(
-      AbstractTransactionModel<?> tx, Optional<String> privateKey) throws Throwable {
+  protected PostTransactionResult blockingPostTx(AbstractTransactionModel<?> tx) throws Throwable {
+    return this.blockingPostTx(tx, null);
+  }
+
+  protected PostTransactionResult blockingPostTx(AbstractTransactionModel<?> tx, String privateKey)
+      throws Throwable {
+    if (privateKey == null) {
+      privateKey = this.baseKeyPair.getPrivateKey();
+    }
     PostTransactionResult postTxResponse =
-        this.aeternityServiceNative.transactions.blockingPostTransaction(
-            tx, privateKey.orElse(this.baseKeyPair.getPrivateKey()));
+        this.aeternityServiceNative.transactions.blockingPostTransaction(tx, privateKey);
     _logger.info("PostTx hash: " + postTxResponse.getTxHash());
     TransactionResult txValue = waitForTxMined(postTxResponse.getTxHash());
     _logger.info(

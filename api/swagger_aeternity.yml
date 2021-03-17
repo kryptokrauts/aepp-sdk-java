@@ -3237,37 +3237,39 @@ definitions:
         $ref: '#/definitions/UInt'
   GAAttachTx:
     type: object
-    properties:
-      owner_id:
-        description: Contract owner pub_key
-        $ref: '#/definitions/EncodedPubkey'
-      nonce:
-        description: 'Owner''s nonce'
-        $ref: '#/definitions/UInt64'
-      code:
-        description: 'Contract''s code'
-        $ref: '#/definitions/EncodedByteArray'
-      vm_version:
-        description: 'Virtual machine''s version'
-        $ref: '#/definitions/UInt16'
-      abi_version:
-        description: 'ABI version'
-        $ref: '#/definitions/UInt16'
-      gas:
-        $ref: '#/definitions/UInt64'
-      gas_price:
-        $ref: '#/definitions/UInt'
-      fee:
-        $ref: '#/definitions/UInt'
-      ttl:
-        $ref: '#/definitions/UInt64'
-      call_data:
-        description: Contract call data
-        $ref: '#/definitions/EncodedByteArray'
-      auth_fun:
-        description: Contract authorization function hash (hex encoded)
-        type: string
-        pattern: ^(0x|0X)?[a-fA-F0-9]+$'
+    allOf:
+      - $ref: '#/definitions/GenericTx'
+      - properties:
+          owner_id:
+            description: Contract owner pub_key
+            $ref: '#/definitions/EncodedPubkey'
+          nonce:
+            description: 'Owner''s nonce'
+            $ref: '#/definitions/UInt64'
+          code:
+            description: 'Contract''s code'
+            $ref: '#/definitions/EncodedByteArray'
+          vm_version:
+            description: 'Virtual machine''s version'
+            $ref: '#/definitions/UInt16'
+          abi_version:
+            description: 'ABI version'
+            $ref: '#/definitions/UInt16'
+          gas:
+            $ref: '#/definitions/UInt64'
+          gas_price:
+            $ref: '#/definitions/UInt'
+          fee:
+            $ref: '#/definitions/UInt'
+          ttl:
+            $ref: '#/definitions/UInt64'
+          call_data:
+            description: Contract call data
+            $ref: '#/definitions/EncodedByteArray'
+          auth_fun:
+            description: Contract authorization function hash (hex encoded)
+            type: string
+            pattern: ^(0x|0X)?[a-fA-F0-9]+$'
     required:
       - owner_id
       - code
@@ -3280,27 +3282,29 @@ definitions:
       - auth_fun
   GAMetaTx:
     type: object
-    properties:
-      ga_id:
-        description: Account owner pub_key
-        $ref: '#/definitions/EncodedPubkey'
-      abi_version:
-        description: 'ABI version'
-        $ref: '#/definitions/UInt16'
-      gas:
-        $ref: '#/definitions/UInt64'
-      gas_price:
-        $ref: '#/definitions/UInt'
-      fee:
-        $ref: '#/definitions/UInt'
-      ttl:
-        $ref: '#/definitions/UInt64'
-      auth_data:
-        description: Contract authorization function call data
-        $ref: '#/definitions/EncodedByteArray'
-      tx:
-        description: Enclosed signed transaction
-        $ref: '#/definitions/GenericSignedTx'
+    allOf:
+      - $ref: '#/definitions/GenericTx'
+      - properties:
+          ga_id:
+            description: Account owner pub_key
+            $ref: '#/definitions/EncodedPubkey'
+          abi_version:
+            description: 'ABI version'
+            $ref: '#/definitions/UInt16'
+          gas:
+            $ref: '#/definitions/UInt64'
+          gas_price:
+            $ref: '#/definitions/UInt'
+          fee:
+            $ref: '#/definitions/UInt'
+          ttl:
+            $ref: '#/definitions/UInt64'
+          auth_data:
+            description: Contract authorization function call data
+            $ref: '#/definitions/EncodedByteArray'
+          tx:
+            description: Enclosed signed transaction
+            $ref: '#/definitions/GenericSignedTx'
     required:
       - ga_id
       - abi_version
