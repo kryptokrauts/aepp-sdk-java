@@ -10,7 +10,8 @@
 The **aepp-sdk-java** is a community developed Java SDK to interact with the æternity blockchain.
 
 ## Latest release
- [ ![Download](https://api.bintray.com/packages/kryptokrauts/maven/aepp-sdk-java/images/download.svg) ](https://bintray.com/kryptokrauts/maven/aepp-sdk-java/_latestVersion)
+ [ ![Download](https://api.bintray.com/packages/kryptokrauts/maven/aepp-sdk-java/images/download.svg) [![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fkryptokrauts%2Faepp-sdk-java.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Fkryptokrauts%2Faepp-sdk-java?ref=badge_shield)
+](https://bintray.com/kryptokrauts/maven/aepp-sdk-java/_latestVersion)
  - [changelog](docs/changelog.md)
 
 ## Documentation
@@ -20,6 +21,9 @@ The documentation is hosted on gitbook:
 ## License
 
 Licensed under the [ISC License](LICENSE)
+
+
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fkryptokrauts%2Faepp-sdk-java.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2Fkryptokrauts%2Faepp-sdk-java?ref=badge_large)
 
 ## Support us
 
