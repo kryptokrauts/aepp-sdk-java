@@ -6,8 +6,8 @@ import com.greghaskins.spectrum.Spectrum;
 import com.kryptokrauts.aeternity.sdk.BaseTest;
 import com.kryptokrauts.aeternity.sdk.domain.secret.impl.MnemonicKeyPair;
 import com.kryptokrauts.aeternity.sdk.exception.AException;
+import org.bouncycastle.util.encoders.Hex;
 import org.junit.Assert;
-import org.spongycastle.util.encoders.Hex;
 
 public class KeyPairServiceFactoryTest extends BaseTest {
   {

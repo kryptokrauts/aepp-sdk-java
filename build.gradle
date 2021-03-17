@@ -56,7 +56,7 @@ ext {
 
     lombokVersion = "1.18.10"
 
-    bouncycastleVersion = "1.61"
+    bouncycastleVersion = "1.68"
     bitcoinjCoreVersion = "0.14.7"
     tuweniVersion = "0.8.2"
 

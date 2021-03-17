@@ -13,8 +13,8 @@ import java.util.List;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 import org.bitcoinj.crypto.ChildNumber;
+import org.bouncycastle.util.encoders.Hex;
 import org.junit.Assert;
-import org.spongycastle.util.encoders.Hex;
 
 public class KeyPairServiceTest extends BaseTest {
   {
