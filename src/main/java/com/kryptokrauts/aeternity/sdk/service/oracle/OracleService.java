@@ -2,11 +2,9 @@ package com.kryptokrauts.aeternity.sdk.service.oracle;
 
 import com.kryptokrauts.aeternity.sdk.service.oracle.domain.OracleQueriesResult;
 import com.kryptokrauts.aeternity.sdk.service.oracle.domain.OracleQueryResult;
-import com.kryptokrauts.aeternity.sdk.service.oracle.domain.QueryType;
+import com.kryptokrauts.aeternity.sdk.service.oracle.domain.QueryParams;
 import com.kryptokrauts.aeternity.sdk.service.oracle.domain.RegisteredOracleResult;
 import io.reactivex.Single;
-import java.math.BigInteger;
-import java.util.Optional;
 
 public interface OracleService {
 
@@ -27,34 +25,39 @@ public interface OracleService {
   RegisteredOracleResult blockingGetRegisteredOracle(String publicKey);
 
   /**
-   * asynchronously get oracle queries by public key
+   * asynchronously get oracle queries by public key; providing default values of {@link
+   * QueryParams}
    *
-   * @param publicKey The public key of the oracle (required)
-   * @param from Last query id in previous page (optional)
-   * @param limit Max number of oracle queries (optional)
-   * @param type The type of a query: open, closed or all (optional)
+   * @param publicKey The public key of the oracle
    * @return asynchronous result handler (RxJava Single) for {@link OracleQueriesResult}
    */
-  Single<OracleQueriesResult> asyncGetOracleQueries(
-      String publicKey,
-      Optional<String> from,
-      Optional<BigInteger> limit,
-      Optional<QueryType> type);
+  Single<OracleQueriesResult> asyncGetOracleQueries(String publicKey);
+
+  /**
+   * asynchronously get oracle queries by public key
+   *
+   * @param publicKey The public key of the oracle
+   * @param queryParams optional query params (from, limit, type)
+   * @return asynchronous result handler (RxJava Single) for {@link OracleQueriesResult}
+   */
+  Single<OracleQueriesResult> asyncGetOracleQueries(String publicKey, QueryParams queryParams);
+
+  /**
+   * synchronously get oracle queries by public key; providing default values of {@link QueryParams}
+   *
+   * @param publicKey The public key of the oracle
+   * @return result of {@link OracleQueriesResult}
+   */
+  OracleQueriesResult blockingGetOracleQueries(String publicKey);
 
   /**
    * synchronously get oracle queries by public key
    *
-   * @param publicKey The public key of the oracle (required)
-   * @param from Last query id in previous page (optional)
-   * @param limit Max number of oracle queries (optional)
-   * @param type The type of a query: open, closed or all (optional)
+   * @param publicKey The public key of the oracle
+   * @param queryParams optional query params (from, limit, type)
    * @return result of {@link OracleQueriesResult}
    */
-  OracleQueriesResult blockingGetOracleQueries(
-      String publicKey,
-      Optional<String> from,
-      Optional<BigInteger> limit,
-      Optional<QueryType> type);
+  OracleQueriesResult blockingGetOracleQueries(String publicKey, QueryParams queryParams);
 
   /**
    * asynchronously get an oracle query by public key and query ID

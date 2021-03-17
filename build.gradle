@@ -48,7 +48,7 @@ ext {
 
     lombokVersion = "1.18.10"
 
-    bouncycastleVersion = "1.61"
+    bouncycastleVersion = "1.68"
     bitcoinjCoreVersion = "0.14.7"
     tuweniVersion = "0.8.2"
 
@@ -136,6 +136,14 @@ configurations {
     integrationTestCompile.extendsFrom testCompile
     integrationTestRuntime.extendsFrom testRuntime
     sharedCompile
+}
+
+configurations.all {
+    resolutionStrategy.eachDependency { details ->
+        if (details.requested.group == 'io.netty') {
+            details.useVersion "4.1.34.Final"
+        }
+    }
 }
 
 sourceSets {
