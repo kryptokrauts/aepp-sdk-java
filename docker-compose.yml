@@ -1,54 +1,22 @@
 version: '3'
 services:
   node:
-    image: aeternity/aeternity:${AETERNITY_TAG}
+    image: kryptokrauts/aeternity:${AETERNITY_TAG}
     ports:
-      - "3013:3013"
-      - "3113:3113"
-    environment:
-      AETERNITY_CONFIG: /home/aeternity/aeternity.yaml
-    command: >
-      bin/aeternity
-      console
-      -noinput
-      -aecore expected_mine_rate 250
-      -aehttp enable_debug_endpoints true
+      - "3113:3113" # node internal api
+      - "3013:3013" # node external api
+      - "3014:3014" # node websocket
+      - "4000:4000" # indaex default port
+      - "4001:4001" # indaex websocket default port
     volumes:
-      - ${PWD}/docker/aeternity.yaml:/home/aeternity/aeternity.yaml
-      - ${PWD}/docker/keys/node:/home/aeternity/node/keys
-      - ${PWD}/docker/accounts_test.json:/home/aeternity/node/data/aecore/.genesis/accounts_test.json
+      - ${PWD}/docker/aeternity.yaml:/home/aeternity/node/local/rel/aeternity/aeternity.yaml
+      - ${PWD}/docker/keys/node:/home/aeternity/node/local/rel/aeternity/keys
+      - ${PWD}/docker/accounts_test.json:/home/aeternity/node/local/rel/aeternity/data/aecore/.genesis/accounts_test.json
 
   compiler:
     image: aeternity/aesophia_http:${SOPHIA_COMPILER_TAG}
     ports:
       - "3080:3080"
-
-  aeternal:
-    image: aeternity/aeternal:${AETERNAL_TAG}
-    ports:
-      - "8080:80"
-      - "3020:3020"
-    entrypoint: ./docker/wait-for-it.sh node:3013 -- ./aeternal -p -s -w
-    environment:
-      - NODE_URL=node:3013
-      - AESOPHIA_URL=compiler:3080
-      - DATABASE_URL=postgres://aeternal:aeternal@db/aeternal
-      - LOG_CONF=/logs/log.yaml
-    volumes:
-      - ${PWD}/docker/wait-for-it.sh:/app/docker/wait-for-it.sh
-    depends_on:
-      - db
-      - node
-      - compiler
-
-  db:
-    image: postgres:11
-    restart: unless-stopped
-    environment:
-      - POSTGRES_USER=aeternal
-      - POSTGRES_PASSWORD=aeternal
-      - POSTGRES_DB=aeternal
-    expose: [5432]
 
   proxy:
     image: nginx:${NGINX_TAG}
@@ -58,4 +26,4 @@ services:
       - ${PWD}/docker/nginx-default.conf:/etc/nginx/conf.d/default.conf
       - ${PWD}/docker/nginx-cors.conf:/etc/nginx/cors.conf
     depends_on:
-      - aeternal
+      - node

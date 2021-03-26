@@ -3,7 +3,6 @@ package com.kryptokrauts.aeternity.generated.api;
 import com.kryptokrauts.aeternity.sdk.service.account.domain.AccountResult;
 import io.vertx.ext.unit.TestContext;
 import java.math.BigInteger;
-import java.util.Optional;
 import org.junit.Test;
 
 public class AccountServiceTest extends BaseTest {
@@ -15,7 +14,7 @@ public class AccountServiceTest extends BaseTest {
         t -> {
           AccountResult result =
               this.aeternityServiceNative.accounts.blockingGetAccount(
-                  Optional.of(this.baseAccount.getAddress()));
+                  this.baseAccount.getAddress());
           context.assertTrue(result.getBalance().compareTo(ZERO) == 1);
         });
   }
@@ -25,8 +24,7 @@ public class AccountServiceTest extends BaseTest {
     this.executeTest(
         context,
         t -> {
-          AccountResult result =
-              this.aeternityServiceNative.accounts.blockingGetAccount(Optional.empty());
+          AccountResult result = this.aeternityServiceNative.accounts.blockingGetAccount();
           context.assertTrue(result.getBalance().compareTo(ZERO) == 1);
         });
   }
@@ -47,8 +45,7 @@ public class AccountServiceTest extends BaseTest {
     this.executeTest(
         context,
         t -> {
-          AccountResult result =
-              this.aeternityServiceNative.accounts.blockingGetAccount(Optional.empty());
+          AccountResult result = this.aeternityServiceNative.accounts.blockingGetAccount();
           context.assertTrue(result.getBalance().compareTo(ZERO) == 1);
         });
   }
@@ -58,11 +55,9 @@ public class AccountServiceTest extends BaseTest {
     this.executeTest(
         context,
         t -> {
-          AccountResult result =
-              this.aeternityServiceNative.accounts.blockingGetAccount(Optional.empty());
+          AccountResult result = this.aeternityServiceNative.accounts.blockingGetAccount();
           BigInteger nextNonce =
-              this.aeternityServiceNative.accounts.blockingGetNextBaseKeypairNonce(
-                  Optional.empty());
+              this.aeternityServiceNative.accounts.blockingGetNextBaseKeypairNonce();
           context.assertTrue(result.getNonce().add(ONE).intValue() == nextNonce.intValue());
         });
   }

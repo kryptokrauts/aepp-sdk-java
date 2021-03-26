@@ -7,19 +7,17 @@ import com.kryptokrauts.aeternity.generated.model.NameUpdateTx;
 import com.kryptokrauts.aeternity.sdk.annotations.Mandatory;
 import com.kryptokrauts.aeternity.sdk.constants.AENS;
 import com.kryptokrauts.aeternity.sdk.constants.ApiIdentifiers;
-import com.kryptokrauts.aeternity.sdk.exception.InvalidParameterException;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.AbstractTransaction;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.impl.NameUpdateTransaction;
 import com.kryptokrauts.aeternity.sdk.util.ValidationUtil;
 import com.kryptokrauts.sophia.compiler.generated.api.rxjava.DefaultApi;
 import java.math.BigInteger;
 import java.util.Arrays;
-import java.util.LinkedList;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Optional;
+import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import lombok.Builder.Default;
 import lombok.Getter;
 import lombok.ToString;
@@ -38,7 +36,7 @@ public class NameUpdateTransactionModel extends AbstractTransactionModel<NameUpd
   private BigInteger nameTtl;
   private BigInteger clientTtl;
 
-  @Default private List<String> pointers = new LinkedList<>();
+  @Default private Map<String, String> pointers = new HashMap<>();
 
   @Override
   public NameUpdateTx toApiModel() {
@@ -55,7 +53,9 @@ public class NameUpdateTransactionModel extends AbstractTransactionModel<NameUpd
   }
 
   public List<NamePointer> getGeneratedPointers() {
-    return pointers.stream().map(pointer -> buildNamePointer(pointer)).collect(Collectors.toList());
+    return pointers.entrySet().stream()
+        .map(p -> new NamePointer().key(p.getKey()).id(p.getValue()))
+        .collect(Collectors.toList());
   }
 
   @Override
@@ -72,8 +72,7 @@ public class NameUpdateTransactionModel extends AbstractTransactionModel<NameUpd
           .ttl(castedTx.getTtl())
           .pointers(
               castedTx.getPointers().stream()
-                  .map(pointer -> pointer.getId())
-                  .collect(Collectors.toList()))
+                  .collect(Collectors.toMap(p -> p.getKey(), p -> p.getId())))
           .build();
     };
   }
@@ -82,32 +81,23 @@ public class NameUpdateTransactionModel extends AbstractTransactionModel<NameUpd
   public void validateInput() {
     // Validate parameters
     ValidationUtil.checkParameters(
-        validate -> Optional.ofNullable(nameId != null),
+        validate -> nameId != null,
         nameId,
-        "validateUpdateTransaction",
+        "validateNameUpdateTransaction",
         Arrays.asList("nameId"),
         ValidationUtil.PARAMETER_IS_NULL);
     ValidationUtil.checkParameters(
-        validate -> Optional.ofNullable(nameId.startsWith(ApiIdentifiers.NAME)),
+        validate -> nameId.startsWith(ApiIdentifiers.NAME),
         nameId,
-        "validateUpdateTransaction",
-        Arrays.asList("nameId", ApiIdentifiers.NAME),
+        "validateNameUpdateTransaction",
+        Arrays.asList("nameId"),
         ValidationUtil.MISSING_API_IDENTIFIER);
     ValidationUtil.checkParameters(
-        validate -> Optional.ofNullable(areDistinctPointerKeys(pointers)),
+        validate -> checkDefaultPointerTypes(pointers),
         pointers,
-        "validateUpdateTransaction",
-        Stream.concat(Arrays.asList("pointers").stream(), pointers.stream())
-            .collect(Collectors.toList()),
-        ValidationUtil.DUPLICATE_POINTER_KEY);
-    for (String pointer : pointers) {
-      ValidationUtil.checkParameters(
-          validate -> Optional.ofNullable(isValidPointer(pointer)),
-          pointer,
-          "validateUpdateTransaction",
-          Arrays.asList("pointer", pointer),
-          ValidationUtil.INVALID_POINTER);
-    }
+        "validateNameUpdateTransaction",
+        Arrays.asList("pointers"),
+        ValidationUtil.INVALID_STANDARD_POINTER);
   }
 
   @Override
@@ -115,24 +105,13 @@ public class NameUpdateTransactionModel extends AbstractTransactionModel<NameUpd
     return NameUpdateTransaction.builder().externalApi(externalApi).model(this).build();
   }
 
-  private boolean areDistinctPointerKeys(List<String> pointers) {
-    return pointers.stream().map(p -> getIdentifier(p)).distinct().count() == pointers.size();
-  }
-
-  private boolean isValidPointer(String pointer) {
-    return AENS.IDENTIFIER_TO_POINTERKEY_MAP.keySet().contains(getIdentifier(pointer));
-  }
-
-  private NamePointer buildNamePointer(String pointer) {
-    return new NamePointer()
-        .key(AENS.IDENTIFIER_TO_POINTERKEY_MAP.get(getIdentifier(pointer)))
-        .id(pointer);
-  }
-
-  private String getIdentifier(String pointer) {
-    if (pointer == null) {
-      throw new InvalidParameterException("pointer mustn't be null");
+  private Boolean checkDefaultPointerTypes(final Map<String, String> pointers) {
+    for (Map.Entry<String, String> entry : AENS.POINTERKEY_TO_IDENTIFIER_MAP.entrySet()) {
+      String value = pointers.get(entry.getKey());
+      if (value != null && !value.matches("^" + entry.getValue() + "_.+$")) {
+        return false;
+      }
     }
-    return pointer.split("_")[0];
+    return true;
   }
 }

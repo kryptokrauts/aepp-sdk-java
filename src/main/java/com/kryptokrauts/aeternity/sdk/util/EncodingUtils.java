@@ -12,6 +12,7 @@ import com.kryptokrauts.aeternity.sdk.domain.secret.impl.Account;
 import com.kryptokrauts.aeternity.sdk.domain.secret.impl.RawKeyPair;
 import com.kryptokrauts.aeternity.sdk.exception.EncodingNotSupportedException;
 import java.math.BigInteger;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.List;
 import lombok.experimental.UtilityClass;
@@ -105,7 +106,7 @@ public final class EncodingUtils {
    * @return the decoded bytearray
    * @throws EncodingNotSupportedException if the encoding type cannot be determined for some reason
    */
-  private static final byte[] decodeCheck(final String input, String identifier)
+  public static final byte[] decodeCheck(final String input, String identifier)
       throws EncodingNotSupportedException {
     if (identifier != null && identifier.trim().length() > 0) {
       // determine encoding from given identifier
@@ -289,8 +290,16 @@ public final class EncodingUtils {
 
   public static String generateCommitmentHash(final String name, final BigInteger salt) {
     return encodeCheck(
-        hash(ByteUtils.concatenate(name.getBytes(), ByteUtils.leftPad(32, salt.toByteArray()))),
+        hash(
+            ByteUtils.concatenate(
+                name.getBytes(StandardCharsets.UTF_8), ByteUtils.leftPad(32, salt.toByteArray()))),
         ApiIdentifiers.COMMITMENT);
+  }
+
+  public static String generateAuthFunHash(final String authFun) {
+    byte[] hash = hash(authFun.getBytes(StandardCharsets.UTF_8));
+    // using Hex to convert bytes due to signed/unsigned problem
+    return Hex.toHexString(ByteUtils.rightPad(32, Arrays.copyOfRange(hash, 0, 4)));
   }
 
   /**

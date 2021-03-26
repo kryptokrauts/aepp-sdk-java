@@ -27,7 +27,6 @@ import io.vertx.ext.unit.junit.Timeout;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
 import java.math.BigInteger;
 import java.util.List;
-import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 import javax.naming.ConfigurationException;
@@ -56,7 +55,7 @@ public abstract class BaseTest {
 
   private static final String COMPILER_BASE_URL = "COMPILER_BASE_URL";
 
-  private static final String AETERNAL_BASE_URL = "AETERNAL_BASE_URL";
+  private static final String INDAEX_BASE_URL = "INDAEX_BASE_URL";
 
   protected static final VirtualMachine targetVM = VirtualMachine.FATE;
 
@@ -68,7 +67,7 @@ public abstract class BaseTest {
 
   protected ObjectMapper objectMapper = new ObjectMapper();
 
-  Account baseAccount;
+  protected Account baseAccount;
 
   @Rule
   public RunTestOnContext rule =
@@ -96,8 +95,8 @@ public abstract class BaseTest {
                 AeternityServiceConfiguration.configure()
                     .baseUrl(getAeternityBaseUrl())
                     .compilerBaseUrl(getCompilerBaseUrl())
-                    .aeternalBaseUrl(getAeternalBaseUrl())
-                    .network(Network.DEVNET)
+                    .indaexBaseUrl(getIndaexBaseUrl())
+                    .network(Network.LOCAL_LIMA_NETWORK)
                     .nativeMode(true)
                     .baseAccount(baseAccount)
                     .vertx(vertx)
@@ -110,8 +109,8 @@ public abstract class BaseTest {
                 AeternityServiceConfiguration.configure()
                     .baseUrl(getAeternityBaseUrl())
                     .compilerBaseUrl(getCompilerBaseUrl())
-                    .aeternalBaseUrl(getAeternalBaseUrl())
-                    .network(Network.DEVNET)
+                    .indaexBaseUrl(getIndaexBaseUrl())
+                    .network(Network.LOCAL_LIMA_NETWORK)
                     .nativeMode(false)
                     .baseAccount(baseAccount)
                     .vertx(vertx)
@@ -141,12 +140,12 @@ public abstract class BaseTest {
     return compilerBaseUrl;
   }
 
-  protected static String getAeternalBaseUrl() throws ConfigurationException {
-    String aeternalBaseUrl = System.getenv(AETERNAL_BASE_URL);
-    if (aeternalBaseUrl == null) {
-      throw new ConfigurationException("ENV variable missing: AETERNAL_BASE_URL");
+  protected static String getIndaexBaseUrl() throws ConfigurationException {
+    String indaexBaseUrl = System.getenv(INDAEX_BASE_URL);
+    if (indaexBaseUrl == null) {
+      throw new ConfigurationException("ENV variable missing: INDAEX_BASE_URL");
     }
-    return aeternalBaseUrl;
+    return indaexBaseUrl;
   }
 
   @BeforeClass
@@ -157,7 +156,7 @@ public abstract class BaseTest {
             "Using following environment"));
     _logger.info(String.format("%s: %s", AETERNITY_BASE_URL, getAeternityBaseUrl()));
     _logger.info(String.format("%s: %s", COMPILER_BASE_URL, getCompilerBaseUrl()));
-    _logger.info(String.format("%s: %s", AETERNAL_BASE_URL, getAeternalBaseUrl()));
+    _logger.info(String.format("%s: %s", INDAEX_BASE_URL, getIndaexBaseUrl()));
     _logger.info(
         "-----------------------------------------------------------------------------------");
   }
@@ -167,7 +166,10 @@ public abstract class BaseTest {
   }
 
   protected AccountResult getAccount(String publicKey) {
-    return aeternityServiceNative.accounts.blockingGetAccount(Optional.ofNullable(publicKey));
+    if (publicKey == null) {
+      return aeternityServiceNative.accounts.blockingGetAccount();
+    }
+    return aeternityServiceNative.accounts.blockingGetAccount(publicKey);
   }
 
   protected TransactionInfoResult waitForTxInfoObject(String txHash) throws Throwable {
@@ -176,11 +178,17 @@ public abstract class BaseTest {
         TransactionInfoResult.class);
   }
 
-  protected PostTransactionResult blockingPostTx(
-      AbstractTransactionModel<?> tx, Optional<String> privateKey) throws Throwable {
+  protected PostTransactionResult blockingPostTx(AbstractTransactionModel<?> tx) throws Throwable {
+    return this.blockingPostTx(tx, null);
+  }
+
+  protected PostTransactionResult blockingPostTx(AbstractTransactionModel<?> tx, String privateKey)
+      throws Throwable {
+    if (privateKey == null) {
+      privateKey = this.baseAccount.getPrivateKey();
+    }
     PostTransactionResult postTxResponse =
-        this.aeternityServiceNative.transactions.blockingPostTransaction(
-            tx, privateKey.orElse(this.baseAccount.getPrivateKey()));
+        this.aeternityServiceNative.transactions.blockingPostTransaction(tx, privateKey);
     _logger.info("PostTx hash: " + postTxResponse.getTxHash());
     TransactionResult txValue = waitForTxMined(postTxResponse.getTxHash());
     _logger.info(

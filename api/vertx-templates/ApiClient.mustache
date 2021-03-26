@@ -63,6 +63,9 @@ public class ApiClient {
         // Use UTC as the default time zone.
         this.dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
 
+        // Tell vertx not to fail when trying to deserialize unknown properties
+        Json.mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+
         // Build object mapper
         this.objectMapper = new ObjectMapper();
         this.objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);

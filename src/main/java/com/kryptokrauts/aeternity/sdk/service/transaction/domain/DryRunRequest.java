@@ -9,7 +9,6 @@ import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.Builder;
 import lombok.Builder.Default;
@@ -41,19 +40,19 @@ public class DryRunRequest extends GenericInputObject<DryRunInput> {
   @Override
   protected void validate() {
     ValidationUtil.checkParameters(
-        validate -> Optional.ofNullable(this.accounts.size() > 0),
+        validate -> this.accounts.size() > 0,
         this.accounts,
         "dryRunTransactions",
         Arrays.asList("accounts"),
         ValidationUtil.NO_ENTRIES);
     ValidationUtil.checkParameters(
-        validate -> Optional.ofNullable(this.txInputs.size() > 0),
+        validate -> this.txInputs.size() > 0,
         this.accounts,
         "dryRunTransactions",
         Arrays.asList("unsignedTransactions"),
         ValidationUtil.NO_ENTRIES);
     ValidationUtil.checkParameters(
-        validate -> Optional.ofNullable(this.txInputs.size() == this.accounts.size()),
+        validate -> this.txInputs.size() == this.accounts.size(),
         this.accounts,
         "dryRunTransactions",
         Arrays.asList("unsignedTransactions", "accounts"),

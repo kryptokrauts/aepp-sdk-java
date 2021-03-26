@@ -53,13 +53,13 @@ public interface AENS {
         }
       };
 
-  Map<String, String> IDENTIFIER_TO_POINTERKEY_MAP =
+  Map<String, String> POINTERKEY_TO_IDENTIFIER_MAP =
       new HashMap<String, String>() {
         {
-          put(ApiIdentifiers.ACCOUNT_PUBKEY, POINTER_KEY_ACCOUNT);
-          put(ApiIdentifiers.CHANNEL, POINTER_KEY_CHANNEL);
-          put(ApiIdentifiers.CONTRACT_PUBKEY, POINTER_KEY_CONTRACT);
-          put(ApiIdentifiers.ORACLE_PUBKEY, POINTER_KEY_ORACLE);
+          put(POINTER_KEY_ACCOUNT, ApiIdentifiers.ACCOUNT_PUBKEY);
+          put(POINTER_KEY_CHANNEL, ApiIdentifiers.CHANNEL);
+          put(POINTER_KEY_CONTRACT, ApiIdentifiers.CONTRACT_PUBKEY);
+          put(POINTER_KEY_ORACLE, ApiIdentifiers.ORACLE_PUBKEY);
         }
       };
 

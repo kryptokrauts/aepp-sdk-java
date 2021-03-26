@@ -23,9 +23,7 @@ public class NamePreclaimTransactionModel extends AbstractTransactionModel<NameP
   @Mandatory private String accountId;
   @Mandatory private String name; // will be used to generate the commitmentId
   @Mandatory private BigInteger salt; // will be used to generate the commitmentId
-
   @Mandatory private BigInteger nonce;
-
   @Mandatory private BigInteger ttl;
 
   @Override

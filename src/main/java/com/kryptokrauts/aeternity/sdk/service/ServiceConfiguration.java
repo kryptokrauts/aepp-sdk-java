@@ -49,7 +49,7 @@ public class ServiceConfiguration {
 
   @Default @Nonnull protected String compilerBaseUrl = BaseConstants.DEFAULT_TESTNET_COMPILER_URL;
 
-  @Default @Nonnull protected String aeternalBaseUrl = BaseConstants.DEFAULT_TESTNET_AETERNAL_URL;
+  @Default @Nonnull protected String indaexBaseUrl = BaseConstants.DEFAULT_TESTNET_INDAEX_URL;
 
   @Getter @Default @Nonnull protected VirtualMachine targetVM = VirtualMachine.FATE;
 
@@ -95,23 +95,23 @@ public class ServiceConfiguration {
           "Cannot instantiate ApiClient due to missing params vertx and or compilerBaseUrl");
   }
 
-  public com.kryptokrauts.aeternal.generated.ApiClient getAeternalApiClient() {
+  public com.kryptokrauts.indaex.generated.ApiClient getIndaexApiClient() {
     if (vertx == null) {
       _logger.debug("Vertx entry point not initialized, creating default");
       vertx = Vertx.vertx();
     }
-    if (vertx != null && aeternalBaseUrl != null) {
+    if (vertx != null && indaexBaseUrl != null) {
       _logger.debug(
           String.format(
-              "Initializing Vertx AeternalApiClient using aeternalBaseUrl %s", aeternalBaseUrl));
-      return new com.kryptokrauts.aeternal.generated.ApiClient(
+              "Initializing Vertx IndaexApiClient using indaexBaseUrl %s", indaexBaseUrl));
+      return new com.kryptokrauts.indaex.generated.ApiClient(
           vertx,
           new JsonObject(
               new HashMap<String, Object>(
-                  ImmutableMap.of(BaseConstants.VERTX_BASE_PATH, aeternalBaseUrl))));
+                  ImmutableMap.of(BaseConstants.VERTX_BASE_PATH, indaexBaseUrl))));
     } else
       throw new RuntimeException(
-          "Cannot instantiate ApiClient due to missing params vertx and or aeternalBaseUrl");
+          "Cannot instantiate ApiClient due to missing params vertx and or indaexBaseUrl");
   }
 
   public Account getBaseAccount() {

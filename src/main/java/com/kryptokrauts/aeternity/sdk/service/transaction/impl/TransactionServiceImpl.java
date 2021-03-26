@@ -18,6 +18,7 @@ import com.kryptokrauts.aeternity.sdk.service.transaction.domain.DryRunRequest;
 import com.kryptokrauts.aeternity.sdk.service.transaction.domain.DryRunTransactionResults;
 import com.kryptokrauts.aeternity.sdk.service.transaction.domain.PostTransactionResult;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.model.AbstractTransactionModel;
+import com.kryptokrauts.aeternity.sdk.service.transaction.type.model.GeneralizedAccountsMetaTransactionModel;
 import com.kryptokrauts.aeternity.sdk.util.ByteUtils;
 import com.kryptokrauts.aeternity.sdk.util.EncodingUtils;
 import com.kryptokrauts.aeternity.sdk.util.SigningUtil;
@@ -76,14 +77,15 @@ public class TransactionServiceImpl implements TransactionService {
   @Override
   public Single<PostTransactionResult> asyncPostTransaction(
       AbstractTransactionModel<?> tx, String privateKey) throws TransactionCreateException {
+    String signedTx;
+    if (tx instanceof GeneralizedAccountsMetaTransactionModel) {
+      signedTx = wrapSignedTransactionForGA(blockingCreateUnsignedTransaction(tx).getResult());
+    } else {
+      signedTx = signTransaction(blockingCreateUnsignedTransaction(tx).getResult(), privateKey);
+    }
     return PostTransactionResult.builder()
         .build()
-        .asyncGet(
-            externalApi.rxPostTransaction(
-                createGeneratedTxObject(
-                    signTransaction(
-                        asyncCreateUnsignedTransaction(tx).blockingGet().getResult(),
-                        privateKey))));
+        .asyncGet(externalApi.rxPostTransaction(createGeneratedTxObject(signedTx)));
   }
 
   @Override
@@ -113,15 +115,16 @@ public class TransactionServiceImpl implements TransactionService {
   @Override
   public PostTransactionResult blockingPostTransaction(
       AbstractTransactionModel<?> tx, String privateKey) throws TransactionCreateException {
+    String signedTx;
+    if (tx instanceof GeneralizedAccountsMetaTransactionModel) {
+      signedTx = wrapSignedTransactionForGA(blockingCreateUnsignedTransaction(tx).getResult());
+    } else {
+      signedTx = signTransaction(blockingCreateUnsignedTransaction(tx).getResult(), privateKey);
+    }
     PostTransactionResult postTransactionResult =
         PostTransactionResult.builder()
             .build()
-            .blockingGet(
-                externalApi.rxPostTransaction(
-                    createGeneratedTxObject(
-                        signTransaction(
-                            asyncCreateUnsignedTransaction(tx).blockingGet().getResult(),
-                            privateKey))));
+            .blockingGet(externalApi.rxPostTransaction(createGeneratedTxObject(signedTx)));
     if (this.config.isWaitForTxIncludedInBlockEnabled()) {
       return this.waitUntilTransactionIsIncludedInBlock(postTransactionResult);
     }
@@ -152,6 +155,20 @@ public class TransactionServiceImpl implements TransactionService {
     } catch (Exception e) {
       throw createException(e);
     }
+  }
+
+  @Override
+  public String wrapSignedTransactionForGA(String unsignedTx) {
+    byte[] binaryTx = EncodingUtils.decodeCheckWithIdentifier(unsignedTx);
+    Bytes encodedRlp =
+        RLP.encodeList(
+            rlpWriter -> {
+              rlpWriter.writeInt(SerializationTags.OBJECT_TAG_SIGNED_TRANSACTION);
+              rlpWriter.writeInt(SerializationTags.VSN_1);
+              rlpWriter.writeList(writer -> {});
+              rlpWriter.writeByteArray(binaryTx);
+            });
+    return EncodingUtils.encodeCheck(encodedRlp.toArray(), ApiIdentifiers.TRANSACTION);
   }
 
   @Override

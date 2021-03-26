@@ -12,7 +12,6 @@ import com.kryptokrauts.aeternity.sdk.service.info.domain.TransactionResults;
 import com.kryptokrauts.aeternity.sdk.util.ValidationUtil;
 import io.reactivex.Single;
 import java.util.Arrays;
-import java.util.Optional;
 import javax.annotation.Nonnull;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -93,7 +92,7 @@ public class InfoServiceImpl implements InfoService {
 
   private void validateMicroTxHash(final String microBlockHash) {
     ValidationUtil.checkParameters(
-        validate -> Optional.ofNullable(microBlockHash.startsWith(ApiIdentifiers.MICRO_BLOCK_HASH)),
+        validate -> microBlockHash.startsWith(ApiIdentifiers.MICRO_BLOCK_HASH),
         microBlockHash,
         "getMicroBlockTransactions",
         Arrays.asList("microBlockHash", ApiIdentifiers.NAME),
@@ -102,7 +101,7 @@ public class InfoServiceImpl implements InfoService {
 
   private void validateContractId(final String contractId) {
     ValidationUtil.checkParameters(
-        validate -> Optional.ofNullable(contractId.startsWith(ApiIdentifiers.CONTRACT_PUBKEY)),
+        validate -> contractId.startsWith(ApiIdentifiers.CONTRACT_PUBKEY),
         contractId,
         "getContract",
         Arrays.asList("contractId", ApiIdentifiers.CONTRACT_PUBKEY),
