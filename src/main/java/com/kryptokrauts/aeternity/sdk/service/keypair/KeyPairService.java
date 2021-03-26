@@ -15,7 +15,7 @@ import javax.crypto.NoSuchPaddingException;
 public interface KeyPairService {
 
   /** @return a base58 encoded keypair */
-  Account generateBaseKeyPair();
+  Account generateAccount();
 
   /** @return a byte arrayed keypair */
   RawKeyPair generateRawKeyPair();
@@ -24,7 +24,7 @@ public interface KeyPairService {
    * @param privateKey encoded privateKey
    * @return a base58 encoded keypair
    */
-  Account generateBaseKeyPairFromSecret(String privateKey);
+  Account generateAccountFromSecret(String privateKey);
 
   /**
    * @param privateKey private key (hex)
@@ -144,8 +144,28 @@ public interface KeyPairService {
    *
    * @param mnemonicKeyPair mnemonicKeyPair containing the deterministic tree of keys necessary for
    *     derivation
-   * @return a new mnemonic object containing the derived child key
+   * @return a new derived child raw keypair
    * @throws AException in case of an error
    */
-  MnemonicKeyPair deriveNextAddress(MnemonicKeyPair mnemonicKeyPair) throws AException;
+  RawKeyPair deriveNextRawKeyPair(MnemonicKeyPair mnemonicKeyPair) throws AException;
+
+  /**
+   * derives the next hardened key. The derived keys are generated according to the deterministic
+   * tree saved within the given menomincKeyPair stated in <a
+   * href=https://github.com/bitcoin/bips/blob/master/bip-0032.mediawiki#Master_key_generation>BIP32</a>
+   *
+   * @param mnemonicKeyPair mnemonicKeyPair containing the deterministic tree of keys necessary for
+   *     derivation
+   * @return a new derived child account
+   * @throws AException in case of an error
+   */
+  Account deriveNextAccount(MnemonicKeyPair mnemonicKeyPair) throws AException;
+
+  /**
+   * convenient method to transform a raw keypair to an account
+   *
+   * @param the raw keypair to transform
+   * @return the account object
+   */
+  Account toAccount(RawKeyPair rawKeyPair);
 }

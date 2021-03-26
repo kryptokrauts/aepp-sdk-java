@@ -184,11 +184,11 @@ public class GenerationAndSigningTest extends BaseTest {
                 it(
                     "generates an account key pair",
                     () -> {
-                      Account keyPair = keypairService.generateBaseKeyPair();
-                      assertNotNull(keyPair);
-                      assertTrue(EncodingUtils.isAddressValid(keyPair.getPublicKey()));
-                      assertTrue(keyPair.getPublicKey().startsWith("ak_"));
-                      int length = keyPair.getPublicKey().length();
+                      Account account = keypairService.generateAccount();
+                      assertNotNull(account);
+                      assertTrue(EncodingUtils.isAddressValid(account.getAddress()));
+                      assertTrue(account.getAddress().startsWith("ak_"));
+                      int length = account.getAddress().length();
                       assertTrue(length <= 53 && length >= 51);
                     });
               });
@@ -251,10 +251,10 @@ public class GenerationAndSigningTest extends BaseTest {
                     () -> {
                       final String beneficiaryPub =
                           "ak_twR4h7dEcUtc2iSEDv8kB7UFJJDGiEDQCXr85C3fYF8FdVdyo";
-                      final Account keyPair =
-                          keypairService.generateBaseKeyPairFromSecret(
+                      final Account address =
+                          keypairService.generateAccountFromSecret(
                               "79816BBF860B95600DDFABF9D81FEE81BDB30BE823B17D80B9E48BE0A7015ADF");
-                      assertEquals(beneficiaryPub, keyPair.getPublicKey());
+                      assertEquals(beneficiaryPub, address.getAddress());
                     });
               });
 

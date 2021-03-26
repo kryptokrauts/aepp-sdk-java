@@ -1,0 +1,107 @@
+[
+	{
+		"mnemonic": "abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about",
+		"password": "kryptokrauts",
+		"accounts": [
+			{
+				"index": 0,
+				"address": "ak_uEoRY2CEAbSzMbN4ohniNHFdrVDHjpw3Za3upmJA8SihGBjCk",
+				"pk": "cb9b31d8e09182ab7228a3252984a68c41513cea33283313680f34c382c58127769cd5368a1a498dff86d3aec54ff4eb3ac89c13d6b100461907133bfa5cd082"
+			},
+			{
+				"index": 1,
+				"address": "ak_Bdv55ARA3Asqy3HK4KiPU3raZURXEMQGkRX6LeYRoStMza742",
+				"pk": "007d1f7a036082f012ed3381aa05be7aaaaa0000fd8fdfb677b17db103cec1ef1826c1e82ca5e99170b100015489101ef377d582431af64fd11ebf948f5fe935"
+			},
+			{
+				"index": 2,
+				"address": "ak_N8wj8LxdSz5YsNwLbGGXKm485TcgrimKWAhh7FTHoLZ57GsAe",
+				"pk": "8b1e4d7c86330a311dfeb013a2d9f3d05e58bf49f3a78bc9ad78fb26ecc964122ffe79f8785c4b385b6d5d7b3ae6d947fd16659b35fdbb1acf4fe5e5cfd99aa9"
+			}
+		]
+	},
+	{
+		"mnemonic": "abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about",
+		"password": "",
+		"accounts": [
+			{
+				"index": 0,
+				"address": "ak_21SBPc3yHP7bpQDvD1KMKzZZEgLtSXpDsK97LTjVwjiskra6Ka",
+				"pk": "04fe1c705457b4607474d1d8f5354536c00d2a924542daf63653d0f15e141d0d84ae8c0fb5fc9df3af67a9348e254cd602b84ccc670faa247600abaec01b5294"
+			},
+			{
+				"index": 1,
+				"address": "ak_iV7sCUsuKZytEEBEsX9N2K37m26X132LegogrgJEWzzPVjmmS",
+				"pk": "f402c90a6b5b406f211844c0888eb81cd9fe9ad74c8b942b7566953eb6d6c7365e32418436f1dfe2e005e9b074b36a3a60f9e6277e501388790e0c80eadeba70"
+			},
+			{
+				"index": 2,
+				"address": "ak_2D8fAoXC3dweJkpstEp89uXQby7i4RU6HeXyPNmyCjXLGH6pPz",
+				"pk": "a2fe1a3473d83a5706059b70199f73cf66cbccf6692c21e40c20ec8b0b1f85259f3e4d4ef8af1b7803325e5ad2834a3b2f91913c52fd27e0de4e53d78ba5873c"
+			}
+		]
+	},
+	{
+		"mnemonic": "acquire useful napkin ranch witness scare lunch smart sibling situate potato inspire",
+		"password": "",
+		"accounts": [
+			{
+				"index": 0,
+				"address": "ak_6z3Efre5nVXLB1togCbr2AWrjnKZNWRAXukSdTPPrAAzdFvXC",
+				"pk": "c11b21e4ee83781ad516bddb6a708d95287a2c1a1ef6bf42cc06ac2cf2dbeb490d960a47eeaa08ee4b6cf4b19a14a11411ac65c86663b97cf80335f053a42dfe"
+			},
+			{
+				"index": 1,
+				"address": "ak_256JtFuqyGJ8PPTdkvSi9Lg1E1HhsWeEnxVMUU2tWJQLsUUm3v",
+				"pk": "26b44062afc81f1df04ead8b2700010af8c971399b5cc39f7da42a3dd45047b18cfc84a633b529c17ee5300e295e501b10ffa633c07dee7457aba16703ef00cf"
+			},
+			{
+				"index": 2,
+				"address": "ak_26uXcydJUDHP7cZ3hc8qjqXKyYSGLCEcH3G6Rnqrpk7midqXcD",
+				"pk": "dea3e9dc2554aff2d39388535f4723743bf7a9f02780e7509ed3640a8689eca3911b08f376a78153b896475aeca385720c041ffed489964fe3beae59ca9c1893"
+			}
+		]
+	},
+	{
+		"mnemonic": "eye quarter chapter suit cruel scrub verify stuff volume control learn dust",
+		"password": "",
+		"accounts": [
+			{
+				"index": 0,
+				"address": "ak_2swhLkgBPeeADxVTAVCJnZLY5NZtCFiM93JxsEaMuC59euuFRQ",
+				"pk": "87abcb9c765f3259cf448542cae4c2e9bbff2ad2588693239fd7ca00b17fd463f75e53f57822227a58b463095d6dab657cab804574be62de0be1f95279d09037"
+			},
+			{
+				"index": 1,
+				"address": "ak_DzELMKnSfJcfnCUZ2SbXUSxRmFYtGrWmMuKiCx68YKLH26kwc",
+				"pk": "e78fdb3c2600a0684906adfcb5fac33167576dcb099580bde000bc5a363c939c1d7ce9bcf06e93c844c02489862b623c23b14a7364350a36336c87bc76b6650a"
+			},
+			{
+				"index": 2,
+				"address": "ak_21tentxmY6ccVCLy2FH5wqF9ePq6jrXtWQ2sYs99AT89sMewy2",
+				"pk": "703bb00477c1e97c7991a397eaa1adf108a3d76797958d68be54d46816cc77bc85b7dafda172d4815216542617da858540bf957366865a8ac8ab9513b6763289"
+			}
+		]
+	},
+	{
+		"mnemonic": "energy pass install genuine sell enroll wear announce brother marble test cruise",
+		"password": "kryptokrauts",
+		"accounts": [
+			{
+				"index": 0,
+				"address": "ak_21pvRZEqkEGEvJe4TF6Utk5DmSscaUNEXcwCucPAiqDNFWoTQd",
+				"pk": "7ab3710ae052639aa14f97ea71ea30d7141cafc43d016c4d47a858fe3271d4a5859277e4a87db7af013a7c78c948254b467fea2dd4016e96b52798c44a0b3824"
+			},
+			{
+				"index": 1,
+				"address": "ak_tQn8JEGuacWH87DCbBBhmnSjRwAYr1V4D5ntgWgpZDopLj8Yo",
+				"pk": "1e79cc25d7b8e1c18e9fc9cf7c5b47e0ad123f14f1e6ff6c3ccd8cf87b7470ee74bb8ccac624ce77d6c4ebb061953fcc3816803dadd9bb1e2d0c4f7764d0aa90"
+			},
+			{
+				"index": 2,
+				"address": "ak_2CWkjztmr7nCM2dswLA4jye3UZsK7vWqpSZMSqjeoMzCiJeq3S",
+				"pk": "20408d1ad7dd2f88ac15d87f4a56828bc33eca01d22b5fa826cfe193fc89d5f29dd6788611b4f8bc0a648cac008262c0ce5d9eb33edc44b958514b4535ac4cfd"
+			}
+		]
+	}
+]

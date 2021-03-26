@@ -68,7 +68,7 @@ public abstract class BaseTest {
 
   protected ObjectMapper objectMapper = new ObjectMapper();
 
-  Account baseKeyPair;
+  Account baseAccount;
 
   @Rule
   public RunTestOnContext rule =
@@ -88,8 +88,7 @@ public abstract class BaseTest {
 
     keyPairService = new KeyPairServiceFactory().getService();
 
-    baseKeyPair =
-        keyPairService.generateBaseKeyPairFromSecret(TestConstants.BENEFICIARY_PRIVATE_KEY);
+    baseAccount = keyPairService.generateAccountFromSecret(TestConstants.BENEFICIARY_PRIVATE_KEY);
 
     aeternityServiceNative =
         new AeternityServiceFactory()
@@ -100,7 +99,7 @@ public abstract class BaseTest {
                     .aeternalBaseUrl(getAeternalBaseUrl())
                     .network(Network.DEVNET)
                     .nativeMode(true)
-                    .baseKeyPair(baseKeyPair)
+                    .baseAccount(baseAccount)
                     .vertx(vertx)
                     .targetVM(targetVM)
                     .millisBetweenTrailsToWaitForConfirmation(500l)
@@ -114,7 +113,7 @@ public abstract class BaseTest {
                     .aeternalBaseUrl(getAeternalBaseUrl())
                     .network(Network.DEVNET)
                     .nativeMode(false)
-                    .baseKeyPair(baseKeyPair)
+                    .baseAccount(baseAccount)
                     .vertx(vertx)
                     .targetVM(targetVM)
                     .compile());
@@ -164,7 +163,7 @@ public abstract class BaseTest {
   }
 
   protected BigInteger getNextBaseKeypairNonce() {
-    return getAccount(this.baseKeyPair.getPublicKey()).getNonce().add(ONE);
+    return getAccount(this.baseAccount.getAddress()).getNonce().add(ONE);
   }
 
   protected AccountResult getAccount(String publicKey) {
@@ -181,7 +180,7 @@ public abstract class BaseTest {
       AbstractTransactionModel<?> tx, Optional<String> privateKey) throws Throwable {
     PostTransactionResult postTxResponse =
         this.aeternityServiceNative.transactions.blockingPostTransaction(
-            tx, privateKey.orElse(this.baseKeyPair.getPrivateKey()));
+            tx, privateKey.orElse(this.baseAccount.getPrivateKey()));
     _logger.info("PostTx hash: " + postTxResponse.getTxHash());
     TransactionResult txValue = waitForTxMined(postTxResponse.getTxHash());
     _logger.info(

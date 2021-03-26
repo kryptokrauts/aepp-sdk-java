@@ -55,9 +55,9 @@ public class WalletServiceTest extends BaseTest {
                 String keystore = IOUtils.toString(inputStream, StandardCharsets.UTF_8.toString());
                 byte[] privateKey =
                     walletService.recoverPrivateKeyFromKeystore(keystore, walletFileSecret);
-                Account keyPair =
-                    keypairService.generateBaseKeyPairFromSecret(Hex.toHexString(privateKey));
-                Assertions.assertEquals(expectedPubKey, keyPair.getPublicKey());
+                Account account =
+                    keypairService.generateAccountFromSecret(Hex.toHexString(privateKey));
+                Assertions.assertEquals(expectedPubKey, account.getAddress());
               });
           Spectrum.it(
               "recovery of a valid keystore.json fails with wrong password",

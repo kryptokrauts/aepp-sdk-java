@@ -1,8 +1,9 @@
 package com.kryptokrauts.aeternity.sdk.domain.secret.impl;
 
+import com.kryptokrauts.aeternity.sdk.constants.BaseConstants;
+import com.kryptokrauts.aeternity.sdk.exception.AException;
 import java.util.HashMap;
 import java.util.Map;
-import com.kryptokrauts.aeternity.sdk.constants.BaseConstants;
 import lombok.Getter;
 
 @Getter
@@ -16,8 +17,8 @@ public class DeterministicHierarchy {
 
   public DeterministicHierarchy(RawKeyPair master) {
     this.deterministicHierarchy = new HashMap<>();
-    this.deterministicHierarchy.put(DEPTH_MASTER,
-        new DeterministicHierarchyEntry(DEPTH_MASTER, master));
+    this.deterministicHierarchy.put(
+        DEPTH_MASTER, new DeterministicHierarchyEntry(DEPTH_MASTER, master));
   }
 
   public void addAccount(RawKeyPair accountKeypair) {
@@ -29,23 +30,38 @@ public class DeterministicHierarchy {
   }
 
   /**
-   * 
    * @param miKeypair child index keypair
    * @param mi0Keypair this childs internal chain keypair
    * @param mi00Keypair this childs actual address keypiar
    */
   public void addNextAddress(RawKeyPair miKeypair, RawKeyPair mi0Keypair, RawKeyPair mi00Keypair) {
-    this.getChain().addChild(this.getChain().getHighestChildIndex(), miKeypair)
-        .addChild(ADDRESS_INDEX_DEFAULT, mi0Keypair).addChild(ADDRESS_INDEX_DEFAULT, mi00Keypair);
+    this.getChain()
+        .addChild(this.getChain().getNextChildIndex(), miKeypair)
+        .addChild(ADDRESS_INDEX_DEFAULT, mi0Keypair)
+        .addChild(ADDRESS_INDEX_DEFAULT, mi00Keypair);
   }
 
   public RawKeyPair getChildAt(Integer index) {
-    return this.getChain().getChildren().get(index).getChildren().get(ADDRESS_INDEX_DEFAULT)
-        .getChildren().get(ADDRESS_INDEX_DEFAULT).getRawKeyPair();
+    if (this.getChain().getChildren().get(index) == null) {
+      throw new AException(
+          "Cannot retrieve child at index " + index + " - no child keypair set for index");
+    }
+    return this.getChain()
+        .getChildren()
+        .get(index)
+        .getChildren()
+        .get(ADDRESS_INDEX_DEFAULT)
+        .getChildren()
+        .get(ADDRESS_INDEX_DEFAULT)
+        .getRawKeyPair();
   }
 
   public Integer getNextChildIndex() {
-    return this.getChain().getHighestChildIndex();
+    return this.getChain().getNextChildIndex();
+  }
+
+  public RawKeyPair getLastChild() {
+    return this.getChildAt(this.getChain().getHighestChildIndex());
   }
 
   public RawKeyPair getMasterKey() {

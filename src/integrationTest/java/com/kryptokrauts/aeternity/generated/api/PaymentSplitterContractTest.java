@@ -56,16 +56,16 @@ public class PaymentSplitterContractTest extends BaseTest {
             paymentSplitterSource =
                 IOUtils.toString(inputStream, StandardCharsets.UTF_8.toString());
 
-            initialReceiver1 = new KeyPairServiceFactory().getService().generateBaseKeyPair();
-            initialReceiver2 = new KeyPairServiceFactory().getService().generateBaseKeyPair();
-            initialReceiver3 = new KeyPairServiceFactory().getService().generateBaseKeyPair();
-            _logger.info("Initial receiver 1: " + initialReceiver1.getPublicKey());
-            _logger.info("Initial receiver 2: " + initialReceiver2.getPublicKey());
-            _logger.info("Initial receiver 3: " + initialReceiver3.getPublicKey());
+            initialReceiver1 = new KeyPairServiceFactory().getService().generateAccount();
+            initialReceiver2 = new KeyPairServiceFactory().getService().generateAccount();
+            initialReceiver3 = new KeyPairServiceFactory().getService().generateAccount();
+            _logger.info("Initial receiver 1: " + initialReceiver1.getAddress());
+            _logger.info("Initial receiver 2: " + initialReceiver2.getAddress());
+            _logger.info("Initial receiver 3: " + initialReceiver3.getAddress());
 
-            initialWeights.put(initialReceiver1.getPublicKey(), 40);
-            initialWeights.put(initialReceiver2.getPublicKey(), 40);
-            initialWeights.put(initialReceiver3.getPublicKey(), 20);
+            initialWeights.put(initialReceiver1.getAddress(), 40);
+            initialWeights.put(initialReceiver2.getAddress(), 40);
+            initialWeights.put(initialReceiver3.getAddress(), 20);
             context.assertEquals(3, initialWeights.size());
           } catch (IOException e) {
             context.fail(e);
@@ -116,7 +116,7 @@ public class PaymentSplitterContractTest extends BaseTest {
                     .gas(gas)
                     .gasPrice(gasPrice)
                     .nonce(getNextBaseKeypairNonce())
-                    .ownerId(baseKeyPair.getPublicKey())
+                    .ownerId(baseAccount.getAddress())
                     .ttl(ZERO)
                     .virtualMachine(targetVM)
                     .build();
@@ -134,7 +134,7 @@ public class PaymentSplitterContractTest extends BaseTest {
                         .build()
                         .account(
                             DryRunAccountModel.builder()
-                                .publicKey(baseKeyPair.getPublicKey())
+                                .publicKey(baseAccount.getAddress())
                                 .build())
                         .transactionInputItem(unsignedTx));
 
@@ -182,13 +182,13 @@ public class PaymentSplitterContractTest extends BaseTest {
             // that the
             // accounts don't have any balance
             balanceRecipient1 =
-                Optional.ofNullable(getAccount(initialReceiver1.getPublicKey()).getBalance())
+                Optional.ofNullable(getAccount(initialReceiver1.getAddress()).getBalance())
                     .orElse(ZERO);
             balanceRecipient2 =
-                Optional.ofNullable(getAccount(initialReceiver2.getPublicKey()).getBalance())
+                Optional.ofNullable(getAccount(initialReceiver2.getAddress()).getBalance())
                     .orElse(ZERO);
             balanceRecipient3 =
-                Optional.ofNullable(getAccount(initialReceiver3.getPublicKey()).getBalance())
+                Optional.ofNullable(getAccount(initialReceiver3.getAddress()).getBalance())
                     .orElse(ZERO);
 
             BigDecimal paymentValue = UnitConversionUtil.toAettos("1", Unit.AE);
@@ -205,7 +205,7 @@ public class PaymentSplitterContractTest extends BaseTest {
                         .build()
                         .account(
                             DryRunAccountModel.builder()
-                                .publicKey(baseKeyPair.getPublicKey())
+                                .publicKey(baseAccount.getAddress())
                                 .build())
                         .transactionInputItem(
                             ContractCallTransactionModel.builder()
@@ -215,7 +215,7 @@ public class PaymentSplitterContractTest extends BaseTest {
                                 .gasPrice(BigInteger.valueOf(BaseConstants.MINIMAL_GAS_PRICE))
                                 .amount(paymentValue.toBigInteger())
                                 .nonce(getNextBaseKeypairNonce())
-                                .callerId(baseKeyPair.getPublicKey())
+                                .callerId(baseAccount.getAddress())
                                 .ttl(ZERO)
                                 .virtualMachine(targetVM)
                                 .build()));
@@ -238,7 +238,7 @@ public class PaymentSplitterContractTest extends BaseTest {
                      */
                     .gasPrice(BigInteger.valueOf(BaseConstants.MINIMAL_GAS_PRICE))
                     .nonce(getNextBaseKeypairNonce())
-                    .callerId(baseKeyPair.getPublicKey())
+                    .callerId(baseAccount.getAddress())
                     .ttl(BigInteger.ZERO)
                     .amount(paymentValue.toBigInteger())
                     .virtualMachine(targetVM)
@@ -269,15 +269,15 @@ public class PaymentSplitterContractTest extends BaseTest {
             context.assertEquals(
                 balanceRecipient1.add(
                     paymentValue.multiply(BigDecimal.valueOf(0.4)).toBigInteger()),
-                getAccount(initialReceiver1.getPublicKey()).getBalance());
+                getAccount(initialReceiver1.getAddress()).getBalance());
             context.assertEquals(
                 balanceRecipient2.add(
                     paymentValue.multiply(BigDecimal.valueOf(0.4)).toBigInteger()),
-                getAccount(initialReceiver2.getPublicKey()).getBalance());
+                getAccount(initialReceiver2.getAddress()).getBalance());
             context.assertEquals(
                 balanceRecipient3.add(
                     paymentValue.multiply(BigDecimal.valueOf(0.2)).toBigInteger()),
-                getAccount(initialReceiver3.getPublicKey()).getBalance());
+                getAccount(initialReceiver3.getAddress()).getBalance());
           } catch (Throwable e) {
             context.fail(e);
           }
@@ -304,7 +304,7 @@ public class PaymentSplitterContractTest extends BaseTest {
                         .build()
                         .account(
                             DryRunAccountModel.builder()
-                                .publicKey(baseKeyPair.getPublicKey())
+                                .publicKey(baseAccount.getAddress())
                                 .build())
                         .transactionInputItem(
                             ContractCallTransactionModel.builder()
@@ -314,7 +314,7 @@ public class PaymentSplitterContractTest extends BaseTest {
                                 .gasPrice(BigInteger.valueOf(BaseConstants.MINIMAL_GAS_PRICE))
                                 .amount(paymentValue.toBigInteger())
                                 .nonce(getNextBaseKeypairNonce())
-                                .callerId(baseKeyPair.getPublicKey())
+                                .callerId(baseAccount.getAddress())
                                 .ttl(ZERO)
                                 .virtualMachine(targetVM)
                                 .build()));
@@ -358,7 +358,7 @@ public class PaymentSplitterContractTest extends BaseTest {
                         .build()
                         .account(
                             DryRunAccountModel.builder()
-                                .publicKey(baseKeyPair.getPublicKey())
+                                .publicKey(baseAccount.getAddress())
                                 .build())
                         .transactionInputItem(
                             ContractCallTransactionModel.builder()
@@ -368,7 +368,7 @@ public class PaymentSplitterContractTest extends BaseTest {
                                 .gasPrice(BigInteger.valueOf(BaseConstants.MINIMAL_GAS_PRICE))
                                 .amount(paymentValue.toBigInteger())
                                 .nonce(getNextBaseKeypairNonce())
-                                .callerId(baseKeyPair.getPublicKey())
+                                .callerId(baseAccount.getAddress())
                                 .ttl(ZERO)
                                 .virtualMachine(targetVM)
                                 .build()));

@@ -35,4 +35,17 @@ public class DeterministicHierarchyEntry {
     }
     return 0;
   }
+
+  public Integer getNextChildIndex() {
+    Integer highestIndex = this.getHighestChildIndex();
+    // special case due to index starts with 0
+    if (highestIndex == 0) {
+      if (this.children.keySet().size() > 0) {
+        return 1;
+      } else {
+        return 0;
+      }
+    }
+    return highestIndex + 1;
+  }
 }

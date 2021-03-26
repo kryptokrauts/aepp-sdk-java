@@ -222,6 +222,8 @@ dependencies {
     compile "com.google.guava:guava:27.0.1-jre"
 
     // tests
+	testCompileOnly "org.projectlombok:lombok:${lombokVersion}"
+	testAnnotationProcessor "org.projectlombok:lombok:${lombokVersion}"
     testImplementation enforcedPlatform("org.junit:junit-bom:${junitVersion}")
     testRuntime "org.junit.platform:junit-platform-console:${junitPlatformVersion}"
     testRuntime "org.junit.jupiter:junit-jupiter-engine:${junitVersion}"

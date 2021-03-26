@@ -23,8 +23,8 @@ public class TransactionChannelsTest extends BaseTest {
 
   @Before
   public void initBeforeTest() {
-    initiator = keyPairService.generateBaseKeyPairFromSecret(TestConstants.BENEFICIARY_PRIVATE_KEY);
-    responder = keyPairService.generateBaseKeyPair();
+    initiator = keyPairService.generateAccountFromSecret(TestConstants.BENEFICIARY_PRIVATE_KEY);
+    responder = keyPairService.generateAccount();
   }
 
   @Test
@@ -36,8 +36,8 @@ public class TransactionChannelsTest extends BaseTest {
             BigInteger amount = UnitConversionUtil.toAettos("10", Unit.AE).toBigInteger();
             SpendTransactionModel spendTx =
                 SpendTransactionModel.builder()
-                    .sender(initiator.getPublicKey())
-                    .recipient(responder.getPublicKey())
+                    .sender(initiator.getAddress())
+                    .recipient(responder.getAddress())
                     .amount(amount)
                     .payload("")
                     .ttl(ZERO)
@@ -60,9 +60,9 @@ public class TransactionChannelsTest extends BaseTest {
 
           ChannelCreateTransactionModel model =
               ChannelCreateTransactionModel.builder()
-                  .initiator(initiator.getPublicKey())
+                  .initiator(initiator.getAddress())
                   .initiatorAmount(amount)
-                  .responder(responder.getPublicKey())
+                  .responder(responder.getAddress())
                   .responderAmount(amount)
                   .channelReserve(ZERO)
                   .lockPeriod(ZERO)

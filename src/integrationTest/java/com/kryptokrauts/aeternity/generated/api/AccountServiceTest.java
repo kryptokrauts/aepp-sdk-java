@@ -15,7 +15,7 @@ public class AccountServiceTest extends BaseTest {
         t -> {
           AccountResult result =
               this.aeternityServiceNative.accounts.blockingGetAccount(
-                  Optional.of(this.baseKeyPair.getPublicKey()));
+                  Optional.of(this.baseAccount.getAddress()));
           context.assertTrue(result.getBalance().compareTo(ZERO) == 1);
         });
   }
