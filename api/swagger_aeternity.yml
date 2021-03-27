@@ -49,7 +49,7 @@ paths:
       description: 'Get the top block (either key or micro block)'
       produces:
         - application/json
-      parameters: []
+      parameters: [ ]
       responses:
         '200':
           description: 'Successful operation'
@@ -68,7 +68,7 @@ paths:
       description: 'Get the current key block'
       produces:
         - application/json
-      parameters: []
+      parameters: [ ]
       responses:
         '200':
           description: 'Successful operation'
@@ -87,7 +87,7 @@ paths:
       description: 'Get the hash of the current key block'
       produces:
         - application/json
-      parameters: []
+      parameters: [ ]
       responses:
         '200':
           description: 'Successful operation'
@@ -109,7 +109,7 @@ paths:
       description: 'Get the height of the current key block'
       produces:
         - application/json
-      parameters: []
+      parameters: [ ]
       responses:
         '200':
           description: 'Successful operation'
@@ -131,7 +131,7 @@ paths:
       description: 'Get the pending key block'
       produces:
         - application/json
-      parameters: []
+      parameters: [ ]
       responses:
         '200':
           description: 'Successful operation'
@@ -367,7 +367,7 @@ paths:
       description: 'Get the current generation'
       produces:
         - application/json
-      parameters: []
+      parameters: [ ]
       responses:
         '200':
           description: 'Successful operation'
@@ -809,7 +809,7 @@ paths:
           description: 'The type of a query: open, closed or all'
           required: false
           type: string
-          enum: [open, closed, all]
+          enum: [ open, closed, all ]
       responses:
         '200':
           description: 'Successful operation'
@@ -927,7 +927,7 @@ paths:
       description: 'Get peer public key'
       produces:
         - application/json
-      parameters: []
+      parameters: [ ]
       responses:
         '200':
           description: 'Successful operation'
@@ -942,7 +942,7 @@ paths:
       description: 'Get the status of a node'
       produces:
         - application/json
-      parameters: []
+      parameters: [ ]
       responses:
         '200':
           description: 'Successful operation'
@@ -1547,7 +1547,7 @@ paths:
       description: 'Get pending transactions'
       produces:
         - application/json
-      parameters: []
+      parameters: [ ]
       responses:
         '200':
           description: 'Successful operation'
@@ -1617,7 +1617,7 @@ paths:
       description: 'Get node''s public key'
       produces:
         - application/json
-      parameters: []
+      parameters: [ ]
       responses:
         '200':
           description: 'Successful operation'
@@ -1638,7 +1638,7 @@ paths:
       description: 'Get node Peers'
       produces:
         - application/json
-      parameters: []
+      parameters: [ ]
       responses:
         '200':
           description: successful operation
@@ -1887,7 +1887,7 @@ definitions:
         type: boolean
       kind:
         type: string
-        enum: [basic, generalized]
+        enum: [ basic, generalized ]
       contract_id:
         description: 'Id of authorization contract for generalized account'
         $ref: '#/definitions/EncodedPubkey'
@@ -2111,7 +2111,7 @@ definitions:
     properties:
       type:
         type: string
-        enum: ["delta", "block"]
+        enum: [ "delta", "block" ]
       value:
         $ref: '#/definitions/UInt64'
     required:
@@ -2122,7 +2122,7 @@ definitions:
     properties:
       type:
         type: string
-        enum: ["delta"]
+        enum: [ "delta" ]
       value:
         $ref: '#/definitions/UInt64'
     required:
@@ -3297,8 +3297,6 @@ definitions:
             $ref: '#/definitions/UInt'
           fee:
             $ref: '#/definitions/UInt'
-          ttl:
-            $ref: '#/definitions/UInt64'
           auth_data:
             description: Contract authorization function call data
             $ref: '#/definitions/EncodedByteArray'

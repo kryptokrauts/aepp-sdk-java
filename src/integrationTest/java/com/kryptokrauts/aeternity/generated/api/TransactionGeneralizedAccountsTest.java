@@ -154,7 +154,6 @@ public class TransactionGeneralizedAccountsTest extends BaseTest {
               GeneralizedAccountsMetaTransactionModel.builder()
                   .gaId(gaTestKeyPair.getPublicKey())
                   .authData(authData)
-                  .ttl(ZERO)
                   .virtualMachine(targetVM)
                   .innerTx(encodedInnerTx)
                   .build();

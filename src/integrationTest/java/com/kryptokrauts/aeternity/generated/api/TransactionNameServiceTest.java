@@ -234,11 +234,11 @@ public class TransactionNameServiceTest extends BaseTest {
             context.assertEquals(contractPointer, nameEntryResult.getContractPointer().get());
             context.assertEquals(oraclePointer, nameEntryResult.getOraclePointer().get());
             BigInteger updatedTTL = nameEntryResult.getTtl();
-            // subtract 40000 because initial default ttl is 50000 and
+            // subtract 170000 because initial default ttl is 180000 and
             // updated ttl was 10000
             int diffTtl = initialTTL.subtract(updatedTTL).intValue();
-            context.assertTrue(diffTtl <= 40000);
-            if (diffTtl < 40000) {
+            context.assertTrue(diffTtl <= 170000);
+            if (diffTtl < 170000) {
               _logger.info(
                   String.format(
                       "Diff of Ttl is %s, this happens when meanwhile new blocks are mined",
@@ -436,8 +436,7 @@ public class TransactionNameServiceTest extends BaseTest {
             AccountResult otherAccount =
                 this.aeternityServiceNative.accounts.blockingGetAccount(recipient);
             NameClaimTransactionModel nextNameClaimTx =
-                nameClaimTx
-                    .toBuilder()
+                nameClaimTx.toBuilder()
                     .accountId(recipient)
                     .nonce(otherAccount.getNonce().add(BigInteger.ONE))
                     .nameFee(nextNameFee)

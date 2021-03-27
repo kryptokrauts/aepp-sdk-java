@@ -36,7 +36,7 @@ public class GeneralizedAccountsMetaTransaction
             rlpWriter -> {
               rlpWriter.writeInt(
                   SerializationTags.OBJECT_TAG_GENERALIZED_ACCOUNTS_META_TRANSACTION);
-              rlpWriter.writeInt(SerializationTags.VSN_1);
+              rlpWriter.writeInt(SerializationTags.VSN_2);
               byte[] gaIdWithTag =
                   EncodingUtils.decodeCheckAndTag(
                       model.getGaId(), Arrays.asList(ApiIdentifiers.ACCOUNT_PUBKEY));
@@ -47,7 +47,6 @@ public class GeneralizedAccountsMetaTransaction
               this.checkZeroAndWriteValue(rlpWriter, model.getFee());
               this.checkZeroAndWriteValue(rlpWriter, model.getGas());
               this.checkZeroAndWriteValue(rlpWriter, model.getGasPrice());
-              this.checkZeroAndWriteValue(rlpWriter, model.getTtl());
               rlpWriter.writeByteArray(EncodingUtils.decodeCheckWithIdentifier(model.getInnerTx()));
             });
     return encodedRlp;
