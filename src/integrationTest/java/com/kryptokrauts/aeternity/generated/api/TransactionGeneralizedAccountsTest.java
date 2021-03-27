@@ -163,7 +163,7 @@ public class TransactionGeneralizedAccountsTest extends BaseTest {
                   .gaId(gaAccountKeyPair.getAddress())
                   .authData(authData)
                   .virtualMachine(targetVM)
-                  .innerTx(encodedInnerTx)
+                  .tx(encodedInnerTx)
                   .build();
           result = this.aeternityServiceNative.transactions.blockingPostTransaction(gaMetaTx);
           _logger.info("gaMetaTx result: {}", result);

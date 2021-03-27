@@ -3311,6 +3311,26 @@ definitions:
       - fee
       - auth_data
       - tx
+  PayingForTx:
+    type: object
+    allOf:
+      - $ref: '#/definitions/GenericTx'
+      - properties:
+          payer_id:
+            description: Payer pub_key
+            $ref: '#/definitions/EncodedPubkey'
+          nonce:
+            description: 'Payer''s nonce'
+            $ref: '#/definitions/UInt64'
+          fee:
+            $ref: '#/definitions/UInt'
+          tx:
+            description: Enclosed signed transaction
+            $ref: '#/definitions/GenericSignedTx'
+    required:
+      - payer_id
+      - fee
+      - tx
 
 externalDocs:
   description: Find out more about Aeternity

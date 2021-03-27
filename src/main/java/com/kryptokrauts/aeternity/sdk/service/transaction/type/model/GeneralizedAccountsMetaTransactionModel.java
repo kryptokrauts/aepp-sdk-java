@@ -25,7 +25,7 @@ public class GeneralizedAccountsMetaTransactionModel extends AbstractTransaction
   @Mandatory private String authData;
   @Default private BigInteger gas = BigInteger.valueOf(50000);
   @Default private BigInteger gasPrice = BigInteger.valueOf(BaseConstants.MINIMAL_GAS_PRICE);
-  @Mandatory private String innerTx;
+  @Mandatory private String tx;
   @Mandatory private VirtualMachine virtualMachine;
 
   @Override
@@ -37,6 +37,7 @@ public class GeneralizedAccountsMetaTransactionModel extends AbstractTransaction
     gaMetaTx.fee(fee);
     gaMetaTx.gas(gas);
     gaMetaTx.gasPrice(gasPrice);
+    // TODO map tx?
     return gaMetaTx;
   }
 
@@ -62,6 +63,7 @@ public class GeneralizedAccountsMetaTransactionModel extends AbstractTransaction
           .gas(castedTx.getGas())
           .gasPrice(castedTx.getGasPrice())
           .virtualMachine(VirtualMachine.getVirtualMachine(castedTx.getAbiVersion()))
+          // TODO map tx?
           .build();
     };
   }

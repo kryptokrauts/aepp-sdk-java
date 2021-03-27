@@ -5,9 +5,9 @@ import com.kryptokrauts.aeternity.generated.model.UnsignedTx;
 import com.kryptokrauts.aeternity.sdk.constants.ApiIdentifiers;
 import com.kryptokrauts.aeternity.sdk.constants.SerializationTags;
 import com.kryptokrauts.aeternity.sdk.service.transaction.fee.FeeCalculationModel;
-import com.kryptokrauts.aeternity.sdk.service.transaction.fee.impl.GaMetaFeeCalculationModel;
+import com.kryptokrauts.aeternity.sdk.service.transaction.fee.impl.PayingForFeeCalculationModel;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.AbstractTransaction;
-import com.kryptokrauts.aeternity.sdk.service.transaction.type.model.GeneralizedAccountsMetaTransactionModel;
+import com.kryptokrauts.aeternity.sdk.service.transaction.type.model.PayingForTransactionModel;
 import com.kryptokrauts.aeternity.sdk.util.EncodingUtils;
 import io.reactivex.Single;
 import java.util.Arrays;
@@ -19,41 +19,35 @@ import org.apache.tuweni.rlp.RLP;
 
 @SuperBuilder
 @ToString
-public class GeneralizedAccountsMetaTransaction
-    extends AbstractTransaction<GeneralizedAccountsMetaTransactionModel> {
+public class PayingForTransaction extends AbstractTransaction<PayingForTransactionModel> {
 
   @NonNull private ExternalApi externalApi;
-
-  @Override
-  protected Single<UnsignedTx> createInternal() {
-    throw new UnsupportedOperationException("Not implemented");
-  }
 
   @Override
   protected Bytes createRLPEncodedList() {
     Bytes encodedRlp =
         RLP.encodeList(
             rlpWriter -> {
-              rlpWriter.writeInt(
-                  SerializationTags.OBJECT_TAG_GENERALIZED_ACCOUNTS_META_TRANSACTION);
-              rlpWriter.writeInt(SerializationTags.VSN_2);
-              byte[] gaIdWithTag =
+              rlpWriter.writeInt(SerializationTags.OBJECT_TAG_PAYING_FOR_TRANSACTION);
+              rlpWriter.writeInt(SerializationTags.VSN_1);
+              byte[] payerIdWithTag =
                   EncodingUtils.decodeCheckAndTag(
-                      model.getGaId(), Arrays.asList(ApiIdentifiers.ACCOUNT_PUBKEY));
-              rlpWriter.writeByteArray(gaIdWithTag);
-              rlpWriter.writeByteArray(
-                  EncodingUtils.decodeCheckWithIdentifier(model.getAuthData()));
-              this.checkZeroAndWriteValue(rlpWriter, model.getVirtualMachine().getAbiVersion());
+                      model.getPayerId(), Arrays.asList(ApiIdentifiers.ACCOUNT_PUBKEY));
+              rlpWriter.writeByteArray(payerIdWithTag);
+              this.checkZeroAndWriteValue(rlpWriter, model.getNonce());
               this.checkZeroAndWriteValue(rlpWriter, model.getFee());
-              this.checkZeroAndWriteValue(rlpWriter, model.getGas());
-              this.checkZeroAndWriteValue(rlpWriter, model.getGasPrice());
               rlpWriter.writeByteArray(EncodingUtils.decodeCheckWithIdentifier(model.getTx()));
             });
     return encodedRlp;
   }
 
   @Override
+  protected <T extends UnsignedTx> Single<T> createInternal() {
+    throw new UnsupportedOperationException("Not implemented");
+  }
+
+  @Override
   protected FeeCalculationModel getFeeCalculationModel() {
-    return new GaMetaFeeCalculationModel();
+    return new PayingForFeeCalculationModel();
   }
 }
