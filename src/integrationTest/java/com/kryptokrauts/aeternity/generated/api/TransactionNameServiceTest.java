@@ -436,7 +436,8 @@ public class TransactionNameServiceTest extends BaseTest {
             AccountResult otherAccount =
                 this.aeternityServiceNative.accounts.blockingGetAccount(recipient);
             NameClaimTransactionModel nextNameClaimTx =
-                nameClaimTx.toBuilder()
+                nameClaimTx
+                    .toBuilder()
                     .accountId(recipient)
                     .nonce(otherAccount.getNonce().add(BigInteger.ONE))
                     .nameFee(nextNameFee)
