@@ -1,4 +1,4 @@
-peers: []
+peers: [ ]
 http:
   external:
     port: 3013
@@ -28,7 +28,7 @@ mining:
       edge_bits: 15
 
 fork_management:
-  network_id: local_lima_testnet
+  network_id: local_iris_testnet
 
 logging:
   level: debug
