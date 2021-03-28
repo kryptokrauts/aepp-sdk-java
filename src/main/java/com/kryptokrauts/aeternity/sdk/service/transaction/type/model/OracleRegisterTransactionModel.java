@@ -11,6 +11,7 @@ import com.kryptokrauts.aeternity.sdk.service.transaction.type.impl.OracleRegist
 import com.kryptokrauts.sophia.compiler.generated.api.rxjava.DefaultApi;
 import java.math.BigInteger;
 import java.util.function.Function;
+import lombok.Builder.Default;
 import lombok.Getter;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
@@ -28,7 +29,7 @@ public class OracleRegisterTransactionModel extends AbstractTransactionModel<Ora
   @Mandatory private BigInteger queryFee;
   @Mandatory private String queryFormat;
   @Mandatory private String responseFormat;
-  @Mandatory private BigInteger ttl;
+  @Default private BigInteger ttl = BigInteger.ZERO;
 
   @Override
   public OracleRegisterTx toApiModel() {

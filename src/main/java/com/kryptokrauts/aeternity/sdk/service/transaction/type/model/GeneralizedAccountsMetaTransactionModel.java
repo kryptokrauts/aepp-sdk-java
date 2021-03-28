@@ -26,7 +26,7 @@ public class GeneralizedAccountsMetaTransactionModel extends AbstractTransaction
   @Default private BigInteger gas = BigInteger.valueOf(50000);
   @Default private BigInteger gasPrice = BigInteger.valueOf(BaseConstants.MINIMAL_GAS_PRICE);
   @Mandatory private String tx;
-  @Mandatory private VirtualMachine virtualMachine;
+  @Default private VirtualMachine virtualMachine = VirtualMachine.FATE;
 
   @Override
   public GAMetaTx toApiModel() {

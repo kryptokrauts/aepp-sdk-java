@@ -12,6 +12,7 @@ import com.kryptokrauts.sophia.compiler.generated.api.rxjava.DefaultApi;
 import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.function.Function;
+import lombok.Builder.Default;
 import lombok.Getter;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
@@ -27,7 +28,7 @@ public class NameClaimTransactionModel extends AbstractTransactionModel<NameClai
   @Mandatory private BigInteger nonce;
   @Mandatory private String name;
   @Mandatory private BigInteger nameSalt;
-  @Mandatory private BigInteger ttl;
+  @Default private BigInteger ttl = BigInteger.ZERO;
 
   private BigInteger nameFee;
 

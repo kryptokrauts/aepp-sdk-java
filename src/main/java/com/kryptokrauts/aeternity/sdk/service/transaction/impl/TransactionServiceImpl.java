@@ -158,6 +158,22 @@ public class TransactionServiceImpl implements TransactionService {
   }
 
   @Override
+  public String signInnerTransaction(final String unsignedTx, final String privateKey)
+      throws TransactionCreateException {
+    try {
+      byte[] networkDataWithAdditionalPrefix =
+          (config.getNetwork().getId() + "-" + "inner_tx").getBytes(StandardCharsets.UTF_8);
+      byte[] binaryTx = EncodingUtils.decodeCheckWithIdentifier(unsignedTx);
+      byte[] txAndNetwork = ByteUtils.concatenate(networkDataWithAdditionalPrefix, binaryTx);
+      byte[] sig = SigningUtil.sign(txAndNetwork, privateKey);
+      String encodedSignedTx = encodeSignedTransaction(sig, binaryTx);
+      return encodedSignedTx;
+    } catch (Exception e) {
+      throw createException(e);
+    }
+  }
+
+  @Override
   public String wrapSignedTransactionForGA(String unsignedTx) {
     byte[] binaryTx = EncodingUtils.decodeCheckWithIdentifier(unsignedTx);
     Bytes encodedRlp =

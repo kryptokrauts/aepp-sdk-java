@@ -10,6 +10,7 @@ import com.kryptokrauts.aeternity.sdk.service.transaction.type.impl.GeneralizedA
 import com.kryptokrauts.sophia.compiler.generated.api.rxjava.DefaultApi;
 import java.math.BigInteger;
 import java.util.function.Function;
+import lombok.Builder.Default;
 import lombok.Getter;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
@@ -27,8 +28,8 @@ public class GeneralizedAccountsAttachTransactionModel
   @Mandatory private BigInteger gasPrice;
   @Mandatory private BigInteger nonce;
   @Mandatory private String ownerId;
-  @Mandatory private BigInteger ttl;
-  @Mandatory private VirtualMachine virtualMachine;
+  @Default private BigInteger ttl = BigInteger.ZERO;
+  @Default private VirtualMachine virtualMachine = VirtualMachine.FATE;
 
   @Override
   public GAAttachTx toApiModel() {

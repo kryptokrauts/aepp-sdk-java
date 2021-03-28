@@ -27,8 +27,8 @@ public class ContractCallTransactionModel extends AbstractTransactionModel<Contr
   @Mandatory private BigInteger gas;
   @Mandatory private BigInteger gasPrice;
   @Mandatory private BigInteger nonce;
-  @Mandatory private BigInteger ttl;
-  @Mandatory private VirtualMachine virtualMachine;
+  @Default private BigInteger ttl = BigInteger.ZERO;
+  @Default private VirtualMachine virtualMachine = VirtualMachine.FATE;
 
   @Override
   public ContractCallTx toApiModel() {

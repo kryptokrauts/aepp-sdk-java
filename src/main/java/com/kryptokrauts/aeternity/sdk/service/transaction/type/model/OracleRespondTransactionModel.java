@@ -11,6 +11,7 @@ import com.kryptokrauts.aeternity.sdk.service.transaction.type.impl.OracleRespon
 import com.kryptokrauts.sophia.compiler.generated.api.rxjava.DefaultApi;
 import java.math.BigInteger;
 import java.util.function.Function;
+import lombok.Builder.Default;
 import lombok.Getter;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
@@ -25,7 +26,7 @@ public class OracleRespondTransactionModel extends AbstractTransactionModel<Orac
   @Mandatory private BigInteger nonce;
   @Mandatory private String response;
   @Mandatory private BigInteger responseTtl;
-  @Mandatory private BigInteger ttl;
+  @Default private BigInteger ttl = BigInteger.ZERO;
 
   @Override
   public OracleRespondTx toApiModel() {

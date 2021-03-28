@@ -13,10 +13,10 @@ import java.util.List;
 public interface TransactionService {
 
   /**
-   * synchronously sign an unsigned transaction with the given private key
+   * sign an unsigned transaction with the given private key
    *
-   * @param unsignedTx a raw unsigned transaction
-   * @param privateKey the private key to sign the transaction
+   * @param unsignedTx the encoded unsigned transaction
+   * @param privateKey the encoded private key to sign the transaction
    * @return signed and encoded transaction
    * @throws TransactionCreateException if an error occurs
    */
@@ -27,6 +27,23 @@ public interface TransactionService {
    *
    * @param unsignedTx a raw unsigned transaction
    * @return wrapped signed and encoded transaction
+   */
+  /**
+   * sign an unsigned transaction with the given private key. method uses an additional prefix and
+   * must be used to sign inner transactions of PayingForTx
+   *
+   * @param unsignedTx the encoded unsigned transaction
+   * @param privateKey the encoded private key to sign the transaction
+   * @return signed and encoded transaction
+   * @throws TransactionCreateException if an error occurs
+   */
+  String signInnerTransaction(String unsignedTx, String privateKey)
+      throws TransactionCreateException;
+
+  /**
+   * wrap into a signed tx with empty list of signatures (to be used for Generalized Accounts)
+   *
+   * @param unsignedTx the encoded unsigned transaction
    */
   String wrapSignedTransactionForGA(String unsignedTx);
 

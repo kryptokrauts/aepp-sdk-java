@@ -23,7 +23,7 @@ public class SpendTransactionModel extends AbstractTransactionModel<SpendTx> {
   @Mandatory private BigInteger amount;
   @Default private String payload = "";
   private String payloadDecoded;
-  @Mandatory private BigInteger ttl;
+  @Default private BigInteger ttl = BigInteger.ZERO;
   @Mandatory private BigInteger nonce;
 
   @Override
