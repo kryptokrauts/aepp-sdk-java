@@ -14,7 +14,7 @@ public interface KeystoreService {
    * @param walletPassword the password for symmetric encryption
    * @param walletName the name of the keystore wallet
    * @return encrypts the keypair using the given walletPassword an returns a JSON derived from
-   *         {@link Keystore}
+   *     {@link Keystore}
    * @throws AException if an error occurs
    */
   String generateKeystore(KeyPair rawKeyPair, String walletPassword, String walletName)

@@ -1,5 +1,8 @@
 package com.kryptokrauts.aeternity.sdk.service.keypair;
 
+import com.kryptokrauts.aeternity.sdk.domain.secret.HDWallet;
+import com.kryptokrauts.aeternity.sdk.domain.secret.KeyPair;
+import com.kryptokrauts.aeternity.sdk.exception.AException;
 import java.io.UnsupportedEncodingException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
@@ -7,9 +10,6 @@ import java.util.List;
 import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
-import com.kryptokrauts.aeternity.sdk.domain.secret.HDWallet;
-import com.kryptokrauts.aeternity.sdk.domain.secret.KeyPair;
-import com.kryptokrauts.aeternity.sdk.exception.AException;
 
 public interface KeyPairService {
 
@@ -124,8 +124,8 @@ public interface KeyPairService {
    * @return instance of {@link HDWallet}
    * @throws AException in case of an error
    */
-  HDWallet recoverMasterMnemonicKeyPair(
-      List<String> mnemonicSeedWords, String mnemonicSeedPassword) throws AException;
+  HDWallet recoverMasterMnemonicKeyPair(List<String> mnemonicSeedWords, String mnemonicSeedPassword)
+      throws AException;
 
   /**
    * derives the next hardened key. The derived keys are generated according to the deterministic

@@ -1,17 +1,5 @@
 package com.kryptokrauts.aeternity.generated.api;
 
-import java.math.BigInteger;
-import java.util.List;
-import java.util.function.Consumer;
-import java.util.function.Supplier;
-import javax.naming.ConfigurationException;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Rule;
-import org.junit.runner.RunWith;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kryptokrauts.aeternity.sdk.constants.Network;
 import com.kryptokrauts.aeternity.sdk.constants.VirtualMachine;
@@ -37,6 +25,18 @@ import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.RunTestOnContext;
 import io.vertx.ext.unit.junit.Timeout;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
+import java.math.BigInteger;
+import java.util.List;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
+import javax.naming.ConfigurationException;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Rule;
+import org.junit.runner.RunWith;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @RunWith(VertxUnitRunner.class)
 public abstract class BaseTest {
@@ -71,12 +71,13 @@ public abstract class BaseTest {
 
   @Rule
   public RunTestOnContext rule =
-      new RunTestOnContext(new VertxOptions().setMaxWorkerExecuteTime(TEST_CASE_TIMEOUT_MILLIS)
-          .setMaxEventLoopExecuteTime(TEST_CASE_TIMEOUT_MILLIS)
-          .setBlockedThreadCheckInterval(TEST_CASE_TIMEOUT_MILLIS));
+      new RunTestOnContext(
+          new VertxOptions()
+              .setMaxWorkerExecuteTime(TEST_CASE_TIMEOUT_MILLIS)
+              .setMaxEventLoopExecuteTime(TEST_CASE_TIMEOUT_MILLIS)
+              .setBlockedThreadCheckInterval(TEST_CASE_TIMEOUT_MILLIS));
 
-  @Rule
-  public Timeout timeoutRule = Timeout.millis(TEST_CASE_TIMEOUT_MILLIS);
+  @Rule public Timeout timeoutRule = Timeout.millis(TEST_CASE_TIMEOUT_MILLIS);
 
   Vertx vertx;
 
@@ -88,15 +89,33 @@ public abstract class BaseTest {
 
     baseKeyPair = keyPairService.generateKeyPairFromSecret(TestConstants.BENEFICIARY_PRIVATE_KEY);
 
-    aeternityServiceNative = new AeternityServiceFactory().getService(AeternityServiceConfiguration
-        .configure().baseUrl(getAeternityBaseUrl()).compilerBaseUrl(getCompilerBaseUrl())
-        .indaexBaseUrl(getIndaexBaseUrl()).network(Network.LOCAL_IRIS_NETWORK).nativeMode(true)
-        .baseKeyPair(baseKeyPair).vertx(vertx).targetVM(targetVM)
-        .millisBetweenTrailsToWaitForConfirmation(500l).compile());
-    aeternityServiceDebug = new AeternityServiceFactory().getService(AeternityServiceConfiguration
-        .configure().baseUrl(getAeternityBaseUrl()).compilerBaseUrl(getCompilerBaseUrl())
-        .indaexBaseUrl(getIndaexBaseUrl()).network(Network.LOCAL_IRIS_NETWORK).nativeMode(false)
-        .baseKeyPair(baseKeyPair).vertx(vertx).targetVM(targetVM).compile());
+    aeternityServiceNative =
+        new AeternityServiceFactory()
+            .getService(
+                AeternityServiceConfiguration.configure()
+                    .baseUrl(getAeternityBaseUrl())
+                    .compilerBaseUrl(getCompilerBaseUrl())
+                    .indaexBaseUrl(getIndaexBaseUrl())
+                    .network(Network.LOCAL_IRIS_NETWORK)
+                    .nativeMode(true)
+                    .baseKeyPair(baseKeyPair)
+                    .vertx(vertx)
+                    .targetVM(targetVM)
+                    .millisBetweenTrailsToWaitForConfirmation(500l)
+                    .compile());
+    aeternityServiceDebug =
+        new AeternityServiceFactory()
+            .getService(
+                AeternityServiceConfiguration.configure()
+                    .baseUrl(getAeternityBaseUrl())
+                    .compilerBaseUrl(getCompilerBaseUrl())
+                    .indaexBaseUrl(getIndaexBaseUrl())
+                    .network(Network.LOCAL_IRIS_NETWORK)
+                    .nativeMode(false)
+                    .baseKeyPair(baseKeyPair)
+                    .vertx(vertx)
+                    .targetVM(targetVM)
+                    .compile());
   }
 
   @After
@@ -131,8 +150,10 @@ public abstract class BaseTest {
 
   @BeforeClass
   public static void startup() throws ConfigurationException {
-    _logger.info(String.format("--------------------------- %s ---------------------------",
-        "Using following environment"));
+    _logger.info(
+        String.format(
+            "--------------------------- %s ---------------------------",
+            "Using following environment"));
     _logger.info(String.format("%s: %s", AETERNITY_BASE_URL, getAeternityBaseUrl()));
     _logger.info(String.format("%s: %s", COMPILER_BASE_URL, getCompilerBaseUrl()));
     _logger.info(String.format("%s: %s", INDAEX_BASE_URL, getIndaexBaseUrl()));
@@ -170,20 +191,25 @@ public abstract class BaseTest {
         this.aeternityServiceNative.transactions.blockingPostTransaction(tx, privateKey);
     _logger.info("PostTx hash: " + postTxResponse.getTxHash());
     TransactionResult txValue = waitForTxMined(postTxResponse.getTxHash());
-    _logger.info(String.format("Transaction of type %s is mined at block %s with height %s",
-        txValue.getTxType(), txValue.getBlockHash(), txValue.getBlockHeight()));
+    _logger.info(
+        String.format(
+            "Transaction of type %s is mined at block %s with height %s",
+            txValue.getTxType(), txValue.getBlockHash(), txValue.getBlockHeight()));
 
     return postTxResponse;
   }
 
   protected PostTransactionResult postTx(AbstractTransactionModel<?> tx) throws Throwable {
-    PostTransactionResult postTxResponse = callMethodAndGetResult(
-        () -> this.aeternityServiceNative.transactions.asyncPostTransaction(tx),
-        PostTransactionResult.class);
+    PostTransactionResult postTxResponse =
+        callMethodAndGetResult(
+            () -> this.aeternityServiceNative.transactions.asyncPostTransaction(tx),
+            PostTransactionResult.class);
     _logger.info("PostTx hash: " + postTxResponse.getTxHash());
     TransactionResult txValue = waitForTxMined(postTxResponse.getTxHash());
-    _logger.info(String.format("Transaction of type %s is mined at block %s with height %s",
-        txValue.getTxType(), txValue.getBlockHash(), txValue.getBlockHeight()));
+    _logger.info(
+        String.format(
+            "Transaction of type %s is mined at block %s with height %s",
+            txValue.getTxType(), txValue.getBlockHash(), txValue.getBlockHeight()));
 
     return postTxResponse;
   }
@@ -194,15 +220,17 @@ public abstract class BaseTest {
     int doneTrials = 1;
 
     while (blockHeight == -1 && doneTrials < TestConstants.NUM_TRIALS_DEFAULT) {
-      minedTx = callMethodAndGetResult(
-          () -> aeternityServiceNative.info.asyncGetTransactionByHash(txHash),
-          TransactionResult.class);
+      minedTx =
+          callMethodAndGetResult(
+              () -> aeternityServiceNative.info.asyncGetTransactionByHash(txHash),
+              TransactionResult.class);
       if (minedTx.getBlockHeight().intValue() > 1) {
         _logger.debug("Mined tx: " + minedTx);
         blockHeight = minedTx.getBlockHeight().intValue();
       } else {
-        _logger
-            .warn(String.format("Transaction not mined yet, trying again in 1 second (%s of %s)...",
+        _logger.warn(
+            String.format(
+                "Transaction not mined yet, trying again in 1 second (%s of %s)...",
                 doneTrials, TestConstants.NUM_TRIALS_DEFAULT));
         Thread.sleep(1000);
         doneTrials++;
@@ -210,8 +238,9 @@ public abstract class BaseTest {
     }
 
     if (blockHeight == -1) {
-      throw new InterruptedException(String
-          .format("Transaction %s was not mined after %s trials, aborting", txHash, doneTrials));
+      throw new InterruptedException(
+          String.format(
+              "Transaction %s was not mined after %s trials, aborting", txHash, doneTrials));
     }
 
     return minedTx;
@@ -219,7 +248,9 @@ public abstract class BaseTest {
 
   protected void waitForBlockHeight(BigInteger blockHeight, Long timeoutMilli) throws Throwable {
     BigInteger currentBlockHeight = BigInteger.ZERO;
-    _logger.info("waiting for blockHeight {} and checking every {} seconds", blockHeight,
+    _logger.info(
+        "waiting for blockHeight {} and checking every {} seconds",
+        blockHeight,
         timeoutMilli / 1000d);
     while (currentBlockHeight.compareTo(blockHeight) == -1) {
       currentBlockHeight = aeternityServiceNative.info.blockingGetCurrentKeyBlock().getHeight();
@@ -228,28 +259,30 @@ public abstract class BaseTest {
     }
   }
 
-  protected String encodeCalldata(String contractSourceCode, String contractFunction,
-      List<String> contractFunctionParams) {
-    return this.aeternityServiceNative.compiler
+  protected String encodeCalldata(
+      String contractSourceCode, String contractFunction, List<String> contractFunctionParams) {
+    return this.aeternityServiceNative
+        .compiler
         .blockingEncodeCalldata(contractSourceCode, contractFunction, contractFunctionParams)
         .getResult();
   }
 
   protected JsonObject decodeCalldata(String encodedValue, String sophiaReturnType) {
-    return JsonObject.mapFrom(this.aeternityServiceNative.compiler
-        .blockingDecodeCalldata(encodedValue, sophiaReturnType));
+    return JsonObject.mapFrom(
+        this.aeternityServiceNative.compiler.blockingDecodeCalldata(
+            encodedValue, sophiaReturnType));
   }
 
-  protected ObjectResultWrapper decodeCallResult(String source, String function, String callResult,
-      String callValue) {
-    return this.aeternityServiceNative.compiler.blockingDecodeCallResult(source, function,
-        callResult, callValue);
+  protected ObjectResultWrapper decodeCallResult(
+      String source, String function, String callResult, String callValue) {
+    return this.aeternityServiceNative.compiler.blockingDecodeCallResult(
+        source, function, callResult, callValue);
   }
 
-  protected <T> T callMethodAndAwaitException(Supplier<Single<T>> observerMethod,
-      Class<T> exception) throws Throwable {
-    return callMethodAndGetResult(TestConstants.NUM_TRIALS_DEFAULT, observerMethod, exception,
-        true);
+  protected <T> T callMethodAndAwaitException(
+      Supplier<Single<T>> observerMethod, Class<T> exception) throws Throwable {
+    return callMethodAndGetResult(
+        TestConstants.NUM_TRIALS_DEFAULT, observerMethod, exception, true);
   }
 
   protected <T> T callMethodAndGetResult(Supplier<Single<T>> observerMethod, Class<T> type)
@@ -257,8 +290,9 @@ public abstract class BaseTest {
     return callMethodAndGetResult(TestConstants.NUM_TRIALS_DEFAULT, observerMethod, type, false);
   }
 
-  protected <T> T callMethodAndGetResult(Integer numTrials, Supplier<Single<T>> observerMethod,
-      Class<T> type, boolean awaitException) throws Throwable {
+  protected <T> T callMethodAndGetResult(
+      Integer numTrials, Supplier<Single<T>> observerMethod, Class<T> type, boolean awaitException)
+      throws Throwable {
 
     if (numTrials == null) {
       numTrials = TestConstants.NUM_TRIALS_DEFAULT;
@@ -282,17 +316,19 @@ public abstract class BaseTest {
           }
           throw new InterruptedException("Max number of function call trials exceeded, aborting");
         }
-        _logger.warn(String.format(
-            "Unable to receive object of type %s, trying again in 1 second (%s of %s)...",
-            type.getSimpleName(), doneTrials, numTrials));
+        _logger.warn(
+            String.format(
+                "Unable to receive object of type %s, trying again in 1 second (%s of %s)...",
+                type.getSimpleName(), doneTrials, numTrials));
         Thread.sleep(1000);
         doneTrials++;
       } else {
         if (!awaitException) {
           result = singleTestObserver.values().get(0);
         } else {
-          _logger
-              .warn(String.format("Waiting for exception, trying again in 1 second (%s of %s)...",
+          _logger.warn(
+              String.format(
+                  "Waiting for exception, trying again in 1 second (%s of %s)...",
                   doneTrials, numTrials));
           Thread.sleep(1000);
           doneTrials++;
@@ -305,20 +341,22 @@ public abstract class BaseTest {
 
   protected void executeTest(TestContext context, Consumer<?> method) {
     Async async = context.async();
-    vertx.executeBlocking(future -> {
-      try {
-        method.accept(null);
-        future.complete();
-      } catch (Throwable e) {
-        _logger.error("Error occured in test", e);
-        context.fail();
-      }
-    }, result -> {
-      if (result.succeeded()) {
-        async.complete();
-      } else {
-        context.fail(result.cause());
-      }
-    });
+    vertx.executeBlocking(
+        future -> {
+          try {
+            method.accept(null);
+            future.complete();
+          } catch (Throwable e) {
+            _logger.error("Error occured in test", e);
+            context.fail();
+          }
+        },
+        result -> {
+          if (result.succeeded()) {
+            async.complete();
+          } else {
+            context.fail(result.cause());
+          }
+        });
   }
 }

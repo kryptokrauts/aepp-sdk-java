@@ -1,9 +1,5 @@
 package com.kryptokrauts.aeternity.generated.api;
 
-import java.math.BigInteger;
-import org.junit.FixMethodOrder;
-import org.junit.Test;
-import org.junit.runners.MethodSorters;
 import com.kryptokrauts.aeternity.sdk.domain.secret.KeyPair;
 import com.kryptokrauts.aeternity.sdk.service.oracle.domain.OracleQueriesResult;
 import com.kryptokrauts.aeternity.sdk.service.oracle.domain.OracleQueryResult;
@@ -19,6 +15,10 @@ import com.kryptokrauts.aeternity.sdk.util.EncodingUtils;
 import com.kryptokrauts.aeternity.sdk.util.UnitConversionUtil;
 import com.kryptokrauts.aeternity.sdk.util.UnitConversionUtil.Unit;
 import io.vertx.ext.unit.TestContext;
+import java.math.BigInteger;
+import org.junit.FixMethodOrder;
+import org.junit.Test;
+import org.junit.runners.MethodSorters;
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class TransactionOraclesTest extends BaseTest {
@@ -37,117 +37,162 @@ public class TransactionOraclesTest extends BaseTest {
 
   @Test
   public void aGenerateKeyPairAndFundOracleAccount(TestContext context) {
-    this.executeTest(context, t -> {
-      try {
-        oracleKeyPair = keyPairService.generateKeyPair();
+    this.executeTest(
+        context,
+        t -> {
+          try {
+            oracleKeyPair = keyPairService.generateKeyPair();
 
-        oracleId = oracleKeyPair.getOraclePK();
-        BigInteger amount = UnitConversionUtil.toAettos("10", Unit.AE).toBigInteger();
-        SpendTransactionModel spendTx = SpendTransactionModel.builder().amount(amount)
-            .sender(baseKeyPair.getAddress()).recipient(oracleKeyPair.getAddress()).ttl(ZERO)
-            .nonce(getNextBaseKeypairNonce()).build();
-        PostTransactionResult postResult = this.blockingPostTx(spendTx);
-        _logger.info(postResult.getTxHash());
-      } catch (Throwable e) {
-        context.fail(e);
-      }
-    });
+            oracleId = oracleKeyPair.getOraclePK();
+            BigInteger amount = UnitConversionUtil.toAettos("10", Unit.AE).toBigInteger();
+            SpendTransactionModel spendTx =
+                SpendTransactionModel.builder()
+                    .amount(amount)
+                    .sender(baseKeyPair.getAddress())
+                    .recipient(oracleKeyPair.getAddress())
+                    .ttl(ZERO)
+                    .nonce(getNextBaseKeypairNonce())
+                    .build();
+            PostTransactionResult postResult = this.blockingPostTx(spendTx);
+            _logger.info(postResult.getTxHash());
+          } catch (Throwable e) {
+            context.fail(e);
+          }
+        });
   }
 
   @Test
   public void bOracleRegisterTest(TestContext context) {
-    this.executeTest(context, t -> {
-      try {
-        BigInteger nonce = getAccount(oracleKeyPair.getAddress()).getNonce().add(ONE);
-        BigInteger currentHeight =
-            this.aeternityServiceNative.info.blockingGetCurrentKeyBlock().getHeight();
-        initialOracleTtl = currentHeight.add(BigInteger.valueOf(5000));
+    this.executeTest(
+        context,
+        t -> {
+          try {
+            BigInteger nonce = getAccount(oracleKeyPair.getAddress()).getNonce().add(ONE);
+            BigInteger currentHeight =
+                this.aeternityServiceNative.info.blockingGetCurrentKeyBlock().getHeight();
+            initialOracleTtl = currentHeight.add(BigInteger.valueOf(5000));
 
-        OracleRegisterTransactionModel oracleRegisterTx =
-            OracleRegisterTransactionModel.builder().accountId(oracleKeyPair.getAddress())
-                .abiVersion(ZERO).nonce(nonce).oracleTtl(initialOracleTtl)
-                .oracleTtlType(OracleTTLType.BLOCK).queryFee(BigInteger.valueOf(100))
-                .queryFormat("string").responseFormat("string").ttl(ZERO).build();
+            OracleRegisterTransactionModel oracleRegisterTx =
+                OracleRegisterTransactionModel.builder()
+                    .accountId(oracleKeyPair.getAddress())
+                    .abiVersion(ZERO)
+                    .nonce(nonce)
+                    .oracleTtl(initialOracleTtl)
+                    .oracleTtlType(OracleTTLType.BLOCK)
+                    .queryFee(BigInteger.valueOf(100))
+                    .queryFormat("string")
+                    .responseFormat("string")
+                    .ttl(ZERO)
+                    .build();
 
-        PostTransactionResult postResult =
-            this.blockingPostTx(oracleRegisterTx, oracleKeyPair.getEncodedPrivateKey());
-        _logger.info(postResult.getTxHash());
-      } catch (Throwable e) {
-        context.fail(e);
-      }
-    });
+            PostTransactionResult postResult =
+                this.blockingPostTx(oracleRegisterTx, oracleKeyPair.getEncodedPrivateKey());
+            _logger.info(postResult.getTxHash());
+          } catch (Throwable e) {
+            context.fail(e);
+          }
+        });
   }
 
   @Test
   public void cOracleQueryTest(TestContext context) {
-    this.executeTest(context, t -> {
-      try {
-        BigInteger nonce = getNextBaseKeypairNonce();
-        OracleQueryTransactionModel oracleQueryTx = OracleQueryTransactionModel.builder()
-            .senderId(baseKeyPair.getAddress()).oracleId(oracleId).nonce(nonce).query(queryString)
-            .queryFee(BigInteger.valueOf(100)).queryTtl(BigInteger.valueOf(50)).ttl(ZERO)
-            .queryTtlType(OracleTTLType.DELTA).responseTtl(BigInteger.valueOf(100)).build();
+    this.executeTest(
+        context,
+        t -> {
+          try {
+            BigInteger nonce = getNextBaseKeypairNonce();
+            OracleQueryTransactionModel oracleQueryTx =
+                OracleQueryTransactionModel.builder()
+                    .senderId(baseKeyPair.getAddress())
+                    .oracleId(oracleId)
+                    .nonce(nonce)
+                    .query(queryString)
+                    .queryFee(BigInteger.valueOf(100))
+                    .queryTtl(BigInteger.valueOf(50))
+                    .ttl(ZERO)
+                    .queryTtlType(OracleTTLType.DELTA)
+                    .responseTtl(BigInteger.valueOf(100))
+                    .build();
 
-        PostTransactionResult postResult =
-            this.blockingPostTx(oracleQueryTx, baseKeyPair.getEncodedPrivateKey());
-        _logger.info(postResult.getTxHash());
-        queryId = EncodingUtils.queryId(baseKeyPair.getAddress(), nonce, oracleId);
-        OracleQueryResult oracleQuery =
-            this.aeternityServiceNative.oracles.blockingGetOracleQuery(oracleId, queryId);
-        _logger.debug(oracleQuery.toString());
-      } catch (Throwable e) {
-        context.fail(e);
-      }
-    });
+            PostTransactionResult postResult =
+                this.blockingPostTx(oracleQueryTx, baseKeyPair.getEncodedPrivateKey());
+            _logger.info(postResult.getTxHash());
+            queryId = EncodingUtils.queryId(baseKeyPair.getAddress(), nonce, oracleId);
+            OracleQueryResult oracleQuery =
+                this.aeternityServiceNative.oracles.blockingGetOracleQuery(oracleId, queryId);
+            _logger.debug(oracleQuery.toString());
+          } catch (Throwable e) {
+            context.fail(e);
+          }
+        });
   }
 
   @Test
   public void dOracleRespondTest(TestContext context) {
-    this.executeTest(context, t -> {
-      try {
-        OracleQueriesResult oracleQueriesResult = this.aeternityServiceNative.oracles
-            .blockingGetOracleQueries(oracleKeyPair.getOraclePK());
-        _logger.info("OracleQueriesResult: {}", oracleQueriesResult);
-        _logger.info("OracleQuery count: {}", oracleQueriesResult.getQueryResults().size());
-        context.assertFalse(oracleQueriesResult.getQueryResults().isEmpty());
-        OracleQueryResult oracleQueryResult = oracleQueriesResult.getQueryResults().stream()
-            .filter(query -> query.getId().equals(queryId)).findFirst().get();
-        context.assertEquals(queryString, oracleQueryResult.getQuery());
-        BigInteger nonce = getAccount(oracleKeyPair.getAddress()).getNonce().add(ONE);
-        OracleRespondTransactionModel oracleRespondTx = OracleRespondTransactionModel.builder()
-            .oracleId(oracleKeyPair.getOraclePK()).queryId(oracleQueryResult.getId()).nonce(nonce)
-            .response(responseString).responseTtl(BigInteger.valueOf(100)).ttl(ZERO).build();
+    this.executeTest(
+        context,
+        t -> {
+          try {
+            OracleQueriesResult oracleQueriesResult =
+                this.aeternityServiceNative.oracles.blockingGetOracleQueries(
+                    oracleKeyPair.getOraclePK());
+            _logger.info("OracleQueriesResult: {}", oracleQueriesResult);
+            _logger.info("OracleQuery count: {}", oracleQueriesResult.getQueryResults().size());
+            context.assertFalse(oracleQueriesResult.getQueryResults().isEmpty());
+            OracleQueryResult oracleQueryResult =
+                oracleQueriesResult.getQueryResults().stream()
+                    .filter(query -> query.getId().equals(queryId))
+                    .findFirst()
+                    .get();
+            context.assertEquals(queryString, oracleQueryResult.getQuery());
+            BigInteger nonce = getAccount(oracleKeyPair.getAddress()).getNonce().add(ONE);
+            OracleRespondTransactionModel oracleRespondTx =
+                OracleRespondTransactionModel.builder()
+                    .oracleId(oracleKeyPair.getOraclePK())
+                    .queryId(oracleQueryResult.getId())
+                    .nonce(nonce)
+                    .response(responseString)
+                    .responseTtl(BigInteger.valueOf(100))
+                    .ttl(ZERO)
+                    .build();
 
-        PostTransactionResult postResult =
-            this.blockingPostTx(oracleRespondTx, oracleKeyPair.getEncodedPrivateKey());
-        _logger.info(postResult.getTxHash());
-      } catch (Throwable e) {
-        context.fail(e);
-      }
-    });
+            PostTransactionResult postResult =
+                this.blockingPostTx(oracleRespondTx, oracleKeyPair.getEncodedPrivateKey());
+            _logger.info(postResult.getTxHash());
+          } catch (Throwable e) {
+            context.fail(e);
+          }
+        });
   }
 
   @Test
   public void eOracleExtendTest(TestContext context) {
-    this.executeTest(context, t -> {
-      try {
-        BigInteger additionalTtl = BigInteger.valueOf(100);
-        BigInteger nonce = getAccount(oracleKeyPair.getAddress()).getNonce().add(ONE);
+    this.executeTest(
+        context,
+        t -> {
+          try {
+            BigInteger additionalTtl = BigInteger.valueOf(100);
+            BigInteger nonce = getAccount(oracleKeyPair.getAddress()).getNonce().add(ONE);
 
-        OracleExtendTransactionModel oracleExtendTx = OracleExtendTransactionModel.builder()
-            .nonce(nonce).oracleId(oracleId).oracleRelativeTtl(additionalTtl).ttl(ZERO).build();
+            OracleExtendTransactionModel oracleExtendTx =
+                OracleExtendTransactionModel.builder()
+                    .nonce(nonce)
+                    .oracleId(oracleId)
+                    .oracleRelativeTtl(additionalTtl)
+                    .ttl(ZERO)
+                    .build();
 
-        PostTransactionResult postResult =
-            this.blockingPostTx(oracleExtendTx, oracleKeyPair.getEncodedPrivateKey());
-        _logger.info(postResult.getTxHash());
+            PostTransactionResult postResult =
+                this.blockingPostTx(oracleExtendTx, oracleKeyPair.getEncodedPrivateKey());
+            _logger.info(postResult.getTxHash());
 
-        RegisteredOracleResult registeredOracle =
-            this.aeternityServiceNative.oracles.blockingGetRegisteredOracle(oracleId);
-        context.assertEquals(initialOracleTtl.add(additionalTtl), registeredOracle.getTtl());
-        _logger.info(registeredOracle.toString());
-      } catch (Throwable e) {
-        context.fail(e);
-      }
-    });
+            RegisteredOracleResult registeredOracle =
+                this.aeternityServiceNative.oracles.blockingGetRegisteredOracle(oracleId);
+            context.assertEquals(initialOracleTtl.add(additionalTtl), registeredOracle.getTtl());
+            _logger.info(registeredOracle.toString());
+          } catch (Throwable e) {
+            context.fail(e);
+          }
+        });
   }
 }

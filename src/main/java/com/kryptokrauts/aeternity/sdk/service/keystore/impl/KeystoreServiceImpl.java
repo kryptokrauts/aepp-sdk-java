@@ -1,14 +1,5 @@
 package com.kryptokrauts.aeternity.sdk.service.keystore.impl;
 
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.sql.Timestamp;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
-import javax.annotation.Nonnull;
-import org.apache.tuweni.crypto.sodium.SecretBox;
-import org.bouncycastle.util.encoders.Hex;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kryptokrauts.aeternity.sdk.domain.Keystore;
@@ -20,13 +11,21 @@ import com.kryptokrauts.aeternity.sdk.service.keystore.KeystoreServiceConfigurat
 import com.kryptokrauts.aeternity.sdk.util.CryptoUtils;
 import de.mkammerer.argon2.Argon2Advanced;
 import de.mkammerer.argon2.Argon2Factory;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.sql.Timestamp;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
+import javax.annotation.Nonnull;
 import lombok.RequiredArgsConstructor;
+import org.apache.tuweni.crypto.sodium.SecretBox;
+import org.bouncycastle.util.encoders.Hex;
 
 @RequiredArgsConstructor
 public class KeystoreServiceImpl implements KeystoreService {
 
-  @Nonnull
-  private KeystoreServiceConfiguration config;
+  @Nonnull private KeystoreServiceConfiguration config;
 
   @Override
   public String createHDKeystore(HDWallet mnemonicKeyPair) throws AException {
@@ -48,16 +47,26 @@ public class KeystoreServiceImpl implements KeystoreService {
     byte[] salt = CryptoUtils.generateSalt(config.getDefaultSaltLength());
 
     // generate hash from password
-    byte[] rawHash = argon2Advanced.rawHash(config.getOpsLimit(), config.getMemlimitKIB(),
-        config.getParallelism(), walletPassword.toCharArray(), StandardCharsets.UTF_8, salt);
+    byte[] rawHash =
+        argon2Advanced.rawHash(
+            config.getOpsLimit(),
+            config.getMemlimitKIB(),
+            config.getParallelism(),
+            walletPassword.toCharArray(),
+            StandardCharsets.UTF_8,
+            salt);
 
     // chain public and private key byte arrays
     byte[] privateAndPublicKey =
         new byte[keyPair.getRawPrivateKey().length + keyPair.getRawPublicKey().length];
-    System.arraycopy(keyPair.getRawPrivateKey(), 0, privateAndPublicKey, 0,
-        keyPair.getRawPrivateKey().length);
-    System.arraycopy(keyPair.getRawPublicKey(), 0, privateAndPublicKey,
-        keyPair.getRawPrivateKey().length, keyPair.getRawPublicKey().length);
+    System.arraycopy(
+        keyPair.getRawPrivateKey(), 0, privateAndPublicKey, 0, keyPair.getRawPrivateKey().length);
+    System.arraycopy(
+        keyPair.getRawPublicKey(),
+        0,
+        privateAndPublicKey,
+        keyPair.getRawPrivateKey().length,
+        keyPair.getRawPublicKey().length);
 
     // encrypt the key arrays with nonce and derived key
     SecretBox.Nonce nonce = SecretBox.Nonce.random();
@@ -70,18 +79,31 @@ public class KeystoreServiceImpl implements KeystoreService {
     }
 
     // generate the domain object for keystore
-    Keystore wallet = Keystore.builder().publicKey(keyPair.getAddress())
-        .crypto(Keystore.Crypto.builder().secretType(config.getSecretType())
-            .symmetricAlgorithm(config.getSymmetricAlgorithm())
-            .cipherText(Hex.toHexString(ciphertext))
-            .cipherParams(
-                Keystore.CipherParams.builder().nonce(Hex.toHexString(nonce.bytesArray())).build())
-            .kdf(config.getArgon2Mode())
-            .kdfParams(Keystore.KdfParams.builder().memLimitKib(config.getMemlimitKIB())
-                .opsLimit(config.getOpsLimit()).salt(Hex.toHexString(salt))
-                .parallelism(config.getParallelism()).build())
-            .build())
-        .id(UUID.randomUUID().toString()).name(walletName).version(config.getVersion()).build();
+    Keystore wallet =
+        Keystore.builder()
+            .publicKey(keyPair.getAddress())
+            .crypto(
+                Keystore.Crypto.builder()
+                    .secretType(config.getSecretType())
+                    .symmetricAlgorithm(config.getSymmetricAlgorithm())
+                    .cipherText(Hex.toHexString(ciphertext))
+                    .cipherParams(
+                        Keystore.CipherParams.builder()
+                            .nonce(Hex.toHexString(nonce.bytesArray()))
+                            .build())
+                    .kdf(config.getArgon2Mode())
+                    .kdfParams(
+                        Keystore.KdfParams.builder()
+                            .memLimitKib(config.getMemlimitKIB())
+                            .opsLimit(config.getOpsLimit())
+                            .salt(Hex.toHexString(salt))
+                            .parallelism(config.getParallelism())
+                            .build())
+                    .build())
+            .id(UUID.randomUUID().toString())
+            .name(walletName)
+            .version(config.getVersion())
+            .build();
 
     try {
       return new ObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(wallet);
@@ -99,8 +121,14 @@ public class KeystoreServiceImpl implements KeystoreService {
       // extract salt
       byte[] salt = Hex.decode(recoverWallet.getCrypto().getKdfParams().getSalt());
       // generate hash from password
-      byte[] rawHash = argon2Advanced.rawHash(config.getOpsLimit(), config.getMemlimitKIB(),
-          config.getParallelism(), walletPassword.toCharArray(), StandardCharsets.UTF_8, salt);
+      byte[] rawHash =
+          argon2Advanced.rawHash(
+              config.getOpsLimit(),
+              config.getMemlimitKIB(),
+              config.getParallelism(),
+              walletPassword.toCharArray(),
+              StandardCharsets.UTF_8,
+              salt);
       // extract nonce
       byte[] nonce = Hex.decode(recoverWallet.getCrypto().getCipherParams().getNonce());
 
@@ -108,8 +136,9 @@ public class KeystoreServiceImpl implements KeystoreService {
       byte[] ciphertext = Hex.decode(recoverWallet.getCrypto().getCipherText());
 
       // recover private key
-      byte[] decrypted = SecretBox.decrypt(ciphertext, SecretBox.Key.fromBytes(rawHash),
-          SecretBox.Nonce.fromBytes(nonce));
+      byte[] decrypted =
+          SecretBox.decrypt(
+              ciphertext, SecretBox.Key.fromBytes(rawHash), SecretBox.Nonce.fromBytes(nonce));
       if (decrypted == null) {
         throw new AException("Error recovering privateKey: wrong password.");
       }

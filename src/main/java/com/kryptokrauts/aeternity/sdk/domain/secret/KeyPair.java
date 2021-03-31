@@ -1,12 +1,12 @@
 package com.kryptokrauts.aeternity.sdk.domain.secret;
 
-import org.bouncycastle.util.encoders.Hex;
 import com.kryptokrauts.aeternity.sdk.constants.ApiIdentifiers;
 import com.kryptokrauts.aeternity.sdk.util.ByteUtils;
 import com.kryptokrauts.aeternity.sdk.util.EncodingUtils;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.bouncycastle.util.encoders.Hex;
 
 @Data
 @NoArgsConstructor
@@ -15,19 +15,13 @@ public class KeyPair {
 
   private byte[] rawPrivateKey;
 
-  /**
-   * if using hd wallet this chaincode is used to derive subsequent key pairs
-   */
+  /** if using hd wallet this chaincode is used to derive subsequent key pairs */
   private byte[] chainCode;
 
-  /**
-   * hex encoded private key
-   */
+  /** hex encoded private key */
   private String encodedPrivateKey;
 
-  /**
-   * base58 encoded human readable publicKey
-   */
+  /** base58 encoded human readable publicKey */
   private String address;
 
   @Builder

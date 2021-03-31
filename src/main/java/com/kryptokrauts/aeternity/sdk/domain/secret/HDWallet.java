@@ -8,9 +8,8 @@ import lombok.Getter;
  * mnemonic seed words, the generated {@link KeyPair} and the {@link DeterministicHierarchy} which
  * build the base for generating a hierarchical deterministic wallet.
  *
- * <p>
- * The deterministicHierarchy object can either be created from the root (master) or a derived key
- * according to the tree structure stated in <a
+ * <p>The deterministicHierarchy object can either be created from the root (master) or a derived
+ * key according to the tree structure stated in <a
  * href=https://github.com/bitcoin/bips/blob/master/bip-0032.mediawiki#Master_key_generation>BIP32</a>
  */
 @Getter
