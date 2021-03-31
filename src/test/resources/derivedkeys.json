@@ -1,27 +1,6 @@
 [
 	{
 		"mnemonic": "abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about",
-		"password": "kryptokrauts",
-		"accounts": [
-			{
-				"index": 0,
-				"address": "ak_uEoRY2CEAbSzMbN4ohniNHFdrVDHjpw3Za3upmJA8SihGBjCk",
-				"pk": "cb9b31d8e09182ab7228a3252984a68c41513cea33283313680f34c382c58127769cd5368a1a498dff86d3aec54ff4eb3ac89c13d6b100461907133bfa5cd082"
-			},
-			{
-				"index": 1,
-				"address": "ak_Bdv55ARA3Asqy3HK4KiPU3raZURXEMQGkRX6LeYRoStMza742",
-				"pk": "007d1f7a036082f012ed3381aa05be7aaaaa0000fd8fdfb677b17db103cec1ef1826c1e82ca5e99170b100015489101ef377d582431af64fd11ebf948f5fe935"
-			},
-			{
-				"index": 2,
-				"address": "ak_N8wj8LxdSz5YsNwLbGGXKm485TcgrimKWAhh7FTHoLZ57GsAe",
-				"pk": "8b1e4d7c86330a311dfeb013a2d9f3d05e58bf49f3a78bc9ad78fb26ecc964122ffe79f8785c4b385b6d5d7b3ae6d947fd16659b35fdbb1acf4fe5e5cfd99aa9"
-			}
-		]
-	},
-	{
-		"mnemonic": "abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about",
 		"password": "",
 		"accounts": [
 			{
@@ -38,6 +17,27 @@
 				"index": 2,
 				"address": "ak_2D8fAoXC3dweJkpstEp89uXQby7i4RU6HeXyPNmyCjXLGH6pPz",
 				"pk": "a2fe1a3473d83a5706059b70199f73cf66cbccf6692c21e40c20ec8b0b1f85259f3e4d4ef8af1b7803325e5ad2834a3b2f91913c52fd27e0de4e53d78ba5873c"
+			}
+		]
+	},
+	{
+		"mnemonic": "abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about",
+		"password": "kryptokrauts",
+		"accounts": [
+			{
+				"index": 0,
+				"address": "ak_uEoRY2CEAbSzMbN4ohniNHFdrVDHjpw3Za3upmJA8SihGBjCk",
+				"pk": "cb9b31d8e09182ab7228a3252984a68c41513cea33283313680f34c382c58127769cd5368a1a498dff86d3aec54ff4eb3ac89c13d6b100461907133bfa5cd082"
+			},
+			{
+				"index": 1,
+				"address": "ak_Bdv55ARA3Asqy3HK4KiPU3raZURXEMQGkRX6LeYRoStMza742",
+				"pk": "007d1f7a036082f012ed3381aa05be7aaaaa0000fd8fdfb677b17db103cec1ef1826c1e82ca5e99170b100015489101ef377d582431af64fd11ebf948f5fe935"
+			},
+			{
+				"index": 2,
+				"address": "ak_N8wj8LxdSz5YsNwLbGGXKm485TcgrimKWAhh7FTHoLZ57GsAe",
+				"pk": "8b1e4d7c86330a311dfeb013a2d9f3d05e58bf49f3a78bc9ad78fb26ecc964122ffe79f8785c4b385b6d5d7b3ae6d947fd16659b35fdbb1acf4fe5e5cfd99aa9"
 			}
 		]
 	},

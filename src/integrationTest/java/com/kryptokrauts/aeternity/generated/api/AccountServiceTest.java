@@ -14,7 +14,7 @@ public class AccountServiceTest extends BaseTest {
         t -> {
           AccountResult result =
               this.aeternityServiceNative.accounts.blockingGetAccount(
-                  this.baseAccount.getAddress());
+                  this.baseKeyPair.getAddress());
           context.assertTrue(result.getBalance().compareTo(ZERO) == 1);
         });
   }

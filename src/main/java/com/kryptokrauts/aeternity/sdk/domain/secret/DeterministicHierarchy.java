@@ -1,9 +1,9 @@
-package com.kryptokrauts.aeternity.sdk.domain.secret.impl;
+package com.kryptokrauts.aeternity.sdk.domain.secret;
 
-import com.kryptokrauts.aeternity.sdk.constants.BaseConstants;
-import com.kryptokrauts.aeternity.sdk.exception.AException;
 import java.util.HashMap;
 import java.util.Map;
+import com.kryptokrauts.aeternity.sdk.constants.BaseConstants;
+import com.kryptokrauts.aeternity.sdk.exception.AException;
 import lombok.Getter;
 
 @Getter
@@ -15,17 +15,17 @@ public class DeterministicHierarchy {
 
   private Map<Integer, DeterministicHierarchyEntry> deterministicHierarchy;
 
-  public DeterministicHierarchy(RawKeyPair master) {
+  public DeterministicHierarchy(KeyPair master) {
     this.deterministicHierarchy = new HashMap<>();
-    this.deterministicHierarchy.put(
-        DEPTH_MASTER, new DeterministicHierarchyEntry(DEPTH_MASTER, master));
+    this.deterministicHierarchy.put(DEPTH_MASTER,
+        new DeterministicHierarchyEntry(DEPTH_MASTER, master));
   }
 
-  public void addAccount(RawKeyPair accountKeypair) {
+  public void addAccount(KeyPair accountKeypair) {
     this.getMaster().addChild(BaseConstants.HD_CHAIN_PURPOSE, accountKeypair);
   }
 
-  public void addChain(RawKeyPair chainKeypair) {
+  public void addChain(KeyPair chainKeypair) {
     this.getAccount().addChild(BaseConstants.HD_CHAIN_CODE_AETERNITY, chainKeypair);
   }
 
@@ -34,45 +34,38 @@ public class DeterministicHierarchy {
    * @param mi0Keypair this childs internal chain keypair
    * @param mi00Keypair this childs actual address keypiar
    */
-  public void addNextAddress(RawKeyPair miKeypair, RawKeyPair mi0Keypair, RawKeyPair mi00Keypair) {
-    this.getChain()
-        .addChild(this.getChain().getNextChildIndex(), miKeypair)
-        .addChild(ADDRESS_INDEX_DEFAULT, mi0Keypair)
-        .addChild(ADDRESS_INDEX_DEFAULT, mi00Keypair);
+  public void addNextAddress(KeyPair miKeypair, KeyPair mi0Keypair, KeyPair mi00Keypair) {
+    this.getChain().addChild(this.getChain().getNextChildIndex(), miKeypair)
+        .addChild(ADDRESS_INDEX_DEFAULT, mi0Keypair).addChild(ADDRESS_INDEX_DEFAULT, mi00Keypair);
   }
 
-  public RawKeyPair getChildAt(Integer index) {
+  public KeyPair getChildAt(Integer index) {
     if (this.getChain().getChildren().get(index) == null) {
-      throw new AException(
-          "Cannot retrieve child at index " + index + " - no child keypair set for index");
+      throw new AException("Cannot retrieve child at index " + index
+          + " - no child keypair was generated for this index. Max child index available: "
+          + (this.getChain().getChildren().size() - 1));
     }
-    return this.getChain()
-        .getChildren()
-        .get(index)
-        .getChildren()
-        .get(ADDRESS_INDEX_DEFAULT)
-        .getChildren()
-        .get(ADDRESS_INDEX_DEFAULT)
-        .getRawKeyPair();
+    return this.getChain().getChildren().get(index).getChildren().get(ADDRESS_INDEX_DEFAULT)
+        .getChildren().get(ADDRESS_INDEX_DEFAULT).getRawKeyPair();
   }
 
   public Integer getNextChildIndex() {
     return this.getChain().getNextChildIndex();
   }
 
-  public RawKeyPair getLastChild() {
+  public KeyPair getLastChild() {
     return this.getChildAt(this.getChain().getHighestChildIndex());
   }
 
-  public RawKeyPair getMasterKey() {
+  public KeyPair getMasterKeyPair() {
     return this.getMaster().getRawKeyPair();
   }
 
-  public RawKeyPair getAccountKeypair() {
+  public KeyPair getAccountKeyPair() {
     return this.getAccount().getRawKeyPair();
   }
 
-  public RawKeyPair getChainKeypair() {
+  public KeyPair getChainKeyPair() {
     return this.getChain().getRawKeyPair();
   }
 

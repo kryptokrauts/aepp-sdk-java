@@ -1,9 +1,5 @@
 package com.kryptokrauts.aeternity.sdk.service.keypair;
 
-import com.kryptokrauts.aeternity.sdk.domain.secret.impl.Account;
-import com.kryptokrauts.aeternity.sdk.domain.secret.impl.MnemonicKeyPair;
-import com.kryptokrauts.aeternity.sdk.domain.secret.impl.RawKeyPair;
-import com.kryptokrauts.aeternity.sdk.exception.AException;
 import java.io.UnsupportedEncodingException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
@@ -11,26 +7,20 @@ import java.util.List;
 import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
+import com.kryptokrauts.aeternity.sdk.domain.secret.HDWallet;
+import com.kryptokrauts.aeternity.sdk.domain.secret.KeyPair;
+import com.kryptokrauts.aeternity.sdk.exception.AException;
 
 public interface KeyPairService {
 
-  /** @return a base58 encoded keypair */
-  Account generateAccount();
-
   /** @return a byte arrayed keypair */
-  RawKeyPair generateRawKeyPair();
-
-  /**
-   * @param privateKey encoded privateKey
-   * @return a base58 encoded keypair
-   */
-  Account generateAccountFromSecret(String privateKey);
+  KeyPair generateKeyPair();
 
   /**
    * @param privateKey private key (hex)
    * @return a raw keypair
    */
-  RawKeyPair generateRawKeyPairFromSecret(String privateKey);
+  KeyPair generateKeyPairFromSecret(String privateKey);
 
   /**
    * encrypts the privateKey using the given password
@@ -100,7 +90,7 @@ public interface KeyPairService {
   /**
    * encrypts the public and private key of the given rawKeyPair using the given password
    *
-   * @param keyPairRaw the {@link RawKeyPair}
+   * @param keyPairRaw the {@link KeyPair}
    * @param password the password to use to encrypt the raw KeyPair
    * @return a rawKeyPair object containing the encrypted byte arrays
    * @throws IllegalBlockSizeException {@link IllegalBlockSizeException}
@@ -109,7 +99,7 @@ public interface KeyPairService {
    * @throws NoSuchAlgorithmException {@link NoSuchAlgorithmException}
    * @throws NoSuchPaddingException {@link NoSuchPaddingException}
    */
-  RawKeyPair encryptRawKeyPair(RawKeyPair keyPairRaw, String password)
+  KeyPair encryptKeyPair(KeyPair keyPairRaw, String password)
       throws IllegalBlockSizeException, InvalidKeyException, BadPaddingException,
           NoSuchAlgorithmException, NoSuchPaddingException;
 
@@ -123,7 +113,7 @@ public interface KeyPairService {
    *     words
    * @throws AException in case of an error
    */
-  MnemonicKeyPair generateMasterMnemonicKeyPair(String mnemonicSeedPassword) throws AException;
+  HDWallet generateMasterMnemonicKeyPair(String mnemonicSeedPassword) throws AException;
 
   /**
    * recover keypair from given mnemonic seed word list with given seed password
@@ -131,10 +121,10 @@ public interface KeyPairService {
    * @param mnemonicSeedWords the words to recover the keypair(s)
    * @param mnemonicSeedPassword the password that procects the keypair(s) generated with the seed
    *     phrase
-   * @return instance of {@link MnemonicKeyPair}
+   * @return instance of {@link HDWallet}
    * @throws AException in case of an error
    */
-  MnemonicKeyPair recoverMasterMnemonicKeyPair(
+  HDWallet recoverMasterMnemonicKeyPair(
       List<String> mnemonicSeedWords, String mnemonicSeedPassword) throws AException;
 
   /**
@@ -147,25 +137,5 @@ public interface KeyPairService {
    * @return a new derived child raw keypair
    * @throws AException in case of an error
    */
-  RawKeyPair deriveNextRawKeyPair(MnemonicKeyPair mnemonicKeyPair) throws AException;
-
-  /**
-   * derives the next hardened key. The derived keys are generated according to the deterministic
-   * tree saved within the given menomincKeyPair stated in <a
-   * href=https://github.com/bitcoin/bips/blob/master/bip-0032.mediawiki#Master_key_generation>BIP32</a>
-   *
-   * @param mnemonicKeyPair mnemonicKeyPair containing the deterministic tree of keys necessary for
-   *     derivation
-   * @return a new derived child account
-   * @throws AException in case of an error
-   */
-  Account deriveNextAccount(MnemonicKeyPair mnemonicKeyPair) throws AException;
-
-  /**
-   * convenient method to transform a raw keypair to an account
-   *
-   * @param the raw keypair to transform
-   * @return the account object
-   */
-  Account toAccount(RawKeyPair rawKeyPair);
+  KeyPair deriveNextKeyPair(HDWallet mnemonicKeyPair) throws AException;
 }

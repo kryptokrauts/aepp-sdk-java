@@ -1,4 +1,4 @@
-package com.kryptokrauts.aeternity.sdk.domain.secret.impl;
+package com.kryptokrauts.aeternity.sdk.domain.secret;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -11,20 +11,24 @@ public class DeterministicHierarchyEntry {
 
   private int depth;
 
-  private RawKeyPair rawKeyPair;
+  private KeyPair rawKeyPair;
+
+  private byte[] chaincode;
+
+  private byte[] privateKey;
 
   private Map<Integer, DeterministicHierarchyEntry> children;
 
   // we will only support hardened keys
   private boolean hardened = true;
 
-  public DeterministicHierarchyEntry(int depth, RawKeyPair keypair) {
+  public DeterministicHierarchyEntry(int depth, KeyPair keypair) {
     this.depth = depth;
     this.rawKeyPair = keypair;
     this.children = new HashMap<>();
   }
 
-  public DeterministicHierarchyEntry addChild(Integer index, RawKeyPair keypair) {
+  public DeterministicHierarchyEntry addChild(Integer index, KeyPair keypair) {
     this.children.put(index, new DeterministicHierarchyEntry(this.depth + 1, keypair));
     return this.children.get(index);
   }
