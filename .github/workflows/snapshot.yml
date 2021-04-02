@@ -38,11 +38,12 @@ jobs:
           echo "AETERNITY_BASE_URL=http://localhost" >> $GITHUB_ENV
           echo "COMPILER_BASE_URL=http://localhost:3080" >> $GITHUB_ENV
           echo "INDAEX_BASE_URL=http://localhost:4000" >> $GITHUB_ENV
-      - name: Test & Build
+      - name: Run Tests
         run: |
           docker-compose up -d
-          ./gradlew integrationTest
-          ./gradlew build
+          ./gradlew test integrationTest
+      - name: Publish Snapshot
+        run: ./gradlew publishToSonatype closeAndReleaseSonatypeStagingRepository
       - name: Cleanup Gradle Cache
         # Remove some files from the Gradle cache, so they aren't cached by GitHub Actions.
         # Restoring these files from a GitHub Actions cache might cause problems for future builds.
@@ -51,5 +52,3 @@ jobs:
           rm -f ~/.gradle/caches/modules-2/gc.properties
       - name: Upload to Codecov
         uses: codecov/codecov-action@v1
-      - name: Publish Snapshot
-        run: ./gradlew publishToSonatype closeAndReleaseSonatypeStagingRepository

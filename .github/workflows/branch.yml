@@ -2,7 +2,7 @@ name: Branch
 
 on:
   push:
-    branches-ignore: [ '3.x' ]
+    branches-ignore: [ '3.x', 'release-build' ]
 
 jobs:
   test-and-build:
