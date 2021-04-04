@@ -15,6 +15,7 @@ plugins {
     id "maven-publish"
     id "jacoco"
     id "java"
+    id "signing"
 }
 
 repositories {
@@ -222,6 +223,8 @@ dependencies {
     compile "com.google.guava:guava:27.0.1-jre"
 
     // tests
+    testCompileOnly "org.projectlombok:lombok:${lombokVersion}"
+    testAnnotationProcessor "org.projectlombok:lombok:${lombokVersion}"
     testImplementation enforcedPlatform("org.junit:junit-bom:${junitVersion}")
     testRuntime "org.junit.platform:junit-platform-console:${junitPlatformVersion}"
     testRuntime "org.junit.jupiter:junit-jupiter-engine:${junitVersion}"
@@ -296,6 +299,15 @@ def pomConfig = {
     }
 }
 
+def releaseTag = System.getenv("BUILD_TAG")
+def isRelease = releaseTag != null && !releaseTag.isEmpty()
+if (isRelease) {
+    if (releaseTag.startsWith("v")) {
+        releaseTag = releaseTag.substring(1)
+    }
+    project.version(releaseTag)
+}
+
 publishing {
     publications {
         mavenPublication(MavenPublication) {
@@ -317,6 +329,15 @@ publishing {
                 root.children().last() + pomConfig
             }
         }
+    }
+}
+
+if (isRelease) {
+    signing {
+        def signingKey = findProperty("signingKey")
+        def signingPassword = findProperty("signingPassword")
+        useInMemoryPgpKeys(signingKey, signingPassword)
+        sign publishing.publications.mavenPublication
     }
 }
 

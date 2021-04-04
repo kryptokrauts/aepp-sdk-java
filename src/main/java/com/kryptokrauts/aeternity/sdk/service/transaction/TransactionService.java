@@ -22,7 +22,12 @@ public interface TransactionService {
    */
   String signTransaction(String unsignedTx, String privateKey) throws TransactionCreateException;
 
-  /** wrap into a signed tx with empty list of signatures (to be used for Generalized Accounts) */
+  /**
+   * wrap into a signed tx with empty list of signatures (to be used for Generalized Accounts)
+   *
+   * @param unsignedTx a raw unsigned transaction
+   * @return wrapped signed and encoded transaction
+   */
   String wrapSignedTransactionForGA(String unsignedTx);
 
   /**
