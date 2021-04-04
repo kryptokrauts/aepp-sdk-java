@@ -3,7 +3,7 @@ name: Release
 on:
   release:
     types: [ released, prereleased ]
-    branches: [ '3.x', 'release-build' ]
+    branches: [ '3.x' ]
     tags:
       - 'v3.*.*'
 
@@ -35,12 +35,10 @@ jobs:
       - name: Extract version tag
         run: echo "BUILD_TAG=${GITHUB_REF:10}" >> $GITHUB_ENV
       - name: Publish Release
-        run: ./gradlew publishToSonatype closeAndReleaseSonatypeStagingRepository --stacktrace
+        run: ./gradlew publishToSonatype closeAndReleaseSonatypeStagingRepository
       - name: Cleanup Gradle Cache
         # Remove some files from the Gradle cache, so they aren't cached by GitHub Actions.
         # Restoring these files from a GitHub Actions cache might cause problems for future builds.
         run: |
           rm -f ~/.gradle/caches/modules-2/modules-2.lock
           rm -f ~/.gradle/caches/modules-2/gc.properties
-      - name: Upload to Codecov
-        uses: codecov/codecov-action@v1
