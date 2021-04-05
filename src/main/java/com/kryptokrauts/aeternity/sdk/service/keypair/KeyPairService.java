@@ -1,15 +1,10 @@
 package com.kryptokrauts.aeternity.sdk.service.keypair;
 
+import com.kryptokrauts.aeternity.sdk.domain.secret.HDKeyPair;
 import com.kryptokrauts.aeternity.sdk.domain.secret.HDWallet;
 import com.kryptokrauts.aeternity.sdk.domain.secret.KeyPair;
 import com.kryptokrauts.aeternity.sdk.exception.AException;
-import java.io.UnsupportedEncodingException;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
 import java.util.List;
-import javax.crypto.BadPaddingException;
-import javax.crypto.IllegalBlockSizeException;
-import javax.crypto.NoSuchPaddingException;
 
 public interface KeyPairService {
 
@@ -18,124 +13,61 @@ public interface KeyPairService {
 
   /**
    * @param privateKey private key (hex)
-   * @return a raw keypair
+   * @return the recovered keypair
    */
-  KeyPair generateKeyPairFromSecret(String privateKey);
+  KeyPair recoverKeyPair(String privateKey);
 
   /**
-   * encrypts the privateKey using the given password
-   *
-   * @param password the password to use to encrypt the binaryKey
-   * @param binaryKey binary privateKey
-   * @return byte array of the encrypted privateKey
-   * @throws NoSuchPaddingException {@link NoSuchPaddingException}
-   * @throws IllegalBlockSizeException {@link IllegalBlockSizeException}
-   * @throws BadPaddingException {@link BadPaddingException}
-   * @throws NoSuchAlgorithmException {@link NoSuchAlgorithmException}
-   * @throws InvalidKeyException {@link InvalidKeyException}
-   */
-  byte[] encryptPrivateKey(String password, byte[] binaryKey)
-      throws NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException,
-          NoSuchAlgorithmException, InvalidKeyException;
-
-  /**
-   * encrypts the publicKey using the given password
-   *
-   * @param password the password to use to encrypt the binaryKey
-   * @param binaryKey binary publicKey
-   * @return byte array of the encrypted publicKey
-   * @throws NoSuchPaddingException {@link NoSuchPaddingException}
-   * @throws IllegalBlockSizeException {@link IllegalBlockSizeException}
-   * @throws BadPaddingException {@link BadPaddingException}
-   * @throws NoSuchAlgorithmException {@link NoSuchAlgorithmException}
-   * @throws InvalidKeyException {@link InvalidKeyException}
-   */
-  byte[] encryptPublicKey(String password, byte[] binaryKey)
-      throws NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException,
-          NoSuchAlgorithmException, InvalidKeyException;
-
-  /**
-   * decrypts the privateKey using the given password
-   *
-   * @param password the password to use to decrypt the privateKey
-   * @param encryptedBinaryKey byte array of the encrypted binary privateKey
-   * @return the decrypted binary privateKey
-   * @throws NoSuchPaddingException {@link NoSuchPaddingException}
-   * @throws UnsupportedEncodingException {@link UnsupportedEncodingException}
-   * @throws IllegalBlockSizeException {@link IllegalBlockSizeException}
-   * @throws BadPaddingException {@link BadPaddingException}
-   * @throws NoSuchAlgorithmException {@link NoSuchAlgorithmException}
-   * @throws InvalidKeyException {@link InvalidKeyException}
-   */
-  byte[] decryptPrivateKey(String password, byte[] encryptedBinaryKey)
-      throws NoSuchPaddingException, UnsupportedEncodingException, IllegalBlockSizeException,
-          BadPaddingException, NoSuchAlgorithmException, InvalidKeyException;
-
-  /**
-   * decrypts the publicKey using the given password
-   *
-   * @param password the password to use to decrypt the publicKey
-   * @param encryptedBinaryKey byte array of the encrypted binary publicKey
-   * @return the decrypted binary publicKey
-   * @throws NoSuchPaddingException {@link NoSuchPaddingException}
-   * @throws IllegalBlockSizeException {@link IllegalBlockSizeException}
-   * @throws BadPaddingException {@link BadPaddingException}
-   * @throws NoSuchAlgorithmException {@link NoSuchAlgorithmException}
-   * @throws InvalidKeyException {@link InvalidKeyException}
-   */
-  byte[] decryptPublicKey(String password, byte[] encryptedBinaryKey)
-      throws NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException,
-          NoSuchAlgorithmException, InvalidKeyException;
-
-  /**
-   * encrypts the public and private key of the given rawKeyPair using the given password
-   *
-   * @param keyPairRaw the {@link KeyPair}
-   * @param password the password to use to encrypt the raw KeyPair
-   * @return a rawKeyPair object containing the encrypted byte arrays
-   * @throws IllegalBlockSizeException {@link IllegalBlockSizeException}
-   * @throws InvalidKeyException {@link InvalidKeyException}
-   * @throws BadPaddingException {@link BadPaddingException}
-   * @throws NoSuchAlgorithmException {@link NoSuchAlgorithmException}
-   * @throws NoSuchPaddingException {@link NoSuchPaddingException}
-   */
-  KeyPair encryptKeyPair(KeyPair keyPairRaw, String password)
-      throws IllegalBlockSizeException, InvalidKeyException, BadPaddingException,
-          NoSuchAlgorithmException, NoSuchPaddingException;
-
-  /**
-   * creates a keyPair as well as a list of mnemonic seed words which can be used to restore the key
-   * (derived from BIP32/39 HD-Wallet generation) the number of seed words depends on the parameter
-   * defined in {@link KeyPairServiceConfiguration}
+   * creates a keyPair as well as a list of mnemonic seed words wrapped into HDWallet object, which
+   * can be used to restore the key (derived from BIP32/39 HD-Wallet generation) the number of seed
+   * words depends on the parameter defined in {@link KeyPairServiceConfiguration}
    *
    * @param mnemonicSeedPassword password or null which is used to seed the list of mnemonics
    * @return keypair with private and public key as well as the generated list of mnemonic seed
-   *     words
+   *     words wrapped into {@link HDWallet}
    * @throws AException in case of an error
    */
-  HDWallet generateMasterMnemonicKeyPair(String mnemonicSeedPassword) throws AException;
+  HDWallet generateHDWallet(String mnemonicSeedPassword) throws AException;
+
+  /**
+   * See {@link #generateHDWallet(String)}
+   *
+   * @return keypair with private and public key as well as the generated list of mnemonic seed
+   *     words wrapped into {@link HDWallet}
+   * @throws AException
+   */
+  HDWallet generateHDWallet() throws AException;
 
   /**
    * recover keypair from given mnemonic seed word list with given seed password
    *
-   * @param mnemonicSeedWords the words to recover the keypair(s)
-   * @param mnemonicSeedPassword the password that procects the keypair(s) generated with the seed
-   *     phrase
+   * @param mnemonicSeedWords the words to recover the HDwallet
+   * @param mnemonicSeedPassword the password that protects the keypair(s) generated with the seed
+   *     phrase (can be null)
    * @return instance of {@link HDWallet}
    * @throws AException in case of an error
    */
-  HDWallet recoverMasterMnemonicKeyPair(List<String> mnemonicSeedWords, String mnemonicSeedPassword)
+  HDWallet recoverHDWallet(List<String> mnemonicSeedWords, String mnemonicSeedPassword)
       throws AException;
+
+  /**
+   * See {@link #recoverHDWallet(List, String)}
+   *
+   * @param mnemonicSeedWords the words to recover the HDwallet
+   * @return instance of {@link HDWallet}
+   * @throws AException
+   */
+  HDWallet recoverHDWallet(List<String> mnemonicSeedWords) throws AException;
 
   /**
    * derives the next hardened key. The derived keys are generated according to the deterministic
    * tree saved within the given menomincKeyPair stated in <a
    * href=https://github.com/bitcoin/bips/blob/master/bip-0032.mediawiki#Master_key_generation>BIP32</a>
    *
-   * @param mnemonicKeyPair mnemonicKeyPair containing the deterministic tree of keys necessary for
+   * @param hdWallet mnemonicKeyPair containing the deterministic tree of keys necessary for
    *     derivation
    * @return a new derived child raw keypair
    * @throws AException in case of an error
    */
-  KeyPair deriveNextKeyPair(HDWallet mnemonicKeyPair) throws AException;
+  HDKeyPair getNextKeyPair(HDWallet hdWallet) throws AException;
 }

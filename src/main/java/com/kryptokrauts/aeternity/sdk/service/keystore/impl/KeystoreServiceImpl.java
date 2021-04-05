@@ -40,7 +40,7 @@ public class KeystoreServiceImpl implements KeystoreService {
   }
 
   @Override
-  public String generateKeystore(KeyPair keyPair, String walletPassword, String walletName)
+  public String createKeystore(KeyPair keyPair, String walletPassword, String walletName)
       throws AException {
     // create derived key with Argon2
     Argon2Advanced argon2Advanced = Argon2Factory.createAdvanced(config.getArgon2Type());

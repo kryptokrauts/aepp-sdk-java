@@ -22,7 +22,7 @@ public class TransactionChannelsTest extends BaseTest {
 
   @Before
   public void initBeforeTest() {
-    initiator = keyPairService.generateKeyPairFromSecret(TestConstants.BENEFICIARY_PRIVATE_KEY);
+    initiator = keyPairService.recoverKeyPair(TestConstants.BENEFICIARY_PRIVATE_KEY);
     responder = keyPairService.generateKeyPair();
   }
 

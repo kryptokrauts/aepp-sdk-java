@@ -11,7 +11,7 @@ public class DeterministicHierarchyEntry {
 
   private int depth;
 
-  private KeyPair rawKeyPair;
+  private HDKeyPair keyPair;
 
   private byte[] chaincode;
 
@@ -22,14 +22,14 @@ public class DeterministicHierarchyEntry {
   // we will only support hardened keys
   private boolean hardened = true;
 
-  public DeterministicHierarchyEntry(int depth, KeyPair keypair) {
+  public DeterministicHierarchyEntry(int depth, HDKeyPair keyPair) {
     this.depth = depth;
-    this.rawKeyPair = keypair;
+    this.keyPair = keyPair;
     this.children = new HashMap<>();
   }
 
-  public DeterministicHierarchyEntry addChild(Integer index, KeyPair keypair) {
-    this.children.put(index, new DeterministicHierarchyEntry(this.depth + 1, keypair));
+  public DeterministicHierarchyEntry addChild(Integer index, HDKeyPair keyPair) {
+    this.children.put(index, new DeterministicHierarchyEntry(this.depth + 1, keyPair));
     return this.children.get(index);
   }
 

@@ -365,7 +365,7 @@ public class TransactionContractsTest extends BaseTest {
       throws TransactionCreateException {
     // needs to be set before executing the test
     String privateKey = "";
-    baseKeyPair = keyPairService.generateKeyPairFromSecret(privateKey);
+    baseKeyPair = keyPairService.recoverKeyPair(privateKey);
 
     AeternityService testnetService =
         new AeternityService(

@@ -87,7 +87,7 @@ public abstract class BaseTest {
 
     keyPairService = new KeyPairServiceFactory().getService();
 
-    baseKeyPair = keyPairService.generateKeyPairFromSecret(TestConstants.BENEFICIARY_PRIVATE_KEY);
+    baseKeyPair = keyPairService.recoverKeyPair(TestConstants.BENEFICIARY_PRIVATE_KEY);
 
     aeternityServiceNative =
         new AeternityServiceFactory()

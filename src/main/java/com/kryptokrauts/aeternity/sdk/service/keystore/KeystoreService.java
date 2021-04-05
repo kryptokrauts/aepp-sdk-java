@@ -8,16 +8,16 @@ import com.kryptokrauts.aeternity.sdk.exception.AException;
 public interface KeystoreService {
 
   /**
-   * generate a JSON keystore which can be stored in a file for later recovery of the private key
+   * create a JSON keystore which can be stored in a file for later recovery of the private key
    *
-   * @param rawKeyPair the public / private keypair
+   * @param keyPair the public / private keypair
    * @param walletPassword the password for symmetric encryption
    * @param walletName the name of the keystore wallet
    * @return encrypts the keypair using the given walletPassword an returns a JSON derived from
    *     {@link Keystore}
    * @throws AException if an error occurs
    */
-  String generateKeystore(KeyPair rawKeyPair, String walletPassword, String walletName)
+  String createKeystore(KeyPair keyPair, String walletPassword, String walletName)
       throws AException;
 
   /**

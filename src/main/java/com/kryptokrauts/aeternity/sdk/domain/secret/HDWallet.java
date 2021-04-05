@@ -19,20 +19,20 @@ public class HDWallet {
 
   private DeterministicHierarchy deterministicHierarchy;
 
-  public HDWallet(KeyPair masterKeyPair, List<String> mnemonicSeedWords) {
+  public HDWallet(HDKeyPair masterKeyPair, List<String> mnemonicSeedWords) {
     this.mnemonicSeedWords = mnemonicSeedWords;
     this.deterministicHierarchy = new DeterministicHierarchy(masterKeyPair);
   }
 
-  public KeyPair getMasterKeyPair() {
+  public HDKeyPair getMasterKeyPair() {
     return this.getDeterministicHierarchy().getMasterKeyPair();
   }
 
-  public KeyPair getChildAt(Integer index) {
-    return this.getDeterministicHierarchy().getChildAt(index);
+  public List<HDKeyPair> getChildKeyPairs() {
+    return this.getDeterministicHierarchy().getChildKeyPairs();
   }
 
-  public KeyPair getLastChild() {
-    return this.getDeterministicHierarchy().getLastChild();
+  public HDKeyPair getLastChildKeyPair() {
+    return this.getDeterministicHierarchy().getLastChildKeyPair();
   }
 }

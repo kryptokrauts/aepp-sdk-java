@@ -3,7 +3,9 @@ package com.kryptokrauts.aeternity.sdk.domain.secret;
 import com.kryptokrauts.aeternity.sdk.constants.BaseConstants;
 import com.kryptokrauts.aeternity.sdk.exception.AException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 import lombok.Getter;
 
 @Getter
@@ -13,19 +15,18 @@ public class DeterministicHierarchy {
 
   public static final Integer ADDRESS_INDEX_DEFAULT = 0;
 
-  private Map<Integer, DeterministicHierarchyEntry> deterministicHierarchy;
+  private Map<Integer, DeterministicHierarchyEntry> dhTree;
 
-  public DeterministicHierarchy(KeyPair master) {
-    this.deterministicHierarchy = new HashMap<>();
-    this.deterministicHierarchy.put(
-        DEPTH_MASTER, new DeterministicHierarchyEntry(DEPTH_MASTER, master));
+  public DeterministicHierarchy(HDKeyPair master) {
+    this.dhTree = new HashMap<>();
+    this.dhTree.put(DEPTH_MASTER, new DeterministicHierarchyEntry(DEPTH_MASTER, master));
   }
 
-  public void addAccount(KeyPair accountKeypair) {
+  public void addAccount(HDKeyPair accountKeypair) {
     this.getMaster().addChild(BaseConstants.HD_CHAIN_PURPOSE, accountKeypair);
   }
 
-  public void addChain(KeyPair chainKeypair) {
+  public void addChain(HDKeyPair chainKeypair) {
     this.getAccount().addChild(BaseConstants.HD_CHAIN_CODE_AETERNITY, chainKeypair);
   }
 
@@ -34,14 +35,14 @@ public class DeterministicHierarchy {
    * @param mi0Keypair this childs internal chain keypair
    * @param mi00Keypair this childs actual address keypiar
    */
-  public void addNextAddress(KeyPair miKeypair, KeyPair mi0Keypair, KeyPair mi00Keypair) {
+  public void addNextAddress(HDKeyPair miKeypair, HDKeyPair mi0Keypair, HDKeyPair mi00Keypair) {
     this.getChain()
         .addChild(this.getChain().getNextChildIndex(), miKeypair)
         .addChild(ADDRESS_INDEX_DEFAULT, mi0Keypair)
         .addChild(ADDRESS_INDEX_DEFAULT, mi00Keypair);
   }
 
-  public KeyPair getChildAt(Integer index) {
+  public HDKeyPair getChildAt(Integer index) {
     if (this.getChain().getChildren().get(index) == null) {
       throw new AException(
           "Cannot retrieve child at index "
@@ -56,32 +57,61 @@ public class DeterministicHierarchy {
         .get(ADDRESS_INDEX_DEFAULT)
         .getChildren()
         .get(ADDRESS_INDEX_DEFAULT)
-        .getRawKeyPair();
+        .getKeyPair();
+  }
+
+  public List<HDKeyPair> getChildKeyPairs() {
+    return this.getChain().getChildren().entrySet().stream()
+        .sorted(Map.Entry.comparingByKey())
+        .map(
+            value ->
+                value
+                    .getValue()
+                    .getChildren()
+                    .get(ADDRESS_INDEX_DEFAULT)
+                    .getChildren()
+                    .get(ADDRESS_INDEX_DEFAULT)
+                    .getKeyPair())
+        .collect(Collectors.toList());
+  }
+
+  public Map<Integer, HDKeyPair> getChildKeysIndexMap() {
+    return this.getChain().getChildren().entrySet().stream()
+        .collect(
+            Collectors.toMap(
+                Map.Entry::getKey,
+                e ->
+                    e.getValue()
+                        .getChildren()
+                        .get(ADDRESS_INDEX_DEFAULT)
+                        .getChildren()
+                        .get(ADDRESS_INDEX_DEFAULT)
+                        .getKeyPair()));
   }
 
   public Integer getNextChildIndex() {
     return this.getChain().getNextChildIndex();
   }
 
-  public KeyPair getLastChild() {
+  public HDKeyPair getLastChildKeyPair() {
     return this.getChildAt(this.getChain().getHighestChildIndex());
   }
 
-  public KeyPair getMasterKeyPair() {
-    return this.getMaster().getRawKeyPair();
+  public HDKeyPair getMasterKeyPair() {
+    return this.getMaster().getKeyPair();
   }
 
-  public KeyPair getAccountKeyPair() {
-    return this.getAccount().getRawKeyPair();
+  public HDKeyPair getAccountKeyPair() {
+    return this.getAccount().getKeyPair();
   }
 
-  public KeyPair getChainKeyPair() {
-    return this.getChain().getRawKeyPair();
+  public HDKeyPair getChainKeyPair() {
+    return this.getChain().getKeyPair();
   }
 
   private DeterministicHierarchyEntry getMaster() {
     this.checkHasMaster();
-    return this.deterministicHierarchy.get(DEPTH_MASTER);
+    return this.dhTree.get(DEPTH_MASTER);
   }
 
   private DeterministicHierarchyEntry getAccount() {
@@ -93,7 +123,7 @@ public class DeterministicHierarchy {
   }
 
   private void checkHasMaster() {
-    if (this.deterministicHierarchy.get(DEPTH_MASTER) == null) {
+    if (this.dhTree.get(DEPTH_MASTER) == null) {
       throw new IllegalAccessError(
           "Cannot construct deterministic hierarchy without master keypair");
     }

@@ -193,39 +193,6 @@ public class GenerationAndSigningTest extends BaseTest {
               });
 
           describe(
-              "encryptPassword",
-              () -> {
-                describe(
-                    "generate a password encrypted key pair",
-                    () -> {
-                      KeyPair keyPair = keypairService.generateKeyPair();
-                      final String password = "verysecret";
-
-                      it(
-                          "works for private keys",
-                          () -> {
-                            final byte[] privateBinary = keyPair.getConcatenatedPrivateKey();
-                            final byte[] encryptedBinary =
-                                keypairService.encryptPrivateKey(password, privateBinary);
-                            final byte[] decryptedBinary =
-                                keypairService.decryptPrivateKey(password, encryptedBinary);
-                            assertArrayEquals(privateBinary, decryptedBinary);
-                          });
-
-                      it(
-                          "works for public keys",
-                          () -> {
-                            final byte[] publicBinary = ((KeyPair) keyPair).getRawPublicKey();
-                            final byte[] encryptedBinary =
-                                keypairService.encryptPublicKey(password, publicBinary);
-                            final byte[] decryptedBinary =
-                                keypairService.decryptPublicKey(password, encryptedBinary);
-                            assertArrayEquals(publicBinary, decryptedBinary);
-                          });
-                    });
-              });
-
-          describe(
               "encodeBase",
               () -> {
                 it(
@@ -251,7 +218,7 @@ public class GenerationAndSigningTest extends BaseTest {
                       final String beneficiaryPub =
                           "ak_twR4h7dEcUtc2iSEDv8kB7UFJJDGiEDQCXr85C3fYF8FdVdyo";
                       final KeyPair keyPair =
-                          keypairService.generateKeyPairFromSecret(
+                          keypairService.recoverKeyPair(
                               "79816BBF860B95600DDFABF9D81FEE81BDB30BE823B17D80B9E48BE0A7015ADF");
                       assertEquals(beneficiaryPub, keyPair.getAddress());
                     });

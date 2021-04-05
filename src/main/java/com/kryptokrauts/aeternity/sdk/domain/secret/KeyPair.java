@@ -6,17 +6,16 @@ import com.kryptokrauts.aeternity.sdk.util.EncodingUtils;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 import org.bouncycastle.util.encoders.Hex;
 
 @Data
 @NoArgsConstructor
 public class KeyPair {
-  private byte[] rawPublicKey;
 
-  private byte[] rawPrivateKey;
+  @ToString.Exclude private byte[] rawPublicKey;
 
-  /** if using hd wallet this chaincode is used to derive subsequent key pairs */
-  private byte[] chainCode;
+  @ToString.Exclude private byte[] rawPrivateKey;
 
   /** hex encoded private key */
   private String encodedPrivateKey;
@@ -25,10 +24,9 @@ public class KeyPair {
   private String address;
 
   @Builder
-  public KeyPair(final byte[] rawPublicKey, final byte[] rawPrivateKey, final byte[] chainCode) {
+  public KeyPair(final byte[] rawPublicKey, final byte[] rawPrivateKey) {
     this.rawPublicKey = rawPublicKey;
     this.rawPrivateKey = rawPrivateKey;
-    this.chainCode = chainCode;
     this.encodedPrivateKey = Hex.toHexString(rawPrivateKey) + Hex.toHexString(rawPublicKey);
     this.address = EncodingUtils.encodeCheck(rawPublicKey, ApiIdentifiers.ACCOUNT_PUBKEY);
   }

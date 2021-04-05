@@ -27,14 +27,14 @@ public class KeystoreServiceTest extends BaseTest {
 
                 // generate Keypair
                 KeyPair keypair = keypairService.generateKeyPair();
-                String json = walletService.generateKeystore(keypair, walletFileSecret, null);
+                String json = walletService.createKeystore(keypair, walletFileSecret, null);
                 Assertions.assertNotNull(json);
 
                 // recover Keypair
                 byte[] recoveredPrivateKey =
                     walletService.recoverPrivateKeyFromKeystore(json, walletFileSecret);
                 KeyPair recoveredRawKeypair =
-                    keypairService.generateKeyPairFromSecret(Hex.toHexString(recoveredPrivateKey));
+                    keypairService.recoverKeyPair(Hex.toHexString(recoveredPrivateKey));
                 Assertions.assertNotNull(recoveredRawKeypair);
 
                 // compare generated and recovered keypair
@@ -53,8 +53,7 @@ public class KeystoreServiceTest extends BaseTest {
                 String keystore = IOUtils.toString(inputStream, StandardCharsets.UTF_8.toString());
                 byte[] privateKey =
                     walletService.recoverPrivateKeyFromKeystore(keystore, walletFileSecret);
-                KeyPair keyPair =
-                    keypairService.generateKeyPairFromSecret(Hex.toHexString(privateKey));
+                KeyPair keyPair = keypairService.recoverKeyPair(Hex.toHexString(privateKey));
                 Assertions.assertEquals(expectedPubKey, keyPair.getAddress());
               });
           Spectrum.it(

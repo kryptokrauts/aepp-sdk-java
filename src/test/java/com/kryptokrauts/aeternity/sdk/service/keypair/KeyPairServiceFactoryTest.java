@@ -37,14 +37,12 @@ public class KeyPairServiceFactoryTest extends BaseTest {
           final String mnemonicSeedPassword = "kryptokrauts";
 
           KeyPairService keyPairService = new KeyPairServiceFactory().getService();
-          HDWallet generatedKeyPair =
-              keyPairService.generateMasterMnemonicKeyPair(mnemonicSeedPassword);
+          HDWallet generatedKeyPair = keyPairService.generateHDWallet(mnemonicSeedPassword);
           HDWallet restoredKeyPairWithSamePWD =
-              keyPairService.recoverMasterMnemonicKeyPair(
+              keyPairService.recoverHDWallet(
                   generatedKeyPair.getMnemonicSeedWords(), mnemonicSeedPassword);
           HDWallet restoredKeyPairWithoutPWD =
-              keyPairService.recoverMasterMnemonicKeyPair(
-                  generatedKeyPair.getMnemonicSeedWords(), null);
+              keyPairService.recoverHDWallet(generatedKeyPair.getMnemonicSeedWords(), null);
 
           Spectrum.it(
               "mnemonic keypair recovered from word seed list is same",
@@ -72,7 +70,7 @@ public class KeyPairServiceFactoryTest extends BaseTest {
                 assertThrows(
                     AException.class,
                     () -> {
-                      keyPairServiceWrongConfig.generateMasterMnemonicKeyPair(null);
+                      keyPairServiceWrongConfig.generateHDWallet(null);
                     });
               });
         });
