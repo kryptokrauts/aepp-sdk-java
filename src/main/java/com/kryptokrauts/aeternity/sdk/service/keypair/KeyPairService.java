@@ -34,7 +34,7 @@ public interface KeyPairService {
    *
    * @return keypair with private and public key as well as the generated list of mnemonic seed
    *     words wrapped into {@link HDWallet}
-   * @throws AException
+   * @throws AException in case of an error
    */
   HDWallet generateHDWallet() throws AException;
 
@@ -55,7 +55,7 @@ public interface KeyPairService {
    *
    * @param mnemonicSeedWords the words to recover the HDwallet
    * @return instance of {@link HDWallet}
-   * @throws AException
+   * @throws AException if recover hdWallet fails
    */
   HDWallet recoverHDWallet(List<String> mnemonicSeedWords) throws AException;
 

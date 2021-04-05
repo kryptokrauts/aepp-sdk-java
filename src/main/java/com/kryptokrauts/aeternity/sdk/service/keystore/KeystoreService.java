@@ -4,6 +4,7 @@ import com.kryptokrauts.aeternity.sdk.domain.Keystore;
 import com.kryptokrauts.aeternity.sdk.domain.secret.HDWallet;
 import com.kryptokrauts.aeternity.sdk.domain.secret.KeyPair;
 import com.kryptokrauts.aeternity.sdk.exception.AException;
+import java.util.List;
 
 public interface KeystoreService {
 
@@ -11,31 +12,44 @@ public interface KeystoreService {
    * create a JSON keystore which can be stored in a file for later recovery of the private key
    *
    * @param keyPair the public / private keypair
-   * @param walletPassword the password for symmetric encryption
-   * @param walletName the name of the keystore wallet
-   * @return encrypts the keypair using the given walletPassword an returns a JSON derived from
+   * @param keystorePassword the password for symmetric encryption
+   * @param keystoreName the name of the keystore wallet
+   * @return encrypts the keypair using the given walletPassword and returns a JSON derived from
    *     {@link Keystore}
    * @throws AException if an error occurs
    */
-  String createKeystore(KeyPair keyPair, String walletPassword, String walletName)
+  String createKeystore(KeyPair keyPair, String keystorePassword, String keystoreName)
       throws AException;
 
   /**
    * allows to recover a private key from a given keystore json
    *
-   * @param json the keystore JSON derived from {@link Keystore}
-   * @param walletPassword the symmetric password used to create the keystore
-   * @return private key (binary)
+   * @param keystoreJSON the keystore JSON derived from {@link Keystore}
+   * @param keystorePassword the symmetric password used to create the keystore
+   * @return encoded private key
    * @throws AException if an error occurs
    */
-  byte[] recoverPrivateKeyFromKeystore(String json, String walletPassword) throws AException;
+  String recoverPrivateKeyFromKeystore(String keystoreJSON, String keystorePassword)
+      throws AException;
 
   /**
    * stores public key and mnemonic seed words (but not the password!) as JSON
    *
-   * @param mnemonicKeyPair instance of {@link HDWallet}
-   * @return the JSON keystore as string
+   * @param hdWallet instance of {@link HDWallet}
+   * @param keystorePassword keystorePassword the symmetric password used to create the keystore
+   * @return encrypts the HDWallets seed word list using the given walletPassword and returns a JSON
+   *     derived from {@link Keystore}
    * @throws AException if an error occurs
    */
-  String createHDKeystore(HDWallet mnemonicKeyPair) throws AException;
+  String createHDKeystore(HDWallet hdWallet, String keystorePassword) throws AException;
+
+  /**
+   * allows to recover the mnemnonic seed words from a given keystore json
+   *
+   * @param keystoreJSON the keystore JSON derived from {@link Keystore}
+   * @param keystorePassword the symmetric password used to create the keystore
+   * @return list of mnemonic seed words
+   * @throws AException if an error occurs
+   */
+  List<String> recoverHDKeystore(String keystoreJSON, String keystorePassword) throws AException;
 }

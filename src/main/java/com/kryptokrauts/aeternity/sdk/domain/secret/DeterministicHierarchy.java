@@ -64,14 +64,18 @@ public class DeterministicHierarchy {
     return this.getChain().getChildren().entrySet().stream()
         .sorted(Map.Entry.comparingByKey())
         .map(
-            value ->
-                value
-                    .getValue()
-                    .getChildren()
-                    .get(ADDRESS_INDEX_DEFAULT)
-                    .getChildren()
-                    .get(ADDRESS_INDEX_DEFAULT)
-                    .getKeyPair())
+            value -> {
+              HDKeyPair returnKeyPair =
+                  value
+                      .getValue()
+                      .getChildren()
+                      .get(ADDRESS_INDEX_DEFAULT)
+                      .getChildren()
+                      .get(ADDRESS_INDEX_DEFAULT)
+                      .getKeyPair();
+              returnKeyPair.setIndex(value.getValue().getKeyPair().getIndex());
+              return returnKeyPair;
+            })
         .collect(Collectors.toList());
   }
 

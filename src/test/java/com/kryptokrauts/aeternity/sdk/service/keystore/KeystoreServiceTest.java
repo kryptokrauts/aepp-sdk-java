@@ -1,21 +1,24 @@
 package com.kryptokrauts.aeternity.sdk.service.keystore;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.greghaskins.spectrum.Spectrum;
 import com.kryptokrauts.aeternity.sdk.BaseTest;
+import com.kryptokrauts.aeternity.sdk.domain.Keystore;
+import com.kryptokrauts.aeternity.sdk.domain.secret.HDWallet;
 import com.kryptokrauts.aeternity.sdk.domain.secret.KeyPair;
 import com.kryptokrauts.aeternity.sdk.exception.AException;
 import com.kryptokrauts.aeternity.sdk.service.keypair.KeyPairService;
 import com.kryptokrauts.aeternity.sdk.service.keypair.KeyPairServiceFactory;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 import org.apache.commons.io.IOUtils;
-import org.bouncycastle.util.encoders.Hex;
 import org.junit.jupiter.api.Assertions;
 
 public class KeystoreServiceTest extends BaseTest {
   {
     final KeyPairService keypairService = new KeyPairServiceFactory().getService();
-    final KeystoreService walletService = new KeystoreServiceFactory().getService();
+    final KeystoreService keystoreService = new KeystoreServiceFactory().getService();
 
     Spectrum.describe(
         "wallet service tests",
@@ -23,18 +26,17 @@ public class KeystoreServiceTest extends BaseTest {
           Spectrum.it(
               "keyPair can be recovered from a generated wallet",
               () -> {
-                final String walletFileSecret = "my_super_safe_password";
+                final String keystoreFileSecret = "my_super_safe_password";
 
                 // generate Keypair
                 KeyPair keypair = keypairService.generateKeyPair();
-                String json = walletService.createKeystore(keypair, walletFileSecret, null);
+                String json = keystoreService.createKeystore(keypair, keystoreFileSecret, null);
                 Assertions.assertNotNull(json);
 
                 // recover Keypair
-                byte[] recoveredPrivateKey =
-                    walletService.recoverPrivateKeyFromKeystore(json, walletFileSecret);
-                KeyPair recoveredRawKeypair =
-                    keypairService.recoverKeyPair(Hex.toHexString(recoveredPrivateKey));
+                String recoveredPrivateKey =
+                    keystoreService.recoverPrivateKeyFromKeystore(json, keystoreFileSecret);
+                KeyPair recoveredRawKeypair = keypairService.recoverKeyPair(recoveredPrivateKey);
                 Assertions.assertNotNull(recoveredRawKeypair);
 
                 // compare generated and recovered keypair
@@ -51,9 +53,9 @@ public class KeystoreServiceTest extends BaseTest {
                         .getContextClassLoader()
                         .getResourceAsStream("keystore.json");
                 String keystore = IOUtils.toString(inputStream, StandardCharsets.UTF_8.toString());
-                byte[] privateKey =
-                    walletService.recoverPrivateKeyFromKeystore(keystore, walletFileSecret);
-                KeyPair keyPair = keypairService.recoverKeyPair(Hex.toHexString(privateKey));
+                String privateKey =
+                    keystoreService.recoverPrivateKeyFromKeystore(keystore, walletFileSecret);
+                KeyPair keyPair = keypairService.recoverKeyPair(privateKey);
                 Assertions.assertEquals(expectedPubKey, keyPair.getAddress());
               });
           Spectrum.it(
@@ -66,11 +68,54 @@ public class KeystoreServiceTest extends BaseTest {
                         .getResourceAsStream("keystore.json");
                 String keystore = IOUtils.toString(inputStream, StandardCharsets.UTF_8.toString());
                 try {
-                  walletService.recoverPrivateKeyFromKeystore(keystore, walletFileSecret);
+                  keystoreService.recoverPrivateKeyFromKeystore(keystore, walletFileSecret);
                   Assertions.fail();
                 } catch (AException e) {
                   Assertions.assertEquals(
-                      "Error recovering privateKey: wrong password.", e.getMessage());
+                      "Error recovering keystore file - wrong password", e.getMessage());
+                }
+              });
+          Spectrum.it(
+              "recovery of hdWallet",
+              () -> {
+                final String keystoreFileSecret = "hd_wallet_password";
+
+                // generate random HDWallet
+                HDWallet hdWallet = keypairService.generateHDWallet();
+                List<String> seedWordsToBeRecovered = hdWallet.getMnemonicSeedWords();
+                String json = keystoreService.createHDKeystore(hdWallet, keystoreFileSecret);
+                Assertions.assertNotNull(json);
+
+                // recover seed words
+                List<String> recoveredSeedWords =
+                    keystoreService.recoverHDKeystore(json, keystoreFileSecret);
+                Assertions.assertNotNull(recoveredSeedWords);
+
+                // compare generated and recovered seed words
+                Assertions.assertEquals(seedWordsToBeRecovered, recoveredSeedWords);
+              });
+          Spectrum.it(
+              "recovery of hdWallet fail wrong type",
+              () -> {
+                final String keystoreFileSecret = "does_not_matter";
+
+                // generate random HDWallet
+                HDWallet hdWallet = keypairService.generateHDWallet();
+                String json = keystoreService.createHDKeystore(hdWallet, keystoreFileSecret);
+                Keystore recoverWallet = new ObjectMapper().readValue(json, Keystore.class);
+                recoverWallet.setName("no_hd_wallet_keystore_file");
+                json =
+                    new ObjectMapper()
+                        .writerWithDefaultPrettyPrinter()
+                        .writeValueAsString(recoverWallet);
+                Assertions.assertNotNull(json);
+
+                // recover seed words
+                try {
+                  keystoreService.recoverHDKeystore(json, keystoreFileSecret);
+                  Assertions.fail();
+                } catch (AException e) {
+                  Assertions.assertEquals("Given JSON is not a HDWallet keystore", e.getMessage());
                 }
               });
         });

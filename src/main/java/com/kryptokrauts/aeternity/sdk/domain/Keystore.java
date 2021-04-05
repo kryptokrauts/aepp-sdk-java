@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 /**
- * the representation of a wallet json file (keystore) containing all necessary information to
+ * the representation of a keystore json file (keystore) containing all necessary information to
  * recover the private key
  */
 public class Keystore {

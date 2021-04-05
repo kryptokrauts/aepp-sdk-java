@@ -43,7 +43,7 @@ public class TransactionOraclesTest extends BaseTest {
           try {
             oracleKeyPair = keyPairService.generateKeyPair();
 
-            oracleId = oracleKeyPair.getOraclePK();
+            oracleId = oracleKeyPair.getOracleAddress();
             BigInteger amount = UnitConversionUtil.toAettos("10", Unit.AE).toBigInteger();
             SpendTransactionModel spendTx =
                 SpendTransactionModel.builder()
@@ -135,7 +135,7 @@ public class TransactionOraclesTest extends BaseTest {
           try {
             OracleQueriesResult oracleQueriesResult =
                 this.aeternityServiceNative.oracles.blockingGetOracleQueries(
-                    oracleKeyPair.getOraclePK());
+                    oracleKeyPair.getOracleAddress());
             _logger.info("OracleQueriesResult: {}", oracleQueriesResult);
             _logger.info("OracleQuery count: {}", oracleQueriesResult.getQueryResults().size());
             context.assertFalse(oracleQueriesResult.getQueryResults().isEmpty());
@@ -148,7 +148,7 @@ public class TransactionOraclesTest extends BaseTest {
             BigInteger nonce = getAccount(oracleKeyPair.getAddress()).getNonce().add(ONE);
             OracleRespondTransactionModel oracleRespondTx =
                 OracleRespondTransactionModel.builder()
-                    .oracleId(oracleKeyPair.getOraclePK())
+                    .oracleId(oracleKeyPair.getOracleAddress())
                     .queryId(oracleQueryResult.getId())
                     .nonce(nonce)
                     .response(responseString)

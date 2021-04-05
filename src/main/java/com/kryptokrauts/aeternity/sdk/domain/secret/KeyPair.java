@@ -1,7 +1,6 @@
 package com.kryptokrauts.aeternity.sdk.domain.secret;
 
 import com.kryptokrauts.aeternity.sdk.constants.ApiIdentifiers;
-import com.kryptokrauts.aeternity.sdk.util.ByteUtils;
 import com.kryptokrauts.aeternity.sdk.util.EncodingUtils;
 import lombok.Builder;
 import lombok.Data;
@@ -31,15 +30,11 @@ public class KeyPair {
     this.address = EncodingUtils.encodeCheck(rawPublicKey, ApiIdentifiers.ACCOUNT_PUBKEY);
   }
 
-  public byte[] getConcatenatedPrivateKey() {
-    return ByteUtils.concatenate(rawPrivateKey, rawPublicKey);
-  }
-
-  public String getContractPK() {
+  public String getContractAddress() {
     return ApiIdentifiers.CONTRACT_PUBKEY + address.substring(2);
   }
 
-  public String getOraclePK() {
+  public String getOracleAddress() {
     return ApiIdentifiers.ORACLE_PUBKEY + address.substring(2);
   }
 }
