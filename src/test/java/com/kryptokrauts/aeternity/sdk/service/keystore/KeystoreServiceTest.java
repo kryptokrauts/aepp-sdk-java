@@ -35,7 +35,7 @@ public class KeystoreServiceTest extends BaseTest {
 
                 // recover Keypair
                 String recoveredPrivateKey =
-                    keystoreService.recoverPrivateKeyFromKeystore(json, keystoreFileSecret);
+                    keystoreService.recoverEncodedPrivateKey(json, keystoreFileSecret);
                 KeyPair recoveredRawKeypair = keypairService.recoverKeyPair(recoveredPrivateKey);
                 Assertions.assertNotNull(recoveredRawKeypair);
 
@@ -54,7 +54,7 @@ public class KeystoreServiceTest extends BaseTest {
                         .getResourceAsStream("keystore.json");
                 String keystore = IOUtils.toString(inputStream, StandardCharsets.UTF_8.toString());
                 String privateKey =
-                    keystoreService.recoverPrivateKeyFromKeystore(keystore, walletFileSecret);
+                    keystoreService.recoverEncodedPrivateKey(keystore, walletFileSecret);
                 KeyPair keyPair = keypairService.recoverKeyPair(privateKey);
                 Assertions.assertEquals(expectedPubKey, keyPair.getAddress());
               });
@@ -68,7 +68,7 @@ public class KeystoreServiceTest extends BaseTest {
                         .getResourceAsStream("keystore.json");
                 String keystore = IOUtils.toString(inputStream, StandardCharsets.UTF_8.toString());
                 try {
-                  keystoreService.recoverPrivateKeyFromKeystore(keystore, walletFileSecret);
+                  keystoreService.recoverEncodedPrivateKey(keystore, walletFileSecret);
                   Assertions.fail();
                 } catch (AException e) {
                   Assertions.assertEquals(
@@ -81,14 +81,14 @@ public class KeystoreServiceTest extends BaseTest {
                 final String keystoreFileSecret = "hd_wallet_password";
 
                 // generate random HDWallet
-                HDWallet hdWallet = keypairService.generateHDWallet();
+                HDWallet hdWallet = keypairService.generateHDWallet(null);
                 List<String> seedWordsToBeRecovered = hdWallet.getMnemonicSeedWords();
-                String json = keystoreService.createHDKeystore(hdWallet, keystoreFileSecret);
+                String json = keystoreService.createKeystore(hdWallet, keystoreFileSecret);
                 Assertions.assertNotNull(json);
 
                 // recover seed words
                 List<String> recoveredSeedWords =
-                    keystoreService.recoverHDKeystore(json, keystoreFileSecret);
+                    keystoreService.recoverMnemonicSeedWords(json, keystoreFileSecret);
                 Assertions.assertNotNull(recoveredSeedWords);
 
                 // compare generated and recovered seed words
@@ -100,8 +100,8 @@ public class KeystoreServiceTest extends BaseTest {
                 final String keystoreFileSecret = "does_not_matter";
 
                 // generate random HDWallet
-                HDWallet hdWallet = keypairService.generateHDWallet();
-                String json = keystoreService.createHDKeystore(hdWallet, keystoreFileSecret);
+                HDWallet hdWallet = keypairService.generateHDWallet(null);
+                String json = keystoreService.createKeystore(hdWallet, keystoreFileSecret);
                 Keystore recoverWallet = new ObjectMapper().readValue(json, Keystore.class);
                 recoverWallet.setName("no_hd_wallet_keystore_file");
                 json =
@@ -112,7 +112,7 @@ public class KeystoreServiceTest extends BaseTest {
 
                 // recover seed words
                 try {
-                  keystoreService.recoverHDKeystore(json, keystoreFileSecret);
+                  keystoreService.recoverMnemonicSeedWords(json, keystoreFileSecret);
                   Assertions.fail();
                 } catch (AException e) {
                   Assertions.assertEquals("Given JSON is not a HDWallet keystore", e.getMessage());
