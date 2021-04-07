@@ -193,14 +193,4 @@ public final class KeyPairServiceImpl implements KeyPairService {
     byte[] privateBinary = privateKeyParams.getEncoded();
     return KeyPair.builder().rawPublicKey(publicBinary).rawPrivateKey(privateBinary).build();
   }
-
-  @Override
-  public HDWallet generateHDWallet() throws AException {
-    return generateHDWallet(null);
-  }
-
-  @Override
-  public HDWallet recoverHDWallet(List<String> mnemonicSeedWords) throws AException {
-    return recoverHDWallet(mnemonicSeedWords, null);
-  }
 }

@@ -30,7 +30,7 @@ public class KeystoreServiceImpl implements KeystoreService {
   @Nonnull private KeystoreServiceConfiguration config;
 
   @Override
-  public String createHDKeystore(HDWallet hdWallet, String keystorePassword) throws AException {
+  public String createKeystore(HDWallet hdWallet, String keystorePassword) throws AException {
     return createKeystoreFile(
         String.join("_", hdWallet.getMnemonicSeedWords()).getBytes(),
         keystorePassword,
@@ -39,7 +39,7 @@ public class KeystoreServiceImpl implements KeystoreService {
   }
 
   @Override
-  public List<String> recoverHDKeystore(String keystoreJSON, String keystorePassword)
+  public List<String> recoverMnemonicSeedWords(String keystoreJSON, String keystorePassword)
       throws AException {
     checkHDKeystoreFile(keystoreJSON);
     return Arrays.asList(
@@ -65,7 +65,7 @@ public class KeystoreServiceImpl implements KeystoreService {
   }
 
   @Override
-  public String recoverPrivateKeyFromKeystore(String keystoreJSON, String keystorePassword)
+  public String recoverEncodedPrivateKey(String keystoreJSON, String keystorePassword)
       throws AException {
     return new String(Hex.encode(recoverKeystoreFile(keystoreJSON, keystorePassword)));
   }

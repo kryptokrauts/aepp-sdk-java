@@ -30,15 +30,6 @@ public interface KeyPairService {
   HDWallet generateHDWallet(String mnemonicSeedPassword) throws AException;
 
   /**
-   * See {@link #generateHDWallet(String)}
-   *
-   * @return keypair with private and public key as well as the generated list of mnemonic seed
-   *     words wrapped into {@link HDWallet}
-   * @throws AException in case of an error
-   */
-  HDWallet generateHDWallet() throws AException;
-
-  /**
    * recover keypair from given mnemonic seed word list with given seed password
    *
    * @param mnemonicSeedWords the words to recover the HDwallet
@@ -49,15 +40,6 @@ public interface KeyPairService {
    */
   HDWallet recoverHDWallet(List<String> mnemonicSeedWords, String mnemonicSeedPassword)
       throws AException;
-
-  /**
-   * See {@link #recoverHDWallet(List, String)}
-   *
-   * @param mnemonicSeedWords the words to recover the HDwallet
-   * @return instance of {@link HDWallet}
-   * @throws AException if recover hdWallet fails
-   */
-  HDWallet recoverHDWallet(List<String> mnemonicSeedWords) throws AException;
 
   /**
    * derives the next hardened key. The derived keys are generated according to the deterministic

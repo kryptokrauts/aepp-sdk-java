@@ -29,8 +29,7 @@ public interface KeystoreService {
    * @return encoded private key
    * @throws AException if an error occurs
    */
-  String recoverPrivateKeyFromKeystore(String keystoreJSON, String keystorePassword)
-      throws AException;
+  String recoverEncodedPrivateKey(String keystoreJSON, String keystorePassword) throws AException;
 
   /**
    * stores public key and mnemonic seed words (but not the password!) as JSON
@@ -41,7 +40,7 @@ public interface KeystoreService {
    *     derived from {@link Keystore}
    * @throws AException if an error occurs
    */
-  String createHDKeystore(HDWallet hdWallet, String keystorePassword) throws AException;
+  String createKeystore(HDWallet hdWallet, String keystorePassword) throws AException;
 
   /**
    * allows to recover the mnemnonic seed words from a given keystore json
@@ -51,5 +50,6 @@ public interface KeystoreService {
    * @return list of mnemonic seed words
    * @throws AException if an error occurs
    */
-  List<String> recoverHDKeystore(String keystoreJSON, String keystorePassword) throws AException;
+  List<String> recoverMnemonicSeedWords(String keystoreJSON, String keystorePassword)
+      throws AException;
 }
