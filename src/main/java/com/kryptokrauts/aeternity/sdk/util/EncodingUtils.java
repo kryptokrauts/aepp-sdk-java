@@ -8,8 +8,6 @@ import static com.kryptokrauts.aeternity.sdk.util.EncodingType.BASE64;
 
 import com.kryptokrauts.aeternity.sdk.constants.ApiIdentifiers;
 import com.kryptokrauts.aeternity.sdk.constants.SerializationTags;
-import com.kryptokrauts.aeternity.sdk.domain.secret.impl.BaseKeyPair;
-import com.kryptokrauts.aeternity.sdk.domain.secret.impl.RawKeyPair;
 import com.kryptokrauts.aeternity.sdk.exception.EncodingNotSupportedException;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
@@ -279,13 +277,6 @@ public final class EncodingUtils {
     byte[] hash = new byte[digest.getDigestSize()];
     digest.doFinal(hash, 0);
     return hash;
-  }
-
-  public static BaseKeyPair createBaseKeyPair(final RawKeyPair rawKeyPair) {
-    String privateKey =
-        Hex.toHexString(rawKeyPair.getPrivateKey()) + Hex.toHexString(rawKeyPair.getPublicKey());
-    String publicKey = encodeCheck(rawKeyPair.getPublicKey(), ApiIdentifiers.ACCOUNT_PUBKEY);
-    return BaseKeyPair.builder().privateKey(privateKey).publicKey(publicKey).build();
   }
 
   public static String generateCommitmentHash(final String name, final BigInteger salt) {

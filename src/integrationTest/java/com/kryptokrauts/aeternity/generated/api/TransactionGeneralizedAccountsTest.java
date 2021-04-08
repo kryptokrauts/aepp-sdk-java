@@ -2,7 +2,7 @@ package com.kryptokrauts.aeternity.generated.api;
 
 import com.kryptokrauts.aeternity.sdk.constants.BaseConstants;
 import com.kryptokrauts.aeternity.sdk.domain.StringResultWrapper;
-import com.kryptokrauts.aeternity.sdk.domain.secret.impl.BaseKeyPair;
+import com.kryptokrauts.aeternity.sdk.domain.secret.KeyPair;
 import com.kryptokrauts.aeternity.sdk.service.account.domain.AccountResult;
 import com.kryptokrauts.aeternity.sdk.service.transaction.domain.DryRunAccountModel;
 import com.kryptokrauts.aeternity.sdk.service.transaction.domain.DryRunRequest;
@@ -25,7 +25,7 @@ import org.junit.Test;
 
 public class TransactionGeneralizedAccountsTest extends BaseTest {
 
-  static BaseKeyPair gaTestKeyPair;
+  static KeyPair gaAccountKeyPair;
   static UnitConversionService unitConversionService = new DefaultUnitConversionServiceImpl();
 
   @Test
@@ -33,14 +33,14 @@ public class TransactionGeneralizedAccountsTest extends BaseTest {
     this.executeTest(
         context,
         t -> {
-          gaTestKeyPair = keyPairService.generateBaseKeyPair();
+          gaAccountKeyPair = keyPairService.generateKeyPair();
           AccountResult account = this.aeternityServiceNative.accounts.blockingGetAccount();
           BigInteger amount = unitConversionService.toSmallestUnit(BigDecimal.TEN);
           BigInteger nonce = account.getNonce().add(ONE);
           SpendTransactionModel spendTx =
               SpendTransactionModel.builder()
                   .sender(account.getPublicKey())
-                  .recipient(gaTestKeyPair.getPublicKey())
+                  .recipient(gaAccountKeyPair.getAddress())
                   .amount(amount)
                   .payload("")
                   .ttl(ZERO)
@@ -48,7 +48,8 @@ public class TransactionGeneralizedAccountsTest extends BaseTest {
                   .build();
           aeternityServiceNative.transactions.blockingPostTransaction(spendTx);
           AccountResult gaTestAccount =
-              this.aeternityServiceNative.accounts.blockingGetAccount(gaTestKeyPair.getPublicKey());
+              this.aeternityServiceNative.accounts.blockingGetAccount(
+                  gaAccountKeyPair.getAddress());
           _logger.info("account: {}", gaTestAccount);
           context.assertEquals("basic", gaTestAccount.getKind());
 
@@ -115,25 +116,32 @@ public class TransactionGeneralizedAccountsTest extends BaseTest {
                   .build();
           PostTransactionResult result =
               this.aeternityServiceNative.transactions.blockingPostTransaction(
-                  gaAttachTx, gaTestKeyPair.getPrivateKey());
+                  gaAttachTx, gaAccountKeyPair.getEncodedPrivateKey());
           _logger.info("gaAttachTx result: {}", result);
 
           gaTestAccount =
-              this.aeternityServiceNative.accounts.blockingGetAccount(gaTestKeyPair.getPublicKey());
+              this.aeternityServiceNative.accounts.blockingGetAccount(
+                  gaAccountKeyPair.getAddress());
           _logger.info("account: {}", gaTestAccount);
           context.assertEquals("generalized", gaTestAccount.getKind());
 
           amount = new BigInteger("1000000000000000000");
 
-          BaseKeyPair otherRecipient = keyPairService.generateBaseKeyPair();
+          KeyPair otherRecipient = keyPairService.generateKeyPair();
           SpendTransactionModel gaInnerSpendTx =
               SpendTransactionModel.builder()
-                  .sender(gaTestKeyPair.getPublicKey())
-                  .recipient(otherRecipient.getPublicKey())
+                  .sender(gaAccountKeyPair.getAddress())
+                  .recipient(otherRecipient.getAddress())
                   .amount(amount)
                   .payload("spent using a generalized account =)")
                   .ttl(ZERO)
-                  .nonce(ZERO) // GA inner tx required 0 as nonce
+                  .nonce(ZERO) // GA
+                  // inner
+                  // tx
+                  // required
+                  // 0
+                  // as
+                  // nonce
                   .build();
 
           String unsignedInnerTx =
@@ -152,7 +160,7 @@ public class TransactionGeneralizedAccountsTest extends BaseTest {
 
           GeneralizedAccountsMetaTransactionModel gaMetaTx =
               GeneralizedAccountsMetaTransactionModel.builder()
-                  .gaId(gaTestKeyPair.getPublicKey())
+                  .gaId(gaAccountKeyPair.getAddress())
                   .authData(authData)
                   .virtualMachine(targetVM)
                   .innerTx(encodedInnerTx)
@@ -163,7 +171,7 @@ public class TransactionGeneralizedAccountsTest extends BaseTest {
           AccountResult otherRecipientAcc =
               this.aeternityServiceNative
                   .accounts
-                  .asyncGetAccount(otherRecipient.getPublicKey())
+                  .asyncGetAccount(otherRecipient.getAddress())
                   .blockingGet();
           _logger.info("otherRecipientAcc : {}", otherRecipientAcc);
           context.assertEquals(amount, otherRecipientAcc.getBalance());

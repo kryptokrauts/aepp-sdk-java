@@ -4,7 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.greghaskins.spectrum.Spectrum;
 import com.kryptokrauts.aeternity.sdk.BaseTest;
-import com.kryptokrauts.aeternity.sdk.domain.secret.impl.MnemonicKeyPair;
+import com.kryptokrauts.aeternity.sdk.domain.secret.HDWallet;
 import com.kryptokrauts.aeternity.sdk.exception.AException;
 import org.bouncycastle.util.encoders.Hex;
 import org.junit.Assert;
@@ -37,28 +37,28 @@ public class KeyPairServiceFactoryTest extends BaseTest {
           final String mnemonicSeedPassword = "kryptokrauts";
 
           KeyPairService keyPairService = new KeyPairServiceFactory().getService();
-          MnemonicKeyPair generatedKeyPair =
-              keyPairService.generateMasterMnemonicKeyPair(mnemonicSeedPassword);
-          MnemonicKeyPair restoredKeyPairWithSamePWD =
-              keyPairService.recoverMasterMnemonicKeyPair(
+          HDWallet generatedKeyPair = keyPairService.generateHDWallet(mnemonicSeedPassword);
+          HDWallet restoredKeyPairWithSamePWD =
+              keyPairService.recoverHDWallet(
                   generatedKeyPair.getMnemonicSeedWords(), mnemonicSeedPassword);
-          MnemonicKeyPair restoredKeyPairWithoutPWD =
-              keyPairService.recoverMasterMnemonicKeyPair(
-                  generatedKeyPair.getMnemonicSeedWords(), null);
+          HDWallet restoredKeyPairWithoutPWD =
+              keyPairService.recoverHDWallet(generatedKeyPair.getMnemonicSeedWords(), null);
 
           Spectrum.it(
               "mnemonic keypair recovered from word seed list is same",
               () -> {
                 Assert.assertEquals(
-                    Hex.toHexString(generatedKeyPair.getPrivateKey()),
-                    Hex.toHexString(restoredKeyPairWithSamePWD.getPrivateKey()));
+                    Hex.toHexString(generatedKeyPair.getMasterKeyPair().getRawPrivateKey()),
+                    Hex.toHexString(
+                        restoredKeyPairWithSamePWD.getMasterKeyPair().getRawPrivateKey()));
               });
           Spectrum.it(
               "mnemonic keypair recovered from word seed list without password is not same",
               () -> {
                 Assert.assertNotEquals(
-                    Hex.toHexString(generatedKeyPair.getPrivateKey()),
-                    Hex.toHexString(restoredKeyPairWithoutPWD.getPrivateKey()));
+                    Hex.toHexString(generatedKeyPair.getMasterKeyPair().getRawPrivateKey()),
+                    Hex.toHexString(
+                        restoredKeyPairWithoutPWD.getMasterKeyPair().getRawPrivateKey()));
               });
           Spectrum.it(
               "mnemonic keypair cannot be generated due to small entropy",
@@ -70,7 +70,7 @@ public class KeyPairServiceFactoryTest extends BaseTest {
                 assertThrows(
                     AException.class,
                     () -> {
-                      keyPairServiceWrongConfig.generateMasterMnemonicKeyPair(null);
+                      keyPairServiceWrongConfig.generateHDWallet(null);
                     });
               });
         });

@@ -1,6 +1,6 @@
 package com.kryptokrauts.aeternity.generated.api;
 
-import com.kryptokrauts.aeternity.sdk.domain.secret.impl.BaseKeyPair;
+import com.kryptokrauts.aeternity.sdk.domain.secret.KeyPair;
 import com.kryptokrauts.aeternity.sdk.exception.TransactionCreateException;
 import com.kryptokrauts.aeternity.sdk.service.account.domain.AccountResult;
 import com.kryptokrauts.aeternity.sdk.service.info.domain.TransactionResult;
@@ -27,8 +27,8 @@ public class TransactionSpendApiTest extends BaseTest {
     this.executeTest(
         context,
         t -> {
-          String sender = keyPairService.generateBaseKeyPair().getPublicKey();
-          String recipient = keyPairService.generateBaseKeyPair().getPublicKey();
+          String sender = keyPairService.generateKeyPair().getAddress();
+          String recipient = keyPairService.generateKeyPair().getAddress();
           BigInteger amount = BigInteger.valueOf(1000);
           String payload = "payload";
           BigInteger ttl = BigInteger.valueOf(100);
@@ -73,8 +73,8 @@ public class TransactionSpendApiTest extends BaseTest {
           // created and increase it by one
           AccountResult account = this.aeternityServiceNative.accounts.blockingGetAccount();
 
-          BaseKeyPair kp = keyPairService.generateBaseKeyPair();
-          String recipient = kp.getPublicKey();
+          KeyPair kp = keyPairService.generateKeyPair();
+          String recipient = kp.getAddress();
           BigInteger amount = new BigInteger("1000000000000000000");
           String payload = "payload";
           BigInteger nonce = account.getNonce().add(ONE);
@@ -109,8 +109,8 @@ public class TransactionSpendApiTest extends BaseTest {
         t -> {
           AccountResult account = this.aeternityServiceNative.accounts.blockingGetAccount();
 
-          BaseKeyPair kp = keyPairService.generateBaseKeyPair();
-          String recipient = kp.getPublicKey();
+          KeyPair kp = keyPairService.generateKeyPair();
+          String recipient = kp.getAddress();
           BigInteger amount = new BigInteger("1000000000000000000");
           String payload = "payload";
           BigInteger nonce = account.getNonce().add(ONE);
@@ -134,7 +134,7 @@ public class TransactionSpendApiTest extends BaseTest {
 
           String signedTxNative =
               aeternityServiceNative.transactions.signTransaction(
-                  unsignedTxNative, baseKeyPair.getPrivateKey());
+                  unsignedTxNative, baseKeyPair.getEncodedPrivateKey());
 
           PostTransactionResult txResponse =
               aeternityServiceNative.transactions.blockingPostTransaction(signedTxNative);
@@ -157,11 +157,11 @@ public class TransactionSpendApiTest extends BaseTest {
         context,
         t -> {
           try {
-            BaseKeyPair recipient = keyPairService.generateBaseKeyPair();
+            KeyPair recipient = keyPairService.generateKeyPair();
             SpendTransactionModel spendTx =
                 SpendTransactionModel.builder()
-                    .sender(this.baseKeyPair.getPublicKey())
-                    .recipient(recipient.getPublicKey())
+                    .sender(this.baseKeyPair.getAddress())
+                    .recipient(recipient.getAddress())
                     .amount(new BigInteger("1000000000000000000"))
                     .payload("donation")
                     .ttl(ZERO)
@@ -185,11 +185,11 @@ public class TransactionSpendApiTest extends BaseTest {
         context,
         t -> {
           try {
-            BaseKeyPair recipient = keyPairService.generateBaseKeyPair();
+            KeyPair recipient = keyPairService.generateKeyPair();
             SpendTransactionModel spendTx =
                 SpendTransactionModel.builder()
-                    .sender(this.baseKeyPair.getPublicKey())
-                    .recipient(recipient.getPublicKey())
+                    .sender(this.baseKeyPair.getAddress())
+                    .recipient(recipient.getAddress())
                     .amount(new BigInteger("1000000000000000000"))
                     .payload("donation")
                     .ttl(ZERO)
@@ -200,15 +200,15 @@ public class TransactionSpendApiTest extends BaseTest {
             _logger.info("SpendTx hash: " + txResponse.getTxHash());
             waitForTxMined(txResponse.getTxHash());
             AccountResult recipientAccount =
-                this.aeternityServiceNative.accounts.blockingGetAccount(recipient.getPublicKey());
+                this.aeternityServiceNative.accounts.blockingGetAccount(recipient.getAddress());
             _logger.info("Account result for recipient {}", recipientAccount);
             // now send amount back
             long recipientAccountBalance = recipientAccount.getBalance().longValue();
             long recipientAccountSendAmount = 10000000l;
             spendTx =
                 SpendTransactionModel.builder()
-                    .sender(recipient.getPublicKey())
-                    .recipient(baseKeyPair.getPublicKey())
+                    .sender(recipient.getAddress())
+                    .recipient(baseKeyPair.getAddress())
                     .amount(BigInteger.valueOf(recipientAccountSendAmount))
                     .nonce(recipientAccount.getNonce().add(ONE))
                     .ttl(ZERO)
@@ -216,11 +216,11 @@ public class TransactionSpendApiTest extends BaseTest {
             _logger.info("Sending back {}", spendTx);
             txResponse =
                 aeternityServiceNative.transactions.blockingPostTransaction(
-                    spendTx, recipient.getPrivateKey());
+                    spendTx, recipient.getEncodedPrivateKey());
             _logger.info("SpendTx hash: " + txResponse.getTxHash());
             waitForTxMined(txResponse.getTxHash());
             recipientAccount =
-                this.aeternityServiceNative.accounts.blockingGetAccount(recipient.getPublicKey());
+                this.aeternityServiceNative.accounts.blockingGetAccount(recipient.getAddress());
             context.assertEquals(
                 recipientAccount.getBalance().longValue(),
                 recipientAccountBalance
@@ -240,11 +240,11 @@ public class TransactionSpendApiTest extends BaseTest {
         t -> {
           try {
             Async async = context.async();
-            BaseKeyPair recipient = keyPairService.generateBaseKeyPair();
+            KeyPair recipient = keyPairService.generateKeyPair();
             SpendTransactionModel spendTx =
                 SpendTransactionModel.builder()
-                    .sender(this.baseKeyPair.getPublicKey())
-                    .recipient(recipient.getPublicKey())
+                    .sender(this.baseKeyPair.getAddress())
+                    .recipient(recipient.getAddress())
                     .amount(new BigInteger("1000000000000000000"))
                     .payload("wait for confirmation works =)")
                     .ttl(ZERO)
@@ -288,11 +288,11 @@ public class TransactionSpendApiTest extends BaseTest {
         t -> {
           try {
             Async async = context.async();
-            BaseKeyPair recipient = keyPairService.generateBaseKeyPair();
+            KeyPair recipient = keyPairService.generateKeyPair();
             SpendTransactionModel spendTx =
                 SpendTransactionModel.builder()
-                    .sender(this.baseKeyPair.getPublicKey())
-                    .recipient(recipient.getPublicKey())
+                    .sender(this.baseKeyPair.getAddress())
+                    .recipient(recipient.getAddress())
                     .amount(new BigInteger("1000000000000000000"))
                     .payload("wait for confirmation fails :-(")
                     .ttl(ZERO)

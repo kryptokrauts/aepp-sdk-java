@@ -1,6 +1,6 @@
 package com.kryptokrauts.aeternity.generated.api;
 
-import com.kryptokrauts.aeternity.sdk.domain.secret.impl.BaseKeyPair;
+import com.kryptokrauts.aeternity.sdk.domain.secret.KeyPair;
 import com.kryptokrauts.aeternity.sdk.service.oracle.domain.OracleQueriesResult;
 import com.kryptokrauts.aeternity.sdk.service.oracle.domain.OracleQueryResult;
 import com.kryptokrauts.aeternity.sdk.service.oracle.domain.OracleTTLType;
@@ -23,7 +23,7 @@ import org.junit.runners.MethodSorters;
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class TransactionOraclesTest extends BaseTest {
 
-  static BaseKeyPair oracleAccount;
+  static KeyPair oracleKeyPair;
 
   static String oracleId;
   static String queryId;
@@ -41,15 +41,15 @@ public class TransactionOraclesTest extends BaseTest {
         context,
         t -> {
           try {
-            oracleAccount = keyPairService.generateBaseKeyPair();
+            oracleKeyPair = keyPairService.generateKeyPair();
 
-            oracleId = oracleAccount.getOraclePK();
+            oracleId = oracleKeyPair.getOracleAddress();
             BigInteger amount = UnitConversionUtil.toAettos("10", Unit.AE).toBigInteger();
             SpendTransactionModel spendTx =
                 SpendTransactionModel.builder()
                     .amount(amount)
-                    .sender(baseKeyPair.getPublicKey())
-                    .recipient(oracleAccount.getPublicKey())
+                    .sender(baseKeyPair.getAddress())
+                    .recipient(oracleKeyPair.getAddress())
                     .ttl(ZERO)
                     .nonce(getNextBaseKeypairNonce())
                     .build();
@@ -67,14 +67,14 @@ public class TransactionOraclesTest extends BaseTest {
         context,
         t -> {
           try {
-            BigInteger nonce = getAccount(oracleAccount.getPublicKey()).getNonce().add(ONE);
+            BigInteger nonce = getAccount(oracleKeyPair.getAddress()).getNonce().add(ONE);
             BigInteger currentHeight =
                 this.aeternityServiceNative.info.blockingGetCurrentKeyBlock().getHeight();
             initialOracleTtl = currentHeight.add(BigInteger.valueOf(5000));
 
             OracleRegisterTransactionModel oracleRegisterTx =
                 OracleRegisterTransactionModel.builder()
-                    .accountId(oracleAccount.getPublicKey())
+                    .accountId(oracleKeyPair.getAddress())
                     .abiVersion(ZERO)
                     .nonce(nonce)
                     .oracleTtl(initialOracleTtl)
@@ -86,7 +86,7 @@ public class TransactionOraclesTest extends BaseTest {
                     .build();
 
             PostTransactionResult postResult =
-                this.blockingPostTx(oracleRegisterTx, oracleAccount.getPrivateKey());
+                this.blockingPostTx(oracleRegisterTx, oracleKeyPair.getEncodedPrivateKey());
             _logger.info(postResult.getTxHash());
           } catch (Throwable e) {
             context.fail(e);
@@ -103,7 +103,7 @@ public class TransactionOraclesTest extends BaseTest {
             BigInteger nonce = getNextBaseKeypairNonce();
             OracleQueryTransactionModel oracleQueryTx =
                 OracleQueryTransactionModel.builder()
-                    .senderId(baseKeyPair.getPublicKey())
+                    .senderId(baseKeyPair.getAddress())
                     .oracleId(oracleId)
                     .nonce(nonce)
                     .query(queryString)
@@ -115,9 +115,9 @@ public class TransactionOraclesTest extends BaseTest {
                     .build();
 
             PostTransactionResult postResult =
-                this.blockingPostTx(oracleQueryTx, baseKeyPair.getPrivateKey());
+                this.blockingPostTx(oracleQueryTx, baseKeyPair.getEncodedPrivateKey());
             _logger.info(postResult.getTxHash());
-            queryId = EncodingUtils.queryId(baseKeyPair.getPublicKey(), nonce, oracleId);
+            queryId = EncodingUtils.queryId(baseKeyPair.getAddress(), nonce, oracleId);
             OracleQueryResult oracleQuery =
                 this.aeternityServiceNative.oracles.blockingGetOracleQuery(oracleId, queryId);
             _logger.debug(oracleQuery.toString());
@@ -135,7 +135,7 @@ public class TransactionOraclesTest extends BaseTest {
           try {
             OracleQueriesResult oracleQueriesResult =
                 this.aeternityServiceNative.oracles.blockingGetOracleQueries(
-                    oracleAccount.getOraclePK());
+                    oracleKeyPair.getOracleAddress());
             _logger.info("OracleQueriesResult: {}", oracleQueriesResult);
             _logger.info("OracleQuery count: {}", oracleQueriesResult.getQueryResults().size());
             context.assertFalse(oracleQueriesResult.getQueryResults().isEmpty());
@@ -145,10 +145,10 @@ public class TransactionOraclesTest extends BaseTest {
                     .findFirst()
                     .get();
             context.assertEquals(queryString, oracleQueryResult.getQuery());
-            BigInteger nonce = getAccount(oracleAccount.getPublicKey()).getNonce().add(ONE);
+            BigInteger nonce = getAccount(oracleKeyPair.getAddress()).getNonce().add(ONE);
             OracleRespondTransactionModel oracleRespondTx =
                 OracleRespondTransactionModel.builder()
-                    .oracleId(oracleAccount.getOraclePK())
+                    .oracleId(oracleKeyPair.getOracleAddress())
                     .queryId(oracleQueryResult.getId())
                     .nonce(nonce)
                     .response(responseString)
@@ -157,7 +157,7 @@ public class TransactionOraclesTest extends BaseTest {
                     .build();
 
             PostTransactionResult postResult =
-                this.blockingPostTx(oracleRespondTx, oracleAccount.getPrivateKey());
+                this.blockingPostTx(oracleRespondTx, oracleKeyPair.getEncodedPrivateKey());
             _logger.info(postResult.getTxHash());
           } catch (Throwable e) {
             context.fail(e);
@@ -172,7 +172,7 @@ public class TransactionOraclesTest extends BaseTest {
         t -> {
           try {
             BigInteger additionalTtl = BigInteger.valueOf(100);
-            BigInteger nonce = getAccount(oracleAccount.getPublicKey()).getNonce().add(ONE);
+            BigInteger nonce = getAccount(oracleKeyPair.getAddress()).getNonce().add(ONE);
 
             OracleExtendTransactionModel oracleExtendTx =
                 OracleExtendTransactionModel.builder()
@@ -183,7 +183,7 @@ public class TransactionOraclesTest extends BaseTest {
                     .build();
 
             PostTransactionResult postResult =
-                this.blockingPostTx(oracleExtendTx, oracleAccount.getPrivateKey());
+                this.blockingPostTx(oracleExtendTx, oracleKeyPair.getEncodedPrivateKey());
             _logger.info(postResult.getTxHash());
 
             RegisteredOracleResult registeredOracle =

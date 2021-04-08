@@ -1,4 +1,4 @@
-package com.kryptokrauts.aeternity.sdk.service.wallet;
+package com.kryptokrauts.aeternity.sdk.service.keystore;
 
 import com.kryptokrauts.aeternity.sdk.service.ServiceConfiguration;
 import de.mkammerer.argon2.Argon2Factory.Argon2Types;
@@ -8,7 +8,7 @@ import lombok.experimental.SuperBuilder;
 
 @Getter
 @SuperBuilder(builderMethodName = "configure", buildMethodName = "compile")
-public class WalletServiceConfiguration extends ServiceConfiguration {
+public class KeystoreServiceConfiguration extends ServiceConfiguration {
   @Default private String secretType = "ed25519";
 
   @Default private String symmetricAlgorithm = "xsalsa20-poly1305";

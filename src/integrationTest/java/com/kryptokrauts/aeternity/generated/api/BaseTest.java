@@ -1,9 +1,10 @@
 package com.kryptokrauts.aeternity.generated.api;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kryptokrauts.aeternity.sdk.constants.Network;
 import com.kryptokrauts.aeternity.sdk.constants.VirtualMachine;
 import com.kryptokrauts.aeternity.sdk.domain.ObjectResultWrapper;
-import com.kryptokrauts.aeternity.sdk.domain.secret.impl.BaseKeyPair;
+import com.kryptokrauts.aeternity.sdk.domain.secret.KeyPair;
 import com.kryptokrauts.aeternity.sdk.service.account.domain.AccountResult;
 import com.kryptokrauts.aeternity.sdk.service.aeternity.AeternityServiceConfiguration;
 import com.kryptokrauts.aeternity.sdk.service.aeternity.AeternityServiceFactory;
@@ -64,7 +65,9 @@ public abstract class BaseTest {
 
   protected AeternityService aeternityServiceDebug;
 
-  BaseKeyPair baseKeyPair;
+  protected ObjectMapper objectMapper = new ObjectMapper();
+
+  protected KeyPair baseKeyPair;
 
   @Rule
   public RunTestOnContext rule =
@@ -84,8 +87,7 @@ public abstract class BaseTest {
 
     keyPairService = new KeyPairServiceFactory().getService();
 
-    baseKeyPair =
-        keyPairService.generateBaseKeyPairFromSecret(TestConstants.BENEFICIARY_PRIVATE_KEY);
+    baseKeyPair = keyPairService.recoverKeyPair(TestConstants.BENEFICIARY_PRIVATE_KEY);
 
     aeternityServiceNative =
         new AeternityServiceFactory()
@@ -160,7 +162,7 @@ public abstract class BaseTest {
   }
 
   protected BigInteger getNextBaseKeypairNonce() {
-    return getAccount(this.baseKeyPair.getPublicKey()).getNonce().add(ONE);
+    return getAccount(this.baseKeyPair.getAddress()).getNonce().add(ONE);
   }
 
   protected AccountResult getAccount(String publicKey) {
@@ -183,7 +185,7 @@ public abstract class BaseTest {
   protected PostTransactionResult blockingPostTx(AbstractTransactionModel<?> tx, String privateKey)
       throws Throwable {
     if (privateKey == null) {
-      privateKey = this.baseKeyPair.getPrivateKey();
+      privateKey = this.baseKeyPair.getEncodedPrivateKey();
     }
     PostTransactionResult postTxResponse =
         this.aeternityServiceNative.transactions.blockingPostTransaction(tx, privateKey);

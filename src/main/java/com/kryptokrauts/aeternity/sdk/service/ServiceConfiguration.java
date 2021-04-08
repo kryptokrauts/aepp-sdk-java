@@ -4,9 +4,9 @@ import com.google.common.collect.ImmutableMap;
 import com.kryptokrauts.aeternity.generated.ApiClient;
 import com.kryptokrauts.aeternity.sdk.constants.BaseConstants;
 import com.kryptokrauts.aeternity.sdk.constants.VirtualMachine;
-import com.kryptokrauts.aeternity.sdk.domain.secret.impl.BaseKeyPair;
+import com.kryptokrauts.aeternity.sdk.domain.secret.KeyPair;
 import com.kryptokrauts.aeternity.sdk.exception.InvalidParameterException;
-import com.kryptokrauts.aeternity.sdk.service.wallet.WalletServiceConfiguration;
+import com.kryptokrauts.aeternity.sdk.service.keystore.KeystoreServiceConfiguration;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
 import java.util.HashMap;
@@ -37,7 +37,7 @@ import org.slf4j.LoggerFactory;
  * [type] paramName = "value";
  * </pre>
  *
- * examples see {@link WalletServiceConfiguration}
+ * examples see {@link KeystoreServiceConfiguration}
  */
 @SuperBuilder(builderMethodName = "configure", buildMethodName = "compile")
 @NoArgsConstructor
@@ -53,7 +53,7 @@ public class ServiceConfiguration {
 
   @Getter @Default @Nonnull protected VirtualMachine targetVM = VirtualMachine.FATE;
 
-  private BaseKeyPair baseKeyPair;
+  private KeyPair baseKeyPair;
 
   /** the vertx instance */
   protected Vertx vertx;
@@ -114,7 +114,7 @@ public class ServiceConfiguration {
           "Cannot instantiate ApiClient due to missing params vertx and or indaexBaseUrl");
   }
 
-  public BaseKeyPair getBaseKeyPair() {
+  public KeyPair getBaseKeyPair() {
     if (baseKeyPair == null) {
       throw new InvalidParameterException(
           "Service call was initiated which needs the baseKeyPair but none is set in ServiceConfiguration.baseKeyPair - check parameters");

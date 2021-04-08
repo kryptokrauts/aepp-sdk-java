@@ -1,13 +1,40 @@
 package com.kryptokrauts.aeternity.sdk.domain.secret;
 
-/**
- * a representation of private and public key pair
- *
- * @param <T> the type of a KeyPair
- */
-public interface KeyPair<T> {
+import com.kryptokrauts.aeternity.sdk.constants.ApiIdentifiers;
+import com.kryptokrauts.aeternity.sdk.util.EncodingUtils;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
+import org.bouncycastle.util.encoders.Hex;
 
-  T getPublicKey();
+@Data
+@NoArgsConstructor
+public class KeyPair {
 
-  T getPrivateKey();
+  @ToString.Exclude private byte[] rawPublicKey;
+
+  @ToString.Exclude private byte[] rawPrivateKey;
+
+  /** hex encoded private key */
+  private String encodedPrivateKey;
+
+  /** base58 encoded human readable publicKey */
+  private String address;
+
+  @Builder
+  public KeyPair(final byte[] rawPublicKey, final byte[] rawPrivateKey) {
+    this.rawPublicKey = rawPublicKey;
+    this.rawPrivateKey = rawPrivateKey;
+    this.encodedPrivateKey = Hex.toHexString(rawPrivateKey) + Hex.toHexString(rawPublicKey);
+    this.address = EncodingUtils.encodeCheck(rawPublicKey, ApiIdentifiers.ACCOUNT_PUBKEY);
+  }
+
+  public String getContractAddress() {
+    return ApiIdentifiers.CONTRACT_PUBKEY + address.substring(2);
+  }
+
+  public String getOracleAddress() {
+    return ApiIdentifiers.ORACLE_PUBKEY + address.substring(2);
+  }
 }

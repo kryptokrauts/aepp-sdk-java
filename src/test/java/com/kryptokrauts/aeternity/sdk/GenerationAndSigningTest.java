@@ -8,8 +8,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import com.kryptokrauts.aeternity.sdk.constants.ApiIdentifiers;
-import com.kryptokrauts.aeternity.sdk.domain.secret.impl.BaseKeyPair;
-import com.kryptokrauts.aeternity.sdk.domain.secret.impl.RawKeyPair;
+import com.kryptokrauts.aeternity.sdk.domain.secret.KeyPair;
 import com.kryptokrauts.aeternity.sdk.service.keypair.KeyPairService;
 import com.kryptokrauts.aeternity.sdk.service.keypair.KeyPairServiceFactory;
 import com.kryptokrauts.aeternity.sdk.util.ByteUtils;
@@ -184,45 +183,12 @@ public class GenerationAndSigningTest extends BaseTest {
                 it(
                     "generates an account key pair",
                     () -> {
-                      BaseKeyPair keyPair = keypairService.generateBaseKeyPair();
-                      assertNotNull(keyPair);
-                      assertTrue(EncodingUtils.isAddressValid(keyPair.getPublicKey()));
-                      assertTrue(keyPair.getPublicKey().startsWith("ak_"));
-                      int length = keyPair.getPublicKey().length();
+                      KeyPair keypair = keypairService.generateKeyPair();
+                      assertNotNull(keypair);
+                      assertTrue(EncodingUtils.isAddressValid(keypair.getAddress()));
+                      assertTrue(keypair.getAddress().startsWith("ak_"));
+                      int length = keypair.getAddress().length();
                       assertTrue(length <= 53 && length >= 51);
-                    });
-              });
-
-          describe(
-              "encryptPassword",
-              () -> {
-                describe(
-                    "generate a password encrypted key pair",
-                    () -> {
-                      RawKeyPair keyPair = keypairService.generateRawKeyPair();
-                      final String password = "verysecret";
-
-                      it(
-                          "works for private keys",
-                          () -> {
-                            final byte[] privateBinary = keyPair.getConcatenatedPrivateKey();
-                            final byte[] encryptedBinary =
-                                keypairService.encryptPrivateKey(password, privateBinary);
-                            final byte[] decryptedBinary =
-                                keypairService.decryptPrivateKey(password, encryptedBinary);
-                            assertArrayEquals(privateBinary, decryptedBinary);
-                          });
-
-                      it(
-                          "works for public keys",
-                          () -> {
-                            final byte[] publicBinary = ((RawKeyPair) keyPair).getPublicKey();
-                            final byte[] encryptedBinary =
-                                keypairService.encryptPublicKey(password, publicBinary);
-                            final byte[] decryptedBinary =
-                                keypairService.decryptPublicKey(password, encryptedBinary);
-                            assertArrayEquals(publicBinary, decryptedBinary);
-                          });
                     });
               });
 
@@ -251,10 +217,10 @@ public class GenerationAndSigningTest extends BaseTest {
                     () -> {
                       final String beneficiaryPub =
                           "ak_twR4h7dEcUtc2iSEDv8kB7UFJJDGiEDQCXr85C3fYF8FdVdyo";
-                      final BaseKeyPair keyPair =
-                          keypairService.generateBaseKeyPairFromSecret(
+                      final KeyPair keyPair =
+                          keypairService.recoverKeyPair(
                               "79816BBF860B95600DDFABF9D81FEE81BDB30BE823B17D80B9E48BE0A7015ADF");
-                      assertEquals(beneficiaryPub, keyPair.getPublicKey());
+                      assertEquals(beneficiaryPub, keyPair.getAddress());
                     });
               });
 

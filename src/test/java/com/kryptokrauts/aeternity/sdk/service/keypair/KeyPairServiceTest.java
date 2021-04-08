@@ -2,17 +2,19 @@ package com.kryptokrauts.aeternity.sdk.service.keypair;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.greghaskins.spectrum.Spectrum;
 import com.kryptokrauts.aeternity.sdk.BaseTest;
-import com.kryptokrauts.aeternity.sdk.domain.secret.impl.BaseKeyPair;
-import com.kryptokrauts.aeternity.sdk.domain.secret.impl.MnemonicKeyPair;
+import com.kryptokrauts.aeternity.sdk.domain.secret.HDWallet;
+import com.kryptokrauts.aeternity.sdk.domain.secret.KeyPair;
 import com.kryptokrauts.aeternity.sdk.exception.AException;
-import com.kryptokrauts.aeternity.sdk.util.EncodingUtils;
+import com.kryptokrauts.aeternity.sdk.service.keypair.Slip0100JsonStruct.DerivedKeyEntry;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
-import java.util.MissingResourceException;
-import java.util.ResourceBundle;
-import org.bitcoinj.crypto.ChildNumber;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import org.bouncycastle.util.encoders.Hex;
 import org.junit.Assert;
 
@@ -25,28 +27,28 @@ public class KeyPairServiceTest extends BaseTest {
               "Mnemonic keypair generation tests",
               () -> {
                 KeyPairService keyPairService = new KeyPairServiceFactory().getService();
-                MnemonicKeyPair generatedKeyPair =
-                    keyPairService.generateMasterMnemonicKeyPair(defaultPassword);
-                MnemonicKeyPair restoredKeyPairWithSamePWD =
-                    keyPairService.recoverMasterMnemonicKeyPair(
+                HDWallet generatedKeyPair = keyPairService.generateHDWallet(defaultPassword);
+                HDWallet restoredKeyPairWithSamePWD =
+                    keyPairService.recoverHDWallet(
                         generatedKeyPair.getMnemonicSeedWords(), defaultPassword);
-                MnemonicKeyPair restoredKeyPairWithoutPWD =
-                    keyPairService.recoverMasterMnemonicKeyPair(
-                        generatedKeyPair.getMnemonicSeedWords(), null);
+                HDWallet restoredKeyPairWithoutPWD =
+                    keyPairService.recoverHDWallet(generatedKeyPair.getMnemonicSeedWords(), null);
 
                 Spectrum.it(
                     "mnemonic keypair recovered from word seed list is same",
                     () -> {
                       Assert.assertEquals(
-                          Hex.toHexString(generatedKeyPair.getPrivateKey()),
-                          Hex.toHexString(restoredKeyPairWithSamePWD.getPrivateKey()));
+                          Hex.toHexString(generatedKeyPair.getMasterKeyPair().getRawPrivateKey()),
+                          Hex.toHexString(
+                              restoredKeyPairWithSamePWD.getMasterKeyPair().getRawPrivateKey()));
                     });
                 Spectrum.it(
                     "mnemonic keypair recovered from word seed list without password is not same",
                     () -> {
                       Assert.assertNotEquals(
-                          Hex.toHexString(generatedKeyPair.getPrivateKey()),
-                          Hex.toHexString(restoredKeyPairWithoutPWD.getPrivateKey()));
+                          Hex.toHexString(generatedKeyPair.getMasterKeyPair().getRawPrivateKey()),
+                          Hex.toHexString(
+                              restoredKeyPairWithoutPWD.getMasterKeyPair().getRawPrivateKey()));
                     });
                 Spectrum.it(
                     "mnemonic keypair cannot be generated due to small entropy",
@@ -60,7 +62,7 @@ public class KeyPairServiceTest extends BaseTest {
                       assertThrows(
                           AException.class,
                           () -> {
-                            keyPairServiceWrongConfig.generateMasterMnemonicKeyPair(null);
+                            keyPairServiceWrongConfig.generateHDWallet(null);
                           });
                     });
                 Spectrum.it(
@@ -71,123 +73,106 @@ public class KeyPairServiceTest extends BaseTest {
                               "abandon", "abandon", "abandon", "abandon", "abandon", "abandon",
                               "abandon", "abandon", "abandon", "abandon", "abandon", "about");
 
-                      String privateKeyAsHex =
-                          "61ae3ed32d9c82749be2f4bf122ea01de434705de3662ed416394df9be045ea9d8607b3a21a3d35529c0f4f60c7f3ddc782ce928d73dae02b0aad92ba38bd94f";
-                      String publicKeyAsHex =
-                          "ak_2eJ4Jk8F9yc1Hn4icG2apyExwrXcxZZADYLGDiMkyfoSpPSEM3";
+                      String firtChildPrivateKeyAsHex =
+                          "cb9b31d8e09182ab7228a3252984a68c41513cea33283313680f34c382c58127769cd5368a1a498dff86d3aec54ff4eb3ac89c13d6b100461907133bfa5cd082";
+                      String firstChildAddress =
+                          "ak_uEoRY2CEAbSzMbN4ohniNHFdrVDHjpw3Za3upmJA8SihGBjCk";
 
-                      MnemonicKeyPair restoredDefault =
-                          keyPairService.recoverMasterMnemonicKeyPair(mnemonic, defaultPassword);
+                      HDWallet restoredDefault =
+                          keyPairService.recoverHDWallet(mnemonic, defaultPassword);
 
-                      BaseKeyPair restoredBaseKeyPair =
-                          EncodingUtils.createBaseKeyPair(restoredDefault.toRawKeyPair());
+                      KeyPair restoredMasterKeyPair = restoredDefault.getLastChildKeyPair();
 
-                      Assert.assertEquals(publicKeyAsHex, restoredBaseKeyPair.getPublicKey());
-                      Assert.assertEquals(privateKeyAsHex, restoredBaseKeyPair.getPrivateKey());
+                      Assert.assertEquals(firstChildAddress, restoredMasterKeyPair.getAddress());
+                      Assert.assertEquals(
+                          firtChildPrivateKeyAsHex, restoredMasterKeyPair.getEncodedPrivateKey());
                     });
                 Spectrum.it(
-                    "hd derivation keys restore test",
+                    "hdKeyPair index test",
                     () -> {
                       List<String> mnemonic =
                           Arrays.asList(
-                              "legal", "winner", "thank", "year", "wave", "sausage", "worth",
-                              "useful", "legal", "winner", "thank", "yellow");
+                              "abandon", "abandon", "abandon", "abandon", "abandon", "abandon",
+                              "abandon", "abandon", "abandon", "abandon", "abandon", "about");
 
-                      MnemonicKeyPair master =
-                          keyPairService.recoverMasterMnemonicKeyPair(mnemonic, defaultPassword);
+                      HDWallet restoredDefault =
+                          keyPairService.recoverHDWallet(mnemonic, defaultPassword);
 
-                      MnemonicKeyPair masterNoPWD =
-                          keyPairService.recoverMasterMnemonicKeyPair(mnemonic, "");
+                      IntStream.range(0, 10)
+                          .forEach(v -> keyPairService.getNextKeyPair(restoredDefault));
 
-                      ResourceBundle derivedKeys = ResourceBundle.getBundle("derivedKeys");
+                      Assert.assertEquals(10, restoredDefault.getLastChildKeyPair().getIndex());
+                    });
+                Spectrum.it(
+                    "test keys contained in hdwallet",
+                    () -> {
+                      List<String> mnemonic =
+                          Arrays.asList(
+                              "acquire useful napkin ranch witness scare lunch smart sibling situate potato inspire"
+                                  .split(" "));
 
-                      /**
-                       * make sure every that derived keys can be restored and that the hardened
-                       * keys differ
-                       */
-                      for (int i = 0; i < 20; i++) {
-                        // derive different keys
-                        BaseKeyPair generatedDerivedKey =
-                            EncodingUtils.createBaseKeyPair(
-                                keyPairService.generateDerivedKey(master, true).toRawKeyPair());
-                        BaseKeyPair notHardendedKey =
-                            EncodingUtils.createBaseKeyPair(
-                                keyPairService.generateDerivedKey(master, false).toRawKeyPair());
-                        BaseKeyPair generatedDerivedKeyNoPwd =
-                            EncodingUtils.createBaseKeyPair(
-                                keyPairService
-                                    .generateDerivedKey(masterNoPWD, true)
-                                    .toRawKeyPair());
-                        BaseKeyPair generatedDerivedKeyWithCustomPath =
-                            EncodingUtils.createBaseKeyPair(
-                                keyPairService
-                                    .generateDerivedKey(
-                                        master,
-                                        true,
-                                        new ChildNumber(4711, true),
-                                        new ChildNumber(4712, true))
-                                    .toRawKeyPair());
-                        // assert that the generated keys are the same
-                        Assert.assertEquals(
-                            derivedKeys.getObject(generatedDerivedKey.getPublicKey()),
-                            generatedDerivedKey.getPrivateKey());
+                      List<String> addresses =
+                          Arrays.asList(
+                              "ak_6z3Efre5nVXLB1togCbr2AWrjnKZNWRAXukSdTPPrAAzdFvXC",
+                              "ak_256JtFuqyGJ8PPTdkvSi9Lg1E1HhsWeEnxVMUU2tWJQLsUUm3v",
+                              "ak_26uXcydJUDHP7cZ3hc8qjqXKyYSGLCEcH3G6Rnqrpk7midqXcD",
+                              "ak_hcmRKKNi1V47VxDMBJCbL9yTHJ7LK6HaXLBVdfDmUmaJ6NLkK",
+                              "ak_vazGmR7dfFd63S1W9ftZNiJPrwKcgEcEF92NMNvWo6GmZh61q",
+                              "ak_2ukHvt54cZKiik1TxV25iXMuaUVM1NyPWRYCipBATSjELJjP59",
+                              "ak_2ty5zKb3hHjKZQxRiCEGuqgdi6ZoxpzCyDBNgJw3UNj51rkyMq",
+                              "ak_2ruLcwMRLE6gqmZVSvmyTvuJyZVns6G7ALfrNn61R8CGoCM5Ks",
+                              "ak_2MBAhS1bb5NZNaEpYPxC7WaHEXDdwPMuhf7nqzycKDNq9t7p67",
+                              "ak_29aErGt2GoeypzUG2BbGyDgSVsepLRHxtVo3Jtgte6mq6aHJw3",
+                              "ak_2mPuRrdQE2kRLFnwVc9ES6a9kugWHuLLXGa74vY4CbWTCn4PCV");
 
-                        // make sure, not hardended keys differ
-                        assertThrows(
-                            MissingResourceException.class,
-                            () -> {
-                              derivedKeys.getObject(notHardendedKey.getPublicKey());
-                            });
-                        // make sure, keys derived from master with same mnemonics but different pwd
-                        // are different
-                        assertThrows(
-                            MissingResourceException.class,
-                            () -> {
-                              derivedKeys.getObject(generatedDerivedKeyNoPwd.getPublicKey());
-                            });
-                        // make sure, keys from other derivation path differ
-                        assertThrows(
-                            MissingResourceException.class,
-                            () -> {
-                              derivedKeys.getObject(
-                                  generatedDerivedKeyWithCustomPath.getPublicKey());
-                            });
+                      HDWallet restoredDefault = keyPairService.recoverHDWallet(mnemonic, "");
+
+                      for (int i = 0; i < 10; i++) {
+                        keyPairService.getNextKeyPair(restoredDefault);
                       }
+
+                      Assert.assertEquals(
+                          addresses,
+                          restoredDefault.getChildKeyPairs().stream()
+                              .map(k -> k.getAddress())
+                              .collect(Collectors.toList()));
                     });
                 Spectrum.it(
-                    "hd derivation keys not possible from derived key test",
+                    "slip0010 test vectors",
                     () -> {
-                      List<String> mnemonic =
-                          Arrays.asList(
-                              "letter",
-                              "advice",
-                              "cage",
-                              "absurd",
-                              "amount",
-                              "doctor",
-                              "acoustic",
-                              "avoid",
-                              "letter",
-                              "advice",
-                              "cage",
-                              "above");
-
-                      MnemonicKeyPair master =
-                          keyPairService.recoverMasterMnemonicKeyPair(mnemonic, defaultPassword);
-                      MnemonicKeyPair generatedDerivedKey =
-                          keyPairService.generateDerivedKey(master, true);
-
-                      Throwable exception =
-                          assertThrows(
-                              AException.class,
-                              () -> {
-                                keyPairService.generateDerivedKey(generatedDerivedKey, true);
-                              });
-                      Assert.assertTrue(
-                          exception
-                              .getMessage()
-                              .contains(
-                                  "Given mnemonicKeyPair object does not contain the master key"));
+                      List<Slip0100JsonStruct> slip0100Resources =
+                          new ObjectMapper()
+                              .readValue(
+                                  this.getClass()
+                                      .getClassLoader()
+                                      .getResourceAsStream("derivedkeys.json"),
+                                  new TypeReference<List<Slip0100JsonStruct>>() {});
+                      System.out.println(
+                          "Generating keys for " + slip0100Resources.size() + " test vectors");
+                      for (Slip0100JsonStruct testVector : slip0100Resources) {
+                        HDWallet restored =
+                            keyPairService.recoverHDWallet(
+                                Arrays.asList(testVector.getMnemonic().split(" ")),
+                                testVector.getPassword());
+                        testVector
+                            .getAccounts()
+                            .sort(Comparator.comparing(DerivedKeyEntry::getIndex));
+                        // List<HDKeyPair> childKeys = restored.getDeterministicHierarchy()
+                        for (DerivedKeyEntry derivedKey : testVector.getAccounts()) {
+                          KeyPair derivedKeyPair = null;
+                          // if index == 0 -> master key
+                          if (derivedKey.getIndex() == 0) {
+                            derivedKeyPair = restored.getLastChildKeyPair();
+                          }
+                          // otherwise get the next derived keypair
+                          else {
+                            derivedKeyPair = keyPairService.getNextKeyPair(restored);
+                          }
+                          Assert.assertEquals(derivedKey.getAddress(), derivedKeyPair.getAddress());
+                          Assert.assertEquals(
+                              derivedKey.getPk(), derivedKeyPair.getEncodedPrivateKey());
+                        }
+                      }
                     });
               });
         });

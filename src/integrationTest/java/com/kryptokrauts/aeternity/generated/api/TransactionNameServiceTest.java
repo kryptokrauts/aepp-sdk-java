@@ -1,7 +1,7 @@
 package com.kryptokrauts.aeternity.generated.api;
 
 import com.kryptokrauts.aeternity.sdk.constants.AENS;
-import com.kryptokrauts.aeternity.sdk.domain.secret.impl.BaseKeyPair;
+import com.kryptokrauts.aeternity.sdk.domain.secret.KeyPair;
 import com.kryptokrauts.aeternity.sdk.service.account.domain.AccountResult;
 import com.kryptokrauts.aeternity.sdk.service.indaex.domain.NameAuctionsResult;
 import com.kryptokrauts.aeternity.sdk.service.info.domain.TransactionResult;
@@ -41,7 +41,7 @@ public class TransactionNameServiceTest extends BaseTest {
     this.executeTest(
         context,
         t -> {
-          String sender = keyPairService.generateBaseKeyPair().getPublicKey();
+          String sender = keyPairService.generateKeyPair().getAddress();
           BigInteger salt = CryptoUtils.generateNamespaceSalt();
           BigInteger ttl = BigInteger.valueOf(100);
 
@@ -85,7 +85,7 @@ public class TransactionNameServiceTest extends BaseTest {
             BigInteger salt = CryptoUtils.generateNamespaceSalt();
             NamePreclaimTransactionModel namePreclaimTx =
                 NamePreclaimTransactionModel.builder()
-                    .accountId(baseKeyPair.getPublicKey())
+                    .accountId(baseKeyPair.getAddress())
                     .name(validName)
                     .salt(salt)
                     .nonce(getNextBaseKeypairNonce())
@@ -100,7 +100,7 @@ public class TransactionNameServiceTest extends BaseTest {
 
             NameClaimTransactionModel nameClaimTx =
                 NameClaimTransactionModel.builder()
-                    .accountId(baseKeyPair.getPublicKey())
+                    .accountId(baseKeyPair.getAddress())
                     .name(validName)
                     .nameSalt(salt)
                     .nonce(getNextBaseKeypairNonce())
@@ -150,7 +150,7 @@ public class TransactionNameServiceTest extends BaseTest {
             /** create a new namespace to update later */
             NamePreclaimTransactionModel namePreclaimTx =
                 NamePreclaimTransactionModel.builder()
-                    .accountId(baseKeyPair.getPublicKey())
+                    .accountId(baseKeyPair.getAddress())
                     .name(name)
                     .salt(salt)
                     .nonce(getNextBaseKeypairNonce())
@@ -166,7 +166,7 @@ public class TransactionNameServiceTest extends BaseTest {
 
             NameClaimTransactionModel nameClaimTx =
                 NameClaimTransactionModel.builder()
-                    .accountId(baseKeyPair.getPublicKey())
+                    .accountId(baseKeyPair.getAddress())
                     .name(name)
                     .nameSalt(salt)
                     .nonce(getNextBaseKeypairNonce())
@@ -191,16 +191,16 @@ public class TransactionNameServiceTest extends BaseTest {
             BigInteger nameTtl = BigInteger.valueOf(10000l);
             BigInteger clientTtl = BigInteger.valueOf(50l);
 
-            BaseKeyPair recipient = keyPairService.generateBaseKeyPair();
-            String accountPointer = recipient.getPublicKey();
+            KeyPair recipient = keyPairService.generateKeyPair();
+            String accountPointer = recipient.getAddress();
             // fake other allowed pointers
-            String contractPointer = baseKeyPair.getContractPK();
-            String channelPointer = baseKeyPair.getPublicKey().replace("ak_", "ch_");
-            String oraclePointer = baseKeyPair.getOraclePK();
+            String contractPointer = baseKeyPair.getContractAddress();
+            String channelPointer = baseKeyPair.getAddress().replace("ak_", "ch_");
+            String oraclePointer = baseKeyPair.getOracleAddress();
 
             NameUpdateTransactionModel nameUpdateTx =
                 NameUpdateTransactionModel.builder()
-                    .accountId(baseKeyPair.getPublicKey())
+                    .accountId(baseKeyPair.getAddress())
                     .nameId(nameEntryResult.getId())
                     .nonce(getNextBaseKeypairNonce())
                     .ttl(ZERO)
@@ -247,7 +247,7 @@ public class TransactionNameServiceTest extends BaseTest {
             BigInteger aettos = new BigInteger("1000000000000000000");
             SpendTransactionModel spendTx =
                 SpendTransactionModel.builder()
-                    .sender(this.baseKeyPair.getPublicKey())
+                    .sender(this.baseKeyPair.getAddress())
                     .recipient(nameEntryResult.getId())
                     .amount(aettos)
                     .payload("send to AENS name test")
@@ -284,7 +284,7 @@ public class TransactionNameServiceTest extends BaseTest {
 
             NameRevokeTransactionModel nameRevokeTx =
                 NameRevokeTransactionModel.builder()
-                    .accountId(baseKeyPair.getPublicKey())
+                    .accountId(baseKeyPair.getAddress())
                     .nameId(nameId)
                     .nonce(getNextBaseKeypairNonce())
                     .ttl(ZERO)
@@ -334,7 +334,7 @@ public class TransactionNameServiceTest extends BaseTest {
             /** create a new namespace to update later */
             NamePreclaimTransactionModel namePreclaimTx =
                 NamePreclaimTransactionModel.builder()
-                    .accountId(baseKeyPair.getPublicKey())
+                    .accountId(this.baseKeyPair.getAddress())
                     .name(name)
                     .salt(salt)
                     .nonce(getNextBaseKeypairNonce())
@@ -357,7 +357,7 @@ public class TransactionNameServiceTest extends BaseTest {
 
             NameClaimTransactionModel nameClaimTx =
                 NameClaimTransactionModel.builder()
-                    .accountId(baseKeyPair.getPublicKey())
+                    .accountId(this.baseKeyPair.getAddress())
                     .name(name)
                     .nameSalt(salt)
                     .nonce(getNextBaseKeypairNonce())
@@ -414,8 +414,8 @@ public class TransactionNameServiceTest extends BaseTest {
 
             /** create and fund other account to claim the same name with nextNameFee */
             AccountResult account = this.aeternityServiceNative.accounts.blockingGetAccount();
-            BaseKeyPair kpNextClaimer = keyPairService.generateBaseKeyPair();
-            String recipient = kpNextClaimer.getPublicKey();
+            KeyPair kpNextClaimer = keyPairService.generateKeyPair();
+            String recipient = kpNextClaimer.getAddress();
             BigInteger amount =
                 UnitConversionUtil.toAettos("50", UnitConversionUtil.Unit.AE).toBigInteger();
             BigInteger nonce = account.getNonce().add(ONE);
@@ -444,7 +444,7 @@ public class TransactionNameServiceTest extends BaseTest {
                     .nameSalt(BigInteger.ZERO)
                     .build();
             PostTransactionResult result =
-                this.blockingPostTx(nextNameClaimTx, kpNextClaimer.getPrivateKey());
+                this.blockingPostTx(nextNameClaimTx, kpNextClaimer.getEncodedPrivateKey());
             TransactionResult transactionResult = waitForTxMined(result.getTxHash());
             _logger.info("next claimTx result: {}", transactionResult);
             BigInteger finalBlockHeight =
@@ -455,7 +455,7 @@ public class TransactionNameServiceTest extends BaseTest {
             nameEntryResult = this.aeternityServiceNative.names.blockingGetNameId(name);
             context.assertTrue(nameEntryResult.getRootErrorMessage() == null);
             _logger.info("NameEntryResult: {}", nameEntryResult);
-            context.assertEquals(kpNextClaimer.getPublicKey(), nameEntryResult.getOwner());
+            context.assertEquals(kpNextClaimer.getAddress(), nameEntryResult.getOwner());
             _logger.info("--------------------- auctionTest ---------------------");
           } catch (Throwable e) {
             context.fail(e);

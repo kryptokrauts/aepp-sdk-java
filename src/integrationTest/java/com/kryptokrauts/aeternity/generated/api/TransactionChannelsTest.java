@@ -1,6 +1,6 @@
 package com.kryptokrauts.aeternity.generated.api;
 
-import com.kryptokrauts.aeternity.sdk.domain.secret.impl.BaseKeyPair;
+import com.kryptokrauts.aeternity.sdk.domain.secret.KeyPair;
 import com.kryptokrauts.aeternity.sdk.exception.TransactionCreateException;
 import com.kryptokrauts.aeternity.sdk.service.transaction.domain.PostTransactionResult;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.model.ChannelCreateTransactionModel;
@@ -17,17 +17,17 @@ import org.junit.runners.MethodSorters;
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class TransactionChannelsTest extends BaseTest {
 
-  BaseKeyPair initiator;
-  BaseKeyPair responder;
+  KeyPair initiator;
+  KeyPair responder;
 
   @Before
   public void initBeforeTest() {
-    initiator = keyPairService.generateBaseKeyPairFromSecret(TestConstants.BENEFICIARY_PRIVATE_KEY);
-    responder = keyPairService.generateBaseKeyPair();
+    initiator = keyPairService.recoverKeyPair(TestConstants.BENEFICIARY_PRIVATE_KEY);
+    responder = keyPairService.generateKeyPair();
   }
 
   @Test
-  public void aFundResponderAccount(TestContext context) throws TransactionCreateException {
+  public void aFundResponderKeyPair(TestContext context) throws TransactionCreateException {
     this.executeTest(
         context,
         t -> {
@@ -35,8 +35,8 @@ public class TransactionChannelsTest extends BaseTest {
             BigInteger amount = UnitConversionUtil.toAettos("10", Unit.AE).toBigInteger();
             SpendTransactionModel spendTx =
                 SpendTransactionModel.builder()
-                    .sender(initiator.getPublicKey())
-                    .recipient(responder.getPublicKey())
+                    .sender(initiator.getAddress())
+                    .recipient(responder.getAddress())
                     .amount(amount)
                     .payload("")
                     .ttl(ZERO)
@@ -59,9 +59,9 @@ public class TransactionChannelsTest extends BaseTest {
 
           ChannelCreateTransactionModel model =
               ChannelCreateTransactionModel.builder()
-                  .initiator(initiator.getPublicKey())
+                  .initiator(initiator.getAddress())
                   .initiatorAmount(amount)
-                  .responder(responder.getPublicKey())
+                  .responder(responder.getAddress())
                   .responderAmount(amount)
                   .channelReserve(ZERO)
                   .lockPeriod(ZERO)
