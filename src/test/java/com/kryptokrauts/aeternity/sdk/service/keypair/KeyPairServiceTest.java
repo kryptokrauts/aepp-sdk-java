@@ -14,6 +14,7 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import org.bouncycastle.util.encoders.Hex;
 import org.junit.Assert;
 
@@ -85,6 +86,22 @@ public class KeyPairServiceTest extends BaseTest {
                       Assert.assertEquals(firstChildAddress, restoredMasterKeyPair.getAddress());
                       Assert.assertEquals(
                           firtChildPrivateKeyAsHex, restoredMasterKeyPair.getEncodedPrivateKey());
+                    });
+                Spectrum.it(
+                    "hdKeyPair index test",
+                    () -> {
+                      List<String> mnemonic =
+                          Arrays.asList(
+                              "abandon", "abandon", "abandon", "abandon", "abandon", "abandon",
+                              "abandon", "abandon", "abandon", "abandon", "abandon", "about");
+
+                      HDWallet restoredDefault =
+                          keyPairService.recoverHDWallet(mnemonic, defaultPassword);
+
+                      IntStream.range(0, 10)
+                          .forEach(v -> keyPairService.getNextKeyPair(restoredDefault));
+
+                      Assert.assertEquals(10, restoredDefault.getLastChildKeyPair().getIndex());
                     });
                 Spectrum.it(
                     "test keys contained in hdwallet",

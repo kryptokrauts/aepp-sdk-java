@@ -50,14 +50,17 @@ public class DeterministicHierarchy {
               + " - no child keypair was generated for this index. Max child index available: "
               + (this.getChain().getChildren().size() - 1));
     }
-    return this.getChain()
-        .getChildren()
-        .get(index)
-        .getChildren()
-        .get(ADDRESS_INDEX_DEFAULT)
-        .getChildren()
-        .get(ADDRESS_INDEX_DEFAULT)
-        .getKeyPair();
+    HDKeyPair keyPair =
+        this.getChain()
+            .getChildren()
+            .get(index)
+            .getChildren()
+            .get(ADDRESS_INDEX_DEFAULT)
+            .getChildren()
+            .get(ADDRESS_INDEX_DEFAULT)
+            .getKeyPair();
+    keyPair.setIndex(index);
+    return keyPair;
   }
 
   public List<HDKeyPair> getChildKeyPairs() {
