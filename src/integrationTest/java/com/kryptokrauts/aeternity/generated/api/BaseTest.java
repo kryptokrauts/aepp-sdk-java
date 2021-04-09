@@ -26,6 +26,7 @@ import io.vertx.ext.unit.junit.Timeout;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
 import java.math.BigInteger;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 import javax.naming.ConfigurationException;
@@ -257,10 +258,14 @@ public abstract class BaseTest {
   }
 
   protected String encodeCalldata(
-      String contractSourceCode, String contractFunction, List<String> contractFunctionParams) {
+      String contractSourceCode,
+      String contractFunction,
+      List<String> contractFunctionParams,
+      Map<String, String> fileSystem) {
     return this.aeternityServiceNative
         .compiler
-        .blockingEncodeCalldata(contractSourceCode, contractFunction, contractFunctionParams)
+        .blockingEncodeCalldata(
+            contractSourceCode, contractFunction, contractFunctionParams, fileSystem)
         .getResult();
   }
 
@@ -273,7 +278,7 @@ public abstract class BaseTest {
   protected ObjectResultWrapper decodeCallResult(
       String source, String function, String callResult, String callValue) {
     return this.aeternityServiceNative.compiler.blockingDecodeCallResult(
-        source, function, callResult, callValue);
+        source, function, callResult, callValue, null);
   }
 
   protected <T> T callMethodAndAwaitException(

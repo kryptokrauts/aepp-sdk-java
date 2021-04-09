@@ -155,7 +155,8 @@ public class TransactionGeneralizedAccountsTest extends BaseTest {
               encodeCalldata(
                   TestConstants.testGABlindAuthContract,
                   "authorize",
-                  Arrays.asList(String.valueOf(new Random().nextInt())));
+                  Arrays.asList(String.valueOf(new Random().nextInt())),
+                  null);
 
           GeneralizedAccountsMetaTransactionModel gaMetaTx =
               GeneralizedAccountsMetaTransactionModel.builder()

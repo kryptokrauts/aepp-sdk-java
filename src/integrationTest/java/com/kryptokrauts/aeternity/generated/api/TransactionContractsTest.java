@@ -134,7 +134,8 @@ public class TransactionContractsTest extends BaseTest {
               encodeCalldata(
                   TestConstants.testContractSourceCode,
                   TestConstants.testContractFunction,
-                  TestConstants.testContractFunctionParams);
+                  TestConstants.testContractFunctionParams,
+                  null);
 
           DryRunTransactionResults results =
               this.aeternityServiceNative.transactions.blockingDryRunTransactions(
@@ -164,7 +165,8 @@ public class TransactionContractsTest extends BaseTest {
               encodeCalldata(
                   TestConstants.testContractSourceCode,
                   TestConstants.testContractFunction,
-                  TestConstants.testContractFunctionParams);
+                  TestConstants.testContractFunctionParams,
+                  null);
 
           DryRunTransactionResults results =
               this.aeternityServiceNative.transactions.blockingDryRunTransactions(
@@ -195,7 +197,8 @@ public class TransactionContractsTest extends BaseTest {
               encodeCalldata(
                   TestConstants.testContractSourceCode,
                   TestConstants.testContractFunction,
-                  TestConstants.testContractFunctionParams);
+                  TestConstants.testContractFunctionParams,
+                  null);
 
           DryRunTransactionResults results =
               this.aeternityServiceNative.transactions.blockingDryRunTransactions(

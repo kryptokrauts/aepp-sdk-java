@@ -143,8 +143,7 @@ public class PaymentSplitterContractTest extends BaseTest {
             context.assertEquals("ok", dryRunResult.getResult());
 
             contractCreate =
-                contractCreate
-                    .toBuilder()
+                contractCreate.toBuilder()
                     .gas(dryRunResult.getContractCallObject().getGasUsed())
                     .gasPrice(dryRunResult.getContractCallObject().getGasPrice())
                     .build();
@@ -291,7 +290,8 @@ public class PaymentSplitterContractTest extends BaseTest {
             String calldata =
                 aeternityServiceNative
                     .compiler
-                    .blockingEncodeCalldata(paymentSplitterSource, "getTotalAmountSplitted", null)
+                    .blockingEncodeCalldata(
+                        paymentSplitterSource, "getTotalAmountSplitted", null, null)
                     .getResult();
             _logger.info("Contract ID: " + localDeployedContractId);
 

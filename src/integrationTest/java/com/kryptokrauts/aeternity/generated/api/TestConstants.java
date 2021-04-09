@@ -5,7 +5,7 @@ import java.util.List;
 
 public interface TestConstants {
 
-  String testnetURL = "https://sdk-testnet.aepps.com";
+  String testnetURL = "https://testnet.aeternity.io";
 
   String testContractSourceCode = "contract Identity =\n  entrypoint main(z : int) = z";
 

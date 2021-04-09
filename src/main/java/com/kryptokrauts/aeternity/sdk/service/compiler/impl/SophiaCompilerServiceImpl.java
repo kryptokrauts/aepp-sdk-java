@@ -29,12 +29,6 @@ public final class SophiaCompilerServiceImpl implements CompilerService {
 
   @Override
   public Single<StringResultWrapper> asyncEncodeCalldata(
-      String sourceCode, String function, List<String> arguments) {
-    return this.asyncEncodeCalldata(sourceCode, function, arguments, null);
-  }
-
-  @Override
-  public Single<StringResultWrapper> asyncEncodeCalldata(
       String sourceCode, String function, List<String> arguments, Map<String, String> fileSystem) {
     return StringResultWrapper.builder()
         .build()
@@ -43,12 +37,6 @@ public final class SophiaCompilerServiceImpl implements CompilerService {
                 .rxEncodeCalldata(
                     buildFunctionCallInput(sourceCode, function, arguments, fileSystem))
                 .map(calldata -> calldata.getCalldata()));
-  }
-
-  @Override
-  public StringResultWrapper blockingEncodeCalldata(
-      String sourceCode, String function, List<String> arguments) {
-    return this.blockingEncodeCalldata(sourceCode, function, arguments, null);
   }
 
   @Override
@@ -106,12 +94,6 @@ public final class SophiaCompilerServiceImpl implements CompilerService {
 
   @Override
   public Single<ObjectResultWrapper> asyncDecodeCallResult(
-      String source, String function, String callResult, String callValue) {
-    return this.asyncDecodeCallResult(source, function, callResult, callValue, null);
-  }
-
-  @Override
-  public Single<ObjectResultWrapper> asyncDecodeCallResult(
       String source,
       String function,
       String callResult,
@@ -124,12 +106,6 @@ public final class SophiaCompilerServiceImpl implements CompilerService {
                 .rxDecodeCallResult(
                     buildDecodeBody(source, function, callResult, callValue, fileSystem))
                 .map(decodeResult -> Optional.ofNullable(decodeResult).orElse("")));
-  }
-
-  @Override
-  public ObjectResultWrapper blockingDecodeCallResult(
-      String source, String function, String callResult, String callValue) {
-    return this.blockingDecodeCallResult(source, function, callResult, callValue, null);
   }
 
   @Override

@@ -28,11 +28,11 @@ public interface BaseConstants {
   String VERTX_BASE_PATH = "basePath";
 
   // the default testnet url
-  String DEFAULT_TESTNET_URL = "https://sdk-testnet.aepps.com";
+  String DEFAULT_TESTNET_URL = "https://testnet.aeternity.io";
 
   // the default testnet compiler url
-  String DEFAULT_TESTNET_COMPILER_URL = "https://compiler.aepps.com";
+  String DEFAULT_TESTNET_COMPILER_URL = "https://compiler.aeternity.io";
 
   // the default testnet indaex url
-  String DEFAULT_TESTNET_INDAEX_URL = "https://testnet.aeternal.io/mdw";
+  String DEFAULT_TESTNET_INDAEX_URL = "https://testnet.aeternity.io/mdw";
 }
