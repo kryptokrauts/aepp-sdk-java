@@ -25,7 +25,8 @@ public class CompilerServiceTest extends BaseTest {
                   .blockingEncodeCalldata(
                       TestConstants.testContractSourceCode,
                       TestConstants.testContractFunction,
-                      TestConstants.testContractFunctionParams)
+                      TestConstants.testContractFunctionParams,
+                      null)
                   .getResult();
           context.assertEquals(TestConstants.encodedServiceCall, calldata);
         });
@@ -61,7 +62,7 @@ public class CompilerServiceTest extends BaseTest {
           String calldata =
               this.aeternityServiceNative
                   .compiler
-                  .blockingEncodeCalldata(TestConstants.testContractSourceCode, "init", null)
+                  .blockingEncodeCalldata(TestConstants.testContractSourceCode, "init", null, null)
                   .getResult();
           context.assertEquals(TestConstants.testContractCallData, calldata);
         });

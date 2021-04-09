@@ -5,15 +5,11 @@ import java.util.List;
 
 public interface TestConstants {
 
-  String aeternalTestnetURL = "https://testnet.aeternal.io";
-
   String testnetURL = "https://sdk-testnet.aepps.com";
 
   String testContractSourceCode = "contract Identity =\n  entrypoint main(z : int) = z";
 
   String testContractFunction = "main";
-
-  String testContractFunctionSophiaType = "int";
 
   String testContractFuntionParam = "42";
 

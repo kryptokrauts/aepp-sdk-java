@@ -134,7 +134,7 @@ public class TransactionSpendApiTest extends BaseTest {
 
           String signedTxNative =
               aeternityServiceNative.transactions.signTransaction(
-                  unsignedTxNative, baseKeyPair.getEncodedPrivateKey());
+                  unsignedTxNative, keyPair.getEncodedPrivateKey());
 
           PostTransactionResult txResponse =
               aeternityServiceNative.transactions.blockingPostTransaction(signedTxNative);
@@ -160,12 +160,12 @@ public class TransactionSpendApiTest extends BaseTest {
             KeyPair recipient = keyPairService.generateKeyPair();
             SpendTransactionModel spendTx =
                 SpendTransactionModel.builder()
-                    .sender(this.baseKeyPair.getAddress())
+                    .sender(this.keyPair.getAddress())
                     .recipient(recipient.getAddress())
                     .amount(new BigInteger("1000000000000000000"))
                     .payload("donation")
                     .ttl(ZERO)
-                    .nonce(getNextBaseKeypairNonce())
+                    .nonce(getNextKeypairNonce())
                     .build();
             PostTransactionResult txResponse =
                 aeternityServiceNative.transactions.blockingPostTransaction(spendTx);
@@ -188,12 +188,12 @@ public class TransactionSpendApiTest extends BaseTest {
             KeyPair recipient = keyPairService.generateKeyPair();
             SpendTransactionModel spendTx =
                 SpendTransactionModel.builder()
-                    .sender(this.baseKeyPair.getAddress())
+                    .sender(this.keyPair.getAddress())
                     .recipient(recipient.getAddress())
                     .amount(new BigInteger("1000000000000000000"))
                     .payload("donation")
                     .ttl(ZERO)
-                    .nonce(getNextBaseKeypairNonce())
+                    .nonce(getNextKeypairNonce())
                     .build();
             PostTransactionResult txResponse =
                 aeternityServiceNative.transactions.blockingPostTransaction(spendTx);
@@ -208,7 +208,7 @@ public class TransactionSpendApiTest extends BaseTest {
             spendTx =
                 SpendTransactionModel.builder()
                     .sender(recipient.getAddress())
-                    .recipient(baseKeyPair.getAddress())
+                    .recipient(keyPair.getAddress())
                     .amount(BigInteger.valueOf(recipientAccountSendAmount))
                     .nonce(recipientAccount.getNonce().add(ONE))
                     .ttl(ZERO)
@@ -243,12 +243,12 @@ public class TransactionSpendApiTest extends BaseTest {
             KeyPair recipient = keyPairService.generateKeyPair();
             SpendTransactionModel spendTx =
                 SpendTransactionModel.builder()
-                    .sender(this.baseKeyPair.getAddress())
+                    .sender(this.keyPair.getAddress())
                     .recipient(recipient.getAddress())
                     .amount(new BigInteger("1000000000000000000"))
                     .payload("wait for confirmation works =)")
                     .ttl(ZERO)
-                    .nonce(getNextBaseKeypairNonce())
+                    .nonce(getNextKeypairNonce())
                     .build();
             Single<PostTransactionResult> postTransactionResultSingle =
                 aeternityServiceNative.transactions.asyncPostTransaction(spendTx);
@@ -291,12 +291,12 @@ public class TransactionSpendApiTest extends BaseTest {
             KeyPair recipient = keyPairService.generateKeyPair();
             SpendTransactionModel spendTx =
                 SpendTransactionModel.builder()
-                    .sender(this.baseKeyPair.getAddress())
+                    .sender(this.keyPair.getAddress())
                     .recipient(recipient.getAddress())
                     .amount(new BigInteger("1000000000000000000"))
                     .payload("wait for confirmation fails :-(")
                     .ttl(ZERO)
-                    .nonce(getNextBaseKeypairNonce())
+                    .nonce(getNextKeypairNonce())
                     .build();
             String computedTxHash = aeternityServiceNative.transactions.computeTxHash(spendTx);
             _logger.info("Computed txHash: " + computedTxHash);

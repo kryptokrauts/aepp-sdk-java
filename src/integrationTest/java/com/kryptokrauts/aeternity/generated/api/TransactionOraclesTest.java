@@ -48,10 +48,10 @@ public class TransactionOraclesTest extends BaseTest {
             SpendTransactionModel spendTx =
                 SpendTransactionModel.builder()
                     .amount(amount)
-                    .sender(baseKeyPair.getAddress())
+                    .sender(keyPair.getAddress())
                     .recipient(oracleKeyPair.getAddress())
                     .ttl(ZERO)
-                    .nonce(getNextBaseKeypairNonce())
+                    .nonce(getNextKeypairNonce())
                     .build();
             PostTransactionResult postResult = this.blockingPostTx(spendTx);
             _logger.info(postResult.getTxHash());
@@ -100,10 +100,10 @@ public class TransactionOraclesTest extends BaseTest {
         context,
         t -> {
           try {
-            BigInteger nonce = getNextBaseKeypairNonce();
+            BigInteger nonce = getNextKeypairNonce();
             OracleQueryTransactionModel oracleQueryTx =
                 OracleQueryTransactionModel.builder()
-                    .senderId(baseKeyPair.getAddress())
+                    .senderId(keyPair.getAddress())
                     .oracleId(oracleId)
                     .nonce(nonce)
                     .query(queryString)
@@ -115,9 +115,9 @@ public class TransactionOraclesTest extends BaseTest {
                     .build();
 
             PostTransactionResult postResult =
-                this.blockingPostTx(oracleQueryTx, baseKeyPair.getEncodedPrivateKey());
+                this.blockingPostTx(oracleQueryTx, keyPair.getEncodedPrivateKey());
             _logger.info(postResult.getTxHash());
-            queryId = EncodingUtils.queryId(baseKeyPair.getAddress(), nonce, oracleId);
+            queryId = EncodingUtils.queryId(keyPair.getAddress(), nonce, oracleId);
             OracleQueryResult oracleQuery =
                 this.aeternityServiceNative.oracles.blockingGetOracleQuery(oracleId, queryId);
             _logger.debug(oracleQuery.toString());

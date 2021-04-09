@@ -1,6 +1,5 @@
 package com.kryptokrauts.aeternity.generated.api;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kryptokrauts.aeternity.sdk.constants.Network;
 import com.kryptokrauts.aeternity.sdk.constants.VirtualMachine;
 import com.kryptokrauts.aeternity.sdk.domain.ObjectResultWrapper;
@@ -65,9 +64,7 @@ public abstract class BaseTest {
 
   protected AeternityService aeternityServiceDebug;
 
-  protected ObjectMapper objectMapper = new ObjectMapper();
-
-  protected KeyPair baseKeyPair;
+  protected KeyPair keyPair;
 
   @Rule
   public RunTestOnContext rule =
@@ -87,7 +84,7 @@ public abstract class BaseTest {
 
     keyPairService = new KeyPairServiceFactory().getService();
 
-    baseKeyPair = keyPairService.recoverKeyPair(TestConstants.BENEFICIARY_PRIVATE_KEY);
+    keyPair = keyPairService.recoverKeyPair(TestConstants.BENEFICIARY_PRIVATE_KEY);
 
     aeternityServiceNative =
         new AeternityServiceFactory()
@@ -98,7 +95,7 @@ public abstract class BaseTest {
                     .indaexBaseUrl(getIndaexBaseUrl())
                     .network(Network.LOCAL_IRIS_NETWORK)
                     .nativeMode(true)
-                    .baseKeyPair(baseKeyPair)
+                    .keyPair(keyPair)
                     .vertx(vertx)
                     .targetVM(targetVM)
                     .millisBetweenTrailsToWaitForConfirmation(500l)
@@ -112,7 +109,7 @@ public abstract class BaseTest {
                     .indaexBaseUrl(getIndaexBaseUrl())
                     .network(Network.LOCAL_IRIS_NETWORK)
                     .nativeMode(false)
-                    .baseKeyPair(baseKeyPair)
+                    .keyPair(keyPair)
                     .vertx(vertx)
                     .targetVM(targetVM)
                     .compile());
@@ -161,8 +158,8 @@ public abstract class BaseTest {
         "-----------------------------------------------------------------------------------");
   }
 
-  protected BigInteger getNextBaseKeypairNonce() {
-    return getAccount(this.baseKeyPair.getAddress()).getNonce().add(ONE);
+  protected BigInteger getNextKeypairNonce() {
+    return getAccount(this.keyPair.getAddress()).getNonce().add(ONE);
   }
 
   protected AccountResult getAccount(String publicKey) {
@@ -185,7 +182,7 @@ public abstract class BaseTest {
   protected PostTransactionResult blockingPostTx(AbstractTransactionModel<?> tx, String privateKey)
       throws Throwable {
     if (privateKey == null) {
-      privateKey = this.baseKeyPair.getEncodedPrivateKey();
+      privateKey = this.keyPair.getEncodedPrivateKey();
     }
     PostTransactionResult postTxResponse =
         this.aeternityServiceNative.transactions.blockingPostTransaction(tx, privateKey);
