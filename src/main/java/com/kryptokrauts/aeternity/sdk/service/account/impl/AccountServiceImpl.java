@@ -20,7 +20,7 @@ public final class AccountServiceImpl implements AccountService {
   public Single<AccountResult> asyncGetAccount() {
     return AccountResult.builder()
         .build()
-        .asyncGet(externalApi.rxGetAccountByPubkey(config.getBaseKeyPair().getAddress()));
+        .asyncGet(externalApi.rxGetAccountByPubkey(config.getKeyPair().getAddress()));
   }
 
   @Override
@@ -34,7 +34,7 @@ public final class AccountServiceImpl implements AccountService {
   public AccountResult blockingGetAccount() {
     return AccountResult.builder()
         .build()
-        .blockingGet(externalApi.rxGetAccountByPubkey(config.getBaseKeyPair().getAddress()));
+        .blockingGet(externalApi.rxGetAccountByPubkey(config.getKeyPair().getAddress()));
   }
 
   @Override

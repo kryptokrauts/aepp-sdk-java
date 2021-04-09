@@ -42,7 +42,6 @@ public class TransactionGeneralizedAccountsTest extends BaseTest {
                   .sender(account.getPublicKey())
                   .recipient(gaAccountKeyPair.getAddress())
                   .amount(amount)
-                  .payload("")
                   .ttl(ZERO)
                   .nonce(nonce)
                   .build();

@@ -36,7 +36,7 @@ public class TransactionContractsTest extends BaseTest {
     this.executeTest(
         context,
         t -> {
-          String ownerId = baseKeyPair.getAddress();
+          String ownerId = keyPair.getAddress();
           BigInteger amount = BigInteger.valueOf(100);
           BigInteger deposit = BigInteger.valueOf(100);
           BigInteger ttl = BigInteger.valueOf(20000l);
@@ -53,7 +53,7 @@ public class TransactionContractsTest extends BaseTest {
                   .fee(fee)
                   .gas(gas)
                   .gasPrice(gasPrice)
-                  .nonce(getNextBaseKeypairNonce())
+                  .nonce(getNextKeypairNonce())
                   .ownerId(ownerId)
                   .ttl(ttl)
                   .virtualMachine(targetVM)
@@ -82,11 +82,11 @@ public class TransactionContractsTest extends BaseTest {
     this.executeTest(
         context,
         t -> {
-          String callerId = baseKeyPair.getAddress();
+          String callerId = keyPair.getAddress();
           BigInteger ttl = BigInteger.valueOf(20000);
           BigInteger gas = BigInteger.valueOf(1000);
           BigInteger gasPrice = BigInteger.valueOf(1000000000);
-          BigInteger nonce = getNextBaseKeypairNonce();
+          BigInteger nonce = getNextKeypairNonce();
           String callContractCalldata = TestConstants.encodedServiceCall;
 
           ContractCallTransactionModel callTx =
@@ -127,7 +127,7 @@ public class TransactionContractsTest extends BaseTest {
     this.executeTest(
         context,
         t -> {
-          BigInteger nonce = getNextBaseKeypairNonce();
+          BigInteger nonce = getNextKeypairNonce();
 
           // Compile the call contract
           String calldata =
@@ -140,10 +140,8 @@ public class TransactionContractsTest extends BaseTest {
               this.aeternityServiceNative.transactions.blockingDryRunTransactions(
                   DryRunRequest.builder()
                       .build()
-                      .account(
-                          DryRunAccountModel.builder().publicKey(baseKeyPair.getAddress()).build())
-                      .account(
-                          DryRunAccountModel.builder().publicKey(baseKeyPair.getAddress()).build())
+                      .account(DryRunAccountModel.builder().publicKey(keyPair.getAddress()).build())
+                      .account(DryRunAccountModel.builder().publicKey(keyPair.getAddress()).build())
                       .transactionInputItem(
                           createUnsignedContractCallTx(context, nonce, calldata, null))
                       .transactionInputItem(
@@ -172,8 +170,7 @@ public class TransactionContractsTest extends BaseTest {
               this.aeternityServiceNative.transactions.blockingDryRunTransactions(
                   DryRunRequest.builder()
                       .build()
-                      .account(
-                          DryRunAccountModel.builder().publicKey(baseKeyPair.getAddress()).build())
+                      .account(DryRunAccountModel.builder().publicKey(keyPair.getAddress()).build())
                       .transactionInputItem(
                           createUnsignedContractCallTx(context, ONE, calldata, null)));
 
@@ -204,11 +201,10 @@ public class TransactionContractsTest extends BaseTest {
               this.aeternityServiceNative.transactions.blockingDryRunTransactions(
                   DryRunRequest.builder()
                       .build()
-                      .account(
-                          DryRunAccountModel.builder().publicKey(baseKeyPair.getAddress()).build())
+                      .account(DryRunAccountModel.builder().publicKey(keyPair.getAddress()).build())
                       .transactionInputItem(
                           createUnsignedContractCallTx(
-                              context, getNextBaseKeypairNonce(), calldata, null)));
+                              context, getNextKeypairNonce(), calldata, null)));
 
           _logger.info("callContractAfterDryRunOnLocalNode: " + results.toString());
 
@@ -221,8 +217,8 @@ public class TransactionContractsTest extends BaseTest {
                     .contractId(localDeployedContractId)
                     .gas(result.getContractCallObject().getGasUsed())
                     .gasPrice(result.getContractCallObject().getGasPrice())
-                    .nonce(getNextBaseKeypairNonce())
-                    .callerId(baseKeyPair.getAddress())
+                    .nonce(getNextKeypairNonce())
+                    .callerId(keyPair.getAddress())
                     .ttl(ZERO)
                     .virtualMachine(targetVM)
                     .build();
@@ -264,7 +260,7 @@ public class TransactionContractsTest extends BaseTest {
 
   private ContractCallTransactionModel createCallContractModel(
       BigInteger nonce, String calldata, BigInteger gasPrice) {
-    String callerId = baseKeyPair.getAddress();
+    String callerId = keyPair.getAddress();
     BigInteger ttl = BigInteger.ZERO;
     BigInteger gas = BigInteger.valueOf(1579000);
     ContractCallTransactionModel model =
@@ -298,8 +294,8 @@ public class TransactionContractsTest extends BaseTest {
                   .deposit(ZERO)
                   .gas(gas)
                   .gasPrice(gasPrice)
-                  .nonce(getNextBaseKeypairNonce())
-                  .ownerId(baseKeyPair.getAddress())
+                  .nonce(getNextKeypairNonce())
+                  .ownerId(keyPair.getAddress())
                   .ttl(ZERO)
                   .virtualMachine(targetVM)
                   .build();
@@ -327,11 +323,12 @@ public class TransactionContractsTest extends BaseTest {
                   .blockingEncodeCalldata(
                       TestConstants.testContractSourceCode,
                       TestConstants.testContractFunction,
-                      TestConstants.testContractFunctionParams)
+                      TestConstants.testContractFunctionParams,
+                      null)
                   .getResult();
 
           // post the signed contract call tx
-          BigInteger nonceToVerifyHash = getNextBaseKeypairNonce();
+          BigInteger nonceToVerifyHash = getNextKeypairNonce();
           PostTransactionResult result =
               this.aeternityServiceNative.transactions.blockingPostTransaction(
                   createCallContractModel(nonceToVerifyHash, callData, null));
@@ -365,7 +362,7 @@ public class TransactionContractsTest extends BaseTest {
       throws TransactionCreateException {
     // needs to be set before executing the test
     String privateKey = "";
-    baseKeyPair = keyPairService.recoverKeyPair(privateKey);
+    keyPair = keyPairService.recoverKeyPair(privateKey);
 
     AeternityService testnetService =
         new AeternityService(
@@ -375,13 +372,13 @@ public class TransactionContractsTest extends BaseTest {
                 .vertx(rule.vertx())
                 .compile());
 
-    String ownerId = baseKeyPair.getAddress();
+    String ownerId = keyPair.getAddress();
     BigInteger amount = BigInteger.ZERO;
     BigInteger deposit = BigInteger.ZERO;
     BigInteger ttl = BigInteger.ZERO;
     BigInteger gas = BigInteger.valueOf(1000);
     BigInteger gasPrice = BigInteger.valueOf(1100000000);
-    BigInteger nonce = getNextBaseKeypairNonce();
+    BigInteger nonce = getNextKeypairNonce();
 
     ContractCreateTransactionModel testnetCreateTx =
         ContractCreateTransactionModel.builder()

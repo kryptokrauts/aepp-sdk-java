@@ -53,7 +53,7 @@ public class ServiceConfiguration {
 
   @Getter @Default @Nonnull protected VirtualMachine targetVM = VirtualMachine.FATE;
 
-  private KeyPair baseKeyPair;
+  private KeyPair keyPair;
 
   /** the vertx instance */
   protected Vertx vertx;
@@ -114,11 +114,11 @@ public class ServiceConfiguration {
           "Cannot instantiate ApiClient due to missing params vertx and or indaexBaseUrl");
   }
 
-  public KeyPair getBaseKeyPair() {
-    if (baseKeyPair == null) {
+  public KeyPair getKeyPair() {
+    if (keyPair == null) {
       throw new InvalidParameterException(
           "Service call was initiated which needs the baseKeyPair but none is set in ServiceConfiguration.baseKeyPair - check parameters");
     }
-    return baseKeyPair;
+    return keyPair;
   }
 }

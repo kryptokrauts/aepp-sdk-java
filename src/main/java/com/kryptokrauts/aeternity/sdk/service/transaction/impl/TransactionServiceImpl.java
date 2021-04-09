@@ -71,7 +71,7 @@ public class TransactionServiceImpl implements TransactionService {
 
   @Override
   public Single<PostTransactionResult> asyncPostTransaction(AbstractTransactionModel<?> tx) {
-    return this.asyncPostTransaction(tx, this.config.getBaseKeyPair().getEncodedPrivateKey());
+    return this.asyncPostTransaction(tx, this.config.getKeyPair().getEncodedPrivateKey());
   }
 
   @Override
@@ -90,7 +90,7 @@ public class TransactionServiceImpl implements TransactionService {
 
   @Override
   public PostTransactionResult blockingPostTransaction(AbstractTransactionModel<?> tx) {
-    return this.blockingPostTransaction(tx, this.config.getBaseKeyPair().getEncodedPrivateKey());
+    return this.blockingPostTransaction(tx, this.config.getKeyPair().getEncodedPrivateKey());
   }
 
   @Override
@@ -138,7 +138,7 @@ public class TransactionServiceImpl implements TransactionService {
         EncodingUtils.decodeCheckWithIdentifier(
             signTransaction(
                 blockingCreateUnsignedTransaction(tx).getResult(),
-                this.config.getBaseKeyPair().getEncodedPrivateKey()));
+                this.config.getKeyPair().getEncodedPrivateKey()));
     return EncodingUtils.hashEncode(signed, ApiIdentifiers.TRANSACTION_HASH);
   }
 

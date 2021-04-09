@@ -98,7 +98,8 @@ public class PaymentSplitterContractTest extends BaseTest {
                     .blockingEncodeCalldata(
                         paymentSplitterSource,
                         "init",
-                        Arrays.asList(generateMapParam(initialWeights)))
+                        Arrays.asList(generateMapParam(initialWeights)),
+                        null)
                     .getResult();
 
             _logger.info("contract bytecode: " + byteCode);
@@ -115,8 +116,8 @@ public class PaymentSplitterContractTest extends BaseTest {
                     .deposit(ZERO)
                     .gas(gas)
                     .gasPrice(gasPrice)
-                    .nonce(getNextBaseKeypairNonce())
-                    .ownerId(baseKeyPair.getAddress())
+                    .nonce(getNextKeypairNonce())
+                    .ownerId(keyPair.getAddress())
                     .ttl(ZERO)
                     .virtualMachine(targetVM)
                     .build();
@@ -133,9 +134,7 @@ public class PaymentSplitterContractTest extends BaseTest {
                     DryRunRequest.builder()
                         .build()
                         .account(
-                            DryRunAccountModel.builder()
-                                .publicKey(baseKeyPair.getAddress())
-                                .build())
+                            DryRunAccountModel.builder().publicKey(keyPair.getAddress()).build())
                         .transactionInputItem(unsignedTx));
 
             _logger.info("callContractAfterDryRunOnLocalNode: " + dryRunResults.toString());
@@ -195,7 +194,7 @@ public class PaymentSplitterContractTest extends BaseTest {
             String calldata =
                 aeternityServiceNative
                     .compiler
-                    .blockingEncodeCalldata(paymentSplitterSource, "payAndSplit", null)
+                    .blockingEncodeCalldata(paymentSplitterSource, "payAndSplit", null, null)
                     .getResult();
             _logger.info("Contract ID: " + localDeployedContractId);
 
@@ -204,9 +203,7 @@ public class PaymentSplitterContractTest extends BaseTest {
                     DryRunRequest.builder()
                         .build()
                         .account(
-                            DryRunAccountModel.builder()
-                                .publicKey(baseKeyPair.getAddress())
-                                .build())
+                            DryRunAccountModel.builder().publicKey(keyPair.getAddress()).build())
                         .transactionInputItem(
                             ContractCallTransactionModel.builder()
                                 .callData(calldata)
@@ -214,8 +211,8 @@ public class PaymentSplitterContractTest extends BaseTest {
                                 .contractId(localDeployedContractId)
                                 .gasPrice(BigInteger.valueOf(BaseConstants.MINIMAL_GAS_PRICE))
                                 .amount(paymentValue.toBigInteger())
-                                .nonce(getNextBaseKeypairNonce())
-                                .callerId(baseKeyPair.getAddress())
+                                .nonce(getNextKeypairNonce())
+                                .callerId(keyPair.getAddress())
                                 .ttl(ZERO)
                                 .virtualMachine(targetVM)
                                 .build()));
@@ -237,8 +234,8 @@ public class PaymentSplitterContractTest extends BaseTest {
                      * <p>.gasPrice(dryRunResult.getContractCallObject().getGasPrice())
                      */
                     .gasPrice(BigInteger.valueOf(BaseConstants.MINIMAL_GAS_PRICE))
-                    .nonce(getNextBaseKeypairNonce())
-                    .callerId(baseKeyPair.getAddress())
+                    .nonce(getNextKeypairNonce())
+                    .callerId(keyPair.getAddress())
                     .ttl(BigInteger.ZERO)
                     .amount(paymentValue.toBigInteger())
                     .virtualMachine(targetVM)
@@ -303,9 +300,7 @@ public class PaymentSplitterContractTest extends BaseTest {
                     DryRunRequest.builder()
                         .build()
                         .account(
-                            DryRunAccountModel.builder()
-                                .publicKey(baseKeyPair.getAddress())
-                                .build())
+                            DryRunAccountModel.builder().publicKey(keyPair.getAddress()).build())
                         .transactionInputItem(
                             ContractCallTransactionModel.builder()
                                 .callData(calldata)
@@ -313,8 +308,8 @@ public class PaymentSplitterContractTest extends BaseTest {
                                 .contractId(localDeployedContractId)
                                 .gasPrice(BigInteger.valueOf(BaseConstants.MINIMAL_GAS_PRICE))
                                 .amount(paymentValue.toBigInteger())
-                                .nonce(getNextBaseKeypairNonce())
-                                .callerId(baseKeyPair.getAddress())
+                                .nonce(getNextKeypairNonce())
+                                .callerId(keyPair.getAddress())
                                 .ttl(ZERO)
                                 .virtualMachine(targetVM)
                                 .build()));
@@ -348,7 +343,7 @@ public class PaymentSplitterContractTest extends BaseTest {
             String calldata =
                 aeternityServiceNative
                     .compiler
-                    .blockingEncodeCalldata(paymentSplitterSource, "getOwner", null)
+                    .blockingEncodeCalldata(paymentSplitterSource, "getOwner", null, null)
                     .getResult();
             _logger.info("Contract ID: " + localDeployedContractId);
 
@@ -357,9 +352,7 @@ public class PaymentSplitterContractTest extends BaseTest {
                     DryRunRequest.builder()
                         .build()
                         .account(
-                            DryRunAccountModel.builder()
-                                .publicKey(baseKeyPair.getAddress())
-                                .build())
+                            DryRunAccountModel.builder().publicKey(keyPair.getAddress()).build())
                         .transactionInputItem(
                             ContractCallTransactionModel.builder()
                                 .callData(calldata)
@@ -367,8 +360,8 @@ public class PaymentSplitterContractTest extends BaseTest {
                                 .contractId(localDeployedContractId)
                                 .gasPrice(BigInteger.valueOf(BaseConstants.MINIMAL_GAS_PRICE))
                                 .amount(paymentValue.toBigInteger())
-                                .nonce(getNextBaseKeypairNonce())
-                                .callerId(baseKeyPair.getAddress())
+                                .nonce(getNextKeypairNonce())
+                                .callerId(keyPair.getAddress())
                                 .ttl(ZERO)
                                 .virtualMachine(targetVM)
                                 .build()));

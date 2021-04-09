@@ -13,8 +13,7 @@ public class AccountServiceTest extends BaseTest {
         context,
         t -> {
           AccountResult result =
-              this.aeternityServiceNative.accounts.blockingGetAccount(
-                  this.baseKeyPair.getAddress());
+              this.aeternityServiceNative.accounts.blockingGetAccount(this.keyPair.getAddress());
           context.assertTrue(result.getBalance().compareTo(ZERO) == 1);
         });
   }

@@ -38,9 +38,8 @@ public class TransactionChannelsTest extends BaseTest {
                     .sender(initiator.getAddress())
                     .recipient(responder.getAddress())
                     .amount(amount)
-                    .payload("")
                     .ttl(ZERO)
-                    .nonce(getNextBaseKeypairNonce())
+                    .nonce(getNextKeypairNonce())
                     .build();
             PostTransactionResult txResponse = this.blockingPostTx(spendTx);
             context.assertNotNull(txResponse);
@@ -67,7 +66,7 @@ public class TransactionChannelsTest extends BaseTest {
                   .lockPeriod(ZERO)
                   .ttl(ZERO)
                   .stateHash("")
-                  .nonce(getNextBaseKeypairNonce())
+                  .nonce(getNextKeypairNonce())
                   .build();
           String txResponse =
               aeternityServiceNative
