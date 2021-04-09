@@ -143,7 +143,8 @@ public class PaymentSplitterContractTest extends BaseTest {
             context.assertEquals("ok", dryRunResult.getResult());
 
             contractCreate =
-                contractCreate.toBuilder()
+                contractCreate
+                    .toBuilder()
                     .gas(dryRunResult.getContractCallObject().getGasUsed())
                     .gasPrice(dryRunResult.getContractCallObject().getGasPrice())
                     .build();
