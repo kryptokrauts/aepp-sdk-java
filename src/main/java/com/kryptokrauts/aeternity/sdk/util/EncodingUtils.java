@@ -238,10 +238,20 @@ public final class EncodingUtils {
    *     false if the address is invalid
    */
   public static final boolean isAddressValid(final String address) {
+    return hasValidType(address, ApiIdentifiers.ACCOUNT_PUBKEY);
+  }
+
+  /**
+   * check if given value is correct according to type
+   *
+   * @param value
+   * @param type
+   * @return
+   */
+  public static final boolean hasValidType(final String value, final String type) {
     boolean isValid;
     try {
-      isValid =
-          decodeBase58Check(assertedType(address, ApiIdentifiers.ACCOUNT_PUBKEY)).length == 32;
+      isValid = decodeBase58Check(assertedType(value, type)).length == 32;
     } catch (Exception e) {
       isValid = false;
     }
