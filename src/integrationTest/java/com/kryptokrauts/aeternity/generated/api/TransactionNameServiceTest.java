@@ -20,6 +20,7 @@ import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.Random;
 import org.junit.FixMethodOrder;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
 
@@ -198,6 +199,8 @@ public class TransactionNameServiceTest extends BaseTest {
             String channelPointer = keyPair.getAddress().replace("ak_", "ch_");
             String oraclePointer = keyPair.getOracleAddress();
 
+            KeyPair anotherKeyPair = keyPairService.generateKeyPair();
+
             NameUpdateTransactionModel nameUpdateTx =
                 NameUpdateTransactionModel.builder()
                     .accountId(keyPair.getAddress())
@@ -213,6 +216,14 @@ public class TransactionNameServiceTest extends BaseTest {
                             put(AENS.POINTER_KEY_CHANNEL, channelPointer);
                             put(AENS.POINTER_KEY_CONTRACT, contractPointer);
                             put(AENS.POINTER_KEY_ORACLE, oraclePointer);
+                            put("arbitrary-account-pointer-key", anotherKeyPair.getAddress());
+                            put(
+                                "arbitrary-channel-pointer-key",
+                                anotherKeyPair.getAddress().replace("ak_", "ch_"));
+                            put(
+                                "arbitrary-contract-pointer-key",
+                                anotherKeyPair.getContractAddress());
+                            put("arbitrary-oracle-pointer-key", anotherKeyPair.getOracleAddress());
                           }
                         })
                     .build();
@@ -314,6 +325,7 @@ public class TransactionNameServiceTest extends BaseTest {
    * @param context
    * @throws Throwable
    */
+  @Ignore
   @Test
   public void zAuctionTest(TestContext context) {
     this.executeTest(
@@ -436,8 +448,7 @@ public class TransactionNameServiceTest extends BaseTest {
             AccountResult otherAccount =
                 this.aeternityServiceNative.accounts.blockingGetAccount(recipient);
             NameClaimTransactionModel nextNameClaimTx =
-                nameClaimTx
-                    .toBuilder()
+                nameClaimTx.toBuilder()
                     .accountId(recipient)
                     .nonce(otherAccount.getNonce().add(BigInteger.ONE))
                     .nameFee(nextNameFee)
