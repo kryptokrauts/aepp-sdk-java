@@ -2,7 +2,7 @@ package com.kryptokrauts.aeternity.sdk.service.name.domain;
 
 import com.kryptokrauts.aeternity.generated.model.NameEntry;
 import com.kryptokrauts.aeternity.generated.model.NamePointer;
-import com.kryptokrauts.aeternity.sdk.constants.ApiIdentifiers;
+import com.kryptokrauts.aeternity.sdk.constants.AENS;
 import com.kryptokrauts.aeternity.sdk.domain.GenericResultObject;
 import java.math.BigInteger;
 import java.util.Collections;
@@ -25,24 +25,30 @@ public class NameEntryResult extends GenericResultObject<NameEntry, NameEntryRes
   private Map<String, String> pointers;
 
   public Optional<String> getAccountPointer() {
-    return pointers.values().stream()
-        .filter(p -> p.startsWith(ApiIdentifiers.ACCOUNT_PUBKEY))
+    return pointers.entrySet().stream()
+        .filter(e -> e.getKey().equals(AENS.POINTER_KEY_ACCOUNT))
+        .map(e -> e.getValue())
         .findFirst();
   }
 
   public Optional<String> getChannelPointer() {
-    return pointers.values().stream().filter(p -> p.startsWith(ApiIdentifiers.CHANNEL)).findFirst();
+    return pointers.entrySet().stream()
+        .filter(e -> e.getKey().equals(AENS.POINTER_KEY_CHANNEL))
+        .map(e -> e.getValue())
+        .findFirst();
   }
 
   public Optional<String> getContractPointer() {
-    return pointers.values().stream()
-        .filter(p -> p.startsWith(ApiIdentifiers.CONTRACT_PUBKEY))
+    return pointers.entrySet().stream()
+        .filter(e -> e.getKey().equals(AENS.POINTER_KEY_CONTRACT))
+        .map(e -> e.getValue())
         .findFirst();
   }
 
   public Optional<String> getOraclePointer() {
-    return pointers.values().stream()
-        .filter(p -> p.startsWith(ApiIdentifiers.ORACLE_PUBKEY))
+    return pointers.entrySet().stream()
+        .filter(e -> e.getKey().equals(AENS.POINTER_KEY_ORACLE))
+        .map(e -> e.getValue())
         .findFirst();
   }
 

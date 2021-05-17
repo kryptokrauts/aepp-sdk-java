@@ -20,7 +20,6 @@ import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.Random;
 import org.junit.FixMethodOrder;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
 
@@ -244,6 +243,10 @@ public class TransactionNameServiceTest extends BaseTest {
             context.assertEquals(channelPointer, nameEntryResult.getChannelPointer().get());
             context.assertEquals(contractPointer, nameEntryResult.getContractPointer().get());
             context.assertEquals(oraclePointer, nameEntryResult.getOraclePointer().get());
+            context.assertEquals(
+                anotherKeyPair.getAddress(),
+                nameEntryResult.getPointers().get("arbitrary-account-pointer-key"));
+            context.assertTrue(nameEntryResult.getPointers().size() == 8);
             BigInteger updatedTTL = nameEntryResult.getTtl();
             // subtract 170000 because initial default ttl is 180000 and
             // updated ttl was 10000
@@ -325,7 +328,6 @@ public class TransactionNameServiceTest extends BaseTest {
    * @param context
    * @throws Throwable
    */
-  @Ignore
   @Test
   public void zAuctionTest(TestContext context) {
     this.executeTest(
