@@ -1,7 +1,7 @@
 swagger: '2.0'
 info:
   description: 'This is the [Aeternity](https://www.aeternity.com/) node API.'
-  version: 5.0.0-rc.2
+  version: x.y.z
   title: Aeternity node
   termsOfService: 'https://www.aeternity.com/terms/'
   contact:
@@ -537,6 +537,33 @@ paths:
             $ref: '#/definitions/Error'
         '404':
           description: 'Account not found or hash not available'
+          schema:
+            $ref: '#/definitions/Error'
+  /dry-run:
+    post:
+      tags:
+        - external
+        - dry-run
+      operationId: 'ProtectedDryRunTxs'
+      description: 'Dry-run transactions on top of a given block. Supports all TXs except GAMetaTx, PayingForTx and OffchainTx. The maximum gas limit of all calls is capped. The maximum gas limit per request is a global node setting. Since DryRunCallReq object do not have a mandatory gas field, if not set a default value of 1000000 is being used instead.'
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: body
+          description: transactions
+          required: true
+          schema:
+            $ref: '#/definitions/DryRunInput'
+      responses:
+        '200':
+          description: Dry-run result
+          schema:
+            $ref: '#/definitions/DryRunResults'
+        '403':
+          description: Invalid input
           schema:
             $ref: '#/definitions/Error'
   /accounts/{pubkey}/transactions/pending:
@@ -1655,7 +1682,7 @@ paths:
         - internal
         - debug
       operationId: 'DryRunTxs'
-      description: 'Dry-run transactions on top of a given block. Supports all TXs except GAMetaTx, PayingForTx and OffchainTx'
+      description: 'Dry-run transactions on top of a given block. Supports all TXs except GAMetaTx, PayingForTx and OffchainTx.'
       consumes:
         - application/json
       produces:
