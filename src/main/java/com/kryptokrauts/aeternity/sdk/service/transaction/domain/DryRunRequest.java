@@ -1,11 +1,9 @@
 package com.kryptokrauts.aeternity.sdk.service.transaction.domain;
 
 import com.kryptokrauts.aeternity.generated.model.DryRunInput;
-import com.kryptokrauts.aeternity.sdk.constants.BaseConstants;
 import com.kryptokrauts.aeternity.sdk.domain.GenericInputObject;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.model.ContractCallTransactionModel;
 import com.kryptokrauts.aeternity.sdk.util.ValidationUtil;
-import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
@@ -102,7 +100,7 @@ public class DryRunRequest extends GenericInputObject<DryRunInput> {
                       .calldata(contractCallModel.getCallData())
                       .caller(contractCallModel.getCallerId())
                       .contract(contractCallModel.getContractId())
-                      .gas(BigInteger.valueOf(BaseConstants.MINIMAL_GAS_PRICE))
+                      .gas(contractCallModel.getGas())
                       .abiVersion(contractCallModel.getVirtualMachine().getAbiVersion())
                       .nonce(contractCallModel.getNonce())
                       .build())
