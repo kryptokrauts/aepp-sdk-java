@@ -64,7 +64,7 @@ public class TransactionGeneralizedAccountsTest extends BaseTest {
                   Collections.emptyMap());
           String callData = resultWrapper.getResult();
 
-          BigInteger gas = BigInteger.valueOf(4800000);
+          BigInteger gas = BigInteger.valueOf(800000);
           BigInteger gasPrice = BigInteger.valueOf(BaseConstants.MINIMAL_GAS_PRICE);
           GeneralizedAccountsAttachTransactionModel gaAttachTx =
               GeneralizedAccountsAttachTransactionModel.builder()
