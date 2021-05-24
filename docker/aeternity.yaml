@@ -3,7 +3,6 @@ peers: [ ]
 http:
   external:
     port: 3013
-    gas_limit: 100000000000
   internal:
     port: 3113
     listen_address: 0.0.0.0
