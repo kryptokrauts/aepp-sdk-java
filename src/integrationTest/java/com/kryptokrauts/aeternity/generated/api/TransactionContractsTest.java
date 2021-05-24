@@ -265,7 +265,7 @@ public class TransactionContractsTest extends BaseTest {
       BigInteger nonce, String calldata, BigInteger gasPrice) {
     String callerId = keyPair.getAddress();
     BigInteger ttl = BigInteger.ZERO;
-    BigInteger gas = BigInteger.valueOf(1579000);
+    BigInteger gas = BigInteger.valueOf(1000000);
     ContractCallTransactionModel model =
         ContractCallTransactionModel.builder()
             .callData(calldata)
