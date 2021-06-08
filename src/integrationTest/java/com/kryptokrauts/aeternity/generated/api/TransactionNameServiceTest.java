@@ -198,6 +198,8 @@ public class TransactionNameServiceTest extends BaseTest {
             String channelPointer = keyPair.getAddress().replace("ak_", "ch_");
             String oraclePointer = keyPair.getOracleAddress();
 
+            KeyPair anotherKeyPair = keyPairService.generateKeyPair();
+
             NameUpdateTransactionModel nameUpdateTx =
                 NameUpdateTransactionModel.builder()
                     .accountId(keyPair.getAddress())
@@ -213,6 +215,14 @@ public class TransactionNameServiceTest extends BaseTest {
                             put(AENS.POINTER_KEY_CHANNEL, channelPointer);
                             put(AENS.POINTER_KEY_CONTRACT, contractPointer);
                             put(AENS.POINTER_KEY_ORACLE, oraclePointer);
+                            put("arbitrary-account-pointer-key", anotherKeyPair.getAddress());
+                            put(
+                                "arbitrary-channel-pointer-key",
+                                anotherKeyPair.getAddress().replace("ak_", "ch_"));
+                            put(
+                                "arbitrary-contract-pointer-key",
+                                anotherKeyPair.getContractAddress());
+                            put("arbitrary-oracle-pointer-key", anotherKeyPair.getOracleAddress());
                           }
                         })
                     .build();
@@ -233,6 +243,10 @@ public class TransactionNameServiceTest extends BaseTest {
             context.assertEquals(channelPointer, nameEntryResult.getChannelPointer().get());
             context.assertEquals(contractPointer, nameEntryResult.getContractPointer().get());
             context.assertEquals(oraclePointer, nameEntryResult.getOraclePointer().get());
+            context.assertEquals(
+                anotherKeyPair.getAddress(),
+                nameEntryResult.getPointers().get("arbitrary-account-pointer-key"));
+            context.assertTrue(nameEntryResult.getPointers().size() == 8);
             BigInteger updatedTTL = nameEntryResult.getTtl();
             // subtract 170000 because initial default ttl is 180000 and
             // updated ttl was 10000
