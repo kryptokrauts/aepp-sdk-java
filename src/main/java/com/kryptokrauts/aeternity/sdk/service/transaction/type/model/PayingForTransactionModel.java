@@ -1,7 +1,5 @@
 package com.kryptokrauts.aeternity.sdk.service.transaction.type.model;
 
-import java.math.BigInteger;
-import java.util.function.Function;
 import com.kryptokrauts.aeternity.generated.api.rxjava.ExternalApi;
 import com.kryptokrauts.aeternity.generated.model.GenericTx;
 import com.kryptokrauts.aeternity.generated.model.PayingForTx;
@@ -10,6 +8,8 @@ import com.kryptokrauts.aeternity.sdk.service.info.domain.ApiModelMapper;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.AbstractTransaction;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.impl.PayingForTransaction;
 import com.kryptokrauts.sophia.compiler.generated.api.rxjava.DefaultApi;
+import java.math.BigInteger;
+import java.util.function.Function;
 import lombok.Getter;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
@@ -19,14 +19,10 @@ import lombok.experimental.SuperBuilder;
 @ToString
 public class PayingForTransactionModel extends AbstractTransactionModel<PayingForTx> {
 
-  @Mandatory
-  private String payerId;
-  @Mandatory
-  private BigInteger nonce;
-  @Mandatory
-  private AbstractTransactionModel<?> innerTxModel;
-  @Mandatory
-  private String privateKeyToSignerInnerTx;
+  @Mandatory private String payerId;
+  @Mandatory private BigInteger nonce;
+  @Mandatory private AbstractTransactionModel<?> innerTxModel;
+  @Mandatory private String privateKeyToSignerInnerTx;
   private String innerTxHash;
 
   @Override
@@ -48,9 +44,13 @@ public class PayingForTransactionModel extends AbstractTransactionModel<PayingFo
 
   @Override
   public AbstractTransaction<?> buildTransaction(ExternalApi externalApi, DefaultApi compilerApi) {
-    return PayingForTransaction.builder().externalApi(externalApi).model(this)
-        .innerTxRLPEncodedList(this.getInnerTxModel().buildTransaction(externalApi, compilerApi)
-            .createRLPEncodedList())
+    return PayingForTransaction.builder()
+        .externalApi(externalApi)
+        .model(this)
+        .innerTxRLPEncodedList(
+            this.getInnerTxModel()
+                .buildTransaction(externalApi, compilerApi)
+                .createRLPEncodedList())
         .build();
   }
 
@@ -58,9 +58,12 @@ public class PayingForTransactionModel extends AbstractTransactionModel<PayingFo
   public Function<GenericTx, ?> getApiToModelFunction() {
     return (tx) -> {
       PayingForTx castedTx = (PayingForTx) tx;
-      return this.toBuilder().payerId(castedTx.getPayerId()).fee(castedTx.getFee())
+      return this.toBuilder()
+          .payerId(castedTx.getPayerId())
+          .fee(castedTx.getFee())
           .nonce(castedTx.getNonce())
-          .innerTxModel(ApiModelMapper.mapToTransactionModel(castedTx.getTx().getTx())).build();
+          .innerTxModel(ApiModelMapper.mapToTransactionModel(castedTx.getTx().getTx()))
+          .build();
     };
   }
 

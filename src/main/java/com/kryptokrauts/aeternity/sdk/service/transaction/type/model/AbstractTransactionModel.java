@@ -1,13 +1,13 @@
 package com.kryptokrauts.aeternity.sdk.service.transaction.type.model;
 
-import java.lang.reflect.Field;
-import java.math.BigInteger;
-import java.util.function.Function;
 import com.kryptokrauts.aeternity.generated.api.rxjava.ExternalApi;
 import com.kryptokrauts.aeternity.generated.model.GenericTx;
 import com.kryptokrauts.aeternity.sdk.annotations.Mandatory;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.AbstractTransaction;
 import com.kryptokrauts.sophia.compiler.generated.api.rxjava.DefaultApi;
+import java.lang.reflect.Field;
+import java.math.BigInteger;
+import java.util.function.Function;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
@@ -31,11 +31,11 @@ public abstract class AbstractTransactionModel<GeneratedTxModel> {
   public abstract GeneratedTxModel toApiModel();
 
   /**
-   * validate, that all mandatory fields are set - if not we throw an
-   * {@link com.kryptokrauts.aeternity.sdk.exception.InvalidParameterException}
+   * validate, that all mandatory fields are set - if not we throw an {@link
+   * com.kryptokrauts.aeternity.sdk.exception.InvalidParameterException}
    *
    * @return null if all fields are set OR <br>
-   *         the name of the field which value is missing
+   *     the name of the field which value is missing
    */
   public String checkMandatoryFields() {
     for (Field field : this.getClass().getDeclaredFields()) {
@@ -64,8 +64,8 @@ public abstract class AbstractTransactionModel<GeneratedTxModel> {
    * @param compilerApi the compiler api instance
    * @return the instance of a specific transaction class that extends {@link AbstractTransaction}
    */
-  public abstract AbstractTransaction<?> buildTransaction(ExternalApi externalApi,
-      DefaultApi compilerApi);
+  public abstract AbstractTransaction<?> buildTransaction(
+      ExternalApi externalApi, DefaultApi compilerApi);
 
   /**
    * remap the given genericTx to a model
@@ -94,7 +94,7 @@ public abstract class AbstractTransactionModel<GeneratedTxModel> {
 
   /**
    * indicates, if the inner transaction needs to be signed (PayFor only)
-   * 
+   *
    * @return
    */
   public boolean doSignInnerTx() {

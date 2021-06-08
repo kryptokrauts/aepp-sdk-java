@@ -1,7 +1,5 @@
 package com.kryptokrauts.aeternity.sdk.service.transaction.type.model;
 
-import java.math.BigInteger;
-import java.util.function.Function;
 import com.kryptokrauts.aeternity.generated.api.rxjava.ExternalApi;
 import com.kryptokrauts.aeternity.generated.model.GAMetaTx;
 import com.kryptokrauts.aeternity.generated.model.GenericTx;
@@ -12,6 +10,8 @@ import com.kryptokrauts.aeternity.sdk.service.info.domain.ApiModelMapper;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.AbstractTransaction;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.impl.GeneralizedAccountsMetaTransaction;
 import com.kryptokrauts.sophia.compiler.generated.api.rxjava.DefaultApi;
+import java.math.BigInteger;
+import java.util.function.Function;
 import lombok.Builder.Default;
 import lombok.Getter;
 import lombok.ToString;
@@ -22,18 +22,12 @@ import lombok.experimental.SuperBuilder;
 @ToString
 public class GeneralizedAccountsMetaTransactionModel extends AbstractTransactionModel<GAMetaTx> {
 
-  @Mandatory
-  private String gaId;
-  @Mandatory
-  private String authData;
-  @Default
-  private BigInteger gas = BigInteger.valueOf(50000);
-  @Default
-  private BigInteger gasPrice = BigInteger.valueOf(BaseConstants.MINIMAL_GAS_PRICE);
-  @Default
-  private VirtualMachine virtualMachine = VirtualMachine.FATE;
-  @Mandatory
-  private AbstractTransactionModel<?> innerTxModel;
+  @Mandatory private String gaId;
+  @Mandatory private String authData;
+  @Default private BigInteger gas = BigInteger.valueOf(50000);
+  @Default private BigInteger gasPrice = BigInteger.valueOf(BaseConstants.MINIMAL_GAS_PRICE);
+  @Default private VirtualMachine virtualMachine = VirtualMachine.FATE;
+  @Mandatory private AbstractTransactionModel<?> innerTxModel;
 
   @Override
   public GAMetaTx toApiModel() {
@@ -57,9 +51,13 @@ public class GeneralizedAccountsMetaTransactionModel extends AbstractTransaction
 
   @Override
   public AbstractTransaction<?> buildTransaction(ExternalApi externalApi, DefaultApi compilerApi) {
-    return GeneralizedAccountsMetaTransaction.builder().externalApi(externalApi).model(this)
-        .innerTxRLPEncodedList(this.getInnerTxModel().buildTransaction(externalApi, compilerApi)
-            .createRLPEncodedList())
+    return GeneralizedAccountsMetaTransaction.builder()
+        .externalApi(externalApi)
+        .model(this)
+        .innerTxRLPEncodedList(
+            this.getInnerTxModel()
+                .buildTransaction(externalApi, compilerApi)
+                .createRLPEncodedList())
         .build();
   }
 
@@ -67,10 +65,15 @@ public class GeneralizedAccountsMetaTransactionModel extends AbstractTransaction
   public Function<GenericTx, GeneralizedAccountsMetaTransactionModel> getApiToModelFunction() {
     return (tx) -> {
       GAMetaTx castedTx = (GAMetaTx) tx;
-      return this.toBuilder().gaId(castedTx.getGaId()).authData(castedTx.getAuthData())
-          .fee(castedTx.getFee()).gas(castedTx.getGas()).gasPrice(castedTx.getGasPrice())
+      return this.toBuilder()
+          .gaId(castedTx.getGaId())
+          .authData(castedTx.getAuthData())
+          .fee(castedTx.getFee())
+          .gas(castedTx.getGas())
+          .gasPrice(castedTx.getGasPrice())
           .virtualMachine(VirtualMachine.getVirtualMachine(castedTx.getAbiVersion()))
-          .innerTxModel(ApiModelMapper.mapToTransactionModel(castedTx.getTx().getTx())).build();
+          .innerTxModel(ApiModelMapper.mapToTransactionModel(castedTx.getTx().getTx()))
+          .build();
     };
   }
 
