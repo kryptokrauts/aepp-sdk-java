@@ -30,7 +30,7 @@ public class OracleRespondTransaction extends AbstractTransaction<OracleRespondT
   }
 
   @Override
-  protected Bytes createRLPEncodedList() {
+  public Bytes createRLPEncodedList() {
     Bytes encodedRlp =
         RLP.encodeList(
             rlpWriter -> {

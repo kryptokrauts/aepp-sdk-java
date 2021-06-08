@@ -27,7 +27,7 @@ public class ChannelCloseSoloTransaction
   }
 
   @Override
-  protected Bytes createRLPEncodedList() {
+  public Bytes createRLPEncodedList() {
     Bytes encodedRlp =
         RLP.encodeList(
             rlpWriter -> {
@@ -43,7 +43,8 @@ public class ChannelCloseSoloTransaction
               rlpWriter.writeByteArray(fromIdWithTag);
               rlpWriter.writeString(model.getPayload());
               rlpWriter.writeString(
-                  model.getPoi()); // TODO inform about Proof of Inclusion and how it is handled
+                  model.getPoi()); // TODO inform about Proof of Inclusion and how it is
+              // handled
               this.checkZeroAndWriteValue(rlpWriter, model.getTtl());
               this.checkZeroAndWriteValue(rlpWriter, model.getFee());
               this.checkZeroAndWriteValue(rlpWriter, model.getNonce());

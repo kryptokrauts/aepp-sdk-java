@@ -27,7 +27,7 @@ public class NameRevokeTransaction extends AbstractTransaction<NameRevokeTransac
   }
 
   @Override
-  protected Bytes createRLPEncodedList() {
+  public Bytes createRLPEncodedList() {
     Bytes encodedRlp =
         RLP.encodeList(
             rlpWriter -> {

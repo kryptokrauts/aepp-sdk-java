@@ -28,7 +28,7 @@ public class ChannelSnapshotSoloTransaction
   }
 
   @Override
-  protected Bytes createRLPEncodedList() {
+  public Bytes createRLPEncodedList() {
     Bytes encodedRlp =
         RLP.encodeList(
             rlpWriter -> {

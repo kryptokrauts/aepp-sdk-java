@@ -34,7 +34,7 @@ public class GeneralizedAccountsAttachTransaction
   }
 
   @Override
-  protected Bytes createRLPEncodedList() {
+  public Bytes createRLPEncodedList() {
     Bytes encodedRlp =
         RLP.encodeList(
             rlpWriter -> {
@@ -48,8 +48,8 @@ public class GeneralizedAccountsAttachTransaction
               this.checkZeroAndWriteValue(rlpWriter, model.getNonce());
               rlpWriter.writeByteArray(EncodingUtils.decodeCheckWithIdentifier(model.getCode()));
               rlpWriter.writeByteArray(
-                  Hex.decode(
-                      model.getAuthFun())); // using Hex to convert bytes due to signed/unsigned
+                  Hex.decode(model.getAuthFun())); // using Hex to convert bytes due to
+              // signed/unsigned
               // problem
               this.checkZeroAndWriteValue(rlpWriter, this.calculateVersion());
               this.checkZeroAndWriteValue(rlpWriter, model.getFee());
