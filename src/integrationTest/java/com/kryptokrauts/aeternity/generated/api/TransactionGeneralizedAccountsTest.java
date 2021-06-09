@@ -42,7 +42,6 @@ public class TransactionGeneralizedAccountsTest extends BaseTest {
                   .sender(account.getPublicKey())
                   .recipient(gaAccountKeyPair.getAddress())
                   .amount(amount)
-                  .ttl(ZERO)
                   .nonce(nonce)
                   .build();
           aeternityServiceNative.transactions.blockingPostTransaction(spendTx);
@@ -75,8 +74,6 @@ public class TransactionGeneralizedAccountsTest extends BaseTest {
                   .gasPrice(gasPrice)
                   .nonce(gaTestAccount.getNonce().add(ONE))
                   .ownerId(gaTestAccount.getPublicKey())
-                  .ttl(ZERO)
-                  .virtualMachine(targetVM)
                   .build();
 
           String unsignedTx =
@@ -110,8 +107,6 @@ public class TransactionGeneralizedAccountsTest extends BaseTest {
                   .gasPrice(dryRunResult.getContractCallObject().getGasPrice())
                   .nonce(gaTestAccount.getNonce().add(ONE))
                   .ownerId(gaTestAccount.getPublicKey())
-                  .ttl(ZERO)
-                  .virtualMachine(targetVM)
                   .build();
           PostTransactionResult result =
               this.aeternityServiceNative.transactions.blockingPostTransaction(
@@ -133,7 +128,6 @@ public class TransactionGeneralizedAccountsTest extends BaseTest {
                   .recipient(otherRecipient.getAddress())
                   .amount(amount)
                   .payload("spent using a generalized account =)")
-                  .ttl(ZERO)
                   .nonce(ZERO) // GA
                   // inner
                   // tx
@@ -154,7 +148,6 @@ public class TransactionGeneralizedAccountsTest extends BaseTest {
               GeneralizedAccountsMetaTransactionModel.builder()
                   .gaId(gaAccountKeyPair.getAddress())
                   .authData(authData)
-                  .virtualMachine(targetVM)
                   // .tx(encodedInnerTx)
                   .innerTxModel(gaInnerSpendTx)
                   .build();

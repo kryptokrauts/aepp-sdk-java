@@ -118,8 +118,6 @@ public class PaymentSplitterContractTest extends BaseTest {
                     .gasPrice(gasPrice)
                     .nonce(getNextKeypairNonce())
                     .ownerId(keyPair.getAddress())
-                    .ttl(ZERO)
-                    .virtualMachine(targetVM)
                     .build();
 
             String unsignedTx =
@@ -213,8 +211,6 @@ public class PaymentSplitterContractTest extends BaseTest {
                                 .amount(paymentValue.toBigInteger())
                                 .nonce(getNextKeypairNonce())
                                 .callerId(keyPair.getAddress())
-                                .ttl(ZERO)
-                                .virtualMachine(targetVM)
                                 .build()));
 
             _logger.info("callContractAfterDryRunOnLocalNode: " + dryRunResults.toString());
@@ -236,9 +232,7 @@ public class PaymentSplitterContractTest extends BaseTest {
                     .gasPrice(BigInteger.valueOf(BaseConstants.MINIMAL_GAS_PRICE))
                     .nonce(getNextKeypairNonce())
                     .callerId(keyPair.getAddress())
-                    .ttl(BigInteger.ZERO)
                     .amount(paymentValue.toBigInteger())
-                    .virtualMachine(targetVM)
                     .build();
 
             PostTransactionResult postTransactionResult =
@@ -311,8 +305,6 @@ public class PaymentSplitterContractTest extends BaseTest {
                                 .amount(paymentValue.toBigInteger())
                                 .nonce(getNextKeypairNonce())
                                 .callerId(keyPair.getAddress())
-                                .ttl(ZERO)
-                                .virtualMachine(targetVM)
                                 .build()));
 
             _logger.info("callContractAfterDryRunOnLocalNode: " + dryRunResults.toString());
@@ -363,8 +355,6 @@ public class PaymentSplitterContractTest extends BaseTest {
                                 .amount(paymentValue.toBigInteger())
                                 .nonce(getNextKeypairNonce())
                                 .callerId(keyPair.getAddress())
-                                .ttl(ZERO)
-                                .virtualMachine(targetVM)
                                 .build()));
 
             _logger.info("callContractAfterDryRunOnLocalNode: " + dryRunResults.toString());
@@ -384,32 +374,5 @@ public class PaymentSplitterContractTest extends BaseTest {
             context.fail(e);
           }
         });
-  }
-
-  protected String createUnsignedContractCallTx(
-      String callerId,
-      BigInteger nonce,
-      String calldata,
-      BigInteger gasPrice,
-      String contractId,
-      BigInteger amount)
-      throws Throwable {
-    BigInteger gas = BigInteger.valueOf(1579000);
-
-    ContractCallTransactionModel model =
-        ContractCallTransactionModel.builder()
-            .callData(calldata)
-            .contractId(contractId)
-            .gas(gas)
-            .amount(amount)
-            .gasPrice(
-                gasPrice != null ? gasPrice : BigInteger.valueOf(BaseConstants.MINIMAL_GAS_PRICE))
-            .nonce(nonce)
-            .callerId(callerId)
-            .ttl(ZERO)
-            .virtualMachine(targetVM)
-            .build();
-
-    return aeternityServiceNative.transactions.blockingCreateUnsignedTransaction(model).getResult();
   }
 }

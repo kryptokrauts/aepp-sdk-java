@@ -50,7 +50,6 @@ public class TransactionOraclesTest extends BaseTest {
                     .amount(amount)
                     .sender(keyPair.getAddress())
                     .recipient(oracleKeyPair.getAddress())
-                    .ttl(ZERO)
                     .nonce(getNextKeypairNonce())
                     .build();
             PostTransactionResult postResult = this.blockingPostTx(spendTx);
@@ -82,7 +81,6 @@ public class TransactionOraclesTest extends BaseTest {
                     .queryFee(BigInteger.valueOf(100))
                     .queryFormat("string")
                     .responseFormat("string")
-                    .ttl(ZERO)
                     .build();
 
             PostTransactionResult postResult =
@@ -109,7 +107,6 @@ public class TransactionOraclesTest extends BaseTest {
                     .query(queryString)
                     .queryFee(BigInteger.valueOf(100))
                     .queryTtl(BigInteger.valueOf(50))
-                    .ttl(ZERO)
                     .queryTtlType(OracleTTLType.DELTA)
                     .responseTtl(BigInteger.valueOf(100))
                     .build();
@@ -153,7 +150,6 @@ public class TransactionOraclesTest extends BaseTest {
                     .nonce(nonce)
                     .response(responseString)
                     .responseTtl(BigInteger.valueOf(100))
-                    .ttl(ZERO)
                     .build();
 
             PostTransactionResult postResult =
@@ -179,7 +175,6 @@ public class TransactionOraclesTest extends BaseTest {
                     .nonce(nonce)
                     .oracleId(oracleId)
                     .oracleRelativeTtl(additionalTtl)
-                    .ttl(ZERO)
                     .build();
 
             PostTransactionResult postResult =
