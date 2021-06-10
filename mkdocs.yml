@@ -1,0 +1,20 @@
+# Project information
+site_name: "aepp-sdk-java"
+site_description: |
+  The official documentation of the aepp-sdk-java provided by kryptokrauts.com
+
+# Repository
+repo_name: 'kryptokrauts/aepp-sdk-java'
+repo_url: 'https://github.com/kryptokrauts/aepp-sdk-java'
+
+# Theme
+theme:
+  name: readthedocs
+
+extra:
+  repo_icon: 'github'
+
+# Navigation
+nav:
+  - Getting Started: index.md
+  - Changelog: changelog.md
