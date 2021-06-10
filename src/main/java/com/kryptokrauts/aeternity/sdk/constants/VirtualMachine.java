@@ -7,7 +7,13 @@ import lombok.Getter;
 
 /**
  * aeternity supports multiple virtual machines. depending on the selected VM contract related
- * transactions need to specify the respective abiVersion and vmVersion
+ * transactions need to specify the respective abiVersion and vmVersion.
+ *
+ * <p>since protocol version 5 (Iris) new contracts can only be created using the FATE VM, see
+ * https://github.com/aeternity/protocol/blob/master/contracts/contract_vms.md#virtual-machines-on-the-%C3%A6ternity-blockchain
+ *
+ * <p>it's still valid to use AEVM for contract calls of old contracts and as developer you can
+ * always define a custom vmVersion to use for contract related transactions for the respective VM
  */
 @AllArgsConstructor
 public enum VirtualMachine {
@@ -27,11 +33,6 @@ public enum VirtualMachine {
 
   public VirtualMachine withVmVersion(BigInteger vmVersion) {
     this.vmVersion = vmVersion;
-    return this;
-  }
-
-  public VirtualMachine withAbiVersion(BigInteger abiVersion) {
-    this.abiVersion = abiVersion;
     return this;
   }
 }
