@@ -15,10 +15,6 @@ websocket:
     listen_address: 0.0.0.0
     port: 3014
 
-keys:
-  peer_password: "top secret"
-  dir: ./keys
-
 mining:
   autostart: true
   beneficiary: "ak_twR4h7dEcUtc2iSEDv8kB7UFJJDGiEDQCXr85C3fYF8FdVdyo"

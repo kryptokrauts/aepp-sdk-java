@@ -309,6 +309,7 @@ public class TransactionContractsTest extends BaseTest {
             TransactionInfoResult txInfoObject = waitForTxInfoObject(result.getTxHash());
             localDeployedContractId = txInfoObject.getCallInfo().getContractId();
             _logger.info("Deployed contract - hash " + result.getTxHash() + " - " + txInfoObject);
+            _logger.info("ContractId: {}", localDeployedContractId);
           } catch (Throwable e) {
             context.fail(e);
           }
@@ -370,7 +371,7 @@ public class TransactionContractsTest extends BaseTest {
     AeternityService testnetService =
         new AeternityService(
             AeternityServiceConfiguration.configure()
-                .baseUrl(TestConstants.testnetURL)
+                .baseUrl(BaseConstants.DEFAULT_TESTNET_URL)
                 .network(Network.TESTNET)
                 .vertx(rule.vertx())
                 .compile());
