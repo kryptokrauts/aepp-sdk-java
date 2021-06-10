@@ -4,7 +4,6 @@ import com.kryptokrauts.aeternity.generated.api.rxjava.ExternalApi;
 import com.kryptokrauts.aeternity.generated.model.GenericTx;
 import com.kryptokrauts.aeternity.generated.model.PayingForTx;
 import com.kryptokrauts.aeternity.sdk.annotations.Mandatory;
-import com.kryptokrauts.aeternity.sdk.service.info.domain.ApiModelMapper;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.AbstractTransaction;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.impl.PayingForTransaction;
 import com.kryptokrauts.sophia.compiler.generated.api.rxjava.DefaultApi;
@@ -21,9 +20,7 @@ public class PayingForTransactionModel extends AbstractTransactionModel<PayingFo
 
   @Mandatory private String payerId;
   @Mandatory private BigInteger nonce;
-  @Mandatory private AbstractTransactionModel<?> innerTxModel;
-  @Mandatory private String privateKeyToSignerInnerTx;
-  private String innerTxHash;
+  @Mandatory private String innerTx;
 
   @Override
   public PayingForTx toApiModel() {
@@ -44,14 +41,7 @@ public class PayingForTransactionModel extends AbstractTransactionModel<PayingFo
 
   @Override
   public AbstractTransaction<?> buildTransaction(ExternalApi externalApi, DefaultApi compilerApi) {
-    return PayingForTransaction.builder()
-        .externalApi(externalApi)
-        .model(this)
-        .innerTxRLPEncodedList(
-            this.getInnerTxModel()
-                .buildTransaction(externalApi, compilerApi)
-                .createRLPEncodedList())
-        .build();
+    return PayingForTransaction.builder().externalApi(externalApi).model(this).build();
   }
 
   @Override
@@ -62,18 +52,7 @@ public class PayingForTransactionModel extends AbstractTransactionModel<PayingFo
           .payerId(castedTx.getPayerId())
           .fee(castedTx.getFee())
           .nonce(castedTx.getNonce())
-          .innerTxModel(ApiModelMapper.mapToTransactionModel(castedTx.getTx().getTx()))
           .build();
     };
-  }
-
-  @Override
-  public boolean doSignInnerTx() {
-    return true;
-  }
-
-  @Override
-  public void setInnerTxHash(String innerTxHash) {
-    this.innerTxHash = innerTxHash;
   }
 }

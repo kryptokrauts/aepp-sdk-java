@@ -6,6 +6,7 @@ import com.kryptokrauts.aeternity.sdk.constants.ApiIdentifiers;
 import com.kryptokrauts.aeternity.sdk.constants.SerializationTags;
 import com.kryptokrauts.aeternity.sdk.service.transaction.fee.FeeCalculationModel;
 import com.kryptokrauts.aeternity.sdk.service.transaction.fee.impl.PayingForFeeCalculationModel;
+import com.kryptokrauts.aeternity.sdk.service.transaction.type.AbstractTransaction;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.model.PayingForTransactionModel;
 import com.kryptokrauts.aeternity.sdk.util.EncodingUtils;
 import io.reactivex.Single;
@@ -18,8 +19,7 @@ import org.apache.tuweni.rlp.RLP;
 
 @SuperBuilder
 @ToString
-public class PayingForTransaction
-    extends AbstractTransactionWithInnerTx<PayingForTransactionModel> {
+public class PayingForTransaction extends AbstractTransaction<PayingForTransactionModel> {
 
   @NonNull private ExternalApi externalApi;
 
@@ -36,8 +36,7 @@ public class PayingForTransaction
               rlpWriter.writeByteArray(payerIdWithTag);
               this.checkZeroAndWriteValue(rlpWriter, model.getNonce());
               this.checkZeroAndWriteValue(rlpWriter, model.getFee());
-              rlpWriter.writeByteArray(
-                  EncodingUtils.decodeCheckWithIdentifier(model.getInnerTxHash()));
+              rlpWriter.writeByteArray(EncodingUtils.decodeCheckWithIdentifier(model.getInnerTx()));
             });
     return encodedRlp;
   }

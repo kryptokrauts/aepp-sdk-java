@@ -93,15 +93,6 @@ public abstract class AbstractTransactionModel<GeneratedTxModel> {
   }
 
   /**
-   * indicates, if the inner transaction needs to be signed (PayFor only)
-   *
-   * @return
-   */
-  public boolean doSignInnerTx() {
-    return false;
-  }
-
-  /**
    * returns the inner transaction model if defined
    *
    * @return
@@ -109,10 +100,4 @@ public abstract class AbstractTransactionModel<GeneratedTxModel> {
   public AbstractTransactionModel<?> getInnerTxModel() {
     return null;
   }
-
-  public String getPrivateKeyToSignerInnerTx() {
-    return null;
-  }
-
-  public void setInnerTxHash(String txHash) {}
 }

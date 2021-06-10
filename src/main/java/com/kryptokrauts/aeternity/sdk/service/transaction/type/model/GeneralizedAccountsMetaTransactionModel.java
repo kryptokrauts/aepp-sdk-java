@@ -81,9 +81,4 @@ public class GeneralizedAccountsMetaTransactionModel extends AbstractTransaction
   public boolean doSign() {
     return false;
   }
-
-  @Override
-  public boolean doSignInnerTx() {
-    return false;
-  }
 }

@@ -156,4 +156,17 @@ public interface TransactionService {
    *     <p>- check getBlockHeight():if the blockHeight is -1 it means the transaction isn't mined.
    */
   Single<TransactionResult> asyncWaitForConfirmation(String txHash, int numOfConfirmations);
+
+  /**
+   * sign an unsigned transaction with the given private key. method uses an additional prefix and
+   * must be used to sign inner transactions of PayingForTx
+   *
+   * @param transactionModel of the inner tx to be signed
+   * @param privateKey the encoded private key to sign the transaction
+   * @return signed and encoded transaction
+   * @throws TransactionCreateException if an error occurs
+   */
+  String signPayingForInnerTransaction(
+      final AbstractTransactionModel<?> model, final String privateKey)
+      throws TransactionCreateException;
 }

@@ -1,6 +1,7 @@
 package com.kryptokrauts.aeternity.generated.api;
 
 import com.kryptokrauts.aeternity.sdk.domain.secret.KeyPair;
+import com.kryptokrauts.aeternity.sdk.exception.TransactionCreateException;
 import com.kryptokrauts.aeternity.sdk.service.account.domain.AccountResult;
 import com.kryptokrauts.aeternity.sdk.service.transaction.domain.PostTransactionResult;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.model.PayingForTransactionModel;
@@ -22,7 +23,7 @@ public class TransactionPayingForTest extends BaseTest {
     this.executeTest(
         testContext,
         t -> {
-          // funding delegation account for testng
+          // funding delegation account for testing
           delegationKeypair = keyPairService.generateKeyPair();
           AccountResult account = this.aeternityServiceNative.accounts.blockingGetAccount();
           BigInteger amount = unitConversionService.toSmallestUnit(BigDecimal.valueOf(2));
@@ -51,18 +52,15 @@ public class TransactionPayingForTest extends BaseTest {
                   .payload("yeah, somebody else payed the tx fee for this transaction =)")
                   .nonce(delegationTestAccount.getNonce().add(ONE))
                   .build();
-          // String unsignedInnerTx = aeternityServiceNative.transactions
-          // .blockingCreateUnsignedTransaction(spendTx).getResult();
-          // String signedInnerTx = aeternityServiceNative.transactions
-          // .signInnerTransaction(unsignedInnerTx, delegationKeypair.getEncodedPrivateKey());
+
           PayingForTransactionModel payingForTx =
               PayingForTransactionModel.builder()
                   .payerId(account.getPublicKey())
                   .nonce(
                       this.aeternityServiceNative.accounts.blockingGetAccount().getNonce().add(ONE))
-                  // .tx(signedInnerTx)
-                  .innerTxModel(spendTx)
-                  .privateKeyToSignerInnerTx(delegationKeypair.getEncodedPrivateKey())
+                  .innerTx(
+                      aeternityServiceNative.transactions.signPayingForInnerTransaction(
+                          spendTx, delegationKeypair.getEncodedPrivateKey()))
                   .build();
           PostTransactionResult payingForTxResult =
               aeternityServiceNative.transactions.blockingPostTransaction(payingForTx);
@@ -71,6 +69,32 @@ public class TransactionPayingForTest extends BaseTest {
               aeternityServiceNative.accounts.blockingGetAccount(delegationKeypair.getAddress());
           _logger.info("delegationTestAccount: {}", delegationTestAccount);
           testContext.assertEquals(ZERO, delegationTestAccount.getBalance());
+        });
+  }
+
+  @Test
+  public void testFailWithInnerTxPayingFor(TestContext testContext) {
+    this.executeTest(
+        testContext,
+        t -> {
+          delegationKeypair = keyPairService.generateKeyPair();
+          AccountResult account = this.aeternityServiceNative.accounts.blockingGetAccount();
+          PayingForTransactionModel payingForAsInnerTx =
+              PayingForTransactionModel.builder()
+                  .payerId(account.getPublicKey())
+                  .nonce(
+                      this.aeternityServiceNative.accounts.blockingGetAccount().getNonce().add(ONE))
+                  .build();
+          try {
+            aeternityServiceNative.transactions.signPayingForInnerTransaction(
+                payingForAsInnerTx, delegationKeypair.getEncodedPrivateKey());
+          } catch (Exception e) {
+            testContext.assertEquals(e.getClass(), TransactionCreateException.class);
+            testContext.assertTrue(
+                e.getCause()
+                    .getMessage()
+                    .contains("Inner transaction of payingFor cannot be of type payingFor!"));
+          }
         });
   }
 }

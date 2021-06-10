@@ -18,6 +18,7 @@ import com.kryptokrauts.aeternity.sdk.service.transaction.domain.DryRunRequest;
 import com.kryptokrauts.aeternity.sdk.service.transaction.domain.DryRunTransactionResults;
 import com.kryptokrauts.aeternity.sdk.service.transaction.domain.PostTransactionResult;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.model.AbstractTransactionModel;
+import com.kryptokrauts.aeternity.sdk.service.transaction.type.model.PayingForTransactionModel;
 import com.kryptokrauts.aeternity.sdk.util.ByteUtils;
 import com.kryptokrauts.aeternity.sdk.util.EncodingUtils;
 import com.kryptokrauts.aeternity.sdk.util.SigningUtil;
@@ -112,12 +113,9 @@ public class TransactionServiceImpl implements TransactionService {
   @Override
   public PostTransactionResult blockingPostTransaction(
       AbstractTransactionModel<?> tx, String privateKey) throws TransactionCreateException {
+    // ga transactions have inner tx model which for an unsigned tx needs to be created
     if (tx.hasInnerTx()) {
-      StringResultWrapper innerTxUnsigned = blockingCreateUnsignedTransaction(tx.getInnerTxModel());
-      if (tx.doSignInnerTx()) {
-        tx.setInnerTxHash(
-            signInnerTransaction(innerTxUnsigned.getResult(), tx.getPrivateKeyToSignerInnerTx()));
-      }
+      blockingCreateUnsignedTransaction(tx.getInnerTxModel());
     }
     String signedTx = blockingCreateUnsignedTransaction(tx).getResult();
     if (tx.doSign()) {
@@ -159,18 +157,17 @@ public class TransactionServiceImpl implements TransactionService {
     }
   }
 
-  /**
-   * sign an unsigned transaction with the given private key. method uses an additional prefix and
-   * must be used to sign inner transactions of PayingForTx
-   *
-   * @param unsignedTx the encoded unsigned transaction
-   * @param privateKey the encoded private key to sign the transaction
-   * @return signed and encoded transaction
-   * @throws TransactionCreateException if an error occurs
-   */
-  private String signInnerTransaction(final String unsignedTx, final String privateKey)
+  public String signPayingForInnerTransaction(
+      final AbstractTransactionModel<?> model, final String privateKey)
       throws TransactionCreateException {
     try {
+      if (model instanceof PayingForTransactionModel) {
+        throw new TransactionCreateException(
+            "Inner transaction of payingFor cannot be of type payingFor!",
+            new IllegalArgumentException());
+      }
+      String unsignedTx = blockingCreateUnsignedTransaction(model).getResult();
+
       byte[] networkDataWithAdditionalPrefix =
           (config.getNetwork().getId() + "-" + "inner_tx").getBytes(StandardCharsets.UTF_8);
       byte[] binaryTx = EncodingUtils.decodeCheckWithIdentifier(unsignedTx);
