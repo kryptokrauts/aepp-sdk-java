@@ -5,6 +5,7 @@ import com.kryptokrauts.aeternity.generated.model.ContractCreateTx;
 import com.kryptokrauts.aeternity.generated.model.GenericTx;
 import com.kryptokrauts.aeternity.sdk.annotations.Mandatory;
 import com.kryptokrauts.aeternity.sdk.constants.VirtualMachine;
+import com.kryptokrauts.aeternity.sdk.exception.InvalidParameterException;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.AbstractTransaction;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.impl.ContractCreateTransaction;
 import com.kryptokrauts.sophia.compiler.generated.api.rxjava.DefaultApi;
@@ -71,8 +72,10 @@ public class ContractCreateTransactionModel extends AbstractTransactionModel<Con
 
   @Override
   public void validateInput() {
-    // TODO Auto-generated method stub
-
+    if (!VirtualMachine.FATE.equals(this.virtualMachine)) {
+      throw new InvalidParameterException(
+          "AEVM cannot be used for the creation of contracts anymore.");
+    }
   }
 
   @Override
