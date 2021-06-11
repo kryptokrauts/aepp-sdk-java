@@ -44,7 +44,7 @@ public class PaymentSplitterContractTest extends BaseTest {
   static Map<String, Integer> initialWeights = new HashMap<>();
 
   @Test
-  public void a_a_init(TestContext context) throws IOException {
+  public void a_a_init(TestContext context) {
     this.executeTest(
         context,
         t -> {
@@ -105,7 +105,6 @@ public class PaymentSplitterContractTest extends BaseTest {
             _logger.info("contract bytecode: " + byteCode);
             _logger.info("contract calldata: " + callData);
 
-            BigInteger gas = BigInteger.valueOf(4800000);
             BigInteger gasPrice = BigInteger.valueOf(BaseConstants.MINIMAL_GAS_PRICE);
 
             ContractCreateTransactionModel contractCreate =
@@ -114,7 +113,7 @@ public class PaymentSplitterContractTest extends BaseTest {
                     .callData(callData)
                     .contractByteCode(byteCode)
                     .deposit(ZERO)
-                    .gas(gas)
+                    .gas(BigInteger.valueOf(800000))
                     .gasPrice(gasPrice)
                     .nonce(getNextKeypairNonce())
                     .ownerId(keyPair.getAddress())
@@ -205,7 +204,7 @@ public class PaymentSplitterContractTest extends BaseTest {
                         .transactionInputItem(
                             ContractCallTransactionModel.builder()
                                 .callData(calldata)
-                                .gas(BigInteger.valueOf(1579000))
+                                .gas(BigInteger.valueOf(1000000))
                                 .contractId(localDeployedContractId)
                                 .gasPrice(BigInteger.valueOf(BaseConstants.MINIMAL_GAS_PRICE))
                                 .amount(paymentValue.toBigInteger())
@@ -299,7 +298,7 @@ public class PaymentSplitterContractTest extends BaseTest {
                         .transactionInputItem(
                             ContractCallTransactionModel.builder()
                                 .callData(calldata)
-                                .gas(BigInteger.valueOf(1579000))
+                                .gas(BigInteger.valueOf(1000000))
                                 .contractId(localDeployedContractId)
                                 .gasPrice(BigInteger.valueOf(BaseConstants.MINIMAL_GAS_PRICE))
                                 .amount(paymentValue.toBigInteger())
@@ -349,7 +348,7 @@ public class PaymentSplitterContractTest extends BaseTest {
                         .transactionInputItem(
                             ContractCallTransactionModel.builder()
                                 .callData(calldata)
-                                .gas(BigInteger.valueOf(1579000))
+                                .gas(BigInteger.valueOf(1000000))
                                 .contractId(localDeployedContractId)
                                 .gasPrice(BigInteger.valueOf(BaseConstants.MINIMAL_GAS_PRICE))
                                 .amount(paymentValue.toBigInteger())

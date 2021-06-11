@@ -25,31 +25,29 @@ public class NameEntryResult extends GenericResultObject<NameEntry, NameEntryRes
   private Map<String, String> pointers;
 
   public Optional<String> getAccountPointer() {
-    return pointers.entrySet().stream()
-        .filter(e -> e.getKey().equals(AENS.POINTER_KEY_ACCOUNT))
-        .map(e -> e.getValue())
-        .findFirst();
+    return getPointer(AENS.POINTER_KEY_ACCOUNT);
   }
 
   public Optional<String> getChannelPointer() {
-    return pointers.entrySet().stream()
-        .filter(e -> e.getKey().equals(AENS.POINTER_KEY_CHANNEL))
-        .map(e -> e.getValue())
-        .findFirst();
+    return getPointer(AENS.POINTER_KEY_CHANNEL);
   }
 
   public Optional<String> getContractPointer() {
-    return pointers.entrySet().stream()
-        .filter(e -> e.getKey().equals(AENS.POINTER_KEY_CONTRACT))
-        .map(e -> e.getValue())
-        .findFirst();
+    return getPointer(AENS.POINTER_KEY_CONTRACT);
   }
 
   public Optional<String> getOraclePointer() {
-    return pointers.entrySet().stream()
-        .filter(e -> e.getKey().equals(AENS.POINTER_KEY_ORACLE))
-        .map(e -> e.getValue())
-        .findFirst();
+    return getPointer(AENS.POINTER_KEY_ORACLE);
+  }
+
+  private Optional<String> getPointer(String type) {
+    if (pointers != null && pointers.entrySet() != null) {
+      return pointers.entrySet().stream()
+          .filter(e -> e.getKey().equals(type))
+          .map(e -> e.getValue())
+          .findFirst();
+    }
+    return Optional.empty();
   }
 
   @Override

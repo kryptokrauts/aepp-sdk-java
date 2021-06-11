@@ -2,6 +2,7 @@ package com.kryptokrauts.aeternity.sdk.service.transaction.impl;
 
 import com.kryptokrauts.aeternity.generated.ApiException;
 import com.kryptokrauts.aeternity.generated.api.rxjava.ExternalApi;
+import com.kryptokrauts.aeternity.generated.model.DryRunResults;
 import com.kryptokrauts.aeternity.generated.model.GenericSignedTx;
 import com.kryptokrauts.aeternity.generated.model.Tx;
 import com.kryptokrauts.aeternity.sdk.constants.ApiIdentifiers;
@@ -182,16 +183,24 @@ public class TransactionServiceImpl implements TransactionService {
 
   @Override
   public Single<DryRunTransactionResults> asyncDryRunTransactions(DryRunRequest input) {
-    return DryRunTransactionResults.builder()
-        .build()
-        .asyncGet(this.externalApi.rxDryRunTxs(input.toGeneratedModel()));
+    Single<DryRunResults> dryRunResultsSingle;
+    if (config.isDebugDryRun()) {
+      dryRunResultsSingle = this.externalApi.rxDryRunTxs(input.toGeneratedModel());
+    } else {
+      dryRunResultsSingle = this.externalApi.rxProtectedDryRunTxs(input.toGeneratedModel());
+    }
+    return DryRunTransactionResults.builder().build().asyncGet(dryRunResultsSingle);
   }
 
   @Override
   public DryRunTransactionResults blockingDryRunTransactions(DryRunRequest input) {
-    return DryRunTransactionResults.builder()
-        .build()
-        .blockingGet(this.externalApi.rxDryRunTxs(input.toGeneratedModel()));
+    Single<DryRunResults> dryRunResultsSingle;
+    if (config.isDebugDryRun()) {
+      dryRunResultsSingle = this.externalApi.rxDryRunTxs(input.toGeneratedModel());
+    } else {
+      dryRunResultsSingle = this.externalApi.rxProtectedDryRunTxs(input.toGeneratedModel());
+    }
+    return DryRunTransactionResults.builder().build().blockingGet(dryRunResultsSingle);
   }
 
   @Override

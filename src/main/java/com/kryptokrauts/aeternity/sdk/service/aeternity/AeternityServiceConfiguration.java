@@ -13,6 +13,8 @@ public class AeternityServiceConfiguration extends ServiceConfiguration {
 
   @Default private boolean nativeMode = true;
 
+  @Default private boolean debugDryRun = false;
+
   @Default private Network network = Network.TESTNET;
 
   @Default private long minimalGasPrice = BaseConstants.MINIMAL_GAS_PRICE;
