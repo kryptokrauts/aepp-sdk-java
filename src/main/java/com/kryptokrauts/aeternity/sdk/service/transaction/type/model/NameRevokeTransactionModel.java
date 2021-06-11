@@ -12,6 +12,7 @@ import com.kryptokrauts.sophia.compiler.generated.api.rxjava.DefaultApi;
 import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.function.Function;
+import lombok.Builder.Default;
 import lombok.Getter;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
@@ -24,7 +25,7 @@ public class NameRevokeTransactionModel extends AbstractTransactionModel<NameRev
   @Mandatory private String accountId;
   @Mandatory private BigInteger nonce;
   @Mandatory private String nameId;
-  @Mandatory private BigInteger ttl;
+  @Default private BigInteger ttl = BigInteger.ZERO;
 
   @Override
   public NameRevokeTx toApiModel() {

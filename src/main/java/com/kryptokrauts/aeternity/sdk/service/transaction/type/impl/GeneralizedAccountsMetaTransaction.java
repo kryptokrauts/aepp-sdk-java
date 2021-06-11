@@ -5,8 +5,7 @@ import com.kryptokrauts.aeternity.generated.model.UnsignedTx;
 import com.kryptokrauts.aeternity.sdk.constants.ApiIdentifiers;
 import com.kryptokrauts.aeternity.sdk.constants.SerializationTags;
 import com.kryptokrauts.aeternity.sdk.service.transaction.fee.FeeCalculationModel;
-import com.kryptokrauts.aeternity.sdk.service.transaction.fee.impl.ContractCallFeeCalculationModel;
-import com.kryptokrauts.aeternity.sdk.service.transaction.type.AbstractTransaction;
+import com.kryptokrauts.aeternity.sdk.service.transaction.fee.impl.GaMetaFeeCalculationModel;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.model.GeneralizedAccountsMetaTransactionModel;
 import com.kryptokrauts.aeternity.sdk.util.EncodingUtils;
 import io.reactivex.Single;
@@ -20,17 +19,21 @@ import org.apache.tuweni.rlp.RLP;
 @SuperBuilder
 @ToString
 public class GeneralizedAccountsMetaTransaction
-    extends AbstractTransaction<GeneralizedAccountsMetaTransactionModel> {
+    extends AbstractTransactionWithInnerTx<GeneralizedAccountsMetaTransactionModel> {
 
   @NonNull private ExternalApi externalApi;
 
   @Override
   protected Single<UnsignedTx> createInternal() {
-    throw new UnsupportedOperationException("Not implemented");
+    throw new UnsupportedOperationException("Not possible");
   }
 
+  /**
+   * for ga transaction the ga tx is wrapped into a signed wrapper as well as the actual transaction
+   * to authorize
+   */
   @Override
-  protected Bytes createRLPEncodedList() {
+  public Bytes createRLPEncodedList() {
     Bytes encodedRlp =
         RLP.encodeList(
             rlpWriter -> {
@@ -47,13 +50,29 @@ public class GeneralizedAccountsMetaTransaction
               this.checkZeroAndWriteValue(rlpWriter, model.getFee());
               this.checkZeroAndWriteValue(rlpWriter, model.getGas());
               this.checkZeroAndWriteValue(rlpWriter, model.getGasPrice());
-              rlpWriter.writeByteArray(EncodingUtils.decodeCheckWithIdentifier(model.getInnerTx()));
+              rlpWriter.writeValue(wrapSignedTransactionForGA(this.innerTxRLPEncodedList));
             });
-    return encodedRlp;
+    return wrapSignedTransactionForGA(encodedRlp);
+  }
+
+  /**
+   * wrap into a signed tx with empty list of signatures
+   *
+   * @param unsignedTx
+   * @return
+   */
+  private Bytes wrapSignedTransactionForGA(Bytes unsignedTx) {
+    return RLP.encodeList(
+        rlpWriter -> {
+          rlpWriter.writeInt(SerializationTags.OBJECT_TAG_SIGNED_TRANSACTION);
+          rlpWriter.writeInt(SerializationTags.VSN_1);
+          rlpWriter.writeList(writer -> {});
+          rlpWriter.writeValue(unsignedTx);
+        });
   }
 
   @Override
   protected FeeCalculationModel getFeeCalculationModel() {
-    return new ContractCallFeeCalculationModel();
+    return new GaMetaFeeCalculationModel();
   }
 }

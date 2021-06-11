@@ -117,8 +117,6 @@ public class PaymentSplitterContractTest extends BaseTest {
                     .gasPrice(gasPrice)
                     .nonce(getNextKeypairNonce())
                     .ownerId(keyPair.getAddress())
-                    .ttl(ZERO)
-                    .virtualMachine(targetVM)
                     .build();
 
             String unsignedTx =
@@ -212,8 +210,6 @@ public class PaymentSplitterContractTest extends BaseTest {
                                 .amount(paymentValue.toBigInteger())
                                 .nonce(getNextKeypairNonce())
                                 .callerId(keyPair.getAddress())
-                                .ttl(ZERO)
-                                .virtualMachine(targetVM)
                                 .build()));
 
             _logger.info("callContractAfterDryRunOnLocalNode: " + dryRunResults.toString());
@@ -235,9 +231,7 @@ public class PaymentSplitterContractTest extends BaseTest {
                     .gasPrice(BigInteger.valueOf(BaseConstants.MINIMAL_GAS_PRICE))
                     .nonce(getNextKeypairNonce())
                     .callerId(keyPair.getAddress())
-                    .ttl(BigInteger.ZERO)
                     .amount(paymentValue.toBigInteger())
-                    .virtualMachine(targetVM)
                     .build();
 
             PostTransactionResult postTransactionResult =
@@ -310,8 +304,6 @@ public class PaymentSplitterContractTest extends BaseTest {
                                 .amount(paymentValue.toBigInteger())
                                 .nonce(getNextKeypairNonce())
                                 .callerId(keyPair.getAddress())
-                                .ttl(ZERO)
-                                .virtualMachine(targetVM)
                                 .build()));
 
             _logger.info("callContractAfterDryRunOnLocalNode: " + dryRunResults.toString());
@@ -362,8 +354,6 @@ public class PaymentSplitterContractTest extends BaseTest {
                                 .amount(paymentValue.toBigInteger())
                                 .nonce(getNextKeypairNonce())
                                 .callerId(keyPair.getAddress())
-                                .ttl(ZERO)
-                                .virtualMachine(targetVM)
                                 .build()));
 
             _logger.info("callContractAfterDryRunOnLocalNode: " + dryRunResults.toString());

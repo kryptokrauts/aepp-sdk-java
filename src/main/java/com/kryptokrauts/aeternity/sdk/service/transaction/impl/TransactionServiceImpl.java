@@ -19,7 +19,7 @@ import com.kryptokrauts.aeternity.sdk.service.transaction.domain.DryRunRequest;
 import com.kryptokrauts.aeternity.sdk.service.transaction.domain.DryRunTransactionResults;
 import com.kryptokrauts.aeternity.sdk.service.transaction.domain.PostTransactionResult;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.model.AbstractTransactionModel;
-import com.kryptokrauts.aeternity.sdk.service.transaction.type.model.GeneralizedAccountsMetaTransactionModel;
+import com.kryptokrauts.aeternity.sdk.service.transaction.type.model.PayingForTransactionModel;
 import com.kryptokrauts.aeternity.sdk.util.ByteUtils;
 import com.kryptokrauts.aeternity.sdk.util.EncodingUtils;
 import com.kryptokrauts.aeternity.sdk.util.SigningUtil;
@@ -78,11 +78,9 @@ public class TransactionServiceImpl implements TransactionService {
   @Override
   public Single<PostTransactionResult> asyncPostTransaction(
       AbstractTransactionModel<?> tx, String privateKey) throws TransactionCreateException {
-    String signedTx;
-    if (tx instanceof GeneralizedAccountsMetaTransactionModel) {
-      signedTx = wrapSignedTransactionForGA(blockingCreateUnsignedTransaction(tx).getResult());
-    } else {
-      signedTx = signTransaction(blockingCreateUnsignedTransaction(tx).getResult(), privateKey);
+    String signedTx = blockingCreateUnsignedTransaction(tx).getResult();
+    if (tx.doSign()) {
+      signedTx = signTransaction(signedTx, privateKey);
     }
     return PostTransactionResult.builder()
         .build()
@@ -116,11 +114,13 @@ public class TransactionServiceImpl implements TransactionService {
   @Override
   public PostTransactionResult blockingPostTransaction(
       AbstractTransactionModel<?> tx, String privateKey) throws TransactionCreateException {
-    String signedTx;
-    if (tx instanceof GeneralizedAccountsMetaTransactionModel) {
-      signedTx = wrapSignedTransactionForGA(blockingCreateUnsignedTransaction(tx).getResult());
-    } else {
-      signedTx = signTransaction(blockingCreateUnsignedTransaction(tx).getResult(), privateKey);
+    // ga transactions have inner tx model which for an unsigned tx needs to be created
+    if (tx.hasInnerTx()) {
+      blockingCreateUnsignedTransaction(tx.getInnerTxModel());
+    }
+    String signedTx = blockingCreateUnsignedTransaction(tx).getResult();
+    if (tx.doSign()) {
+      signedTx = signTransaction(signedTx, privateKey);
     }
     PostTransactionResult postTransactionResult =
         PostTransactionResult.builder()
@@ -158,18 +158,27 @@ public class TransactionServiceImpl implements TransactionService {
     }
   }
 
-  @Override
-  public String wrapSignedTransactionForGA(String unsignedTx) {
-    byte[] binaryTx = EncodingUtils.decodeCheckWithIdentifier(unsignedTx);
-    Bytes encodedRlp =
-        RLP.encodeList(
-            rlpWriter -> {
-              rlpWriter.writeInt(SerializationTags.OBJECT_TAG_SIGNED_TRANSACTION);
-              rlpWriter.writeInt(SerializationTags.VSN_1);
-              rlpWriter.writeList(writer -> {});
-              rlpWriter.writeByteArray(binaryTx);
-            });
-    return EncodingUtils.encodeCheck(encodedRlp.toArray(), ApiIdentifiers.TRANSACTION);
+  public String signPayingForInnerTransaction(
+      final AbstractTransactionModel<?> model, final String privateKey)
+      throws TransactionCreateException {
+    try {
+      if (model instanceof PayingForTransactionModel) {
+        throw new TransactionCreateException(
+            "Inner transaction of payingFor cannot be of type payingFor!",
+            new IllegalArgumentException());
+      }
+      String unsignedTx = blockingCreateUnsignedTransaction(model).getResult();
+
+      byte[] networkDataWithAdditionalPrefix =
+          (config.getNetwork().getId() + "-" + "inner_tx").getBytes(StandardCharsets.UTF_8);
+      byte[] binaryTx = EncodingUtils.decodeCheckWithIdentifier(unsignedTx);
+      byte[] txAndNetwork = ByteUtils.concatenate(networkDataWithAdditionalPrefix, binaryTx);
+      byte[] sig = SigningUtil.sign(txAndNetwork, privateKey);
+      String encodedSignedTx = encodeSignedTransaction(sig, binaryTx);
+      return encodedSignedTx;
+    } catch (Exception e) {
+      throw createException(e);
+    }
   }
 
   @Override

@@ -11,6 +11,7 @@ import com.kryptokrauts.aeternity.sdk.util.ValidationUtil;
 import com.kryptokrauts.sophia.compiler.generated.api.rxjava.DefaultApi;
 import java.math.BigInteger;
 import java.util.function.Function;
+import lombok.Builder.Default;
 import lombok.Getter;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
@@ -24,7 +25,7 @@ public class NamePreclaimTransactionModel extends AbstractTransactionModel<NameP
   @Mandatory private String name; // will be used to generate the commitmentId
   @Mandatory private BigInteger salt; // will be used to generate the commitmentId
   @Mandatory private BigInteger nonce;
-  @Mandatory private BigInteger ttl;
+  @Default private BigInteger ttl = BigInteger.ZERO;
 
   @Override
   public NamePreclaimTx toApiModel() {

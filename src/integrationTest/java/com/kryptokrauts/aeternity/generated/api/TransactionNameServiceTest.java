@@ -89,7 +89,6 @@ public class TransactionNameServiceTest extends BaseTest {
                     .name(validName)
                     .salt(salt)
                     .nonce(getNextKeypairNonce())
-                    .ttl(ZERO)
                     .build();
 
             PostTransactionResult result = this.blockingPostTx(namePreclaimTx);
@@ -104,7 +103,6 @@ public class TransactionNameServiceTest extends BaseTest {
                     .name(validName)
                     .nameSalt(salt)
                     .nonce(getNextKeypairNonce())
-                    .ttl(ZERO)
                     .build();
 
             _logger.info(
@@ -154,7 +152,6 @@ public class TransactionNameServiceTest extends BaseTest {
                     .name(name)
                     .salt(salt)
                     .nonce(getNextKeypairNonce())
-                    .ttl(ZERO)
                     .build();
 
             PostTransactionResult namePreclaimResult = this.blockingPostTx(namePreclaimTx);
@@ -170,7 +167,6 @@ public class TransactionNameServiceTest extends BaseTest {
                     .name(name)
                     .nameSalt(salt)
                     .nonce(getNextKeypairNonce())
-                    .ttl(ZERO)
                     .build();
             PostTransactionResult nameClaimResult = this.blockingPostTx(nameClaimTx);
             _logger.info(
@@ -205,7 +201,6 @@ public class TransactionNameServiceTest extends BaseTest {
                     .accountId(keyPair.getAddress())
                     .nameId(nameEntryResult.getId())
                     .nonce(getNextKeypairNonce())
-                    .ttl(ZERO)
                     .clientTtl(clientTtl)
                     .nameTtl(nameTtl)
                     .pointers(
@@ -265,7 +260,6 @@ public class TransactionNameServiceTest extends BaseTest {
                     .recipient(nameEntryResult.getId())
                     .amount(aettos)
                     .payload("send to AENS name test")
-                    .ttl(ZERO)
                     .nonce(getNextKeypairNonce())
                     .build();
             PostTransactionResult txResponse =
@@ -301,7 +295,6 @@ public class TransactionNameServiceTest extends BaseTest {
                     .accountId(keyPair.getAddress())
                     .nameId(nameId)
                     .nonce(getNextKeypairNonce())
-                    .ttl(ZERO)
                     .build();
 
             PostTransactionResult nameRevokeResult = this.blockingPostTx(nameRevokeTx);
@@ -352,7 +345,6 @@ public class TransactionNameServiceTest extends BaseTest {
                     .name(name)
                     .salt(salt)
                     .nonce(getNextKeypairNonce())
-                    .ttl(ZERO)
                     .build();
             PostTransactionResult namePreclaimResult = this.blockingPostTx(namePreclaimTx);
             _logger.info("NamePreclaimTx hash: {}", namePreclaimResult.getTxHash());
@@ -375,7 +367,6 @@ public class TransactionNameServiceTest extends BaseTest {
                     .name(name)
                     .nameSalt(salt)
                     .nonce(getNextKeypairNonce())
-                    .ttl(ZERO)
                     .build();
             BigInteger currentNameFee = nameClaimTx.getNameFee();
             _logger.info("current nameFee: {} ættos", currentNameFee);
@@ -438,7 +429,6 @@ public class TransactionNameServiceTest extends BaseTest {
                     .sender(account.getPublicKey())
                     .recipient(recipient)
                     .amount(amount)
-                    .ttl(ZERO)
                     .nonce(nonce)
                     .build();
             PostTransactionResult txResponse = this.blockingPostTx(spendTx);

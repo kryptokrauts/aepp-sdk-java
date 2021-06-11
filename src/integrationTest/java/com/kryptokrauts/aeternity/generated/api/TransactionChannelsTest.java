@@ -38,7 +38,6 @@ public class TransactionChannelsTest extends BaseTest {
                     .sender(initiator.getAddress())
                     .recipient(responder.getAddress())
                     .amount(amount)
-                    .ttl(ZERO)
                     .nonce(getNextKeypairNonce())
                     .build();
             PostTransactionResult txResponse = this.blockingPostTx(spendTx);

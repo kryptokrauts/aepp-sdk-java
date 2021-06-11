@@ -13,22 +13,14 @@ import java.util.List;
 public interface TransactionService {
 
   /**
-   * synchronously sign an unsigned transaction with the given private key
+   * sign an unsigned transaction with the given private key
    *
-   * @param unsignedTx a raw unsigned transaction
-   * @param privateKey the private key to sign the transaction
+   * @param unsignedTx the encoded unsigned transaction
+   * @param privateKey the encoded private key to sign the transaction
    * @return signed and encoded transaction
    * @throws TransactionCreateException if an error occurs
    */
   String signTransaction(String unsignedTx, String privateKey) throws TransactionCreateException;
-
-  /**
-   * wrap into a signed tx with empty list of signatures (to be used for Generalized Accounts)
-   *
-   * @param unsignedTx a raw unsigned transaction
-   * @return wrapped signed and encoded transaction
-   */
-  String wrapSignedTransactionForGA(String unsignedTx);
 
   /**
    * asynchronously creates an unsignedTx object for further processing and especially abstracts the
@@ -164,4 +156,17 @@ public interface TransactionService {
    *     <p>- check getBlockHeight():if the blockHeight is -1 it means the transaction isn't mined.
    */
   Single<TransactionResult> asyncWaitForConfirmation(String txHash, int numOfConfirmations);
+
+  /**
+   * sign an unsigned transaction with the given private key. method uses an additional prefix and
+   * must be used to sign inner transactions of PayingForTx
+   *
+   * @param transactionModel of the inner tx to be signed
+   * @param privateKey the encoded private key to sign the transaction
+   * @return signed and encoded transaction
+   * @throws TransactionCreateException if an error occurs
+   */
+  String signPayingForInnerTransaction(
+      final AbstractTransactionModel<?> model, final String privateKey)
+      throws TransactionCreateException;
 }

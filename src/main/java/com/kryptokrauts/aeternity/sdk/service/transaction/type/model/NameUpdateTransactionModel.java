@@ -31,7 +31,7 @@ public class NameUpdateTransactionModel extends AbstractTransactionModel<NameUpd
   @Mandatory private String accountId;
   @Mandatory private BigInteger nonce;
   @Mandatory private String nameId;
-  @Mandatory private BigInteger ttl;
+  @Default private BigInteger ttl = BigInteger.ZERO;
 
   private BigInteger nameTtl;
   private BigInteger clientTtl;
