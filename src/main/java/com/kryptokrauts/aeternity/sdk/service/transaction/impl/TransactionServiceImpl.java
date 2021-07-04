@@ -158,6 +158,7 @@ public class TransactionServiceImpl implements TransactionService {
     }
   }
 
+  @Override
   public String signPayingForInnerTransaction(
       final AbstractTransactionModel<?> model, final String privateKey)
       throws TransactionCreateException {
@@ -290,7 +291,7 @@ public class TransactionServiceImpl implements TransactionService {
 
   private TransactionCreateException createException(Exception e) {
     return new TransactionCreateException(
-        String.format("Technical error creating exception: ", e.getMessage()), e);
+        String.format("Technical error creating exception: %s", e.getMessage()), e);
   }
 
   private Tx createGeneratedTxObject(String signedTx) {
