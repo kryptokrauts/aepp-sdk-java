@@ -3,6 +3,7 @@ package com.kryptokrauts.aeternity.sdk.service;
 import com.google.common.collect.ImmutableMap;
 import com.kryptokrauts.aeternity.generated.ApiClient;
 import com.kryptokrauts.aeternity.sdk.constants.BaseConstants;
+import com.kryptokrauts.aeternity.sdk.constants.Network;
 import com.kryptokrauts.aeternity.sdk.constants.VirtualMachine;
 import com.kryptokrauts.aeternity.sdk.domain.secret.KeyPair;
 import com.kryptokrauts.aeternity.sdk.exception.InvalidParameterException;
@@ -51,12 +52,22 @@ public class ServiceConfiguration {
 
   @Default @Nonnull protected String indaexBaseUrl = BaseConstants.DEFAULT_TESTNET_INDAEX_URL;
 
+  @Getter @Default protected Network network = Network.TESTNET;
+
   @Getter @Default @Nonnull protected VirtualMachine targetVM = VirtualMachine.FATE;
 
   private KeyPair keyPair;
 
   /** the vertx instance */
   protected Vertx vertx;
+
+  public KeyPair getKeyPair() {
+    if (keyPair == null) {
+      throw new InvalidParameterException(
+          "Service call was initiated which needs the keyPair but none is set in ServiceConfiguration.keyPair - check parameters");
+    }
+    return keyPair;
+  }
 
   /** @return apiClient initalized with default or given values of vertx and baseURL */
   public ApiClient getApiClient() {
@@ -112,13 +123,5 @@ public class ServiceConfiguration {
     } else
       throw new RuntimeException(
           "Cannot instantiate ApiClient due to missing params vertx and or indaexBaseUrl");
-  }
-
-  public KeyPair getKeyPair() {
-    if (keyPair == null) {
-      throw new InvalidParameterException(
-          "Service call was initiated which needs the baseKeyPair but none is set in ServiceConfiguration.baseKeyPair - check parameters");
-    }
-    return keyPair;
   }
 }

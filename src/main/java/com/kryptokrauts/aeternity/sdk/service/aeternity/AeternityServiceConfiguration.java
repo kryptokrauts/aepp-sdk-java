@@ -1,7 +1,6 @@
 package com.kryptokrauts.aeternity.sdk.service.aeternity;
 
 import com.kryptokrauts.aeternity.sdk.constants.BaseConstants;
-import com.kryptokrauts.aeternity.sdk.constants.Network;
 import com.kryptokrauts.aeternity.sdk.service.ServiceConfiguration;
 import lombok.Builder.Default;
 import lombok.Getter;
@@ -14,8 +13,6 @@ public class AeternityServiceConfiguration extends ServiceConfiguration {
   @Default private boolean nativeMode = true;
 
   @Default private boolean debugDryRun = false;
-
-  @Default private Network network = Network.TESTNET;
 
   @Default private long minimalGasPrice = BaseConstants.MINIMAL_GAS_PRICE;
 

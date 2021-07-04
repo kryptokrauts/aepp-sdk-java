@@ -1,8 +1,10 @@
 package com.kryptokrauts.aeternity.sdk.constants;
 
+import com.kryptokrauts.aeternity.sdk.util.EncodingUtils;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -108,5 +110,14 @@ public interface AENS {
         .add(nameFee)
         .setScale(2, RoundingMode.HALF_UP)
         .toBigInteger();
+  }
+
+  /**
+   * @param name the AENS name (e.g. kryptokrauts.chain)
+   * @return the nameId for a given name
+   */
+  static String getNameId(String name) {
+    return EncodingUtils.encodeCheck(
+        EncodingUtils.hash(name.getBytes(StandardCharsets.UTF_8)), ApiIdentifiers.NAME);
   }
 }
