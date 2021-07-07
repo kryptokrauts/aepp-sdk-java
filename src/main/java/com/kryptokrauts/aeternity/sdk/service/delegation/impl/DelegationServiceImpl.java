@@ -7,6 +7,7 @@ import com.kryptokrauts.aeternity.sdk.service.delegation.DelegationService;
 import com.kryptokrauts.aeternity.sdk.util.ByteUtils;
 import com.kryptokrauts.aeternity.sdk.util.EncodingUtils;
 import com.kryptokrauts.aeternity.sdk.util.SigningUtil;
+import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import javax.annotation.Nonnull;
 import lombok.RequiredArgsConstructor;
@@ -53,6 +54,12 @@ public class DelegationServiceImpl implements DelegationService {
             EncodingUtils.decodeCheckWithIdentifier(queryId),
             EncodingUtils.decodeCheckWithIdentifier(contractId));
     return signPayloadWithNetworkId(payload);
+  }
+
+  @Override
+  public String getAensCommitmentHash(String name, BigInteger salt) {
+    return Hex.toHexString(
+        EncodingUtils.decodeCheckWithIdentifier(EncodingUtils.generateCommitmentHash(name, salt)));
   }
 
   private String signPayloadWithNetworkId(byte[] payload) {

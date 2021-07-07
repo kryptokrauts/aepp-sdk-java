@@ -64,7 +64,7 @@ public class NameClaimTransactionModel extends AbstractTransactionModel<NameClai
   @Override
   public void validateInput() {
     ValidationUtil.checkNamespace(this.name);
-    BigInteger minimumNameFee = AENS.INITIAL_NAME_LENGTH_FEE_MAP.get(this.getNameLength());
+    BigInteger minimumNameFee = AENS.getInitialNameFee(this.name);
     ValidationUtil.checkParameters(
         validate -> this.getNameFee().compareTo(minimumNameFee) != -1,
         this.nameFee,
@@ -88,18 +88,9 @@ public class NameClaimTransactionModel extends AbstractTransactionModel<NameClai
     if (this.nameFee == null && this.name != null) {
       log.info(
           "nameFee not provided. using the initial required fee for the length of the given name.");
-      int nameLength = this.getNameLength();
-      if (nameLength >= 31) {
-        this.nameFee = AENS.SMALLEST_FEE;
-      } else {
-        this.nameFee = AENS.INITIAL_NAME_LENGTH_FEE_MAP.get(nameLength);
-      }
+      this.nameFee = AENS.getInitialNameFee(name);
       log.info("initial name fee for the domain '{}' is: {}", this.name, this.nameFee);
     }
     return this.nameFee;
-  }
-
-  private Integer getNameLength() {
-    return this.name.split("\\.")[0].length();
   }
 }

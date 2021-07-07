@@ -96,6 +96,20 @@ public interface AENS {
   }
 
   /**
+   * returns the initial nameFee which is required to claim the name
+   *
+   * @param name the name to claim
+   * @return the initial nameFee which is required to claim the name
+   */
+  static BigInteger getInitialNameFee(String name) {
+    int length = name.split("\\.")[0].length();
+    if (length >= 31) {
+      return SMALLEST_FEE;
+    }
+    return INITIAL_NAME_LENGTH_FEE_MAP.get(length);
+  }
+
+  /**
    * returns the nameFee which is required for the next claim based on the current nameFee <br>
    * the next nameFee is 5% higher than the current nameFee
    *
@@ -118,6 +132,7 @@ public interface AENS {
    */
   static String getNameId(String name) {
     return EncodingUtils.encodeCheck(
-        EncodingUtils.hash(name.getBytes(StandardCharsets.UTF_8)), ApiIdentifiers.NAME);
+        EncodingUtils.hash(name.toLowerCase().getBytes(StandardCharsets.UTF_8)),
+        ApiIdentifiers.NAME);
   }
 }
