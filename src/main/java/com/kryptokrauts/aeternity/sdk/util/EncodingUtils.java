@@ -293,7 +293,8 @@ public final class EncodingUtils {
     return encodeCheck(
         hash(
             ByteUtils.concatenate(
-                name.getBytes(StandardCharsets.UTF_8), ByteUtils.leftPad(32, salt.toByteArray()))),
+                name.toLowerCase().getBytes(StandardCharsets.UTF_8),
+                ByteUtils.leftPad(32, salt.toByteArray()))),
         ApiIdentifiers.COMMITMENT);
   }
 

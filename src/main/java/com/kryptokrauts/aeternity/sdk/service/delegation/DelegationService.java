@@ -1,5 +1,7 @@
 package com.kryptokrauts.aeternity.sdk.service.delegation;
 
+import java.math.BigInteger;
+
 public interface DelegationService {
 
   /**
@@ -43,4 +45,14 @@ public interface DelegationService {
    *     behalf of the configured (oracle) keypair
    */
   String createOracleDelegationSignature(String contractId, String queryId);
+
+  /**
+   * for claiming names with contracts it is required to provide the commitmentHash for an aens name
+   *
+   * @param name the AENS name to claim
+   * @param salt the salt used in the pre-claim transaction
+   * @return the hash that needs to be wrapped in the `Hash` object (generated via
+   *     contraect-maven-plugin)
+   */
+  String getAensCommitmentHash(String name, BigInteger salt);
 }
