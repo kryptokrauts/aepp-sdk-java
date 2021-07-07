@@ -44,7 +44,7 @@ public abstract class AbstractTransaction<TxModel extends AbstractTransactionMod
    *
    * @return {@link Bytes}
    */
-  protected abstract Bytes createRLPEncodedList();
+  public abstract Bytes createRLPEncodedList();
 
   /**
    * this method needs to be implemented for testing purposes (non native mode)

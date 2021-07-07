@@ -12,6 +12,7 @@ import com.kryptokrauts.aeternity.sdk.service.transaction.type.impl.OracleQueryT
 import com.kryptokrauts.sophia.compiler.generated.api.rxjava.DefaultApi;
 import java.math.BigInteger;
 import java.util.function.Function;
+import lombok.Builder.Default;
 import lombok.Getter;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
@@ -29,7 +30,7 @@ public class OracleQueryTransactionModel extends AbstractTransactionModel<Oracle
   @Mandatory private BigInteger queryTtl;
   @Mandatory private OracleTTLType queryTtlType;
   @Mandatory private BigInteger responseTtl;
-  @Mandatory private BigInteger ttl;
+  @Default private BigInteger ttl = BigInteger.ZERO;
 
   @Override
   public OracleQueryTx toApiModel() {

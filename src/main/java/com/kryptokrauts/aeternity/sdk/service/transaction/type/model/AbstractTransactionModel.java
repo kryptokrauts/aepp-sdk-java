@@ -73,4 +73,31 @@ public abstract class AbstractTransactionModel<GeneratedTxModel> {
    * @return a function that maps the generated Api class into our SDK model class
    */
   public abstract Function<GenericTx, ?> getApiToModelFunction();
+
+  /**
+   * indicates, if the transaction needs to be signed
+   *
+   * @return
+   */
+  public boolean doSign() {
+    return true;
+  }
+
+  /**
+   * indicates, if the transaction has inner tx (GATx, PayforTx)
+   *
+   * @return
+   */
+  public boolean hasInnerTx() {
+    return getInnerTxModel() != null;
+  }
+
+  /**
+   * returns the inner transaction model if defined
+   *
+   * @return
+   */
+  public AbstractTransactionModel<?> getInnerTxModel() {
+    return null;
+  }
 }

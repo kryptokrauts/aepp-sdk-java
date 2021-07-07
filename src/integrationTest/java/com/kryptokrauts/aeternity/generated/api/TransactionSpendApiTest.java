@@ -85,7 +85,6 @@ public class TransactionSpendApiTest extends BaseTest {
                   .recipient(recipient)
                   .amount(amount)
                   .payload(payload)
-                  .ttl(ZERO)
                   .nonce(nonce)
                   .build();
 
@@ -121,7 +120,6 @@ public class TransactionSpendApiTest extends BaseTest {
                   .recipient(recipient)
                   .amount(amount)
                   .payload(payload)
-                  .ttl(ZERO)
                   .nonce(nonce)
                   .build();
 
@@ -164,7 +162,6 @@ public class TransactionSpendApiTest extends BaseTest {
                     .recipient(recipient.getAddress())
                     .amount(new BigInteger("1000000000000000000"))
                     .payload("donation")
-                    .ttl(ZERO)
                     .nonce(getNextKeypairNonce())
                     .build();
             PostTransactionResult txResponse =
@@ -192,7 +189,6 @@ public class TransactionSpendApiTest extends BaseTest {
                     .recipient(recipient.getAddress())
                     .amount(new BigInteger("1000000000000000000"))
                     .payload("donation")
-                    .ttl(ZERO)
                     .nonce(getNextKeypairNonce())
                     .build();
             PostTransactionResult txResponse =
@@ -211,7 +207,6 @@ public class TransactionSpendApiTest extends BaseTest {
                     .recipient(keyPair.getAddress())
                     .amount(BigInteger.valueOf(recipientAccountSendAmount))
                     .nonce(recipientAccount.getNonce().add(ONE))
-                    .ttl(ZERO)
                     .build();
             _logger.info("Sending back {}", spendTx);
             txResponse =
@@ -247,7 +242,6 @@ public class TransactionSpendApiTest extends BaseTest {
                     .recipient(recipient.getAddress())
                     .amount(new BigInteger("1000000000000000000"))
                     .payload("wait for confirmation works =)")
-                    .ttl(ZERO)
                     .nonce(getNextKeypairNonce())
                     .build();
             Single<PostTransactionResult> postTransactionResultSingle =
@@ -295,7 +289,6 @@ public class TransactionSpendApiTest extends BaseTest {
                     .recipient(recipient.getAddress())
                     .amount(new BigInteger("1000000000000000000"))
                     .payload("wait for confirmation fails :-(")
-                    .ttl(ZERO)
                     .nonce(getNextKeypairNonce())
                     .build();
             String computedTxHash = aeternityServiceNative.transactions.computeTxHash(spendTx);

@@ -42,7 +42,6 @@ public class TransactionGeneralizedAccountsTest extends BaseTest {
                   .sender(account.getPublicKey())
                   .recipient(gaAccountKeyPair.getAddress())
                   .amount(amount)
-                  .ttl(ZERO)
                   .nonce(nonce)
                   .build();
           aeternityServiceNative.transactions.blockingPostTransaction(spendTx);
@@ -64,7 +63,7 @@ public class TransactionGeneralizedAccountsTest extends BaseTest {
                   Collections.emptyMap());
           String callData = resultWrapper.getResult();
 
-          BigInteger gas = BigInteger.valueOf(4800000);
+          BigInteger gas = BigInteger.valueOf(800000);
           BigInteger gasPrice = BigInteger.valueOf(BaseConstants.MINIMAL_GAS_PRICE);
           GeneralizedAccountsAttachTransactionModel gaAttachTx =
               GeneralizedAccountsAttachTransactionModel.builder()
@@ -75,8 +74,6 @@ public class TransactionGeneralizedAccountsTest extends BaseTest {
                   .gasPrice(gasPrice)
                   .nonce(gaTestAccount.getNonce().add(ONE))
                   .ownerId(gaTestAccount.getPublicKey())
-                  .ttl(ZERO)
-                  .virtualMachine(targetVM)
                   .build();
 
           String unsignedTx =
@@ -110,8 +107,6 @@ public class TransactionGeneralizedAccountsTest extends BaseTest {
                   .gasPrice(dryRunResult.getContractCallObject().getGasPrice())
                   .nonce(gaTestAccount.getNonce().add(ONE))
                   .ownerId(gaTestAccount.getPublicKey())
-                  .ttl(ZERO)
-                  .virtualMachine(targetVM)
                   .build();
           PostTransactionResult result =
               this.aeternityServiceNative.transactions.blockingPostTransaction(
@@ -133,7 +128,6 @@ public class TransactionGeneralizedAccountsTest extends BaseTest {
                   .recipient(otherRecipient.getAddress())
                   .amount(amount)
                   .payload("spent using a generalized account =)")
-                  .ttl(ZERO)
                   .nonce(ZERO) // GA
                   // inner
                   // tx
@@ -142,14 +136,6 @@ public class TransactionGeneralizedAccountsTest extends BaseTest {
                   // as
                   // nonce
                   .build();
-
-          String unsignedInnerTx =
-              aeternityServiceNative
-                  .transactions
-                  .blockingCreateUnsignedTransaction(gaInnerSpendTx)
-                  .getResult();
-          String encodedInnerTx =
-              aeternityServiceNative.transactions.wrapSignedTransactionForGA(unsignedInnerTx);
 
           String authData =
               encodeCalldata(
@@ -162,8 +148,8 @@ public class TransactionGeneralizedAccountsTest extends BaseTest {
               GeneralizedAccountsMetaTransactionModel.builder()
                   .gaId(gaAccountKeyPair.getAddress())
                   .authData(authData)
-                  .virtualMachine(targetVM)
-                  .innerTx(encodedInnerTx)
+                  // .tx(encodedInnerTx)
+                  .innerTxModel(gaInnerSpendTx)
                   .build();
           result = this.aeternityServiceNative.transactions.blockingPostTransaction(gaMetaTx);
           _logger.info("gaMetaTx result: {}", result);

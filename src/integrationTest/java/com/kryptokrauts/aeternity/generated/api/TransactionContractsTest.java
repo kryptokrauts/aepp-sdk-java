@@ -222,8 +222,6 @@ public class TransactionContractsTest extends BaseTest {
                     .gasPrice(result.getContractCallObject().getGasPrice())
                     .nonce(getNextKeypairNonce())
                     .callerId(keyPair.getAddress())
-                    .ttl(ZERO)
-                    .virtualMachine(targetVM)
                     .build();
 
             PostTransactionResult response =
@@ -265,7 +263,7 @@ public class TransactionContractsTest extends BaseTest {
       BigInteger nonce, String calldata, BigInteger gasPrice) {
     String callerId = keyPair.getAddress();
     BigInteger ttl = BigInteger.ZERO;
-    BigInteger gas = BigInteger.valueOf(1579000);
+    BigInteger gas = BigInteger.valueOf(1000000);
     ContractCallTransactionModel model =
         ContractCallTransactionModel.builder()
             .callData(calldata)
@@ -299,8 +297,6 @@ public class TransactionContractsTest extends BaseTest {
                   .gasPrice(gasPrice)
                   .nonce(getNextKeypairNonce())
                   .ownerId(keyPair.getAddress())
-                  .ttl(ZERO)
-                  .virtualMachine(targetVM)
                   .build();
 
           PostTransactionResult result =
@@ -309,6 +305,7 @@ public class TransactionContractsTest extends BaseTest {
             TransactionInfoResult txInfoObject = waitForTxInfoObject(result.getTxHash());
             localDeployedContractId = txInfoObject.getCallInfo().getContractId();
             _logger.info("Deployed contract - hash " + result.getTxHash() + " - " + txInfoObject);
+            _logger.info("ContractId: {}", localDeployedContractId);
           } catch (Throwable e) {
             context.fail(e);
           }
@@ -370,7 +367,7 @@ public class TransactionContractsTest extends BaseTest {
     AeternityService testnetService =
         new AeternityService(
             AeternityServiceConfiguration.configure()
-                .baseUrl(TestConstants.testnetURL)
+                .baseUrl(BaseConstants.DEFAULT_TESTNET_URL)
                 .network(Network.TESTNET)
                 .vertx(rule.vertx())
                 .compile());
@@ -378,7 +375,6 @@ public class TransactionContractsTest extends BaseTest {
     String ownerId = keyPair.getAddress();
     BigInteger amount = BigInteger.ZERO;
     BigInteger deposit = BigInteger.ZERO;
-    BigInteger ttl = BigInteger.ZERO;
     BigInteger gas = BigInteger.valueOf(1000);
     BigInteger gasPrice = BigInteger.valueOf(1100000000);
     BigInteger nonce = getNextKeypairNonce();
@@ -393,8 +389,6 @@ public class TransactionContractsTest extends BaseTest {
             .gasPrice(gasPrice)
             .nonce(nonce)
             .ownerId(ownerId)
-            .ttl(ttl)
-            .virtualMachine(targetVM)
             .build();
 
     PostTransactionResult result =

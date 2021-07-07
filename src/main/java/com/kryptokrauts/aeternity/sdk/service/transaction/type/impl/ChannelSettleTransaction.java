@@ -27,7 +27,7 @@ public class ChannelSettleTransaction extends AbstractTransaction<ChannelSettleT
   }
 
   @Override
-  protected Bytes createRLPEncodedList() {
+  public Bytes createRLPEncodedList() {
     Bytes encodedRlp =
         RLP.encodeList(
             rlpWriter -> {

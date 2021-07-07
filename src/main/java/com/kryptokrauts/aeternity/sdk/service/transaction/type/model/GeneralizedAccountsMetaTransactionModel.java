@@ -6,6 +6,7 @@ import com.kryptokrauts.aeternity.generated.model.GenericTx;
 import com.kryptokrauts.aeternity.sdk.annotations.Mandatory;
 import com.kryptokrauts.aeternity.sdk.constants.BaseConstants;
 import com.kryptokrauts.aeternity.sdk.constants.VirtualMachine;
+import com.kryptokrauts.aeternity.sdk.service.info.domain.ApiModelMapper;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.AbstractTransaction;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.impl.GeneralizedAccountsMetaTransaction;
 import com.kryptokrauts.sophia.compiler.generated.api.rxjava.DefaultApi;
@@ -25,8 +26,8 @@ public class GeneralizedAccountsMetaTransactionModel extends AbstractTransaction
   @Mandatory private String authData;
   @Default private BigInteger gas = BigInteger.valueOf(50000);
   @Default private BigInteger gasPrice = BigInteger.valueOf(BaseConstants.MINIMAL_GAS_PRICE);
-  @Mandatory private String innerTx;
-  @Mandatory private VirtualMachine virtualMachine;
+  @Default private VirtualMachine virtualMachine = VirtualMachine.FATE;
+  @Mandatory private AbstractTransactionModel<?> innerTxModel;
 
   @Override
   public GAMetaTx toApiModel() {
@@ -37,6 +38,11 @@ public class GeneralizedAccountsMetaTransactionModel extends AbstractTransaction
     gaMetaTx.fee(fee);
     gaMetaTx.gas(gas);
     gaMetaTx.gasPrice(gasPrice);
+    /**
+     * we cannot map the inner tx because we need a GenericSignedTx here which cannot be produced
+     * from the model class without using the {@link TransactionServiceImpl} which is not allowed
+     * here
+     */
     return gaMetaTx;
   }
 
@@ -48,6 +54,10 @@ public class GeneralizedAccountsMetaTransactionModel extends AbstractTransaction
     return GeneralizedAccountsMetaTransaction.builder()
         .externalApi(externalApi)
         .model(this)
+        .innerTxRLPEncodedList(
+            this.getInnerTxModel()
+                .buildTransaction(externalApi, compilerApi)
+                .createRLPEncodedList())
         .build();
   }
 
@@ -62,7 +72,13 @@ public class GeneralizedAccountsMetaTransactionModel extends AbstractTransaction
           .gas(castedTx.getGas())
           .gasPrice(castedTx.getGasPrice())
           .virtualMachine(VirtualMachine.getVirtualMachine(castedTx.getAbiVersion()))
+          .innerTxModel(ApiModelMapper.mapToTransactionModel(castedTx.getTx().getTx()))
           .build();
     };
+  }
+
+  @Override
+  public boolean doSign() {
+    return false;
   }
 }

@@ -27,7 +27,7 @@ public class NamePreclaimTransaction extends AbstractTransaction<NamePreclaimTra
   }
 
   @Override
-  protected Bytes createRLPEncodedList() {
+  public Bytes createRLPEncodedList() {
     Bytes encodedRlp =
         RLP.encodeList(
             rlpWriter -> {

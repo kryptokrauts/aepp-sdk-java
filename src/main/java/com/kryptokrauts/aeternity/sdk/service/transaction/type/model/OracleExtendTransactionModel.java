@@ -11,6 +11,7 @@ import com.kryptokrauts.aeternity.sdk.service.transaction.type.impl.OracleExtend
 import com.kryptokrauts.sophia.compiler.generated.api.rxjava.DefaultApi;
 import java.math.BigInteger;
 import java.util.function.Function;
+import lombok.Builder.Default;
 import lombok.Getter;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
@@ -23,7 +24,7 @@ public class OracleExtendTransactionModel extends AbstractTransactionModel<Oracl
   @Mandatory private BigInteger nonce;
   @Mandatory private String oracleId;
   @Mandatory private BigInteger oracleRelativeTtl;
-  @Mandatory private BigInteger ttl;
+  @Default private BigInteger ttl = BigInteger.ZERO;
 
   @Override
   public OracleExtendTx toApiModel() {
