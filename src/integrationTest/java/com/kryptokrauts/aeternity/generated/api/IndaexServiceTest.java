@@ -13,8 +13,8 @@ public class IndaexServiceTest extends BaseTest {
         t -> {
           StatusResult statusResult = this.aeternityServiceNative.indaex.blockingGetStatus();
           _logger.info(statusResult.toString());
-          context.assertEquals("6.0.0", statusResult.getNodeVersion());
-          context.assertEquals("1.0.6", statusResult.getMdwVersion());
+          context.assertEquals("6.1.0", statusResult.getNodeVersion());
+          context.assertEquals("1.0.8", statusResult.getMdwVersion());
         });
   }
 }
