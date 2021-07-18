@@ -1,6 +1,7 @@
 package com.kryptokrauts.aeternity.sdk.service.transaction.type.impl;
 
 import com.kryptokrauts.aeternity.generated.api.rxjava.ExternalApi;
+import com.kryptokrauts.aeternity.generated.api.rxjava.InternalApi;
 import com.kryptokrauts.aeternity.generated.model.UnsignedTx;
 import com.kryptokrauts.aeternity.sdk.constants.ApiIdentifiers;
 import com.kryptokrauts.aeternity.sdk.constants.SerializationTags;
@@ -21,10 +22,11 @@ public class ChannelCloseMutualTransaction
     extends AbstractTransaction<ChannelCloseMutualTransactionModel> {
 
   @NonNull private ExternalApi externalApi;
+  @NonNull private InternalApi internalApi;
 
   @Override
   protected Single<UnsignedTx> createInternal() {
-    return externalApi.rxPostChannelCloseMutual(model.toApiModel());
+    return internalApi.rxPostChannelCloseMutual(model.toApiModel(), false, null);
   }
 
   @Override

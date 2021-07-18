@@ -1,7 +1,9 @@
 package com.kryptokrauts.aeternity.sdk.service.aeternity.impl;
 
 import com.kryptokrauts.aeternity.generated.api.ExternalApiImpl;
+import com.kryptokrauts.aeternity.generated.api.InternalApiImpl;
 import com.kryptokrauts.aeternity.generated.api.rxjava.ExternalApi;
+import com.kryptokrauts.aeternity.generated.api.rxjava.InternalApi;
 import com.kryptokrauts.aeternity.sdk.service.account.AccountService;
 import com.kryptokrauts.aeternity.sdk.service.account.impl.AccountServiceImpl;
 import com.kryptokrauts.aeternity.sdk.service.aeternity.AeternityServiceConfiguration;
@@ -31,6 +33,8 @@ public class AeternityService {
 
   private ExternalApi externalApi;
 
+  private InternalApi internalApi;
+
   private DefaultApi compilerApi;
 
   private com.kryptokrauts.indaex.generated.api.rxjava.MiddlewareApi indaexApi;
@@ -52,6 +56,7 @@ public class AeternityService {
   public AeternityService(AeternityServiceConfiguration config) {
     this.config = config;
     this.externalApi = new ExternalApi(new ExternalApiImpl(config.getApiClient()));
+    this.internalApi = new InternalApi(new InternalApiImpl(config.getApiClient()));
     this.compilerApi = new DefaultApi(new DefaultApiImpl(config.getCompilerApiClient()));
     this.indaexApi =
         new com.kryptokrauts.indaex.generated.api.rxjava.MiddlewareApi(
@@ -64,6 +69,7 @@ public class AeternityService {
     this.names = new NameServiceImpl(this.config, this.externalApi);
     this.oracles = new OracleServiceImpl(this.config, this.externalApi);
     this.transactions =
-        new TransactionServiceImpl(this.config, this.externalApi, this.compilerApi, this.info);
+        new TransactionServiceImpl(
+            this.config, this.externalApi, this.internalApi, this.compilerApi, this.info);
   }
 }

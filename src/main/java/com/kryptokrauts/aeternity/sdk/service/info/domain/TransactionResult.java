@@ -1,6 +1,6 @@
 package com.kryptokrauts.aeternity.sdk.service.info.domain;
 
-import com.kryptokrauts.aeternity.generated.model.GenericSignedTx;
+import com.kryptokrauts.aeternity.generated.model.SignedTx;
 import com.kryptokrauts.aeternity.sdk.domain.GenericResultObject;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.model.AbstractTransactionModel;
 import java.math.BigInteger;
@@ -12,7 +12,7 @@ import lombok.experimental.SuperBuilder;
 @Getter
 @SuperBuilder(toBuilder = true)
 @ToString
-public class TransactionResult extends GenericResultObject<GenericSignedTx, TransactionResult> {
+public class TransactionResult extends GenericResultObject<SignedTx, TransactionResult> {
 
   private BigInteger txVersion;
 
@@ -29,10 +29,10 @@ public class TransactionResult extends GenericResultObject<GenericSignedTx, Tran
   private AbstractTransactionModel<?> resultTransactionModel;
 
   @Override
-  protected TransactionResult map(GenericSignedTx generatedResultObject) {
+  protected TransactionResult map(SignedTx generatedResultObject) {
     if (generatedResultObject != null)
       return this.toBuilder()
-          .txType(generatedResultObject.getTx().getType())
+          .txType(generatedResultObject.getTx().getType().toString())
           .txVersion(generatedResultObject.getTx().getVersion())
           .blockHash(generatedResultObject.getBlockHash())
           .blockHeight(generatedResultObject.getBlockHeight())

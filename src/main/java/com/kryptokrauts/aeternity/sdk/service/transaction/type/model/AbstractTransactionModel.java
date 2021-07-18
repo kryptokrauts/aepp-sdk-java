@@ -1,10 +1,10 @@
 package com.kryptokrauts.aeternity.sdk.service.transaction.type.model;
 
 import com.kryptokrauts.aeternity.generated.api.rxjava.ExternalApi;
-import com.kryptokrauts.aeternity.generated.model.GenericTx;
+import com.kryptokrauts.aeternity.generated.api.rxjava.InternalApi;
+import com.kryptokrauts.aeternity.generated.model.Tx;
 import com.kryptokrauts.aeternity.sdk.annotations.Mandatory;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.AbstractTransaction;
-import com.kryptokrauts.sophia.compiler.generated.api.rxjava.DefaultApi;
 import java.lang.reflect.Field;
 import java.math.BigInteger;
 import java.util.function.Function;
@@ -61,18 +61,18 @@ public abstract class AbstractTransactionModel<GeneratedTxModel> {
    * builds the necessary transaction object
    *
    * @param externalApi the node api instance
-   * @param compilerApi the compiler api instance
+   * @param internalApi the node api instance
    * @return the instance of a specific transaction class that extends {@link AbstractTransaction}
    */
   public abstract AbstractTransaction<?> buildTransaction(
-      ExternalApi externalApi, DefaultApi compilerApi);
+      ExternalApi externalApi, InternalApi internalApi);
 
   /**
    * remap the given genericTx to a model
    *
    * @return a function that maps the generated Api class into our SDK model class
    */
-  public abstract Function<GenericTx, ?> getApiToModelFunction();
+  public abstract Function<Tx, ?> getApiToModelFunction();
 
   /**
    * indicates, if the transaction needs to be signed

@@ -35,7 +35,7 @@ public final class SophiaCompilerServiceImpl implements CompilerService {
         .asyncGet(
             this.compilerApi
                 .rxEncodeCalldata(
-                    buildFunctionCallInput(sourceCode, function, arguments, fileSystem))
+                    buildFunctionCallInput(sourceCode, function, arguments, fileSystem), null)
                 .map(calldata -> calldata.getCalldata()));
   }
 
@@ -47,7 +47,7 @@ public final class SophiaCompilerServiceImpl implements CompilerService {
         .blockingGet(
             this.compilerApi
                 .rxEncodeCalldata(
-                    buildFunctionCallInput(sourceCode, function, arguments, fileSystem))
+                    buildFunctionCallInput(sourceCode, function, arguments, fileSystem), null)
                 .map(calldata -> calldata.getCalldata()));
   }
 
@@ -74,7 +74,7 @@ public final class SophiaCompilerServiceImpl implements CompilerService {
         .build()
         .asyncGet(
             this.compilerApi
-                .rxDecodeData(buildDecodeBody(calldata, sophiaType))
+                .rxDecodeData(buildDecodeBody(calldata, sophiaType), null)
                 .map(
                     decodeResult ->
                         Optional.ofNullable(decodeResult).orElse(new SophiaJsonData()).getData()));
@@ -86,7 +86,7 @@ public final class SophiaCompilerServiceImpl implements CompilerService {
         .build()
         .blockingGet(
             this.compilerApi
-                .rxDecodeData(buildDecodeBody(calldata, sophiaType))
+                .rxDecodeData(buildDecodeBody(calldata, sophiaType), null)
                 .map(
                     decodeResult ->
                         Optional.ofNullable(decodeResult).orElse(new SophiaJsonData()).getData()));
@@ -104,7 +104,7 @@ public final class SophiaCompilerServiceImpl implements CompilerService {
         .asyncGet(
             this.compilerApi
                 .rxDecodeCallResult(
-                    buildDecodeBody(source, function, callResult, callValue, fileSystem))
+                    buildDecodeBody(source, function, callResult, callValue, fileSystem), null)
                 .map(decodeResult -> Optional.ofNullable(decodeResult).orElse("")));
   }
 
@@ -120,7 +120,7 @@ public final class SophiaCompilerServiceImpl implements CompilerService {
         .blockingGet(
             this.compilerApi
                 .rxDecodeCallResult(
-                    buildDecodeBody(source, function, callResult, callValue, fileSystem))
+                    buildDecodeBody(source, function, callResult, callValue, fileSystem), null)
                 .map(decodeResult -> Optional.ofNullable(decodeResult).orElse("")));
   }
 
@@ -156,7 +156,8 @@ public final class SophiaCompilerServiceImpl implements CompilerService {
       String contractCode, String srcFile, Object fileSystem) {
     return ACIResult.builder()
         .build()
-        .asyncGet(this.compilerApi.rxGenerateACI(buildACIBody(contractCode, srcFile, fileSystem)));
+        .asyncGet(
+            this.compilerApi.rxGenerateACI(buildACIBody(contractCode, srcFile, fileSystem), null));
   }
 
   @Override
@@ -164,7 +165,7 @@ public final class SophiaCompilerServiceImpl implements CompilerService {
     return ACIResult.builder()
         .build()
         .blockingGet(
-            this.compilerApi.rxGenerateACI(buildACIBody(contractCode, srcFile, fileSystem)));
+            this.compilerApi.rxGenerateACI(buildACIBody(contractCode, srcFile, fileSystem), null));
   }
 
   private Contract buildACIBody(String contractCode, String srcFile, Object fileSystem) {
@@ -188,7 +189,7 @@ public final class SophiaCompilerServiceImpl implements CompilerService {
         .build()
         .asyncGet(
             this.compilerApi
-                .rxCompileContract(buildContractBody(contractCode, srcFile, fileSystem))
+                .rxCompileContract(buildContractBody(contractCode, srcFile, fileSystem), null)
                 .map(byteCode -> byteCode.getBytecode()));
   }
 
@@ -199,7 +200,7 @@ public final class SophiaCompilerServiceImpl implements CompilerService {
         .build()
         .blockingGet(
             this.compilerApi
-                .rxCompileContract(buildContractBody(contractCode, srcFile, fileSystem))
+                .rxCompileContract(buildContractBody(contractCode, srcFile, fileSystem), null)
                 .map(bytecode -> bytecode.getBytecode()));
   }
 

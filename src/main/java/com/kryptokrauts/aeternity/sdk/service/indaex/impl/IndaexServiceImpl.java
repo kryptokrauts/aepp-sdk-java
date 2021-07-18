@@ -1,7 +1,11 @@
 package com.kryptokrauts.aeternity.sdk.service.indaex.impl;
 
 import com.kryptokrauts.aeternity.sdk.service.indaex.IndaexService;
-import com.kryptokrauts.aeternity.sdk.service.indaex.domain.*;
+import com.kryptokrauts.aeternity.sdk.service.indaex.domain.AuctionSortBy;
+import com.kryptokrauts.aeternity.sdk.service.indaex.domain.NameAuctionResult;
+import com.kryptokrauts.aeternity.sdk.service.indaex.domain.NameAuctionsResult;
+import com.kryptokrauts.aeternity.sdk.service.indaex.domain.SortDirection;
+import com.kryptokrauts.aeternity.sdk.service.indaex.domain.StatusResult;
 import com.kryptokrauts.indaex.generated.api.rxjava.MiddlewareApi;
 import java.math.BigInteger;
 import lombok.NonNull;
@@ -14,12 +18,14 @@ public class IndaexServiceImpl implements IndaexService {
 
   @Override
   public StatusResult blockingGetStatus() {
-    return StatusResult.builder().build().blockingGet(indaexApi.rxGetStatus());
+    return StatusResult.builder().build().blockingGet(indaexApi.rxGetStatus(null));
   }
 
   @Override
   public NameAuctionResult blockingGetNameAuction(String name) {
-    return NameAuctionResult.builder().build().blockingGet(indaexApi.rxGetNameAuctionById(name));
+    return NameAuctionResult.builder()
+        .build()
+        .blockingGet(indaexApi.rxGetNameAuctionById(name, null));
   }
 
   @Override
@@ -34,6 +40,7 @@ public class IndaexServiceImpl implements IndaexService {
     return NameAuctionsResult.builder()
         .build()
         .blockingGet(
-            indaexApi.rxGetAllAuctions(sortBy.toString(), sortDirection.toString(), page, limit));
+            indaexApi.rxGetAllAuctions(
+                sortBy.toString(), sortDirection.toString(), page, limit, null));
   }
 }

@@ -33,7 +33,7 @@ public class AccountResult extends GenericResultObject<Account, AccountResult> {
           .publicKey(generatedResultObject.getId())
           .balance(generatedResultObject.getBalance())
           .nonce(generatedResultObject.getNonce())
-          .payable(generatedResultObject.isPayable())
+          .payable(generatedResultObject.getPayable())
           .kind(generatedResultObject.getKind().toString())
           .gaContractId(generatedResultObject.getContractId())
           .gaAuthenticationFunction(generatedResultObject.getAuthFun())

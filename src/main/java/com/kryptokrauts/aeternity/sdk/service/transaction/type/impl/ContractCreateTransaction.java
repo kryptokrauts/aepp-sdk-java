@@ -1,7 +1,8 @@
 package com.kryptokrauts.aeternity.sdk.service.transaction.type.impl;
 
 import com.kryptokrauts.aeternity.generated.api.rxjava.ExternalApi;
-import com.kryptokrauts.aeternity.generated.model.CreateContractUnsignedTx;
+import com.kryptokrauts.aeternity.generated.api.rxjava.InternalApi;
+import com.kryptokrauts.aeternity.generated.model.UnsignedTx;
 import com.kryptokrauts.aeternity.sdk.constants.ApiIdentifiers;
 import com.kryptokrauts.aeternity.sdk.constants.SerializationTags;
 import com.kryptokrauts.aeternity.sdk.service.transaction.fee.FeeCalculationModel;
@@ -25,10 +26,18 @@ import org.apache.tuweni.rlp.RLP;
 public class ContractCreateTransaction extends AbstractTransaction<ContractCreateTransactionModel> {
 
   @NonNull private ExternalApi externalApi;
+  @NonNull private InternalApi internalApi;
 
   @Override
-  protected Single<CreateContractUnsignedTx> createInternal() {
-    return externalApi.rxPostContractCreate(model.toApiModel());
+  protected Single<UnsignedTx> createInternal() {
+    return internalApi
+        .rxPostContractCreate(model.toApiModel(), false, null)
+        .map(
+            createContractUnsignedTx -> {
+              UnsignedTx unsignedTx = new UnsignedTx();
+              unsignedTx.setTx(createContractUnsignedTx.getTx());
+              return unsignedTx;
+            });
   }
 
   @Override

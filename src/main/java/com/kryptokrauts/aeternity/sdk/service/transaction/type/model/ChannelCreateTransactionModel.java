@@ -1,11 +1,11 @@
 package com.kryptokrauts.aeternity.sdk.service.transaction.type.model;
 
 import com.kryptokrauts.aeternity.generated.api.rxjava.ExternalApi;
+import com.kryptokrauts.aeternity.generated.api.rxjava.InternalApi;
 import com.kryptokrauts.aeternity.generated.model.ChannelCreateTx;
-import com.kryptokrauts.aeternity.generated.model.GenericTx;
+import com.kryptokrauts.aeternity.generated.model.Tx;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.AbstractTransaction;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.impl.ChannelCreateTransaction;
-import com.kryptokrauts.sophia.compiler.generated.api.rxjava.DefaultApi;
 import java.math.BigInteger;
 import java.util.function.Function;
 import lombok.Getter;
@@ -52,29 +52,31 @@ public class ChannelCreateTransactionModel extends AbstractTransactionModel<Chan
   }
 
   @Override
-  public Function<GenericTx, ChannelCreateTransactionModel> getApiToModelFunction() {
-    return (tx) -> {
-      ChannelCreateTx castedTx = (ChannelCreateTx) tx;
-      return this.toBuilder()
-          .initiator(castedTx.getInitiatorId())
-          .initiatorAmount(castedTx.getInitiatorAmount())
-          .responder(castedTx.getResponderId())
-          .responderAmount(castedTx.getResponderAmount())
-          .channelReserve(castedTx.getChannelReserve())
-          .lockPeriod(castedTx.getLockPeriod())
-          .stateHash(castedTx.getStateHash())
-          .fee(castedTx.getFee())
-          .ttl(castedTx.getTtl())
-          .nonce(castedTx.getNonce())
-          .build();
-    };
+  public Function<Tx, ChannelCreateTransactionModel> getApiToModelFunction() {
+    return (tx) ->
+        this.toBuilder()
+            .initiator(tx.getInitiatorId())
+            .initiatorAmount(tx.getInitiatorAmount())
+            .responder(tx.getResponderId())
+            .responderAmount(tx.getResponderAmount())
+            .channelReserve(tx.getChannelReserve())
+            .lockPeriod(tx.getLockPeriod())
+            .stateHash(tx.getStateHash())
+            .fee(tx.getFee())
+            .ttl(tx.getTtl())
+            .nonce(tx.getNonce())
+            .build();
   }
 
   @Override
   public void validateInput() {}
 
   @Override
-  public AbstractTransaction<?> buildTransaction(ExternalApi externalApi, DefaultApi compilerApi) {
-    return ChannelCreateTransaction.builder().externalApi(externalApi).model(this).build();
+  public AbstractTransaction<?> buildTransaction(ExternalApi externalApi, InternalApi internalApi) {
+    return ChannelCreateTransaction.builder()
+        .externalApi(externalApi)
+        .internalApi(internalApi)
+        .model(this)
+        .build();
   }
 }
