@@ -1,15 +1,15 @@
 package com.kryptokrauts.aeternity.sdk.service.transaction.type.model;
 
 import com.kryptokrauts.aeternity.generated.api.rxjava.ExternalApi;
-import com.kryptokrauts.aeternity.generated.model.GenericTx;
+import com.kryptokrauts.aeternity.generated.api.rxjava.InternalApi;
 import com.kryptokrauts.aeternity.generated.model.OracleQueryTx;
-import com.kryptokrauts.aeternity.generated.model.RelativeTTL;
 import com.kryptokrauts.aeternity.generated.model.TTL;
+import com.kryptokrauts.aeternity.generated.model.TTL.TypeEnum;
+import com.kryptokrauts.aeternity.generated.model.Tx;
 import com.kryptokrauts.aeternity.sdk.annotations.Mandatory;
 import com.kryptokrauts.aeternity.sdk.service.oracle.domain.OracleTTLType;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.AbstractTransaction;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.impl.OracleQueryTransaction;
-import com.kryptokrauts.sophia.compiler.generated.api.rxjava.DefaultApi;
 import java.math.BigInteger;
 import java.util.function.Function;
 import lombok.Builder.Default;
@@ -42,29 +42,24 @@ public class OracleQueryTransactionModel extends AbstractTransactionModel<Oracle
     oracleQueryTx.query(this.query);
     oracleQueryTx.queryFee(this.queryFee);
     oracleQueryTx.queryTtl(new TTL().type(queryTtlType.toGeneratedEnum()).value(queryTtl));
-    oracleQueryTx.responseTtl(
-        new RelativeTTL()
-            .type(com.kryptokrauts.aeternity.generated.model.RelativeTTL.TypeEnum.DELTA)
-            .value(responseTtl));
+    oracleQueryTx.responseTtl(new TTL().type(TypeEnum.DELTA).value(responseTtl));
     return oracleQueryTx;
   }
 
   @Override
-  public Function<GenericTx, OracleQueryTransactionModel> getApiToModelFunction() {
-    return (tx) -> {
-      OracleQueryTx castedTx = (OracleQueryTx) tx;
-      return this.toBuilder()
-          .oracleId(castedTx.getOracleId())
-          .nonce(castedTx.getNonce())
-          .senderId(castedTx.getSenderId())
-          .query(castedTx.getQuery())
-          .queryFee(castedTx.getQueryFee())
-          .queryTtl(castedTx.getQueryTtl().getValue())
-          .queryTtlType(OracleTTLType.fromTypeEnum(castedTx.getQueryTtl()))
-          .responseTtl(castedTx.getResponseTtl().getValue())
-          .ttl(castedTx.getTtl())
-          .build();
-    };
+  public Function<Tx, OracleQueryTransactionModel> getApiToModelFunction() {
+    return (tx) ->
+        this.toBuilder()
+            .oracleId(tx.getOracleId())
+            .nonce(tx.getNonce())
+            .senderId(tx.getSenderId())
+            .query(tx.getQuery())
+            .queryFee(tx.getQueryFee())
+            .queryTtl(tx.getQueryTtl().getValue())
+            .queryTtlType(OracleTTLType.fromTypeEnum(tx.getQueryTtl()))
+            .responseTtl(tx.getResponseTtl().getValue())
+            .ttl(tx.getTtl())
+            .build();
   }
 
   @Override
@@ -73,7 +68,11 @@ public class OracleQueryTransactionModel extends AbstractTransactionModel<Oracle
   }
 
   @Override
-  public AbstractTransaction<?> buildTransaction(ExternalApi externalApi, DefaultApi compilerApi) {
-    return OracleQueryTransaction.builder().externalApi(externalApi).model(this).build();
+  public AbstractTransaction<?> buildTransaction(ExternalApi externalApi, InternalApi internalApi) {
+    return OracleQueryTransaction.builder()
+        .externalApi(externalApi)
+        .internalApi(internalApi)
+        .model(this)
+        .build();
   }
 }

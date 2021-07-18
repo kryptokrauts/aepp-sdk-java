@@ -1,14 +1,14 @@
 package com.kryptokrauts.aeternity.sdk.service.transaction.type.model;
 
 import com.kryptokrauts.aeternity.generated.api.rxjava.ExternalApi;
-import com.kryptokrauts.aeternity.generated.model.GenericTx;
+import com.kryptokrauts.aeternity.generated.api.rxjava.InternalApi;
 import com.kryptokrauts.aeternity.generated.model.NamePreclaimTx;
+import com.kryptokrauts.aeternity.generated.model.Tx;
 import com.kryptokrauts.aeternity.sdk.annotations.Mandatory;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.AbstractTransaction;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.impl.NamePreclaimTransaction;
 import com.kryptokrauts.aeternity.sdk.util.EncodingUtils;
 import com.kryptokrauts.aeternity.sdk.util.ValidationUtil;
-import com.kryptokrauts.sophia.compiler.generated.api.rxjava.DefaultApi;
 import java.math.BigInteger;
 import java.util.function.Function;
 import lombok.Builder.Default;
@@ -39,16 +39,14 @@ public class NamePreclaimTransactionModel extends AbstractTransactionModel<NameP
   }
 
   @Override
-  public Function<GenericTx, NamePreclaimTransactionModel> getApiToModelFunction() {
-    return (tx) -> {
-      NamePreclaimTx castedTx = (NamePreclaimTx) tx;
-      return this.toBuilder()
-          .accountId(castedTx.getAccountId())
-          .fee(castedTx.getFee())
-          .nonce(castedTx.getNonce())
-          .ttl(castedTx.getTtl())
-          .build();
-    };
+  public Function<Tx, NamePreclaimTransactionModel> getApiToModelFunction() {
+    return (tx) ->
+        this.toBuilder()
+            .accountId(tx.getAccountId())
+            .fee(tx.getFee())
+            .nonce(tx.getNonce())
+            .ttl(tx.getTtl())
+            .build();
   }
 
   @Override
@@ -57,7 +55,11 @@ public class NamePreclaimTransactionModel extends AbstractTransactionModel<NameP
   }
 
   @Override
-  public AbstractTransaction<?> buildTransaction(ExternalApi externalApi, DefaultApi compilerApi) {
-    return NamePreclaimTransaction.builder().externalApi(externalApi).model(this).build();
+  public AbstractTransaction<?> buildTransaction(ExternalApi externalApi, InternalApi internalApi) {
+    return NamePreclaimTransaction.builder()
+        .externalApi(externalApi)
+        .internalApi(internalApi)
+        .model(this)
+        .build();
   }
 }

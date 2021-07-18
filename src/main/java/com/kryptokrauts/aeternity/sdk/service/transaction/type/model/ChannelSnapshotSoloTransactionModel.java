@@ -1,11 +1,11 @@
 package com.kryptokrauts.aeternity.sdk.service.transaction.type.model;
 
 import com.kryptokrauts.aeternity.generated.api.rxjava.ExternalApi;
+import com.kryptokrauts.aeternity.generated.api.rxjava.InternalApi;
 import com.kryptokrauts.aeternity.generated.model.ChannelSnapshotSoloTx;
-import com.kryptokrauts.aeternity.generated.model.GenericTx;
+import com.kryptokrauts.aeternity.generated.model.Tx;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.AbstractTransaction;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.impl.ChannelSnapshotSoloTransaction;
-import com.kryptokrauts.sophia.compiler.generated.api.rxjava.DefaultApi;
 import java.math.BigInteger;
 import java.util.function.Function;
 import lombok.Getter;
@@ -37,25 +37,27 @@ public class ChannelSnapshotSoloTransactionModel
   }
 
   @Override
-  public Function<GenericTx, ChannelSnapshotSoloTransactionModel> getApiToModelFunction() {
-    return (tx) -> {
-      ChannelSnapshotSoloTx castedTx = (ChannelSnapshotSoloTx) tx;
-      return this.toBuilder()
-          .channelId(castedTx.getChannelId())
-          .fromId(castedTx.getFromId())
-          .fee(castedTx.getFee())
-          .payload(castedTx.getPayload())
-          .ttl(castedTx.getTtl())
-          .nonce(castedTx.getNonce())
-          .build();
-    };
+  public Function<Tx, ChannelSnapshotSoloTransactionModel> getApiToModelFunction() {
+    return (tx) ->
+        this.toBuilder()
+            .channelId(tx.getChannelId())
+            .fromId(tx.getFromId())
+            .fee(tx.getFee())
+            .payload(tx.getPayload())
+            .ttl(tx.getTtl())
+            .nonce(tx.getNonce())
+            .build();
   }
 
   @Override
   public void validateInput() {}
 
   @Override
-  public AbstractTransaction<?> buildTransaction(ExternalApi externalApi, DefaultApi compilerApi) {
-    return ChannelSnapshotSoloTransaction.builder().externalApi(externalApi).model(this).build();
+  public AbstractTransaction<?> buildTransaction(ExternalApi externalApi, InternalApi internalApi) {
+    return ChannelSnapshotSoloTransaction.builder()
+        .externalApi(externalApi)
+        .internalApi(internalApi)
+        .model(this)
+        .build();
   }
 }

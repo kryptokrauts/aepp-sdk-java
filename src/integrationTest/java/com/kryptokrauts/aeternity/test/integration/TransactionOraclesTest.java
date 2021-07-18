@@ -1,4 +1,4 @@
-package com.kryptokrauts.aeternity.generated.api;
+package com.kryptokrauts.aeternity.test.integration;
 
 import com.kryptokrauts.aeternity.sdk.domain.secret.KeyPair;
 import com.kryptokrauts.aeternity.sdk.service.oracle.domain.OracleQueriesResult;
@@ -174,7 +174,7 @@ public class TransactionOraclesTest extends BaseTest {
                 OracleExtendTransactionModel.builder()
                     .nonce(nonce)
                     .oracleId(oracleId)
-                    .oracleRelativeTtl(additionalTtl)
+                    .relativeTtl(additionalTtl)
                     .build();
 
             PostTransactionResult postResult =

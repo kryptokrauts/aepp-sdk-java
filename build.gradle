@@ -4,7 +4,8 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath "io.swagger.codegen.v3:swagger-codegen:3.0.8"
+        classpath "io.swagger.codegen.v3:swagger-codegen-maven-plugin:3.0.27"
+        classpath "org.openapitools:openapi-generator-gradle-plugin:5.2.0"
     }
 }
 
@@ -23,6 +24,8 @@ repositories {
     mavenCentral()
 }
 
+apply plugin: 'org.openapi.generator'
+
 sourceCompatibility = JavaVersion.VERSION_1_8
 
 googleJavaFormat {
@@ -30,9 +33,10 @@ googleJavaFormat {
 }
 
 ext {
+    invokerPackageAeternity = "com.kryptokrauts.aeternity.generated"
     apiPackageAeternity = "com.kryptokrauts.aeternity.generated.api"
     modelPackageAeternity = "com.kryptokrauts.aeternity.generated.model"
-    swaggerFileAeternity = "${rootDir}/api/swagger_aeternity.yml"
+    oas3Aeternity = "${rootDir}/api/oas3_aeternity.yml"
 
     apiPackageSophiaCompiler = "com.kryptokrauts.sophia.compiler.generated.api"
     modelPackageSophiaCompiler = "com.kryptokrauts.sophia.compiler.generated.model"
@@ -60,32 +64,36 @@ ext {
     slf4jVersion = "1.7.26"
 }
 
-import io.swagger.codegen.DefaultGenerator
+openApiGenerate {
+    generatorName = "java"
+    library = "vertx"
+    inputSpec = project.oas3Aeternity.toString()
+    outputDir = "${rootDir}/build/swagger"
+    invokerPackage = "${invokerPackageAeternity}"
+    apiPackage = "${apiPackageAeternity}"
+    modelPackage = "${modelPackageAeternity}"
+    templateDir = "${rootDir}/api/vertx-templates-openapi"
+    importMappings = [
+            "UInt"         : "java.math.BigInteger",
+            "UInt16"       : "java.math.BigInteger",
+            "UInt32"       : "java.math.BigInteger",
+            "UInt64"       : "java.math.BigInteger",
+            "Integer"      : "java.math.BigInteger",
+            "TxBlockHeight": "java.math.BigInteger",
+            "RelativeTTL"  : "com.kryptokrauts.aeternity.generated.model.TTL"
+    ]
+    configOptions = [
+            dateLibrary    : "java8",
+            openApiNullable: "true",
+    ]
+}
+
 import io.swagger.codegen.config.CodegenConfigurator
 
 def swaggerOutputDir = file("build/swagger")
+
 task generateApiClient {
     doLast {
-        def configAeternity = new CodegenConfigurator()
-        configAeternity.setLang("java")
-        configAeternity.setLibrary("vertx")
-        configAeternity.setGroupId("${group}")
-        configAeternity.setArtifactId("aeternity-client-vertx")
-        configAeternity.setApiPackage("${apiPackageAeternity}")
-        configAeternity.setModelPackage("${modelPackageAeternity}")
-        configAeternity.setInputSpec(project.swaggerFileAeternity.toString())
-        configAeternity.setOutputDir(swaggerOutputDir.path)
-        configAeternity.setTemplateDir(project.templateDir)
-        configAeternity.setAdditionalProperties([
-                "dateLibrary": "java8",
-                "title"      : rootProject.name,
-                "useTags"    : "true"
-        ])
-        configAeternity.setTypeMappings([
-                "Integer": "java.math.BigInteger"
-        ])
-        new DefaultGenerator().opts(configAeternity.toClientOptInput()).generate()
-
         def configSophiaCompiler = new CodegenConfigurator()
         configSophiaCompiler.setLang("java")
         configSophiaCompiler.setLibrary("vertx")
@@ -101,7 +109,7 @@ task generateApiClient {
                 "title"      : rootProject.name,
                 "useTags"    : "true"
         ])
-        new DefaultGenerator().opts(configSophiaCompiler.toClientOptInput()).generate()
+        new io.swagger.codegen.DefaultGenerator().opts(configSophiaCompiler.toClientOptInput()).generate()
 
         def configIndaex = new CodegenConfigurator()
         configIndaex.setLang("java")
@@ -121,17 +129,11 @@ task generateApiClient {
         configIndaex.setTypeMappings([
                 "Integer": "java.math.BigInteger"
         ])
-        new DefaultGenerator().opts(configIndaex.toClientOptInput()).generate()
-
-        // modify UnsignedTx
-        ant.replaceregexp(match: '^.*\\b(JsonTypeInfo|JsonSubTypes)\\b.*$', replace: '', flags: 'g', byline: true) {
-            fileset(dir: 'build/swagger/src/main/java/com/kryptokrauts/aeternity/generated/model', includes: 'UnsignedTx.java')
-        }
-        ant.replaceregexp(match: '\\}.*?\\)', replace: '', flags: 's') {
-            fileset(dir: 'build/swagger/src/main/java/com/kryptokrauts/aeternity/generated/model', includes: 'UnsignedTx.java')
-        }
+        new io.swagger.codegen.DefaultGenerator().opts(configIndaex.toClientOptInput()).generate()
     }
 }
+
+generateApiClient.finalizedBy(tasks.openApiGenerate)
 
 configurations {
     integrationTestCompile.extendsFrom testCompile

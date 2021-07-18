@@ -25,7 +25,7 @@ public class GeneralizedAccountsMetaTransaction
 
   @Override
   protected Single<UnsignedTx> createInternal() {
-    throw new UnsupportedOperationException("Not possible");
+    throw new UnsupportedOperationException("GAMetaTx cannot be created using the debug API.");
   }
 
   /**

@@ -1,4 +1,4 @@
-package com.kryptokrauts.aeternity.generated.api;
+package com.kryptokrauts.aeternity.test.integration;
 
 import java.util.Arrays;
 import java.util.List;

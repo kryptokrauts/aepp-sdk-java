@@ -1,4 +1,4 @@
-package com.kryptokrauts.aeternity.generated.api;
+package com.kryptokrauts.aeternity.test.integration;
 
 import com.kryptokrauts.aeternity.sdk.constants.AENS;
 import com.kryptokrauts.aeternity.sdk.domain.secret.KeyPair;

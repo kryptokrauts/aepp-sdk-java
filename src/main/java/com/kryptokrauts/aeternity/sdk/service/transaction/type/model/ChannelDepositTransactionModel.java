@@ -1,11 +1,11 @@
 package com.kryptokrauts.aeternity.sdk.service.transaction.type.model;
 
 import com.kryptokrauts.aeternity.generated.api.rxjava.ExternalApi;
+import com.kryptokrauts.aeternity.generated.api.rxjava.InternalApi;
 import com.kryptokrauts.aeternity.generated.model.ChannelDepositTx;
-import com.kryptokrauts.aeternity.generated.model.GenericTx;
+import com.kryptokrauts.aeternity.generated.model.Tx;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.AbstractTransaction;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.impl.ChannelDepositTransaction;
-import com.kryptokrauts.sophia.compiler.generated.api.rxjava.DefaultApi;
 import java.math.BigInteger;
 import java.util.function.Function;
 import lombok.Getter;
@@ -46,27 +46,29 @@ public class ChannelDepositTransactionModel extends AbstractTransactionModel<Cha
   }
 
   @Override
-  public Function<GenericTx, ChannelDepositTransactionModel> getApiToModelFunction() {
-    return (tx) -> {
-      ChannelDepositTx castedTx = (ChannelDepositTx) tx;
-      return this.toBuilder()
-          .channelId(castedTx.getChannelId())
-          .fromId(castedTx.getFromId())
-          .amount(castedTx.getAmount())
-          .stateHash(castedTx.getStateHash())
-          .round(castedTx.getRound())
-          .fee(castedTx.getFee())
-          .ttl(castedTx.getTtl())
-          .nonce(castedTx.getNonce())
-          .build();
-    };
+  public Function<Tx, ChannelDepositTransactionModel> getApiToModelFunction() {
+    return (tx) ->
+        this.toBuilder()
+            .channelId(tx.getChannelId())
+            .fromId(tx.getFromId())
+            .amount(tx.getAmount())
+            .stateHash(tx.getStateHash())
+            .round(tx.getRound())
+            .fee(tx.getFee())
+            .ttl(tx.getTtl())
+            .nonce(tx.getNonce())
+            .build();
   }
 
   @Override
   public void validateInput() {}
 
   @Override
-  public AbstractTransaction<?> buildTransaction(ExternalApi externalApi, DefaultApi compilerApi) {
-    return ChannelDepositTransaction.builder().externalApi(externalApi).model(this).build();
+  public AbstractTransaction<?> buildTransaction(ExternalApi externalApi, InternalApi internalApi) {
+    return ChannelDepositTransaction.builder()
+        .externalApi(externalApi)
+        .internalApi(internalApi)
+        .model(this)
+        .build();
   }
 }

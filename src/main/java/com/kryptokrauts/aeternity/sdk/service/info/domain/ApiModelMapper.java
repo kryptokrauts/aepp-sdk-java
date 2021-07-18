@@ -10,7 +10,6 @@ import com.kryptokrauts.aeternity.generated.model.ChannelSnapshotSoloTx;
 import com.kryptokrauts.aeternity.generated.model.ChannelWithdrawTx;
 import com.kryptokrauts.aeternity.generated.model.ContractCallTx;
 import com.kryptokrauts.aeternity.generated.model.ContractCreateTx;
-import com.kryptokrauts.aeternity.generated.model.GenericTx;
 import com.kryptokrauts.aeternity.generated.model.NameClaimTx;
 import com.kryptokrauts.aeternity.generated.model.NamePreclaimTx;
 import com.kryptokrauts.aeternity.generated.model.NameRevokeTx;
@@ -20,6 +19,7 @@ import com.kryptokrauts.aeternity.generated.model.OracleQueryTx;
 import com.kryptokrauts.aeternity.generated.model.OracleRegisterTx;
 import com.kryptokrauts.aeternity.generated.model.OracleRespondTx;
 import com.kryptokrauts.aeternity.generated.model.SpendTx;
+import com.kryptokrauts.aeternity.generated.model.Tx;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.model.AbstractTransactionModel;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.model.ChannelCloseMutualTransactionModel;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.model.ChannelCloseSoloTransactionModel;
@@ -46,8 +46,8 @@ import java.util.function.Function;
 
 public class ApiModelMapper {
 
-  public static AbstractTransactionModel<?> mapToTransactionModel(GenericTx tx) {
-    Function<GenericTx, ? extends AbstractTransactionModel<?>> mappedSupplier =
+  public static AbstractTransactionModel<?> mapToTransactionModel(Tx tx) {
+    Function<Tx, ? extends AbstractTransactionModel<?>> mappedSupplier =
         txMapping.get(tx.getClass());
     if (mappedSupplier != null) {
       return mappedSupplier.apply(tx);
@@ -59,8 +59,8 @@ public class ApiModelMapper {
    * this static map and initializer holds the mapping from generated tx type (API) to aepp-java-sdk
    * transaction models
    */
-  private static Map<Class<?>, Function<GenericTx, ? extends AbstractTransactionModel<?>>>
-      txMapping = new HashMap<>();
+  private static Map<Class<?>, Function<Tx, ? extends AbstractTransactionModel<?>>> txMapping =
+      new HashMap<>();
 
   static {
     txMapping.put(

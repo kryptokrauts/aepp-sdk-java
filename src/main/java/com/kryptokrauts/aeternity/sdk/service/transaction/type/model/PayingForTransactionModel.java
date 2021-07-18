@@ -1,12 +1,12 @@
 package com.kryptokrauts.aeternity.sdk.service.transaction.type.model;
 
 import com.kryptokrauts.aeternity.generated.api.rxjava.ExternalApi;
-import com.kryptokrauts.aeternity.generated.model.GenericTx;
+import com.kryptokrauts.aeternity.generated.api.rxjava.InternalApi;
 import com.kryptokrauts.aeternity.generated.model.PayingForTx;
+import com.kryptokrauts.aeternity.generated.model.Tx;
 import com.kryptokrauts.aeternity.sdk.annotations.Mandatory;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.AbstractTransaction;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.impl.PayingForTransaction;
-import com.kryptokrauts.sophia.compiler.generated.api.rxjava.DefaultApi;
 import java.math.BigInteger;
 import java.util.function.Function;
 import lombok.Getter;
@@ -40,19 +40,17 @@ public class PayingForTransactionModel extends AbstractTransactionModel<PayingFo
   public void validateInput() {}
 
   @Override
-  public AbstractTransaction<?> buildTransaction(ExternalApi externalApi, DefaultApi compilerApi) {
-    return PayingForTransaction.builder().externalApi(externalApi).model(this).build();
+  public AbstractTransaction<?> buildTransaction(ExternalApi externalApi, InternalApi internalApi) {
+    return PayingForTransaction.builder()
+        .externalApi(externalApi)
+        .internalApi(internalApi)
+        .model(this)
+        .build();
   }
 
   @Override
-  public Function<GenericTx, ?> getApiToModelFunction() {
-    return (tx) -> {
-      PayingForTx castedTx = (PayingForTx) tx;
-      return this.toBuilder()
-          .payerId(castedTx.getPayerId())
-          .fee(castedTx.getFee())
-          .nonce(castedTx.getNonce())
-          .build();
-    };
+  public Function<Tx, ?> getApiToModelFunction() {
+    return (tx) ->
+        this.toBuilder().payerId(tx.getPayerId()).fee(tx.getFee()).nonce(tx.getNonce()).build();
   }
 }
