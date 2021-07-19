@@ -31,7 +31,7 @@ public class KeyBlockResult extends GenericResultObject<KeyBlock, KeyBlockResult
 
   private BigInteger target;
 
-  @Default private List<Integer> pow = new LinkedList<Integer>();
+  @Default private List<BigInteger> pow = new LinkedList<BigInteger>();
 
   private BigInteger nonce;
 

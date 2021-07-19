@@ -1,4 +1,4 @@
-package com.kryptokrauts.aeternity.generated.api.ignore;
+package com.kryptokrauts.aeternity.test.integration.ignore;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
@@ -15,6 +15,7 @@ public class ChainApiTestJunit5 extends BaseTestJunit5 {
   public void getCurrentKeyBlockTest(VertxTestContext testContext) {
     getChainApi()
         .getCurrentKeyBlock(
+            false,
             testContext.succeeding(
                 keyBlock -> {
                   testContext.verify(
@@ -31,6 +32,7 @@ public class ChainApiTestJunit5 extends BaseTestJunit5 {
     context.completeNow();
     getChainApi()
         .getCurrentKeyBlock(
+            false,
             res -> {
               if (res.failed()) {
                 fail();

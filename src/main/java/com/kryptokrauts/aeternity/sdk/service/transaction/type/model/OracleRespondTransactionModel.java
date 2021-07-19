@@ -1,14 +1,14 @@
 package com.kryptokrauts.aeternity.sdk.service.transaction.type.model;
 
 import com.kryptokrauts.aeternity.generated.api.rxjava.ExternalApi;
-import com.kryptokrauts.aeternity.generated.model.GenericTx;
+import com.kryptokrauts.aeternity.generated.api.rxjava.InternalApi;
 import com.kryptokrauts.aeternity.generated.model.OracleRespondTx;
-import com.kryptokrauts.aeternity.generated.model.RelativeTTL;
-import com.kryptokrauts.aeternity.generated.model.RelativeTTL.TypeEnum;
+import com.kryptokrauts.aeternity.generated.model.TTL;
+import com.kryptokrauts.aeternity.generated.model.TTL.TypeEnum;
+import com.kryptokrauts.aeternity.generated.model.Tx;
 import com.kryptokrauts.aeternity.sdk.annotations.Mandatory;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.AbstractTransaction;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.impl.OracleRespondTransaction;
-import com.kryptokrauts.sophia.compiler.generated.api.rxjava.DefaultApi;
 import java.math.BigInteger;
 import java.util.function.Function;
 import lombok.Builder.Default;
@@ -36,35 +36,36 @@ public class OracleRespondTransactionModel extends AbstractTransactionModel<Orac
     oracleRespondTx.oracleId(this.oracleId);
     oracleRespondTx.queryId(this.queryId);
     oracleRespondTx.response(this.response);
-    oracleRespondTx.responseTtl(new RelativeTTL().type(TypeEnum.DELTA).value(responseTtl));
+    oracleRespondTx.responseTtl(new TTL().type(TypeEnum.DELTA).value(responseTtl));
     oracleRespondTx.ttl(this.ttl);
     return oracleRespondTx;
   }
 
   @Override
-  public Function<GenericTx, OracleRespondTransactionModel> getApiToModelFunction() {
-    return (tx) -> {
-      OracleRespondTx castedTx = (OracleRespondTx) tx;
-      return this.toBuilder()
-          .oracleId(castedTx.getOracleId())
-          .nonce(castedTx.getNonce())
-          .fee(castedTx.getFee())
-          .queryId(castedTx.getQueryId())
-          .response(castedTx.getResponse())
-          .responseTtl(castedTx.getResponseTtl().getValue())
-          .ttl(castedTx.getTtl())
-          .build();
-    };
+  public Function<Tx, OracleRespondTransactionModel> getApiToModelFunction() {
+    return (tx) ->
+        this.toBuilder()
+            .oracleId(tx.getOracleId())
+            .nonce(tx.getNonce())
+            .fee(tx.getFee())
+            .queryId(tx.getQueryId())
+            .response(tx.getResponse())
+            .responseTtl(tx.getResponseTtl().getValue())
+            .ttl(tx.getTtl())
+            .build();
   }
 
   @Override
   public void validateInput() {
     // TODO Auto-generated method stub
-
   }
 
   @Override
-  public AbstractTransaction<?> buildTransaction(ExternalApi externalApi, DefaultApi compilerApi) {
-    return OracleRespondTransaction.builder().externalApi(externalApi).model(this).build();
+  public AbstractTransaction<?> buildTransaction(ExternalApi externalApi, InternalApi internalApi) {
+    return OracleRespondTransaction.builder()
+        .externalApi(externalApi)
+        .internalApi(internalApi)
+        .model(this)
+        .build();
   }
 }

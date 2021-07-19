@@ -1,4 +1,4 @@
-package com.kryptokrauts.aeternity.generated.api;
+package com.kryptokrauts.aeternity.test.integration;
 
 import com.kryptokrauts.aeternity.sdk.constants.Network;
 import com.kryptokrauts.aeternity.sdk.constants.VirtualMachine;
@@ -106,6 +106,7 @@ public abstract class BaseTest {
             .getService(
                 AeternityServiceConfiguration.configure()
                     .baseUrl(getAeternityBaseUrl())
+                    .debugBaseUrl(getAeternityBaseUrl())
                     .compilerBaseUrl(getCompilerBaseUrl())
                     .indaexBaseUrl(getIndaexBaseUrl())
                     .network(Network.LOCAL_IRIS_NETWORK)

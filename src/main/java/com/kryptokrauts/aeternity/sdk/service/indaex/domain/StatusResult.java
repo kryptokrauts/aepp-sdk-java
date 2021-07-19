@@ -27,12 +27,12 @@ public class StatusResult extends GenericResultObject<Status, StatusResult> {
     if (generatedResultObject != null) {
       return this.toBuilder()
           .mdwHeight(generatedResultObject.getMdwHeight())
-          .mdwSynced(generatedResultObject.isMdwSynced())
+          .mdwSynced(generatedResultObject.getMdwSynced())
           .mdwTxIndex(generatedResultObject.getMdwTxIndex())
           .mdwVersion(generatedResultObject.getMdwVersion())
           .nodeHeight(generatedResultObject.getNodeHeight())
           .nodeProgress(generatedResultObject.getNodeProgress())
-          .nodeSyncing(generatedResultObject.isNodeSyncing())
+          .nodeSyncing(generatedResultObject.getNodeSyncing())
           .nodeVersion(generatedResultObject.getNodeVersion())
           .build();
     } else {

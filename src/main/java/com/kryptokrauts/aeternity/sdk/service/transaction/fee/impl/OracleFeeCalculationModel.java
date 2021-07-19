@@ -21,11 +21,12 @@ public class OracleFeeCalculationModel implements FeeCalculationModel {
   public BigInteger calculateFee(
       int tx_byte_size, long minimalGasPrice, AbstractTransaction<?> transaction) {
     long relativeTtl;
+    // TODO seems like this isn't always the relative TTL and calculate fee might be higher than
+    // expected
     if (transaction instanceof OracleRegisterTransaction) {
       relativeTtl = ((OracleRegisterTransaction) transaction).getModel().getOracleTtl().longValue();
     } else if (transaction instanceof OracleExtendTransaction) {
-      relativeTtl =
-          ((OracleExtendTransaction) transaction).getModel().getOracleRelativeTtl().longValue();
+      relativeTtl = ((OracleExtendTransaction) transaction).getModel().getRelativeTtl().longValue();
     } else if (transaction instanceof OracleQueryTransaction) {
       relativeTtl = ((OracleQueryTransaction) transaction).getModel().getQueryTtl().longValue();
     } else if (transaction instanceof OracleRespondTransaction) {

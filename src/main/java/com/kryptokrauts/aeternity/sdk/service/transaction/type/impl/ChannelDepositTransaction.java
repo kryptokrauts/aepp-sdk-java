@@ -1,6 +1,7 @@
 package com.kryptokrauts.aeternity.sdk.service.transaction.type.impl;
 
 import com.kryptokrauts.aeternity.generated.api.rxjava.ExternalApi;
+import com.kryptokrauts.aeternity.generated.api.rxjava.InternalApi;
 import com.kryptokrauts.aeternity.generated.model.UnsignedTx;
 import com.kryptokrauts.aeternity.sdk.constants.ApiIdentifiers;
 import com.kryptokrauts.aeternity.sdk.constants.SerializationTags;
@@ -18,11 +19,13 @@ import org.apache.tuweni.rlp.RLP;
 @SuperBuilder
 @ToString
 public class ChannelDepositTransaction extends AbstractTransaction<ChannelDepositTransactionModel> {
+
   @NonNull private ExternalApi externalApi;
+  @NonNull private InternalApi internalApi;
 
   @Override
   protected Single<UnsignedTx> createInternal() {
-    return externalApi.rxPostChannelDeposit(model.toApiModel());
+    return internalApi.rxPostChannelDeposit(model.toApiModel(), false, null);
   }
 
   @Override

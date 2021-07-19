@@ -30,7 +30,7 @@ public class GeneralizedAccountsAttachTransaction
 
   @Override
   protected Single<UnsignedTx> createInternal() {
-    throw new UnsupportedOperationException("Not implemented");
+    throw new UnsupportedOperationException("GAAttachTx cannot be created using the debug API.");
   }
 
   @Override

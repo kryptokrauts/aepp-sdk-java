@@ -1,13 +1,13 @@
 package com.kryptokrauts.aeternity.sdk.service.transaction.type.model;
 
 import com.kryptokrauts.aeternity.generated.api.rxjava.ExternalApi;
+import com.kryptokrauts.aeternity.generated.api.rxjava.InternalApi;
 import com.kryptokrauts.aeternity.generated.model.GAAttachTx;
-import com.kryptokrauts.aeternity.generated.model.GenericTx;
+import com.kryptokrauts.aeternity.generated.model.Tx;
 import com.kryptokrauts.aeternity.sdk.annotations.Mandatory;
 import com.kryptokrauts.aeternity.sdk.constants.VirtualMachine;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.AbstractTransaction;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.impl.GeneralizedAccountsAttachTransaction;
-import com.kryptokrauts.sophia.compiler.generated.api.rxjava.DefaultApi;
 import java.math.BigInteger;
 import java.util.function.Function;
 import lombok.Builder.Default;
@@ -52,29 +52,27 @@ public class GeneralizedAccountsAttachTransactionModel
   public void validateInput() {}
 
   @Override
-  public AbstractTransaction<?> buildTransaction(ExternalApi externalApi, DefaultApi compilerApi) {
+  public Function<Tx, GeneralizedAccountsAttachTransactionModel> getApiToModelFunction() {
+    return (tx) ->
+        this.toBuilder()
+            .authFun(tx.getAuthFun())
+            .callData(tx.getCallData())
+            .code(tx.getCode())
+            .fee(tx.getFee())
+            .gas(tx.getGas())
+            .ownerId(tx.getOwnerId())
+            .gasPrice(tx.getGasPrice())
+            .ttl(tx.getTtl())
+            .nonce(tx.getNonce())
+            .virtualMachine(VirtualMachine.getVirtualMachine(tx.getAbiVersion()))
+            .build();
+  }
+
+  @Override
+  public AbstractTransaction<?> buildTransaction(ExternalApi externalApi, InternalApi internalApi) {
     return GeneralizedAccountsAttachTransaction.builder()
         .externalApi(externalApi)
         .model(this)
         .build();
-  }
-
-  @Override
-  public Function<GenericTx, GeneralizedAccountsAttachTransactionModel> getApiToModelFunction() {
-    return (tx) -> {
-      GAAttachTx castedTx = (GAAttachTx) tx;
-      return this.toBuilder()
-          .authFun(castedTx.getAuthFun())
-          .callData(castedTx.getCallData())
-          .code(castedTx.getCode())
-          .fee(castedTx.getFee())
-          .gas(castedTx.getGas())
-          .ownerId(castedTx.getOwnerId())
-          .gasPrice(castedTx.getGasPrice())
-          .ttl(castedTx.getTtl())
-          .nonce(castedTx.getNonce())
-          .virtualMachine(VirtualMachine.getVirtualMachine(castedTx.getAbiVersion()))
-          .build();
-    };
   }
 }

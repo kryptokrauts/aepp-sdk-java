@@ -1,11 +1,11 @@
 package com.kryptokrauts.aeternity.sdk.service.transaction.type.model;
 
 import com.kryptokrauts.aeternity.generated.api.rxjava.ExternalApi;
+import com.kryptokrauts.aeternity.generated.api.rxjava.InternalApi;
 import com.kryptokrauts.aeternity.generated.model.ChannelSettleTx;
-import com.kryptokrauts.aeternity.generated.model.GenericTx;
+import com.kryptokrauts.aeternity.generated.model.Tx;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.AbstractTransaction;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.impl.ChannelSettleTransaction;
-import com.kryptokrauts.sophia.compiler.generated.api.rxjava.DefaultApi;
 import java.math.BigInteger;
 import java.util.function.Function;
 import lombok.Getter;
@@ -43,26 +43,28 @@ public class ChannelSettleTransactionModel extends AbstractTransactionModel<Chan
   }
 
   @Override
-  public Function<GenericTx, ChannelSettleTransactionModel> getApiToModelFunction() {
-    return (tx) -> {
-      ChannelSettleTx castedTx = (ChannelSettleTx) tx;
-      return this.toBuilder()
-          .channelId(castedTx.getChannelId())
-          .fromId(castedTx.getFromId())
-          .initiatorAmountFinal(castedTx.getInitiatorAmountFinal())
-          .responderAmountFinal(castedTx.getResponderAmountFinal())
-          .fee(castedTx.getFee())
-          .ttl(castedTx.getTtl())
-          .nonce(castedTx.getNonce())
-          .build();
-    };
+  public Function<Tx, ChannelSettleTransactionModel> getApiToModelFunction() {
+    return (tx) ->
+        this.toBuilder()
+            .channelId(tx.getChannelId())
+            .fromId(tx.getFromId())
+            .initiatorAmountFinal(tx.getInitiatorAmountFinal())
+            .responderAmountFinal(tx.getResponderAmountFinal())
+            .fee(tx.getFee())
+            .ttl(tx.getTtl())
+            .nonce(tx.getNonce())
+            .build();
   }
 
   @Override
   public void validateInput() {}
 
   @Override
-  public AbstractTransaction<?> buildTransaction(ExternalApi externalApi, DefaultApi compilerApi) {
-    return ChannelSettleTransaction.builder().externalApi(externalApi).model(this).build();
+  public AbstractTransaction<?> buildTransaction(ExternalApi externalApi, InternalApi internalApi) {
+    return ChannelSettleTransaction.builder()
+        .externalApi(externalApi)
+        .internalApi(internalApi)
+        .model(this)
+        .build();
   }
 }

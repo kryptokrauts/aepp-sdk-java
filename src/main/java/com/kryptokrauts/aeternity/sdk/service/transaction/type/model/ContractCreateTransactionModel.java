@@ -1,14 +1,14 @@
 package com.kryptokrauts.aeternity.sdk.service.transaction.type.model;
 
 import com.kryptokrauts.aeternity.generated.api.rxjava.ExternalApi;
+import com.kryptokrauts.aeternity.generated.api.rxjava.InternalApi;
 import com.kryptokrauts.aeternity.generated.model.ContractCreateTx;
-import com.kryptokrauts.aeternity.generated.model.GenericTx;
+import com.kryptokrauts.aeternity.generated.model.Tx;
 import com.kryptokrauts.aeternity.sdk.annotations.Mandatory;
 import com.kryptokrauts.aeternity.sdk.constants.VirtualMachine;
 import com.kryptokrauts.aeternity.sdk.exception.InvalidParameterException;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.AbstractTransaction;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.impl.ContractCreateTransaction;
-import com.kryptokrauts.sophia.compiler.generated.api.rxjava.DefaultApi;
 import java.math.BigInteger;
 import java.util.function.Function;
 import lombok.Builder.Default;
@@ -52,23 +52,21 @@ public class ContractCreateTransactionModel extends AbstractTransactionModel<Con
   }
 
   @Override
-  public Function<GenericTx, ContractCreateTransactionModel> getApiToModelFunction() {
-    return (tx) -> {
-      ContractCreateTx castedTx = (ContractCreateTx) tx;
-      return this.toBuilder()
-          .amount(castedTx.getAmount())
-          .callData(castedTx.getCallData())
-          .contractByteCode(castedTx.getCode())
-          .deposit(castedTx.getDeposit())
-          .fee(castedTx.getFee())
-          .gas(castedTx.getGas())
-          .ownerId(castedTx.getOwnerId())
-          .gasPrice(castedTx.getGasPrice())
-          .ttl(castedTx.getTtl())
-          .nonce(castedTx.getNonce())
-          .virtualMachine(VirtualMachine.getVirtualMachine(castedTx.getAbiVersion()))
-          .build();
-    };
+  public Function<Tx, ContractCreateTransactionModel> getApiToModelFunction() {
+    return (tx) ->
+        this.toBuilder()
+            .amount(tx.getAmount())
+            .callData(tx.getCallData())
+            .contractByteCode(tx.getCode())
+            .deposit(tx.getDeposit())
+            .fee(tx.getFee())
+            .gas(tx.getGas())
+            .ownerId(tx.getOwnerId())
+            .gasPrice(tx.getGasPrice())
+            .ttl(tx.getTtl())
+            .nonce(tx.getNonce())
+            .virtualMachine(VirtualMachine.getVirtualMachine(tx.getAbiVersion()))
+            .build();
   }
 
   @Override
@@ -80,7 +78,11 @@ public class ContractCreateTransactionModel extends AbstractTransactionModel<Con
   }
 
   @Override
-  public AbstractTransaction<?> buildTransaction(ExternalApi externalApi, DefaultApi compilerApi) {
-    return ContractCreateTransaction.builder().externalApi(externalApi).model(this).build();
+  public AbstractTransaction<?> buildTransaction(ExternalApi externalApi, InternalApi internalApi) {
+    return ContractCreateTransaction.builder()
+        .externalApi(externalApi)
+        .internalApi(internalApi)
+        .model(this)
+        .build();
   }
 }

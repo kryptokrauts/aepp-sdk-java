@@ -1,13 +1,13 @@
 package com.kryptokrauts.aeternity.sdk.service.transaction.type.model;
 
 import com.kryptokrauts.aeternity.generated.api.rxjava.ExternalApi;
+import com.kryptokrauts.aeternity.generated.api.rxjava.InternalApi;
 import com.kryptokrauts.aeternity.generated.model.ContractCallTx;
-import com.kryptokrauts.aeternity.generated.model.GenericTx;
+import com.kryptokrauts.aeternity.generated.model.Tx;
 import com.kryptokrauts.aeternity.sdk.annotations.Mandatory;
 import com.kryptokrauts.aeternity.sdk.constants.VirtualMachine;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.AbstractTransaction;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.impl.ContractCallTransaction;
-import com.kryptokrauts.sophia.compiler.generated.api.rxjava.DefaultApi;
 import java.math.BigInteger;
 import java.util.function.Function;
 import lombok.Builder.Default;
@@ -48,32 +48,33 @@ public class ContractCallTransactionModel extends AbstractTransactionModel<Contr
   }
 
   @Override
-  public Function<GenericTx, ContractCallTransactionModel> getApiToModelFunction() {
-    return (tx) -> {
-      ContractCallTx castedTx = (ContractCallTx) tx;
-      return this.toBuilder()
-          .amount(castedTx.getAmount())
-          .callData(castedTx.getCallData())
-          .callerId(castedTx.getCallerId())
-          .contractId(castedTx.getContractId())
-          .fee(castedTx.getFee())
-          .gas(castedTx.getGas())
-          .gasPrice(castedTx.getGasPrice())
-          .ttl(castedTx.getTtl())
-          .virtualMachine(VirtualMachine.getVirtualMachine(castedTx.getAbiVersion()))
-          .nonce(castedTx.getNonce())
-          .build();
-    };
+  public Function<Tx, ContractCallTransactionModel> getApiToModelFunction() {
+    return (tx) ->
+        this.toBuilder()
+            .amount(tx.getAmount())
+            .callData(tx.getCallData())
+            .callerId(tx.getCallerId())
+            .contractId(tx.getContractId())
+            .fee(tx.getFee())
+            .gas(tx.getGas())
+            .gasPrice(tx.getGasPrice())
+            .ttl(tx.getTtl())
+            .virtualMachine(VirtualMachine.getVirtualMachine(tx.getAbiVersion()))
+            .nonce(tx.getNonce())
+            .build();
   }
 
   @Override
   public void validateInput() {
     // TODO Auto-generated method stub
-
   }
 
   @Override
-  public AbstractTransaction<?> buildTransaction(ExternalApi externalApi, DefaultApi compilerApi) {
-    return ContractCallTransaction.builder().externalApi(externalApi).model(this).build();
+  public AbstractTransaction<?> buildTransaction(ExternalApi externalApi, InternalApi internalApi) {
+    return ContractCallTransaction.builder()
+        .externalApi(externalApi)
+        .internalApi(internalApi)
+        .model(this)
+        .build();
   }
 }

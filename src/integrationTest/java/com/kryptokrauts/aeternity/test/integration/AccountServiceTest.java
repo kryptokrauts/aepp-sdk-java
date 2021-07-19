@@ -1,4 +1,4 @@
-package com.kryptokrauts.aeternity.generated.api;
+package com.kryptokrauts.aeternity.test.integration;
 
 import com.kryptokrauts.aeternity.sdk.service.account.domain.AccountResult;
 import io.vertx.ext.unit.TestContext;

@@ -48,6 +48,8 @@ public class ServiceConfiguration {
 
   @Default @Nonnull protected String baseUrl = BaseConstants.DEFAULT_TESTNET_URL;
 
+  @Default @Nonnull protected String debugBaseUrl = BaseConstants.DEFAULT_TESTNET_URL;
+
   @Default @Nonnull protected String compilerBaseUrl = BaseConstants.DEFAULT_TESTNET_COMPILER_URL;
 
   @Default @Nonnull protected String indaexBaseUrl = BaseConstants.DEFAULT_TESTNET_INDAEX_URL;
@@ -69,7 +71,7 @@ public class ServiceConfiguration {
     return keyPair;
   }
 
-  /** @return apiClient initalized with default or given values of vertx and baseURL */
+  /** @return apiClient initialized with default or given values of vertx and baseURL */
   public ApiClient getApiClient() {
     if (vertx == null) {
       _logger.debug("Vertx entry point not initialized, creating default");
@@ -82,6 +84,24 @@ public class ServiceConfiguration {
           new JsonObject(
               new HashMap<String, Object>(
                   ImmutableMap.of(BaseConstants.VERTX_BASE_PATH, baseUrl))));
+    } else
+      throw new RuntimeException(
+          "Cannot instantiate ApiClient due to missing params vertx and or baseUrl");
+  }
+
+  public ApiClient getDebugApiClient() {
+    if (vertx == null) {
+      _logger.debug("Vertx entry point not initialized, creating default");
+      vertx = Vertx.vertx();
+    }
+    if (vertx != null && debugBaseUrl != null) {
+      _logger.debug(
+          String.format("Initializing Vertx ApiClient using debugBaseUrl %s", debugBaseUrl));
+      return new ApiClient(
+          vertx,
+          new JsonObject(
+              new HashMap<String, Object>(
+                  ImmutableMap.of(BaseConstants.VERTX_BASE_PATH, debugBaseUrl))));
     } else
       throw new RuntimeException(
           "Cannot instantiate ApiClient due to missing params vertx and or baseUrl");

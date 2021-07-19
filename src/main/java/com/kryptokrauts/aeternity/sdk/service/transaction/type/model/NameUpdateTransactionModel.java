@@ -1,16 +1,16 @@
 package com.kryptokrauts.aeternity.sdk.service.transaction.type.model;
 
 import com.kryptokrauts.aeternity.generated.api.rxjava.ExternalApi;
-import com.kryptokrauts.aeternity.generated.model.GenericTx;
+import com.kryptokrauts.aeternity.generated.api.rxjava.InternalApi;
 import com.kryptokrauts.aeternity.generated.model.NamePointer;
 import com.kryptokrauts.aeternity.generated.model.NameUpdateTx;
+import com.kryptokrauts.aeternity.generated.model.Tx;
 import com.kryptokrauts.aeternity.sdk.annotations.Mandatory;
 import com.kryptokrauts.aeternity.sdk.constants.AENS;
 import com.kryptokrauts.aeternity.sdk.constants.ApiIdentifiers;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.AbstractTransaction;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.impl.NameUpdateTransaction;
 import com.kryptokrauts.aeternity.sdk.util.ValidationUtil;
-import com.kryptokrauts.sophia.compiler.generated.api.rxjava.DefaultApi;
 import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -59,22 +59,20 @@ public class NameUpdateTransactionModel extends AbstractTransactionModel<NameUpd
   }
 
   @Override
-  public Function<GenericTx, NameUpdateTransactionModel> getApiToModelFunction() {
-    return (tx) -> {
-      NameUpdateTx castedTx = (NameUpdateTx) tx;
-      return this.toBuilder()
-          .accountId(castedTx.getAccountId())
-          .fee(castedTx.getFee())
-          .nonce(castedTx.getNonce())
-          .nameId(castedTx.getNameId())
-          .nameTtl(castedTx.getNameTtl())
-          .clientTtl(castedTx.getClientTtl())
-          .ttl(castedTx.getTtl())
-          .pointers(
-              castedTx.getPointers().stream()
-                  .collect(Collectors.toMap(p -> p.getKey(), p -> p.getId())))
-          .build();
-    };
+  public Function<Tx, NameUpdateTransactionModel> getApiToModelFunction() {
+    return (tx) ->
+        this.toBuilder()
+            .accountId(tx.getAccountId())
+            .fee(tx.getFee())
+            .nonce(tx.getNonce())
+            .nameId(tx.getNameId())
+            .nameTtl(tx.getNameTtl())
+            .clientTtl(tx.getClientTtl())
+            .ttl(tx.getTtl())
+            .pointers(
+                tx.getPointers().stream()
+                    .collect(Collectors.toMap(p -> p.getKey(), p -> p.getId())))
+            .build();
   }
 
   @Override
@@ -101,8 +99,12 @@ public class NameUpdateTransactionModel extends AbstractTransactionModel<NameUpd
   }
 
   @Override
-  public AbstractTransaction<?> buildTransaction(ExternalApi externalApi, DefaultApi compilerApi) {
-    return NameUpdateTransaction.builder().externalApi(externalApi).model(this).build();
+  public AbstractTransaction<?> buildTransaction(ExternalApi externalApi, InternalApi internalApi) {
+    return NameUpdateTransaction.builder()
+        .externalApi(externalApi)
+        .internalApi(internalApi)
+        .model(this)
+        .build();
   }
 
   private Boolean checkDefaultPointerTypes(final Map<String, String> pointers) {

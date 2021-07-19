@@ -22,14 +22,14 @@ public class OracleServiceImpl implements OracleService {
   public Single<RegisteredOracleResult> asyncGetRegisteredOracle(String publicKey) {
     return RegisteredOracleResult.builder()
         .build()
-        .asyncGet(externalApi.rxGetOracleByPubkey(publicKey));
+        .asyncGet(externalApi.rxGetOracleByPubkey(publicKey, false, null));
   }
 
   @Override
   public RegisteredOracleResult blockingGetRegisteredOracle(String publicKey) {
     return RegisteredOracleResult.builder()
         .build()
-        .blockingGet(externalApi.rxGetOracleByPubkey(publicKey));
+        .blockingGet(externalApi.rxGetOracleByPubkey(publicKey, false, null));
   }
 
   @Override
@@ -45,9 +45,11 @@ public class OracleServiceImpl implements OracleService {
         .asyncGet(
             externalApi.rxGetOracleQueriesByPubkey(
                 publicKey,
+                false,
                 queryParams.getFrom(),
                 queryParams.getLimit(),
-                queryParams.getQueryType().toString()));
+                queryParams.getQueryType().toString(),
+                null));
   }
 
   @Override
@@ -62,22 +64,24 @@ public class OracleServiceImpl implements OracleService {
         .blockingGet(
             externalApi.rxGetOracleQueriesByPubkey(
                 publicKey,
+                false,
                 queryParams.getFrom(),
                 queryParams.getLimit(),
-                queryParams.getQueryType().toString()));
+                queryParams.getQueryType().toString(),
+                null));
   }
 
   @Override
   public Single<OracleQueryResult> asyncGetOracleQuery(String pubkey, String queryId) {
     return OracleQueryResult.builder()
         .build()
-        .asyncGet(externalApi.rxGetOracleQueryByPubkeyAndQueryId(pubkey, queryId));
+        .asyncGet(externalApi.rxGetOracleQueryByPubkeyAndQueryId(pubkey, queryId, false, null));
   }
 
   @Override
   public OracleQueryResult blockingGetOracleQuery(String pubkey, String queryId) {
     return OracleQueryResult.builder()
         .build()
-        .blockingGet(externalApi.rxGetOracleQueryByPubkeyAndQueryId(pubkey, queryId));
+        .blockingGet(externalApi.rxGetOracleQueryByPubkeyAndQueryId(pubkey, queryId, false, null));
   }
 }

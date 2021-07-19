@@ -1,6 +1,6 @@
 package com.kryptokrauts.aeternity.sdk.service.info.domain;
 
-import com.kryptokrauts.aeternity.generated.model.GenericTxs;
+import com.kryptokrauts.aeternity.generated.model.SignedTxs;
 import com.kryptokrauts.aeternity.sdk.domain.GenericResultObject;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -11,12 +11,12 @@ import lombok.experimental.SuperBuilder;
 @Getter
 @SuperBuilder(toBuilder = true)
 @ToString
-public class TransactionResults extends GenericResultObject<GenericTxs, TransactionResults> {
+public class TransactionResults extends GenericResultObject<SignedTxs, TransactionResults> {
 
   private List<TransactionResult> results;
 
   @Override
-  protected TransactionResults map(GenericTxs generatedResultObject) {
+  protected TransactionResults map(SignedTxs generatedResultObject) {
     if (generatedResultObject != null)
       return this.toBuilder()
           .results(

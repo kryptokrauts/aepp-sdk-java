@@ -1,6 +1,7 @@
 package com.kryptokrauts.aeternity.sdk.service.transaction.type.impl;
 
 import com.kryptokrauts.aeternity.generated.api.rxjava.ExternalApi;
+import com.kryptokrauts.aeternity.generated.api.rxjava.InternalApi;
 import com.kryptokrauts.aeternity.generated.model.UnsignedTx;
 import com.kryptokrauts.aeternity.sdk.constants.ApiIdentifiers;
 import com.kryptokrauts.aeternity.sdk.constants.SerializationTags;
@@ -21,10 +22,11 @@ public class ChannelWithdrawTransaction
     extends AbstractTransaction<ChannelWithdrawTransactionModel> {
 
   @NonNull private ExternalApi externalApi;
+  @NonNull private InternalApi internalApi;
 
   @Override
   protected Single<UnsignedTx> createInternal() {
-    return externalApi.rxPostChannelWithdraw(model.toApiModel());
+    return internalApi.rxPostChannelWithdraw(model.toApiModel(), false, null);
   }
 
   @Override

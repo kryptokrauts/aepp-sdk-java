@@ -1,6 +1,7 @@
 package com.kryptokrauts.aeternity.sdk.service.transaction.type.impl;
 
 import com.kryptokrauts.aeternity.generated.api.rxjava.ExternalApi;
+import com.kryptokrauts.aeternity.generated.api.rxjava.InternalApi;
 import com.kryptokrauts.aeternity.generated.model.UnsignedTx;
 import com.kryptokrauts.aeternity.sdk.constants.ApiIdentifiers;
 import com.kryptokrauts.aeternity.sdk.constants.SerializationTags;
@@ -22,6 +23,12 @@ import org.apache.tuweni.rlp.RLP;
 public class ContractCallTransaction extends AbstractTransaction<ContractCallTransactionModel> {
 
   @NonNull private ExternalApi externalApi;
+  @NonNull private InternalApi internalApi;
+
+  @Override
+  protected Single<UnsignedTx> createInternal() {
+    return internalApi.rxPostContractCall(model.toApiModel(), false, null);
+  }
 
   @Override
   public Bytes createRLPEncodedList() {
@@ -49,11 +56,6 @@ public class ContractCallTransaction extends AbstractTransaction<ContractCallTra
                   EncodingUtils.decodeCheckWithIdentifier(model.getCallData()));
             });
     return encodedRlp;
-  }
-
-  @Override
-  protected Single<UnsignedTx> createInternal() {
-    return externalApi.rxPostContractCall(model.toApiModel());
   }
 
   @Override

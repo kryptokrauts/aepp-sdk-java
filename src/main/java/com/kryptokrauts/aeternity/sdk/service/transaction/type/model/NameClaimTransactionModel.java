@@ -1,14 +1,14 @@
 package com.kryptokrauts.aeternity.sdk.service.transaction.type.model;
 
 import com.kryptokrauts.aeternity.generated.api.rxjava.ExternalApi;
-import com.kryptokrauts.aeternity.generated.model.GenericTx;
+import com.kryptokrauts.aeternity.generated.api.rxjava.InternalApi;
 import com.kryptokrauts.aeternity.generated.model.NameClaimTx;
+import com.kryptokrauts.aeternity.generated.model.Tx;
 import com.kryptokrauts.aeternity.sdk.annotations.Mandatory;
 import com.kryptokrauts.aeternity.sdk.constants.AENS;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.AbstractTransaction;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.impl.NameClaimTransaction;
 import com.kryptokrauts.aeternity.sdk.util.ValidationUtil;
-import com.kryptokrauts.sophia.compiler.generated.api.rxjava.DefaultApi;
 import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.function.Function;
@@ -46,19 +46,17 @@ public class NameClaimTransactionModel extends AbstractTransactionModel<NameClai
   }
 
   @Override
-  public Function<GenericTx, NameClaimTransactionModel> getApiToModelFunction() {
-    return (tx) -> {
-      NameClaimTx castedTx = (NameClaimTx) tx;
-      return this.toBuilder()
-          .accountId(castedTx.getAccountId())
-          .fee(castedTx.getFee())
-          .nonce(castedTx.getNonce())
-          .name(castedTx.getName())
-          .nameSalt(castedTx.getNameSalt())
-          .nameFee(castedTx.getNameFee())
-          .ttl(castedTx.getTtl())
-          .build();
-    };
+  public Function<Tx, NameClaimTransactionModel> getApiToModelFunction() {
+    return (tx) ->
+        this.toBuilder()
+            .accountId(tx.getAccountId())
+            .fee(tx.getFee())
+            .nonce(tx.getNonce())
+            .name(tx.getName())
+            .nameSalt(tx.getNameSalt())
+            .nameFee(tx.getNameFee())
+            .ttl(tx.getTtl())
+            .build();
   }
 
   @Override
@@ -74,8 +72,12 @@ public class NameClaimTransactionModel extends AbstractTransactionModel<NameClai
   }
 
   @Override
-  public AbstractTransaction<?> buildTransaction(ExternalApi externalApi, DefaultApi compilerApi) {
-    return NameClaimTransaction.builder().externalApi(externalApi).model(this).build();
+  public AbstractTransaction<?> buildTransaction(ExternalApi externalApi, InternalApi internalApi) {
+    return NameClaimTransaction.builder()
+        .externalApi(externalApi)
+        .internalApi(internalApi)
+        .model(this)
+        .build();
   }
 
   /**

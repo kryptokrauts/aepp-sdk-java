@@ -1,12 +1,12 @@
 package com.kryptokrauts.aeternity.sdk.service.transaction.type.model;
 
 import com.kryptokrauts.aeternity.generated.api.rxjava.ExternalApi;
-import com.kryptokrauts.aeternity.generated.model.GenericTx;
+import com.kryptokrauts.aeternity.generated.api.rxjava.InternalApi;
 import com.kryptokrauts.aeternity.generated.model.SpendTx;
+import com.kryptokrauts.aeternity.generated.model.Tx;
 import com.kryptokrauts.aeternity.sdk.annotations.Mandatory;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.impl.SpendTransaction;
 import com.kryptokrauts.aeternity.sdk.util.EncodingUtils;
-import com.kryptokrauts.sophia.compiler.generated.api.rxjava.DefaultApi;
 import java.math.BigInteger;
 import java.util.function.Function;
 import lombok.Builder.Default;
@@ -41,21 +41,18 @@ public class SpendTransactionModel extends AbstractTransactionModel<SpendTx> {
   }
 
   @Override
-  public Function<GenericTx, SpendTransactionModel> getApiToModelFunction() {
-    return (tx) -> {
-      SpendTx castedTx = (SpendTx) tx;
-      return this.toBuilder()
-          .sender(castedTx.getSenderId())
-          .recipient(castedTx.getRecipientId())
-          .amount(castedTx.getAmount())
-          .payload(castedTx.getPayload())
-          .payloadDecoded(
-              new String(EncodingUtils.decodeCheckWithIdentifier(castedTx.getPayload())))
-          .fee(castedTx.getFee())
-          .nonce(castedTx.getNonce())
-          .ttl(castedTx.getTtl())
-          .build();
-    };
+  public Function<Tx, SpendTransactionModel> getApiToModelFunction() {
+    return (tx) ->
+        this.toBuilder()
+            .sender(tx.getSenderId())
+            .recipient(tx.getRecipientId())
+            .amount(tx.getAmount())
+            .payload(tx.getPayload())
+            .payloadDecoded(new String(EncodingUtils.decodeCheckWithIdentifier(tx.getPayload())))
+            .fee(tx.getFee())
+            .nonce(tx.getNonce())
+            .ttl(tx.getTtl())
+            .build();
   }
 
   @Override
@@ -64,7 +61,11 @@ public class SpendTransactionModel extends AbstractTransactionModel<SpendTx> {
   }
 
   @Override
-  public SpendTransaction buildTransaction(ExternalApi externalApi, DefaultApi compilerApi) {
-    return SpendTransaction.builder().externalApi(externalApi).model(this).build();
+  public SpendTransaction buildTransaction(ExternalApi externalApi, InternalApi internalApi) {
+    return SpendTransaction.builder()
+        .externalApi(externalApi)
+        .internalApi(internalApi)
+        .model(this)
+        .build();
   }
 }

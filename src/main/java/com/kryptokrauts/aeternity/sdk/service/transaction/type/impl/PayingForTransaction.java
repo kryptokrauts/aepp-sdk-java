@@ -1,6 +1,7 @@
 package com.kryptokrauts.aeternity.sdk.service.transaction.type.impl;
 
 import com.kryptokrauts.aeternity.generated.api.rxjava.ExternalApi;
+import com.kryptokrauts.aeternity.generated.api.rxjava.InternalApi;
 import com.kryptokrauts.aeternity.generated.model.UnsignedTx;
 import com.kryptokrauts.aeternity.sdk.constants.ApiIdentifiers;
 import com.kryptokrauts.aeternity.sdk.constants.SerializationTags;
@@ -22,6 +23,12 @@ import org.apache.tuweni.rlp.RLP;
 public class PayingForTransaction extends AbstractTransaction<PayingForTransactionModel> {
 
   @NonNull private ExternalApi externalApi;
+  @NonNull private InternalApi internalApi;
+
+  @Override
+  protected Single<UnsignedTx> createInternal() {
+    return internalApi.rxPostPayingFor(model.toApiModel(), false, null);
+  }
 
   @Override
   public Bytes createRLPEncodedList() {
@@ -39,11 +46,6 @@ public class PayingForTransaction extends AbstractTransaction<PayingForTransacti
               rlpWriter.writeByteArray(EncodingUtils.decodeCheckWithIdentifier(model.getInnerTx()));
             });
     return encodedRlp;
-  }
-
-  @Override
-  protected <T extends UnsignedTx> Single<T> createInternal() {
-    throw new UnsupportedOperationException("Not possible");
   }
 
   @Override

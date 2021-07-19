@@ -1,14 +1,14 @@
 package com.kryptokrauts.aeternity.sdk.service.transaction.type.model;
 
 import com.kryptokrauts.aeternity.generated.api.rxjava.ExternalApi;
-import com.kryptokrauts.aeternity.generated.model.GenericTx;
+import com.kryptokrauts.aeternity.generated.api.rxjava.InternalApi;
 import com.kryptokrauts.aeternity.generated.model.NameRevokeTx;
+import com.kryptokrauts.aeternity.generated.model.Tx;
 import com.kryptokrauts.aeternity.sdk.annotations.Mandatory;
 import com.kryptokrauts.aeternity.sdk.constants.ApiIdentifiers;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.AbstractTransaction;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.impl.NameRevokeTransaction;
 import com.kryptokrauts.aeternity.sdk.util.ValidationUtil;
-import com.kryptokrauts.sophia.compiler.generated.api.rxjava.DefaultApi;
 import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.function.Function;
@@ -39,16 +39,14 @@ public class NameRevokeTransactionModel extends AbstractTransactionModel<NameRev
   }
 
   @Override
-  public Function<GenericTx, NameRevokeTransactionModel> getApiToModelFunction() {
-    return (tx) -> {
-      NameRevokeTx castedTx = (NameRevokeTx) tx;
-      return this.toBuilder()
-          .accountId(castedTx.getAccountId())
-          .nonce(castedTx.getNonce())
-          .nameId(castedTx.getNameId())
-          .ttl(castedTx.getTtl())
-          .build();
-    };
+  public Function<Tx, NameRevokeTransactionModel> getApiToModelFunction() {
+    return (tx) ->
+        this.toBuilder()
+            .accountId(tx.getAccountId())
+            .nonce(tx.getNonce())
+            .nameId(tx.getNameId())
+            .ttl(tx.getTtl())
+            .build();
   }
 
   @Override
@@ -69,7 +67,11 @@ public class NameRevokeTransactionModel extends AbstractTransactionModel<NameRev
   }
 
   @Override
-  public AbstractTransaction<?> buildTransaction(ExternalApi externalApi, DefaultApi compilerApi) {
-    return NameRevokeTransaction.builder().externalApi(externalApi).model(this).build();
+  public AbstractTransaction<?> buildTransaction(ExternalApi externalApi, InternalApi internalApi) {
+    return NameRevokeTransaction.builder()
+        .externalApi(externalApi)
+        .internalApi(internalApi)
+        .model(this)
+        .build();
   }
 }
