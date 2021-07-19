@@ -24,7 +24,6 @@ import com.kryptokrauts.aeternity.sdk.service.transaction.type.model.PayingForTr
 import com.kryptokrauts.aeternity.sdk.util.ByteUtils;
 import com.kryptokrauts.aeternity.sdk.util.EncodingUtils;
 import com.kryptokrauts.aeternity.sdk.util.SigningUtil;
-import com.kryptokrauts.sophia.compiler.generated.api.rxjava.DefaultApi;
 import io.reactivex.Flowable;
 import io.reactivex.Single;
 import java.math.BigInteger;
@@ -47,8 +46,6 @@ public class TransactionServiceImpl implements TransactionService {
   @Nonnull private ExternalApi externalApi;
 
   @Nonnull private InternalApi internalApi;
-
-  @Nonnull private DefaultApi compilerApi;
 
   @Nonnull private InfoService infoService;
 

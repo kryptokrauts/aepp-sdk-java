@@ -101,10 +101,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  hash:
-                    $ref: "#/components/schemas/EncodedHash"
+                $ref: "#/components/schemas/HashResponse"
         "404":
           description: Block not found
           content:
@@ -126,10 +123,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  height:
-                    $ref: "#/components/schemas/UInt64"
+                $ref: "#/components/schemas/HeightResponse"
         "404":
           description: Block not found
           content:
@@ -261,11 +255,7 @@ paths:
           content:
             application/json:
               schema:
-                properties:
-                  transactions:
-                    type: array
-                    items:
-                      $ref: "#/components/schemas/SignedTx"
+                $ref: "#/components/schemas/SignedTxs"
         "400":
           description: Invalid hash
           content:
@@ -331,10 +321,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  count:
-                    $ref: "#/components/schemas/UInt32"
+                $ref: "#/components/schemas/CountResponse"
         "400":
           description: Invalid hash
           content:
@@ -527,11 +514,7 @@ paths:
           content:
             application/json:
               schema:
-                properties:
-                  transactions:
-                    type: array
-                    items:
-                      $ref: "#/components/schemas/SignedTx"
+                $ref: "#/components/schemas/SignedTxs"
         "400":
           description: Invalid public key
           content:
@@ -1738,11 +1721,7 @@ paths:
           content:
             application/json:
               schema:
-                properties:
-                  transactions:
-                    type: array
-                    items:
-                      $ref: "#/components/schemas/SignedTx"
+                $ref: "#/components/schemas/SignedTxs"
   /debug/names/commitment-id:
     get:
       tags:
@@ -3541,6 +3520,34 @@ components:
       anyOf:
         - $ref: "#/components/schemas/KeyBlock"
         - $ref: "#/components/schemas/MicroBlockHeader"
+    SignedTxs:
+      type: object
+      properties:
+        transactions:
+          type: array
+          items:
+            $ref: "#/components/schemas/SignedTx"
+    HashResponse:
+      type: object
+      properties:
+        hash:
+          type: string
+      required:
+        - hash
+    HeightResponse:
+      type: object
+      properties:
+        height:
+          $ref: "#/components/schemas/UInt64"
+      required:
+        - height
+    CountResponse:
+      type: object
+      properties:
+        count:
+          $ref: "#/components/schemas/UInt32"
+      required:
+        - count
   parameters:
     intAsString:
       in: query

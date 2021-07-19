@@ -4,7 +4,6 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath "io.swagger.codegen.v3:swagger-codegen-maven-plugin:3.0.27"
         classpath "org.openapitools:openapi-generator-gradle-plugin:5.2.0"
     }
 }
@@ -33,21 +32,6 @@ googleJavaFormat {
 }
 
 ext {
-    invokerPackageAeternity = "com.kryptokrauts.aeternity.generated"
-    apiPackageAeternity = "com.kryptokrauts.aeternity.generated.api"
-    modelPackageAeternity = "com.kryptokrauts.aeternity.generated.model"
-    oas3Aeternity = "${rootDir}/api/oas3_aeternity.yml"
-
-    apiPackageSophiaCompiler = "com.kryptokrauts.sophia.compiler.generated.api"
-    modelPackageSophiaCompiler = "com.kryptokrauts.sophia.compiler.generated.model"
-    swaggerFileSophiaCompiler = "${rootDir}/api/swagger_sophia_compiler.yml"
-
-    apiPackageIndaex = "com.kryptokrauts.indaex.generated.api"
-    modelPackageIndaex = "com.kryptokrauts.indaex.generated.model"
-    swaggerFileIndaex = "${rootDir}/api/swagger_indaex.yml"
-
-    templateDir = "${rootDir}/api/vertx-templates"
-    swaggerAnnotationsVersion = "1.5.22"
     vertxVersion = "3.6.3"
     jacksonVersion = "2.9.8"
 
@@ -64,15 +48,24 @@ ext {
     slf4jVersion = "1.7.26"
 }
 
-openApiGenerate {
+task generateAeternityApiClient(type: org.openapitools.generator.gradle.plugin.tasks.GenerateTask) {
     generatorName = "java"
     library = "vertx"
-    inputSpec = project.oas3Aeternity.toString()
-    outputDir = "${rootDir}/build/swagger"
-    invokerPackage = "${invokerPackageAeternity}"
-    apiPackage = "${apiPackageAeternity}"
-    modelPackage = "${modelPackageAeternity}"
-    templateDir = "${rootDir}/api/vertx-templates-openapi"
+    inputSpec = "${rootDir}/api/oas3_aeternity.yml".toString()
+    outputDir = "${rootDir}/build/generated"
+    invokerPackage = "com.kryptokrauts.aeternity.generated"
+    apiPackage = "com.kryptokrauts.aeternity.generated.api"
+    modelPackage = "com.kryptokrauts.aeternity.generated.model"
+    templateDir = "${rootDir}/api/vertx-templates"
+    typeMappings = [
+            "UInt"         : "java.math.BigInteger",
+            "UInt16"       : "java.math.BigInteger",
+            "UInt32"       : "java.math.BigInteger",
+            "UInt64"       : "java.math.BigInteger",
+            "Integer"      : "java.math.BigInteger",
+            "TxBlockHeight": "java.math.BigInteger",
+            "RelativeTTL"  : "com.kryptokrauts.aeternity.generated.model.TTL"
+    ]
     importMappings = [
             "UInt"         : "java.math.BigInteger",
             "UInt16"       : "java.math.BigInteger",
@@ -83,57 +76,55 @@ openApiGenerate {
             "RelativeTTL"  : "com.kryptokrauts.aeternity.generated.model.TTL"
     ]
     configOptions = [
-            dateLibrary    : "java8",
-            openApiNullable: "true",
+            dateLibrary: "java8",
     ]
 }
 
-import io.swagger.codegen.config.CodegenConfigurator
-
-def swaggerOutputDir = file("build/swagger")
-
-task generateApiClient {
-    doLast {
-        def configSophiaCompiler = new CodegenConfigurator()
-        configSophiaCompiler.setLang("java")
-        configSophiaCompiler.setLibrary("vertx")
-        configSophiaCompiler.setGroupId("${group}")
-        configSophiaCompiler.setArtifactId("sophia-compiler-client-vertx")
-        configSophiaCompiler.setApiPackage("${apiPackageSophiaCompiler}")
-        configSophiaCompiler.setModelPackage("${modelPackageSophiaCompiler}")
-        configSophiaCompiler.setInputSpec(project.swaggerFileSophiaCompiler.toString())
-        configSophiaCompiler.setOutputDir(swaggerOutputDir.path)
-        configSophiaCompiler.setTemplateDir(project.templateDir)
-        configSophiaCompiler.setAdditionalProperties([
-                "dateLibrary": "java8",
-                "title"      : rootProject.name,
-                "useTags"    : "true"
-        ])
-        new io.swagger.codegen.DefaultGenerator().opts(configSophiaCompiler.toClientOptInput()).generate()
-
-        def configIndaex = new CodegenConfigurator()
-        configIndaex.setLang("java")
-        configIndaex.setLibrary("vertx")
-        configIndaex.setGroupId("${group}")
-        configIndaex.setArtifactId("indaex-client-vertx")
-        configIndaex.setApiPackage("${apiPackageIndaex}")
-        configIndaex.setModelPackage("${modelPackageIndaex}")
-        configIndaex.setInputSpec(project.swaggerFileIndaex.toString())
-        configIndaex.setOutputDir(swaggerOutputDir.path)
-        configIndaex.setTemplateDir(project.templateDir)
-        configIndaex.setAdditionalProperties([
-                "dateLibrary": "java8",
-                "title"      : rootProject.name,
-                "useTags"    : "true"
-        ])
-        configIndaex.setTypeMappings([
-                "Integer": "java.math.BigInteger"
-        ])
-        new io.swagger.codegen.DefaultGenerator().opts(configIndaex.toClientOptInput()).generate()
-    }
+task generateSophiaCompilerClient(type: org.openapitools.generator.gradle.plugin.tasks.GenerateTask) {
+    generatorName = "java"
+    library = "vertx"
+    inputSpec = "${rootDir}/api/swagger_sophia_compiler.yml".toString()
+    outputDir = "${rootDir}/build/generated"
+    invokerPackage = "com.kryptokrauts.sophia.compiler.generated"
+    apiPackage = "com.kryptokrauts.sophia.compiler.generated.api"
+    modelPackage = "com.kryptokrauts.sophia.compiler.generated.model"
+    templateDir = "${rootDir}/api/vertx-templates"
+    typeMappings = [
+            "Integer": "java.math.BigInteger",
+    ]
+    importMappings = [
+            "Integer": "java.math.BigInteger",
+    ]
+    configOptions = [
+            dateLibrary: "java8",
+    ]
 }
 
-generateApiClient.finalizedBy(tasks.openApiGenerate)
+task generateIndaexApiClient(type: org.openapitools.generator.gradle.plugin.tasks.GenerateTask) {
+    generatorName = "java"
+    library = "vertx"
+    inputSpec = "${rootDir}/api/swagger_indaex.yml".toString()
+    outputDir = "${rootDir}/build/generated"
+    invokerPackage = "com.kryptokrauts.indaex.generated"
+    apiPackage = "com.kryptokrauts.indaex.generated.api"
+    modelPackage = "com.kryptokrauts.indaex.generated.model"
+    templateDir = "${rootDir}/api/vertx-templates"
+    typeMappings = [
+            "Integer": "java.math.BigInteger",
+    ]
+    importMappings = [
+            "Integer": "java.math.BigInteger",
+    ]
+    configOptions = [
+            dateLibrary: "java8",
+    ]
+}
+
+task generateApiClients {
+    dependsOn(generateAeternityApiClient)
+    dependsOn(generateSophiaCompilerClient)
+    dependsOn(generateIndaexApiClient)
+}
 
 configurations {
     integrationTestCompile.extendsFrom testCompile
@@ -150,23 +141,13 @@ configurations.all {
 }
 
 sourceSets {
-    swagger {
-        java {
-            srcDir file("${project.buildDir.path}/swagger/src/main/java")
-        }
-    }
     main {
-        compileClasspath += swagger.output
-        runtimeClasspath += swagger.output
-    }
-    test {
-        compileClasspath += swagger.output
-        runtimeClasspath += swagger.output
+        java.srcDirs += "${project.buildDir.path}/generated/src/main/java"
     }
     integrationTest {
         java {
-            compileClasspath += main.output + test.output + swagger.output
-            runtimeClasspath += main.output + test.output + swagger.output
+            compileClasspath += main.output + test.output
+            runtimeClasspath += main.output + test.output
             srcDir file("src/integrationTest/java")
         }
         resources.srcDir file("src/integrationTest/resources")
@@ -185,15 +166,14 @@ task integrationTest(type: JavaExec, dependsOn: integrationTestClasses) {
 }
 
 final Boolean generateSources = Boolean.parseBoolean(System.getenv("AETERNITY_GENERATE_SOURCES"))
-compileSwaggerJava {
+task compileGeneratedSources() {
     if (generateSources) {
-        dependsOn(generateApiClient)
+        dependsOn(generateApiClients)
     }
-    classpath = configurations.compile
 }
+
 compileJava {
-    dependsOn(compileSwaggerJava)
-    source += sourceSets.swagger.java
+    dependsOn(compileGeneratedSources)
 }
 
 tasks.withType(JavaCompile) {
@@ -212,8 +192,8 @@ dependencies {
     compile "org.apache.tuweni:tuweni-crypto:${tuweniVersion}"
     compile "de.mkammerer:argon2-jvm:2.5"
 
-    // needed for vertx client
-    compile "io.swagger:swagger-annotations:${swaggerAnnotationsVersion}"
+    // client & generated model classes
+    compile "io.swagger:swagger-annotations:1.5.22"
     compile "io.vertx:vertx-web-client:${vertxVersion}"
     compile "io.vertx:vertx-rx-java2:${vertxVersion}"
     compile "com.fasterxml.jackson.core:jackson-core:${jacksonVersion}"

@@ -56,7 +56,7 @@ public class AeternityService {
   public AeternityService(AeternityServiceConfiguration config) {
     this.config = config;
     this.externalApi = new ExternalApi(new ExternalApiImpl(config.getApiClient()));
-    this.internalApi = new InternalApi(new InternalApiImpl(config.getApiClient()));
+    this.internalApi = new InternalApi(new InternalApiImpl(config.getDebugApiClient()));
     this.compilerApi = new DefaultApi(new DefaultApiImpl(config.getCompilerApiClient()));
     this.indaexApi =
         new com.kryptokrauts.indaex.generated.api.rxjava.MiddlewareApi(
@@ -69,7 +69,6 @@ public class AeternityService {
     this.names = new NameServiceImpl(this.config, this.externalApi);
     this.oracles = new OracleServiceImpl(this.config, this.externalApi);
     this.transactions =
-        new TransactionServiceImpl(
-            this.config, this.externalApi, this.internalApi, this.compilerApi, this.info);
+        new TransactionServiceImpl(this.config, this.externalApi, this.internalApi, this.info);
   }
 }
