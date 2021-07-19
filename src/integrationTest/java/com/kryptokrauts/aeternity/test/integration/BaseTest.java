@@ -106,6 +106,7 @@ public abstract class BaseTest {
             .getService(
                 AeternityServiceConfiguration.configure()
                     .baseUrl(getAeternityBaseUrl())
+                    .debugBaseUrl(getAeternityBaseUrl())
                     .compilerBaseUrl(getCompilerBaseUrl())
                     .indaexBaseUrl(getIndaexBaseUrl())
                     .network(Network.LOCAL_IRIS_NETWORK)
