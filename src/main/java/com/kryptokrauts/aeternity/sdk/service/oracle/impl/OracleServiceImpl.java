@@ -22,14 +22,14 @@ public class OracleServiceImpl implements OracleService {
   public Single<RegisteredOracleResult> asyncGetRegisteredOracle(String publicKey) {
     return RegisteredOracleResult.builder()
         .build()
-        .asyncGet(externalApi.rxGetOracleByPubkey(publicKey, false, null));
+        .asyncGet(externalApi.rxGetOracleByPubkey(publicKey, false));
   }
 
   @Override
   public RegisteredOracleResult blockingGetRegisteredOracle(String publicKey) {
     return RegisteredOracleResult.builder()
         .build()
-        .blockingGet(externalApi.rxGetOracleByPubkey(publicKey, false, null));
+        .blockingGet(externalApi.rxGetOracleByPubkey(publicKey, false));
   }
 
   @Override
@@ -48,8 +48,7 @@ public class OracleServiceImpl implements OracleService {
                 false,
                 queryParams.getFrom(),
                 queryParams.getLimit(),
-                queryParams.getQueryType().toString(),
-                null));
+                queryParams.getQueryType().toString()));
   }
 
   @Override
@@ -67,21 +66,20 @@ public class OracleServiceImpl implements OracleService {
                 false,
                 queryParams.getFrom(),
                 queryParams.getLimit(),
-                queryParams.getQueryType().toString(),
-                null));
+                queryParams.getQueryType().toString()));
   }
 
   @Override
   public Single<OracleQueryResult> asyncGetOracleQuery(String pubkey, String queryId) {
     return OracleQueryResult.builder()
         .build()
-        .asyncGet(externalApi.rxGetOracleQueryByPubkeyAndQueryId(pubkey, queryId, false, null));
+        .asyncGet(externalApi.rxGetOracleQueryByPubkeyAndQueryId(pubkey, queryId, false));
   }
 
   @Override
   public OracleQueryResult blockingGetOracleQuery(String pubkey, String queryId) {
     return OracleQueryResult.builder()
         .build()
-        .blockingGet(externalApi.rxGetOracleQueryByPubkeyAndQueryId(pubkey, queryId, false, null));
+        .blockingGet(externalApi.rxGetOracleQueryByPubkeyAndQueryId(pubkey, queryId, false));
   }
 }

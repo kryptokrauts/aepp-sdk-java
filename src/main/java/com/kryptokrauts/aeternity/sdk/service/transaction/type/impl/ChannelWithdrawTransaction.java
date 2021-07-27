@@ -26,7 +26,7 @@ public class ChannelWithdrawTransaction
 
   @Override
   protected Single<UnsignedTx> createInternal() {
-    return internalApi.rxPostChannelWithdraw(model.toApiModel(), false, null);
+    return internalApi.rxPostChannelWithdraw(model.toApiModel(), false);
   }
 
   @Override

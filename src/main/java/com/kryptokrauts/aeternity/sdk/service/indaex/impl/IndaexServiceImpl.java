@@ -18,14 +18,12 @@ public class IndaexServiceImpl implements IndaexService {
 
   @Override
   public StatusResult blockingGetStatus() {
-    return StatusResult.builder().build().blockingGet(indaexApi.rxGetStatus(null));
+    return StatusResult.builder().build().blockingGet(indaexApi.rxGetStatus());
   }
 
   @Override
   public NameAuctionResult blockingGetNameAuction(String name) {
-    return NameAuctionResult.builder()
-        .build()
-        .blockingGet(indaexApi.rxGetNameAuctionById(name, null));
+    return NameAuctionResult.builder().build().blockingGet(indaexApi.rxGetNameAuctionById(name));
   }
 
   @Override
@@ -40,7 +38,6 @@ public class IndaexServiceImpl implements IndaexService {
     return NameAuctionsResult.builder()
         .build()
         .blockingGet(
-            indaexApi.rxGetAllAuctions(
-                sortBy.toString(), sortDirection.toString(), page, limit, null));
+            indaexApi.rxGetAllAuctions(sortBy.toString(), sortDirection.toString(), page, limit));
   }
 }

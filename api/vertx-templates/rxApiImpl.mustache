@@ -29,7 +29,7 @@ import io.vertx.reactivex.SingleHelper;
         * {{summary}}
         * {{notes}}
         {{#allParams}}
-            * @param {{paramName}} {{description}}{{#required}} (required){{/required}}{{^required}} (optional{{#defaultValue}}, default to {{{.}}}{{/defaultValue}}){{/required}}
+        * @param {{paramName}} {{description}}{{#required}} (required){{/required}}{{^required}} (optional{{#defaultValue}}, default to {{{.}}}{{/defaultValue}}){{/required}}
         {{/allParams}}
         * @param resultHandler Asynchronous result handler
         */
@@ -41,11 +41,11 @@ import io.vertx.reactivex.SingleHelper;
         * {{summary}}
         * {{notes}}
         {{#allParams}}
-            * @param {{paramName}} {{description}}{{#required}} (required){{/required}}{{^required}} (optional{{#defaultValue}}, default to {{{.}}}{{/defaultValue}}){{/required}}
+        * @param {{paramName}} {{description}}{{#required}} (required){{/required}}{{^required}} (optional{{#defaultValue}}, default to {{{.}}}{{/defaultValue}}){{/required}}
         {{/allParams}}
         * @return Asynchronous result handler (RxJava Single)
         */
-        public Single<{{#returnType}}{{{returnType}}}{{/returnType}}{{^returnType}}Void{{/returnType}}> rx{{operationIdCamelCase}}({{#allParams}}{{{dataType}}} {{paramName}},{{/allParams}}Object placeholder) {
+        public Single<{{#returnType}}{{{returnType}}}{{/returnType}}{{^returnType}}Void{{/returnType}}> rx{{operationIdCamelCase}}({{#allParams}}{{{dataType}}} {{paramName}}, {{/allParams}}) {
             return SingleHelper.toSingle(fut -> {
                 delegate.{{operationId}}({{#allParams}}{{paramName}}, {{/allParams}}fut);
             });

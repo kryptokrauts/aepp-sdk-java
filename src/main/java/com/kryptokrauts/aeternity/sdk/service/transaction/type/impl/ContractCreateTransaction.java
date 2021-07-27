@@ -31,7 +31,7 @@ public class ContractCreateTransaction extends AbstractTransaction<ContractCreat
   @Override
   protected Single<UnsignedTx> createInternal() {
     return internalApi
-        .rxPostContractCreate(model.toApiModel(), false, null)
+        .rxPostContractCreate(model.toApiModel(), false)
         .map(
             createContractUnsignedTx -> {
               UnsignedTx unsignedTx = new UnsignedTx();

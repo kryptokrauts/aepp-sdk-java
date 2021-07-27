@@ -19,13 +19,13 @@ public final class NameServiceImpl implements NameService {
   public Single<NameEntryResult> asyncGetNameId(final String name) {
     return NameEntryResult.builder()
         .build()
-        .asyncGet(this.externalApi.rxGetNameEntryByName(name, false, null));
+        .asyncGet(this.externalApi.rxGetNameEntryByName(name, false));
   }
 
   @Override
   public NameEntryResult blockingGetNameId(String name) {
     return NameEntryResult.builder()
         .build()
-        .blockingGet(this.externalApi.rxGetNameEntryByName(name, false, null));
+        .blockingGet(this.externalApi.rxGetNameEntryByName(name, false));
   }
 }

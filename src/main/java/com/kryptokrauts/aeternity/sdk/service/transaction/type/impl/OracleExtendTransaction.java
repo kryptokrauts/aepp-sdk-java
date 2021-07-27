@@ -28,7 +28,7 @@ public class OracleExtendTransaction extends AbstractTransaction<OracleExtendTra
 
   @Override
   protected Single<UnsignedTx> createInternal() {
-    return this.internalApi.rxPostOracleExtend(model.toApiModel(), false, null);
+    return this.internalApi.rxPostOracleExtend(model.toApiModel(), false);
   }
 
   @Override

@@ -25,7 +25,7 @@ public class ChannelSettleTransaction extends AbstractTransaction<ChannelSettleT
 
   @Override
   protected Single<UnsignedTx> createInternal() {
-    return internalApi.rxPostChannelSettle(model.toApiModel(), false, null);
+    return internalApi.rxPostChannelSettle(model.toApiModel(), false);
   }
 
   @Override

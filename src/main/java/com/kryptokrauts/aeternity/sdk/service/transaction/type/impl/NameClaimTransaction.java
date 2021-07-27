@@ -25,7 +25,7 @@ public class NameClaimTransaction extends AbstractTransaction<NameClaimTransacti
 
   @Override
   protected Single<UnsignedTx> createInternal() {
-    return this.internalApi.rxPostNameClaim(model.toApiModel(), false, null);
+    return this.internalApi.rxPostNameClaim(model.toApiModel(), false);
   }
 
   @Override

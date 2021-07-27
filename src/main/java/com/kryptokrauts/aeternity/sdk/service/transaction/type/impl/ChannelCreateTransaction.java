@@ -27,7 +27,7 @@ public class ChannelCreateTransaction extends AbstractTransaction<ChannelCreateT
 
   @Override
   protected Single<UnsignedTx> createInternal() {
-    return internalApi.rxPostChannelCreate(model.toApiModel(), false, null);
+    return internalApi.rxPostChannelCreate(model.toApiModel(), false);
   }
 
   @Override

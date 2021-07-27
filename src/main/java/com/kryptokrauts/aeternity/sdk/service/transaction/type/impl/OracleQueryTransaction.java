@@ -28,7 +28,7 @@ public class OracleQueryTransaction extends AbstractTransaction<OracleQueryTrans
 
   @Override
   protected Single<UnsignedTx> createInternal() {
-    return this.internalApi.rxPostOracleQuery(model.toApiModel(), false, null);
+    return this.internalApi.rxPostOracleQuery(model.toApiModel(), false);
   }
 
   @Override

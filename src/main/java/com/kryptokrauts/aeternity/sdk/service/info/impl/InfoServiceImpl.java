@@ -30,28 +30,28 @@ public class InfoServiceImpl implements InfoService {
   public Single<TransactionResult> asyncGetTransactionByHash(String txHash) {
     return TransactionResult.builder()
         .build()
-        .asyncGet(externalApi.rxGetTransactionByHash(txHash, false, null));
+        .asyncGet(externalApi.rxGetTransactionByHash(txHash, false));
   }
 
   @Override
   public TransactionResult blockingGetTransactionByHash(String txHash) {
     return TransactionResult.builder()
         .build()
-        .blockingGet(externalApi.rxGetTransactionByHash(txHash, false, null));
+        .blockingGet(externalApi.rxGetTransactionByHash(txHash, false));
   }
 
   @Override
   public Single<TransactionInfoResult> asyncGetTransactionInfoByHash(String txHash) {
     return TransactionInfoResult.builder()
         .build()
-        .asyncGet(externalApi.rxGetTransactionInfoByHash(txHash, false, null));
+        .asyncGet(externalApi.rxGetTransactionInfoByHash(txHash, false));
   }
 
   @Override
   public TransactionInfoResult blockingGetTransactionInfoByHash(String txHash) {
     return TransactionInfoResult.builder()
         .build()
-        .blockingGet(externalApi.rxGetTransactionInfoByHash(txHash, false, null));
+        .blockingGet(externalApi.rxGetTransactionInfoByHash(txHash, false));
   }
 
   @Override
@@ -59,7 +59,7 @@ public class InfoServiceImpl implements InfoService {
     this.validateMicroTxHash(microBlockHash);
     return TransactionResults.builder()
         .build()
-        .asyncGet(this.externalApi.rxGetMicroBlockTransactionsByHash(microBlockHash, false, null));
+        .asyncGet(this.externalApi.rxGetMicroBlockTransactionsByHash(microBlockHash, false));
   }
 
   @Override
@@ -67,8 +67,7 @@ public class InfoServiceImpl implements InfoService {
     this.validateMicroTxHash(microBlockHash);
     return TransactionResults.builder()
         .build()
-        .blockingGet(
-            this.externalApi.rxGetMicroBlockTransactionsByHash(microBlockHash, false, null));
+        .blockingGet(this.externalApi.rxGetMicroBlockTransactionsByHash(microBlockHash, false));
   }
 
   @Override
@@ -78,7 +77,7 @@ public class InfoServiceImpl implements InfoService {
         .build()
         .blockingGet(
             this.externalApi
-                .rxGetContractCode(contractId, false, null)
+                .rxGetContractCode(contractId, false)
                 .map(contactCode -> contactCode.getBytecode()));
   }
 
@@ -89,7 +88,7 @@ public class InfoServiceImpl implements InfoService {
         .build()
         .asyncGet(
             this.externalApi
-                .rxGetContractCode(contractId, false, null)
+                .rxGetContractCode(contractId, false)
                 .map(contactCode -> contactCode.getBytecode()));
   }
 
@@ -113,15 +112,13 @@ public class InfoServiceImpl implements InfoService {
 
   @Override
   public Single<KeyBlockResult> asyncGetCurrentKeyBlock() {
-    return KeyBlockResult.builder()
-        .build()
-        .asyncGet(this.externalApi.rxGetCurrentKeyBlock(false, null));
+    return KeyBlockResult.builder().build().asyncGet(this.externalApi.rxGetCurrentKeyBlock(false));
   }
 
   @Override
   public KeyBlockResult blockingGetCurrentKeyBlock() {
     return KeyBlockResult.builder()
         .build()
-        .blockingGet(this.externalApi.rxGetCurrentKeyBlock(false, null));
+        .blockingGet(this.externalApi.rxGetCurrentKeyBlock(false));
   }
 }

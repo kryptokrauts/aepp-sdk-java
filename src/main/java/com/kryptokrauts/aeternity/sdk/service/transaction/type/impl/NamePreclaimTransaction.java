@@ -25,7 +25,7 @@ public class NamePreclaimTransaction extends AbstractTransaction<NamePreclaimTra
 
   @Override
   protected Single<UnsignedTx> createInternal() {
-    return internalApi.rxPostNamePreclaim(model.toApiModel(), false, null);
+    return internalApi.rxPostNamePreclaim(model.toApiModel(), false);
   }
 
   @Override

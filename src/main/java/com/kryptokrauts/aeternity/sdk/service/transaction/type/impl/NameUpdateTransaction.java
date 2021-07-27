@@ -25,7 +25,7 @@ public class NameUpdateTransaction extends AbstractTransaction<NameUpdateTransac
 
   @Override
   protected Single<UnsignedTx> createInternal() {
-    return this.internalApi.rxPostNameUpdate(model.toApiModel(), false, null);
+    return this.internalApi.rxPostNameUpdate(model.toApiModel(), false);
   }
 
   @Override
