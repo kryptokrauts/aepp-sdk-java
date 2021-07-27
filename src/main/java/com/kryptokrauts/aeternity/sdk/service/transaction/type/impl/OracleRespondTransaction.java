@@ -28,7 +28,7 @@ public class OracleRespondTransaction extends AbstractTransaction<OracleRespondT
 
   @Override
   protected Single<UnsignedTx> createInternal() {
-    return this.internalApi.rxPostOracleRespond(model.toApiModel(), false, null);
+    return this.internalApi.rxPostOracleRespond(model.toApiModel(), false);
   }
 
   @Override

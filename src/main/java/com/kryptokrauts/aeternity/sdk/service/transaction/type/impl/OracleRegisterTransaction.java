@@ -28,7 +28,7 @@ public class OracleRegisterTransaction extends AbstractTransaction<OracleRegiste
 
   @Override
   protected Single<UnsignedTx> createInternal() {
-    return this.internalApi.rxPostOracleRegister(model.toApiModel(), false, null);
+    return this.internalApi.rxPostOracleRegister(model.toApiModel(), false);
   }
 
   @Override

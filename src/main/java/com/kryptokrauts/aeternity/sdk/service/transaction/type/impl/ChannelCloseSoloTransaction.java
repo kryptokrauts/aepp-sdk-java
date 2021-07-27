@@ -26,7 +26,7 @@ public class ChannelCloseSoloTransaction
 
   @Override
   protected Single<UnsignedTx> createInternal() {
-    return internalApi.rxPostChannelCloseSolo(model.toApiModel(), false, null);
+    return internalApi.rxPostChannelCloseSolo(model.toApiModel(), false);
   }
 
   @Override

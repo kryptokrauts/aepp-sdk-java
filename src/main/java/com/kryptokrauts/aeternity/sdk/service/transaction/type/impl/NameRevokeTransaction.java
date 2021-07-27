@@ -25,7 +25,7 @@ public class NameRevokeTransaction extends AbstractTransaction<NameRevokeTransac
 
   @Override
   protected Single<UnsignedTx> createInternal() {
-    return this.internalApi.rxPostNameRevoke(model.toApiModel(), false, null);
+    return this.internalApi.rxPostNameRevoke(model.toApiModel(), false);
   }
 
   @Override

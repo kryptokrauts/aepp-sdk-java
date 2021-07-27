@@ -27,7 +27,7 @@ public class PayingForTransaction extends AbstractTransaction<PayingForTransacti
 
   @Override
   protected Single<UnsignedTx> createInternal() {
-    return internalApi.rxPostPayingFor(model.toApiModel(), false, null);
+    return internalApi.rxPostPayingFor(model.toApiModel(), false);
   }
 
   @Override

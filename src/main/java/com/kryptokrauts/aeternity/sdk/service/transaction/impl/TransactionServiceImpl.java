@@ -84,7 +84,7 @@ public class TransactionServiceImpl implements TransactionService {
     }
     return PostTransactionResult.builder()
         .build()
-        .asyncGet(externalApi.rxPostTransaction(createEncodedTxObject(signedTx), false, null));
+        .asyncGet(externalApi.rxPostTransaction(createEncodedTxObject(signedTx), false));
   }
 
   @Override
@@ -97,8 +97,7 @@ public class TransactionServiceImpl implements TransactionService {
     PostTransactionResult postTransactionResult =
         PostTransactionResult.builder()
             .build()
-            .blockingGet(
-                externalApi.rxPostTransaction(createEncodedTxObject(signedTx), false, null));
+            .blockingGet(externalApi.rxPostTransaction(createEncodedTxObject(signedTx), false));
     if (this.config.isWaitForTxIncludedInBlockEnabled()) {
       return this.waitUntilTransactionIsIncludedInBlock(postTransactionResult);
     }
@@ -109,7 +108,7 @@ public class TransactionServiceImpl implements TransactionService {
   public Single<PostTransactionResult> asyncPostTransaction(String signedTx) {
     return PostTransactionResult.builder()
         .build()
-        .asyncGet(externalApi.rxPostTransaction(createEncodedTxObject(signedTx), false, null));
+        .asyncGet(externalApi.rxPostTransaction(createEncodedTxObject(signedTx), false));
   }
 
   @Override
@@ -126,8 +125,7 @@ public class TransactionServiceImpl implements TransactionService {
     PostTransactionResult postTransactionResult =
         PostTransactionResult.builder()
             .build()
-            .blockingGet(
-                externalApi.rxPostTransaction(createEncodedTxObject(signedTx), false, null));
+            .blockingGet(externalApi.rxPostTransaction(createEncodedTxObject(signedTx), false));
     if (this.config.isWaitForTxIncludedInBlockEnabled()) {
       return this.waitUntilTransactionIsIncludedInBlock(postTransactionResult);
     }
@@ -188,10 +186,9 @@ public class TransactionServiceImpl implements TransactionService {
   public Single<DryRunTransactionResults> asyncDryRunTransactions(DryRunRequest input) {
     Single<DryRunResults> dryRunResultsSingle;
     if (config.isDebugDryRun()) {
-      dryRunResultsSingle = this.internalApi.rxDryRunTxs(input.toGeneratedModel(), false, null);
+      dryRunResultsSingle = this.internalApi.rxDryRunTxs(input.toGeneratedModel(), false);
     } else {
-      dryRunResultsSingle =
-          this.externalApi.rxProtectedDryRunTxs(input.toGeneratedModel(), false, null);
+      dryRunResultsSingle = this.externalApi.rxProtectedDryRunTxs(input.toGeneratedModel(), false);
     }
     return DryRunTransactionResults.builder().build().asyncGet(dryRunResultsSingle);
   }
@@ -200,10 +197,9 @@ public class TransactionServiceImpl implements TransactionService {
   public DryRunTransactionResults blockingDryRunTransactions(DryRunRequest input) {
     Single<DryRunResults> dryRunResultsSingle;
     if (config.isDebugDryRun()) {
-      dryRunResultsSingle = this.internalApi.rxDryRunTxs(input.toGeneratedModel(), false, null);
+      dryRunResultsSingle = this.internalApi.rxDryRunTxs(input.toGeneratedModel(), false);
     } else {
-      dryRunResultsSingle =
-          this.externalApi.rxProtectedDryRunTxs(input.toGeneratedModel(), false, null);
+      dryRunResultsSingle = this.externalApi.rxProtectedDryRunTxs(input.toGeneratedModel(), false);
     }
     return DryRunTransactionResults.builder().build().blockingGet(dryRunResultsSingle);
   }
@@ -314,7 +310,7 @@ public class TransactionServiceImpl implements TransactionService {
       while (currentBlockHeight == -1
           && elapsedTrials < this.config.getNumTrialsToWaitForTxIncludedInBlock()) {
         includedTransaction =
-            this.externalApi.rxGetTransactionByHash(transactionHash, false, null).blockingGet();
+            this.externalApi.rxGetTransactionByHash(transactionHash, false).blockingGet();
         if (includedTransaction.getBlockHeight().intValue() > 1) {
           _logger.debug("Transaction is included in a block - " + includedTransaction.toString());
           currentBlockHeight = includedTransaction.getBlockHeight().intValue();

@@ -26,7 +26,7 @@ public class ChannelSnapshotSoloTransaction
 
   @Override
   protected Single<UnsignedTx> createInternal() {
-    return internalApi.rxPostChannelSnapshotSolo(model.toApiModel(), false, null);
+    return internalApi.rxPostChannelSnapshotSolo(model.toApiModel(), false);
   }
 
   @Override

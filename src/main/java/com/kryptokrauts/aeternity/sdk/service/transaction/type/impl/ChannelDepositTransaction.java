@@ -25,7 +25,7 @@ public class ChannelDepositTransaction extends AbstractTransaction<ChannelDeposi
 
   @Override
   protected Single<UnsignedTx> createInternal() {
-    return internalApi.rxPostChannelDeposit(model.toApiModel(), false, null);
+    return internalApi.rxPostChannelDeposit(model.toApiModel(), false);
   }
 
   @Override

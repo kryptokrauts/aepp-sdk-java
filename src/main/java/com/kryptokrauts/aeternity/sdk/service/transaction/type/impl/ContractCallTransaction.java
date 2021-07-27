@@ -27,7 +27,7 @@ public class ContractCallTransaction extends AbstractTransaction<ContractCallTra
 
   @Override
   protected Single<UnsignedTx> createInternal() {
-    return internalApi.rxPostContractCall(model.toApiModel(), false, null);
+    return internalApi.rxPostContractCall(model.toApiModel(), false);
   }
 
   @Override

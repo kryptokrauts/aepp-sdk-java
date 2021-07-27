@@ -25,7 +25,7 @@ public class SpendTransaction extends AbstractTransaction<SpendTransactionModel>
 
   @Override
   protected Single<UnsignedTx> createInternal() {
-    return internalApi.rxPostSpend(model.toApiModel(), false, null);
+    return internalApi.rxPostSpend(model.toApiModel(), false);
   }
 
   @Override

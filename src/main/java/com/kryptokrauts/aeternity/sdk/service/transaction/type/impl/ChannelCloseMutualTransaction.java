@@ -26,7 +26,7 @@ public class ChannelCloseMutualTransaction
 
   @Override
   protected Single<UnsignedTx> createInternal() {
-    return internalApi.rxPostChannelCloseMutual(model.toApiModel(), false, null);
+    return internalApi.rxPostChannelCloseMutual(model.toApiModel(), false);
   }
 
   @Override

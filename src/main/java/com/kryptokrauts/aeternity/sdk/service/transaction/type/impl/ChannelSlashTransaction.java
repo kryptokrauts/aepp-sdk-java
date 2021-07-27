@@ -25,7 +25,7 @@ public class ChannelSlashTransaction extends AbstractTransaction<ChannelSlashTra
 
   @Override
   protected Single<UnsignedTx> createInternal() {
-    return internalApi.rxPostChannelSlash(model.toApiModel(), false, null);
+    return internalApi.rxPostChannelSlash(model.toApiModel(), false);
   }
 
   @Override
