@@ -25,7 +25,7 @@ repositories {
 
 apply plugin: 'org.openapi.generator'
 
-sourceCompatibility = JavaVersion.VERSION_1_8
+sourceCompatibility = JavaVersion.VERSION_15
 
 googleJavaFormat {
     toolVersion = '1.7'
@@ -186,6 +186,9 @@ tasks.withType(JavaCompile) {
 }
 
 dependencies {
+    // java
+    compile "javax.annotation:javax.annotation-api:1.3.2"
+
     // lombok
     compileOnly "org.projectlombok:lombok:${lombokVersion}"
     annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
