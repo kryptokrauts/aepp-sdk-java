@@ -13,26 +13,26 @@ import lombok.Getter;
  * href=https://github.com/bitcoin/bips/blob/master/bip-0032.mediawiki#Master_key_generation>BIP32</a>
  */
 @Getter
-public class HDWallet {
+public class HdWallet {
 
   private List<String> mnemonicSeedWords;
 
   private DeterministicHierarchy deterministicHierarchy;
 
-  public HDWallet(HDKeyPair masterKeyPair, List<String> mnemonicSeedWords) {
+  public HdWallet(HdKeyPair masterKeyPair, List<String> mnemonicSeedWords) {
     this.mnemonicSeedWords = mnemonicSeedWords;
     this.deterministicHierarchy = new DeterministicHierarchy(masterKeyPair);
   }
 
-  public HDKeyPair getMasterKeyPair() {
+  public HdKeyPair getMasterKeyPair() {
     return this.getDeterministicHierarchy().getMasterKeyPair();
   }
 
-  public List<HDKeyPair> getChildKeyPairs() {
+  public List<HdKeyPair> getChildKeyPairs() {
     return this.getDeterministicHierarchy().getChildKeyPairs();
   }
 
-  public HDKeyPair getLastChildKeyPair() {
+  public HdKeyPair getLastChildKeyPair() {
     return this.getDeterministicHierarchy().getLastChildKeyPair();
   }
 }

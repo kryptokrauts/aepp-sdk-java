@@ -3,7 +3,7 @@ package com.kryptokrauts.aeternity.sdk.service.keystore.impl;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kryptokrauts.aeternity.sdk.domain.Keystore;
-import com.kryptokrauts.aeternity.sdk.domain.secret.HDWallet;
+import com.kryptokrauts.aeternity.sdk.domain.secret.HdWallet;
 import com.kryptokrauts.aeternity.sdk.domain.secret.KeyPair;
 import com.kryptokrauts.aeternity.sdk.exception.AException;
 import com.kryptokrauts.aeternity.sdk.service.keystore.KeystoreService;
@@ -30,7 +30,7 @@ public class KeystoreServiceImpl implements KeystoreService {
   @Nonnull private KeystoreServiceConfiguration config;
 
   @Override
-  public String createKeystore(HDWallet hdWallet, String keystorePassword) throws AException {
+  public String createKeystore(HdWallet hdWallet, String keystorePassword) throws AException {
     return createKeystoreFile(
         String.join("_", hdWallet.getMnemonicSeedWords()).getBytes(),
         keystorePassword,
