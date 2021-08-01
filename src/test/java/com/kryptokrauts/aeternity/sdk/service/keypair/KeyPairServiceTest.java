@@ -6,7 +6,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.greghaskins.spectrum.Spectrum;
 import com.kryptokrauts.aeternity.sdk.BaseTest;
-import com.kryptokrauts.aeternity.sdk.domain.secret.HDWallet;
+import com.kryptokrauts.aeternity.sdk.domain.secret.HdWallet;
 import com.kryptokrauts.aeternity.sdk.domain.secret.KeyPair;
 import com.kryptokrauts.aeternity.sdk.exception.AException;
 import com.kryptokrauts.aeternity.sdk.service.keypair.Slip0100JsonStruct.DerivedKeyEntry;
@@ -27,12 +27,12 @@ public class KeyPairServiceTest extends BaseTest {
               "Mnemonic keypair generation tests",
               () -> {
                 KeyPairService keyPairService = new KeyPairServiceFactory().getService();
-                HDWallet generatedKeyPair = keyPairService.generateHDWallet(defaultPassword);
-                HDWallet restoredKeyPairWithSamePWD =
-                    keyPairService.recoverHDWallet(
+                HdWallet generatedKeyPair = keyPairService.generateHdWallet(defaultPassword);
+                HdWallet restoredKeyPairWithSamePWD =
+                    keyPairService.recoverHdWallet(
                         generatedKeyPair.getMnemonicSeedWords(), defaultPassword);
-                HDWallet restoredKeyPairWithoutPWD =
-                    keyPairService.recoverHDWallet(generatedKeyPair.getMnemonicSeedWords(), null);
+                HdWallet restoredKeyPairWithoutPWD =
+                    keyPairService.recoverHdWallet(generatedKeyPair.getMnemonicSeedWords(), null);
 
                 Spectrum.it(
                     "mnemonic keypair recovered from word seed list is same",
@@ -62,7 +62,7 @@ public class KeyPairServiceTest extends BaseTest {
                       assertThrows(
                           AException.class,
                           () -> {
-                            keyPairServiceWrongConfig.generateHDWallet(null);
+                            keyPairServiceWrongConfig.generateHdWallet(null);
                           });
                     });
                 Spectrum.it(
@@ -78,8 +78,8 @@ public class KeyPairServiceTest extends BaseTest {
                       String firstChildAddress =
                           "ak_uEoRY2CEAbSzMbN4ohniNHFdrVDHjpw3Za3upmJA8SihGBjCk";
 
-                      HDWallet restoredDefault =
-                          keyPairService.recoverHDWallet(mnemonic, defaultPassword);
+                      HdWallet restoredDefault =
+                          keyPairService.recoverHdWallet(mnemonic, defaultPassword);
 
                       KeyPair restoredMasterKeyPair = restoredDefault.getLastChildKeyPair();
 
@@ -95,8 +95,8 @@ public class KeyPairServiceTest extends BaseTest {
                               "abandon", "abandon", "abandon", "abandon", "abandon", "abandon",
                               "abandon", "abandon", "abandon", "abandon", "abandon", "about");
 
-                      HDWallet restoredDefault =
-                          keyPairService.recoverHDWallet(mnemonic, defaultPassword);
+                      HdWallet restoredDefault =
+                          keyPairService.recoverHdWallet(mnemonic, defaultPassword);
 
                       IntStream.range(0, 10)
                           .forEach(v -> keyPairService.getNextKeyPair(restoredDefault));
@@ -125,7 +125,7 @@ public class KeyPairServiceTest extends BaseTest {
                               "ak_29aErGt2GoeypzUG2BbGyDgSVsepLRHxtVo3Jtgte6mq6aHJw3",
                               "ak_2mPuRrdQE2kRLFnwVc9ES6a9kugWHuLLXGa74vY4CbWTCn4PCV");
 
-                      HDWallet restoredDefault = keyPairService.recoverHDWallet(mnemonic, "");
+                      HdWallet restoredDefault = keyPairService.recoverHdWallet(mnemonic, "");
 
                       for (int i = 0; i < 10; i++) {
                         keyPairService.getNextKeyPair(restoredDefault);
@@ -150,8 +150,8 @@ public class KeyPairServiceTest extends BaseTest {
                       System.out.println(
                           "Generating keys for " + slip0100Resources.size() + " test vectors");
                       for (Slip0100JsonStruct testVector : slip0100Resources) {
-                        HDWallet restored =
-                            keyPairService.recoverHDWallet(
+                        HdWallet restored =
+                            keyPairService.recoverHdWallet(
                                 Arrays.asList(testVector.getMnemonic().split(" ")),
                                 testVector.getPassword());
                         testVector

@@ -4,7 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.greghaskins.spectrum.Spectrum;
 import com.kryptokrauts.aeternity.sdk.BaseTest;
-import com.kryptokrauts.aeternity.sdk.domain.secret.HDWallet;
+import com.kryptokrauts.aeternity.sdk.domain.secret.HdWallet;
 import com.kryptokrauts.aeternity.sdk.exception.AException;
 import org.bouncycastle.util.encoders.Hex;
 import org.junit.Assert;
@@ -37,12 +37,12 @@ public class KeyPairServiceFactoryTest extends BaseTest {
           final String mnemonicSeedPassword = "kryptokrauts";
 
           KeyPairService keyPairService = new KeyPairServiceFactory().getService();
-          HDWallet generatedKeyPair = keyPairService.generateHDWallet(mnemonicSeedPassword);
-          HDWallet restoredKeyPairWithSamePWD =
-              keyPairService.recoverHDWallet(
+          HdWallet generatedKeyPair = keyPairService.generateHdWallet(mnemonicSeedPassword);
+          HdWallet restoredKeyPairWithSamePWD =
+              keyPairService.recoverHdWallet(
                   generatedKeyPair.getMnemonicSeedWords(), mnemonicSeedPassword);
-          HDWallet restoredKeyPairWithoutPWD =
-              keyPairService.recoverHDWallet(generatedKeyPair.getMnemonicSeedWords(), null);
+          HdWallet restoredKeyPairWithoutPWD =
+              keyPairService.recoverHdWallet(generatedKeyPair.getMnemonicSeedWords(), null);
 
           Spectrum.it(
               "mnemonic keypair recovered from word seed list is same",
@@ -70,7 +70,7 @@ public class KeyPairServiceFactoryTest extends BaseTest {
                 assertThrows(
                     AException.class,
                     () -> {
-                      keyPairServiceWrongConfig.generateHDWallet(null);
+                      keyPairServiceWrongConfig.generateHdWallet(null);
                     });
               });
         });

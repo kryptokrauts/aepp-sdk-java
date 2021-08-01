@@ -17,16 +17,16 @@ public class DeterministicHierarchy {
 
   private Map<Integer, DeterministicHierarchyEntry> dhTree;
 
-  public DeterministicHierarchy(HDKeyPair master) {
+  public DeterministicHierarchy(HdKeyPair master) {
     this.dhTree = new HashMap<>();
     this.dhTree.put(DEPTH_MASTER, new DeterministicHierarchyEntry(DEPTH_MASTER, master));
   }
 
-  public void addAccount(HDKeyPair accountKeypair) {
+  public void addAccount(HdKeyPair accountKeypair) {
     this.getMaster().addChild(BaseConstants.HD_CHAIN_PURPOSE, accountKeypair);
   }
 
-  public void addChain(HDKeyPair chainKeypair) {
+  public void addChain(HdKeyPair chainKeypair) {
     this.getAccount().addChild(BaseConstants.HD_CHAIN_CODE_AETERNITY, chainKeypair);
   }
 
@@ -35,14 +35,14 @@ public class DeterministicHierarchy {
    * @param mi0Keypair this childs internal chain keypair
    * @param mi00Keypair this childs actual address keypiar
    */
-  public void addNextAddress(HDKeyPair miKeypair, HDKeyPair mi0Keypair, HDKeyPair mi00Keypair) {
+  public void addNextAddress(HdKeyPair miKeypair, HdKeyPair mi0Keypair, HdKeyPair mi00Keypair) {
     this.getChain()
         .addChild(this.getChain().getNextChildIndex(), miKeypair)
         .addChild(ADDRESS_INDEX_DEFAULT, mi0Keypair)
         .addChild(ADDRESS_INDEX_DEFAULT, mi00Keypair);
   }
 
-  public HDKeyPair getChildAt(Integer index) {
+  public HdKeyPair getChildAt(Integer index) {
     if (this.getChain().getChildren().get(index) == null) {
       throw new AException(
           "Cannot retrieve child at index "
@@ -50,7 +50,7 @@ public class DeterministicHierarchy {
               + " - no child keypair was generated for this index. Max child index available: "
               + (this.getChain().getChildren().size() - 1));
     }
-    HDKeyPair keyPair =
+    HdKeyPair keyPair =
         this.getChain()
             .getChildren()
             .get(index)
@@ -63,12 +63,12 @@ public class DeterministicHierarchy {
     return keyPair;
   }
 
-  public List<HDKeyPair> getChildKeyPairs() {
+  public List<HdKeyPair> getChildKeyPairs() {
     return this.getChain().getChildren().entrySet().stream()
         .sorted(Map.Entry.comparingByKey())
         .map(
             value -> {
-              HDKeyPair returnKeyPair =
+              HdKeyPair returnKeyPair =
                   value
                       .getValue()
                       .getChildren()
@@ -82,7 +82,7 @@ public class DeterministicHierarchy {
         .collect(Collectors.toList());
   }
 
-  public Map<Integer, HDKeyPair> getChildKeysIndexMap() {
+  public Map<Integer, HdKeyPair> getChildKeysIndexMap() {
     return this.getChain().getChildren().entrySet().stream()
         .collect(
             Collectors.toMap(
@@ -100,19 +100,19 @@ public class DeterministicHierarchy {
     return this.getChain().getNextChildIndex();
   }
 
-  public HDKeyPair getLastChildKeyPair() {
+  public HdKeyPair getLastChildKeyPair() {
     return this.getChildAt(this.getChain().getHighestChildIndex());
   }
 
-  public HDKeyPair getMasterKeyPair() {
+  public HdKeyPair getMasterKeyPair() {
     return this.getMaster().getKeyPair();
   }
 
-  public HDKeyPair getAccountKeyPair() {
+  public HdKeyPair getAccountKeyPair() {
     return this.getAccount().getKeyPair();
   }
 
-  public HDKeyPair getChainKeyPair() {
+  public HdKeyPair getChainKeyPair() {
     return this.getChain().getKeyPair();
   }
 

@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.greghaskins.spectrum.Spectrum;
 import com.kryptokrauts.aeternity.sdk.BaseTest;
 import com.kryptokrauts.aeternity.sdk.domain.Keystore;
-import com.kryptokrauts.aeternity.sdk.domain.secret.HDWallet;
+import com.kryptokrauts.aeternity.sdk.domain.secret.HdWallet;
 import com.kryptokrauts.aeternity.sdk.domain.secret.KeyPair;
 import com.kryptokrauts.aeternity.sdk.exception.AException;
 import com.kryptokrauts.aeternity.sdk.service.keypair.KeyPairService;
@@ -81,7 +81,7 @@ public class KeystoreServiceTest extends BaseTest {
                 final String keystoreFileSecret = "hd_wallet_password";
 
                 // generate random HDWallet
-                HDWallet hdWallet = keypairService.generateHDWallet(null);
+                HdWallet hdWallet = keypairService.generateHdWallet(null);
                 List<String> seedWordsToBeRecovered = hdWallet.getMnemonicSeedWords();
                 String json = keystoreService.createKeystore(hdWallet, keystoreFileSecret);
                 Assertions.assertNotNull(json);
@@ -100,7 +100,7 @@ public class KeystoreServiceTest extends BaseTest {
                 final String keystoreFileSecret = "does_not_matter";
 
                 // generate random HDWallet
-                HDWallet hdWallet = keypairService.generateHDWallet(null);
+                HdWallet hdWallet = keypairService.generateHdWallet(null);
                 String json = keystoreService.createKeystore(hdWallet, keystoreFileSecret);
                 Keystore recoverWallet = new ObjectMapper().readValue(json, Keystore.class);
                 recoverWallet.setName("no_hd_wallet_keystore_file");

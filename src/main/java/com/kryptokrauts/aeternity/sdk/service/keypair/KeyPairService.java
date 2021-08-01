@@ -1,7 +1,7 @@
 package com.kryptokrauts.aeternity.sdk.service.keypair;
 
-import com.kryptokrauts.aeternity.sdk.domain.secret.HDKeyPair;
-import com.kryptokrauts.aeternity.sdk.domain.secret.HDWallet;
+import com.kryptokrauts.aeternity.sdk.domain.secret.HdKeyPair;
+import com.kryptokrauts.aeternity.sdk.domain.secret.HdWallet;
 import com.kryptokrauts.aeternity.sdk.domain.secret.KeyPair;
 import com.kryptokrauts.aeternity.sdk.exception.AException;
 import java.util.List;
@@ -18,27 +18,27 @@ public interface KeyPairService {
   KeyPair recoverKeyPair(String privateKey);
 
   /**
-   * creates a keyPair as well as a list of mnemonic seed words wrapped into HDWallet object, which
+   * creates a keyPair as well as a list of mnemonic seed words wrapped into HdWallet object, which
    * can be used to restore the key (derived from BIP32/39 HD-Wallet generation) the number of seed
    * words depends on the parameter defined in {@link KeyPairServiceConfiguration}
    *
    * @param mnemonicSeedPassword password or null which is used to seed the list of mnemonics
    * @return keypair with private and public key as well as the generated list of mnemonic seed
-   *     words wrapped into {@link HDWallet}
+   *     words wrapped into {@link HdWallet}
    * @throws AException in case of an error
    */
-  HDWallet generateHDWallet(String mnemonicSeedPassword) throws AException;
+  HdWallet generateHdWallet(String mnemonicSeedPassword) throws AException;
 
   /**
    * recover keypair from given mnemonic seed word list with given seed password
    *
-   * @param mnemonicSeedWords the words to recover the HDwallet
+   * @param mnemonicSeedWords the words to recover the Hdwallet
    * @param mnemonicSeedPassword the password that protects the keypair(s) generated with the seed
    *     phrase (can be null)
-   * @return instance of {@link HDWallet}
+   * @return instance of {@link HdWallet}
    * @throws AException in case of an error
    */
-  HDWallet recoverHDWallet(List<String> mnemonicSeedWords, String mnemonicSeedPassword)
+  HdWallet recoverHdWallet(List<String> mnemonicSeedWords, String mnemonicSeedPassword)
       throws AException;
 
   /**
@@ -51,5 +51,5 @@ public interface KeyPairService {
    * @return a new derived child raw keypair
    * @throws AException in case of an error
    */
-  HDKeyPair getNextKeyPair(HDWallet hdWallet) throws AException;
+  HdKeyPair getNextKeyPair(HdWallet hdWallet) throws AException;
 }
