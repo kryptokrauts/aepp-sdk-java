@@ -2,8 +2,8 @@ package com.kryptokrauts.aeternity.sdk.service.keypair.impl;
 
 import com.kryptokrauts.aeternity.sdk.constants.BaseConstants;
 import com.kryptokrauts.aeternity.sdk.domain.secret.DeterministicHierarchy;
-import com.kryptokrauts.aeternity.sdk.domain.secret.HDKeyPair;
-import com.kryptokrauts.aeternity.sdk.domain.secret.HDWallet;
+import com.kryptokrauts.aeternity.sdk.domain.secret.HdKeyPair;
+import com.kryptokrauts.aeternity.sdk.domain.secret.HdWallet;
 import com.kryptokrauts.aeternity.sdk.domain.secret.KeyPair;
 import com.kryptokrauts.aeternity.sdk.exception.AException;
 import com.kryptokrauts.aeternity.sdk.service.keypair.KeyPairService;
@@ -35,7 +35,7 @@ public final class KeyPairServiceImpl implements KeyPairService {
   @Nonnull private KeyPairServiceConfiguration config;
 
   @Override
-  public HDWallet generateHDWallet(String mnemonicSeedPassword) throws AException {
+  public HdWallet generateHdWallet(String mnemonicSeedPassword) throws AException {
     try {
       if (mnemonicSeedPassword == null) {
         mnemonicSeedPassword = "";
@@ -44,7 +44,7 @@ public final class KeyPairServiceImpl implements KeyPairService {
       byte[] entropy = CryptoUtils.generateSalt(config.getEntropySizeInByte());
       // generate the list of mnemonic seed words based on the random byte array
       List<String> mnemonicSeedWords = MnemonicCode.INSTANCE.toMnemonic(entropy);
-      return recoverHDWallet(mnemonicSeedWords, mnemonicSeedPassword);
+      return recoverHdWallet(mnemonicSeedWords, mnemonicSeedPassword);
     } catch (Exception e) {
       throw new AException(
           String.format("An error occured generating keyPair %s", e.getLocalizedMessage()), e);
@@ -52,7 +52,7 @@ public final class KeyPairServiceImpl implements KeyPairService {
   }
 
   @Override
-  public HDWallet recoverHDWallet(List<String> mnemonicSeedWords, String mnemonicSeedPassword)
+  public HdWallet recoverHdWallet(List<String> mnemonicSeedWords, String mnemonicSeedPassword)
       throws AException {
 
     if (mnemonicSeedPassword == null) {
@@ -61,7 +61,7 @@ public final class KeyPairServiceImpl implements KeyPairService {
     // generate the seed from words and password
     byte[] seed = MnemonicCode.toSeed(mnemonicSeedWords, mnemonicSeedPassword);
 
-    HDWallet hdWallet = new HDWallet(this.generateMasterKeyFromSeed(seed), mnemonicSeedWords);
+    HdWallet hdWallet = new HdWallet(this.generateMasterKeyFromSeed(seed), mnemonicSeedWords);
 
     /**
      * following the BIP32 specification create the following derivation path: purpose (44) -> coin
@@ -81,13 +81,13 @@ public final class KeyPairServiceImpl implements KeyPairService {
     return hdWallet;
   }
 
-  private HDKeyPair generateMasterKeyFromSeed(byte[] seed) {
+  private HdKeyPair generateMasterKeyFromSeed(byte[] seed) {
     byte[] i = HDUtils.hmacSha512("ed25519 seed".getBytes(), seed);
 
     byte[] masterKey = Arrays.copyOfRange(i, 0, 32);
     byte[] chainCode = Arrays.copyOfRange(i, 32, 64);
 
-    HDKeyPair master = new HDKeyPair(chainCode, masterKey, chainCode, 0);
+    HdKeyPair master = new HdKeyPair(chainCode, masterKey, chainCode, 0);
 
     return master;
   }
@@ -99,7 +99,7 @@ public final class KeyPairServiceImpl implements KeyPairService {
    * @param parent keyPair to derive from
    * @return derive child
    */
-  private HDKeyPair deriveChild(int index, HDKeyPair parent) {
+  private HdKeyPair deriveChild(int index, HdKeyPair parent) {
     ByteBuffer buffer = ByteBuffer.allocate(37);
     buffer.put((byte) 0);
 
@@ -121,7 +121,7 @@ public final class KeyPairServiceImpl implements KeyPairService {
       printChildKeyPair(il, ir);
     }
 
-    HDKeyPair child = HDKeyPair.fromKeyPair(this.recoverKeyPair(byteToHex(il)), ir, index);
+    HdKeyPair child = HdKeyPair.fromKeyPair(this.recoverKeyPair(byteToHex(il)), ir, index);
 
     return child;
   }
@@ -141,13 +141,13 @@ public final class KeyPairServiceImpl implements KeyPairService {
   }
 
   @Override
-  public HDKeyPair getNextKeyPair(HDWallet mnemonicKeyPair) throws AException {
-    HDKeyPair miKeypair =
+  public HdKeyPair getNextKeyPair(HdWallet mnemonicKeyPair) throws AException {
+    HdKeyPair miKeypair =
         deriveChild(
             mnemonicKeyPair.getDeterministicHierarchy().getNextChildIndex(),
             mnemonicKeyPair.getDeterministicHierarchy().getChainKeyPair());
-    HDKeyPair mi0Keypair = deriveChild(DeterministicHierarchy.ADDRESS_INDEX_DEFAULT, miKeypair);
-    HDKeyPair mi00Keypair = deriveChild(DeterministicHierarchy.ADDRESS_INDEX_DEFAULT, mi0Keypair);
+    HdKeyPair mi0Keypair = deriveChild(DeterministicHierarchy.ADDRESS_INDEX_DEFAULT, miKeypair);
+    HdKeyPair mi00Keypair = deriveChild(DeterministicHierarchy.ADDRESS_INDEX_DEFAULT, mi0Keypair);
     mnemonicKeyPair.getDeterministicHierarchy().addNextAddress(miKeypair, mi0Keypair, mi00Keypair);
     return mnemonicKeyPair.getLastChildKeyPair();
   }

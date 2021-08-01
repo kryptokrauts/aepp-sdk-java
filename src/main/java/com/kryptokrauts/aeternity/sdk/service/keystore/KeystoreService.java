@@ -1,7 +1,7 @@
 package com.kryptokrauts.aeternity.sdk.service.keystore;
 
 import com.kryptokrauts.aeternity.sdk.domain.Keystore;
-import com.kryptokrauts.aeternity.sdk.domain.secret.HDWallet;
+import com.kryptokrauts.aeternity.sdk.domain.secret.HdWallet;
 import com.kryptokrauts.aeternity.sdk.domain.secret.KeyPair;
 import com.kryptokrauts.aeternity.sdk.exception.AException;
 import java.util.List;
@@ -34,13 +34,13 @@ public interface KeystoreService {
   /**
    * stores public key and mnemonic seed words (but not the password!) as JSON
    *
-   * @param hdWallet instance of {@link HDWallet}
+   * @param hdWallet instance of {@link HdWallet}
    * @param keystorePassword keystorePassword the symmetric password used to create the keystore
    * @return encrypts the HDWallets seed word list using the given walletPassword and returns a JSON
    *     derived from {@link Keystore}
    * @throws AException if an error occurs
    */
-  String createKeystore(HDWallet hdWallet, String keystorePassword) throws AException;
+  String createKeystore(HdWallet hdWallet, String keystorePassword) throws AException;
 
   /**
    * allows to recover the mnemnonic seed words from a given keystore json
