@@ -155,6 +155,10 @@ public class TransactionOraclesTest extends BaseTest {
             PostTransactionResult postResult =
                 this.blockingPostTx(oracleRespondTx, oracleKeyPair.getEncodedPrivateKey());
             _logger.info(postResult.getTxHash());
+            oracleQueryResult =
+                aeternityServiceNative.oracles.blockingGetOracleQuery(
+                    oracleKeyPair.getOracleAddress(), oracleQueryResult.getId());
+            context.assertEquals(responseString, oracleQueryResult.getResponse());
           } catch (Throwable e) {
             context.fail(e);
           }
