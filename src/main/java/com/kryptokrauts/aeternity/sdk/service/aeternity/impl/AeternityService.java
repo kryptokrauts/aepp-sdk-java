@@ -9,10 +9,10 @@ import com.kryptokrauts.aeternity.sdk.service.account.impl.AccountServiceImpl;
 import com.kryptokrauts.aeternity.sdk.service.aeternity.AeternityServiceConfiguration;
 import com.kryptokrauts.aeternity.sdk.service.compiler.CompilerService;
 import com.kryptokrauts.aeternity.sdk.service.compiler.impl.SophiaCompilerServiceImpl;
-import com.kryptokrauts.aeternity.sdk.service.indaex.IndaexService;
-import com.kryptokrauts.aeternity.sdk.service.indaex.impl.IndaexServiceImpl;
 import com.kryptokrauts.aeternity.sdk.service.info.InfoService;
 import com.kryptokrauts.aeternity.sdk.service.info.impl.InfoServiceImpl;
+import com.kryptokrauts.aeternity.sdk.service.mdw.MiddlewareService;
+import com.kryptokrauts.aeternity.sdk.service.mdw.impl.MiddlewareServiceImpl;
 import com.kryptokrauts.aeternity.sdk.service.name.NameService;
 import com.kryptokrauts.aeternity.sdk.service.name.impl.NameServiceImpl;
 import com.kryptokrauts.aeternity.sdk.service.oracle.OracleService;
@@ -37,13 +37,13 @@ public class AeternityService {
 
   private DefaultApi compilerApi;
 
-  private com.kryptokrauts.indaex.generated.api.rxjava.MiddlewareApi indaexApi;
+  private com.kryptokrauts.mdw.generated.api.rxjava.MiddlewareApi mdwApi;
 
   public TransactionService transactions;
 
   public AccountService accounts;
 
-  public IndaexService indaex;
+  public MiddlewareService mdw;
 
   public CompilerService compiler;
 
@@ -58,13 +58,12 @@ public class AeternityService {
     this.externalApi = new ExternalApi(new ExternalApiImpl(config.getApiClient()));
     this.internalApi = new InternalApi(new InternalApiImpl(config.getDebugApiClient()));
     this.compilerApi = new DefaultApi(new DefaultApiImpl(config.getCompilerApiClient()));
-    this.indaexApi =
-        new com.kryptokrauts.indaex.generated.api.rxjava.MiddlewareApi(
-            new com.kryptokrauts.indaex.generated.api.MiddlewareApiImpl(
-                config.getIndaexApiClient()));
+    this.mdwApi =
+        new com.kryptokrauts.mdw.generated.api.rxjava.MiddlewareApi(
+            new com.kryptokrauts.mdw.generated.api.MiddlewareApiImpl(config.getMdwApiClient()));
     this.accounts = new AccountServiceImpl(this.config, this.externalApi);
     this.compiler = new SophiaCompilerServiceImpl(this.config, this.compilerApi);
-    this.indaex = new IndaexServiceImpl(this.indaexApi);
+    this.mdw = new MiddlewareServiceImpl(this.mdwApi);
     this.info = new InfoServiceImpl(this.config, this.externalApi);
     this.names = new NameServiceImpl(this.config, this.externalApi);
     this.oracles = new OracleServiceImpl(this.config, this.externalApi);

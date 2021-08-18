@@ -52,7 +52,7 @@ public class ServiceConfiguration {
 
   @Default @Nonnull protected String compilerBaseUrl = BaseConstants.DEFAULT_TESTNET_COMPILER_URL;
 
-  @Default @Nonnull protected String indaexBaseUrl = BaseConstants.DEFAULT_TESTNET_INDAEX_URL;
+  @Default @Nonnull protected String mdwBaseUrl = BaseConstants.DEFAULT_TESTNET_MDW_URL;
 
   @Getter @Default protected Network network = Network.TESTNET;
 
@@ -126,22 +126,21 @@ public class ServiceConfiguration {
           "Cannot instantiate ApiClient due to missing params vertx and or compilerBaseUrl");
   }
 
-  public com.kryptokrauts.indaex.generated.ApiClient getIndaexApiClient() {
+  public com.kryptokrauts.mdw.generated.ApiClient getMdwApiClient() {
     if (vertx == null) {
       _logger.debug("Vertx entry point not initialized, creating default");
       vertx = Vertx.vertx();
     }
-    if (vertx != null && indaexBaseUrl != null) {
+    if (vertx != null && mdwBaseUrl != null) {
       _logger.debug(
-          String.format(
-              "Initializing Vertx IndaexApiClient using indaexBaseUrl %s", indaexBaseUrl));
-      return new com.kryptokrauts.indaex.generated.ApiClient(
+          String.format("Initializing Vertx MdwApiClient using mdwBaseUrl %s", mdwBaseUrl));
+      return new com.kryptokrauts.mdw.generated.ApiClient(
           vertx,
           new JsonObject(
               new HashMap<String, Object>(
-                  ImmutableMap.of(BaseConstants.VERTX_BASE_PATH, indaexBaseUrl))));
+                  ImmutableMap.of(BaseConstants.VERTX_BASE_PATH, mdwBaseUrl))));
     } else
       throw new RuntimeException(
-          "Cannot instantiate ApiClient due to missing params vertx and or indaexBaseUrl");
+          "Cannot instantiate ApiClient due to missing params vertx and or mdwBaseUrl");
   }
 }

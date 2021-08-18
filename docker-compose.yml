@@ -6,8 +6,8 @@ services:
       - "3113:3113" # node internal api
       - "3013:3013" # node external api
       - "3014:3014" # node websocket
-      - "4000:4000" # indaex default port
-      - "4001:4001" # indaex websocket default port
+      - "4000:4000" # mdw default port
+      - "4001:4001" # mdw websocket default port
     volumes:
       - ${PWD}/docker/aeternity.yaml:/home/aeternity/node/local/rel/aeternity/aeternity.yaml
       - ${PWD}/docker/accounts_test.json:/home/aeternity/node/local/rel/aeternity/data/aecore/.genesis/accounts_test.json

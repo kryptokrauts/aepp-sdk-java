@@ -1,7 +1,7 @@
-package com.kryptokrauts.aeternity.sdk.service.indaex.domain;
+package com.kryptokrauts.aeternity.sdk.service.mdw.domain;
 
 import com.kryptokrauts.aeternity.sdk.domain.GenericResultObject;
-import com.kryptokrauts.indaex.generated.model.NameAuctions;
+import com.kryptokrauts.mdw.generated.model.NameAuctions;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.Getter;

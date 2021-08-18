@@ -1,4 +1,4 @@
-package com.kryptokrauts.aeternity.sdk.service.indaex.domain;
+package com.kryptokrauts.aeternity.sdk.service.mdw.domain;
 
 public enum AuctionSortBy {
   NAME("name"),
