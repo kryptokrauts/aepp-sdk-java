@@ -55,8 +55,7 @@ public class AccountServiceTest extends BaseTest {
         context,
         t -> {
           AccountResult result = this.aeternityServiceNative.accounts.blockingGetAccount();
-          BigInteger nextNonce =
-              this.aeternityServiceNative.accounts.blockingGetNextBaseKeypairNonce();
+          BigInteger nextNonce = this.aeternityServiceNative.accounts.blockingGetNextNonce();
           context.assertTrue(result.getNonce().add(ONE).intValue() == nextNonce.intValue());
         });
   }

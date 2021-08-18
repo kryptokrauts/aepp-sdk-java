@@ -4,6 +4,7 @@ import com.kryptokrauts.aeternity.generated.api.rxjava.ExternalApi;
 import com.kryptokrauts.aeternity.sdk.service.ServiceConfiguration;
 import com.kryptokrauts.aeternity.sdk.service.account.AccountService;
 import com.kryptokrauts.aeternity.sdk.service.account.domain.AccountResult;
+import com.kryptokrauts.aeternity.sdk.service.account.domain.NextNonceStrategy;
 import io.reactivex.Single;
 import java.math.BigInteger;
 import javax.annotation.Nonnull;
@@ -45,22 +46,68 @@ public final class AccountServiceImpl implements AccountService {
   }
 
   @Override
-  public Single<BigInteger> asyncGetNextBaseKeypairNonce() {
-    return this.asyncGetAccount().map(ar -> ar.getNonce().add(BigInteger.ONE));
+  public Single<BigInteger> asyncGetNextNonce() {
+    return externalApi
+        .rxGetAccountNextNonce(
+            config.getKeyPair().getAddress(), false, NextNonceStrategy.MAX.toString())
+        .map(res -> res.getNextNonce());
   }
 
   @Override
-  public Single<BigInteger> asyncGetNextBaseKeypairNonce(final String base58PublicKey) {
-    return this.asyncGetAccount(base58PublicKey).map(ar -> ar.getNonce().add(BigInteger.ONE));
+  public Single<BigInteger> asyncGetNextNonce(final NextNonceStrategy nextNonceStrategy) {
+    return externalApi
+        .rxGetAccountNextNonce(
+            config.getKeyPair().getAddress(), false, nextNonceStrategy.toString())
+        .map(res -> res.getNextNonce());
   }
 
   @Override
-  public BigInteger blockingGetNextBaseKeypairNonce() {
-    return this.blockingGetAccount().getNonce().add(BigInteger.ONE);
+  public Single<BigInteger> asyncGetNextNonce(final String base58PublicKey) {
+    return externalApi
+        .rxGetAccountNextNonce(base58PublicKey, false, NextNonceStrategy.MAX.toString())
+        .map(res -> res.getNextNonce());
   }
 
   @Override
-  public BigInteger blockingGetNextBaseKeypairNonce(final String base58PublicKey) {
-    return this.blockingGetAccount(base58PublicKey).getNonce().add(BigInteger.ONE);
+  public Single<BigInteger> asyncGetNextNonce(
+      final String base58PublicKey, final NextNonceStrategy nextNonceStrategy) {
+    return externalApi
+        .rxGetAccountNextNonce(base58PublicKey, false, nextNonceStrategy.toString())
+        .map(res -> res.getNextNonce());
+  }
+
+  @Override
+  public BigInteger blockingGetNextNonce() {
+    return externalApi
+        .rxGetAccountNextNonce(
+            config.getKeyPair().getAddress(), false, NextNonceStrategy.MAX.toString())
+        .blockingGet()
+        .getNextNonce();
+  }
+
+  @Override
+  public BigInteger blockingGetNextNonce(final NextNonceStrategy nextNonceStrategy) {
+    return externalApi
+        .rxGetAccountNextNonce(
+            config.getKeyPair().getAddress(), false, nextNonceStrategy.toString())
+        .blockingGet()
+        .getNextNonce();
+  }
+
+  @Override
+  public BigInteger blockingGetNextNonce(final String base58PublicKey) {
+    return externalApi
+        .rxGetAccountNextNonce(base58PublicKey, false, NextNonceStrategy.MAX.toString())
+        .blockingGet()
+        .getNextNonce();
+  }
+
+  @Override
+  public BigInteger blockingGetNextNonce(
+      final String base58PublicKey, final NextNonceStrategy nextNonceStrategy) {
+    return externalApi
+        .rxGetAccountNextNonce(base58PublicKey, false, nextNonceStrategy.toString())
+        .blockingGet()
+        .getNextNonce();
   }
 }
