@@ -1,7 +1,7 @@
-package com.kryptokrauts.aeternity.sdk.service.indaex.domain;
+package com.kryptokrauts.aeternity.sdk.service.mdw.domain;
 
 import com.kryptokrauts.aeternity.sdk.domain.GenericResultObject;
-import com.kryptokrauts.indaex.generated.model.Status;
+import com.kryptokrauts.mdw.generated.model.Status;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import lombok.Getter;

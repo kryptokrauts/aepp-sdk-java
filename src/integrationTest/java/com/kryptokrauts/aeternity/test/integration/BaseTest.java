@@ -55,7 +55,7 @@ public abstract class BaseTest {
 
   private static final String COMPILER_BASE_URL = "COMPILER_BASE_URL";
 
-  private static final String INDAEX_BASE_URL = "INDAEX_BASE_URL";
+  private static final String MDW_BASE_URL = "MDW_BASE_URL";
 
   protected static final VirtualMachine targetVM = VirtualMachine.FATE;
 
@@ -93,7 +93,7 @@ public abstract class BaseTest {
                 AeternityServiceConfiguration.configure()
                     .baseUrl(getAeternityBaseUrl())
                     .compilerBaseUrl(getCompilerBaseUrl())
-                    .indaexBaseUrl(getIndaexBaseUrl())
+                    .mdwBaseUrl(getMdwBaseUrl())
                     .network(Network.LOCAL_IRIS_NETWORK)
                     .nativeMode(true)
                     .keyPair(keyPair)
@@ -108,7 +108,7 @@ public abstract class BaseTest {
                     .baseUrl(getAeternityBaseUrl())
                     .debugBaseUrl(getAeternityBaseUrl())
                     .compilerBaseUrl(getCompilerBaseUrl())
-                    .indaexBaseUrl(getIndaexBaseUrl())
+                    .mdwBaseUrl(getMdwBaseUrl())
                     .network(Network.LOCAL_IRIS_NETWORK)
                     .nativeMode(false)
                     .keyPair(keyPair)
@@ -139,12 +139,12 @@ public abstract class BaseTest {
     return compilerBaseUrl;
   }
 
-  protected static String getIndaexBaseUrl() throws ConfigurationException {
-    String indaexBaseUrl = System.getenv(INDAEX_BASE_URL);
-    if (indaexBaseUrl == null) {
-      throw new ConfigurationException("ENV variable missing: INDAEX_BASE_URL");
+  protected static String getMdwBaseUrl() throws ConfigurationException {
+    String mdwBaseUrl = System.getenv(MDW_BASE_URL);
+    if (mdwBaseUrl == null) {
+      throw new ConfigurationException("ENV variable missing: MDW_BASE_URL");
     }
-    return indaexBaseUrl;
+    return mdwBaseUrl;
   }
 
   @BeforeClass
@@ -155,7 +155,7 @@ public abstract class BaseTest {
             "Using following environment"));
     _logger.info(String.format("%s: %s", AETERNITY_BASE_URL, getAeternityBaseUrl()));
     _logger.info(String.format("%s: %s", COMPILER_BASE_URL, getCompilerBaseUrl()));
-    _logger.info(String.format("%s: %s", INDAEX_BASE_URL, getIndaexBaseUrl()));
+    _logger.info(String.format("%s: %s", MDW_BASE_URL, getMdwBaseUrl()));
     _logger.info(
         "-----------------------------------------------------------------------------------");
   }

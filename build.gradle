@@ -100,14 +100,14 @@ task generateSophiaCompilerClient(type: org.openapitools.generator.gradle.plugin
     ]
 }
 
-task generateIndaexApiClient(type: org.openapitools.generator.gradle.plugin.tasks.GenerateTask) {
+task generateMdwApiClient(type: org.openapitools.generator.gradle.plugin.tasks.GenerateTask) {
     generatorName = "java"
     library = "vertx"
-    inputSpec = "${rootDir}/api/swagger_indaex.yml".toString()
+    inputSpec = "${rootDir}/api/swagger_mdw.yml".toString()
     outputDir = "${rootDir}/build/generated"
-    invokerPackage = "com.kryptokrauts.indaex.generated"
-    apiPackage = "com.kryptokrauts.indaex.generated.api"
-    modelPackage = "com.kryptokrauts.indaex.generated.model"
+    invokerPackage = "com.kryptokrauts.mdw.generated"
+    apiPackage = "com.kryptokrauts.mdw.generated.api"
+    modelPackage = "com.kryptokrauts.mdw.generated.model"
     templateDir = "${rootDir}/api/vertx-templates"
     typeMappings = [
             "Integer": "java.math.BigInteger",
@@ -123,7 +123,7 @@ task generateIndaexApiClient(type: org.openapitools.generator.gradle.plugin.task
 task generateApiClients {
     dependsOn(generateAeternityApiClient)
     dependsOn(generateSophiaCompilerClient)
-    dependsOn(generateIndaexApiClient)
+    dependsOn(generateMdwApiClient)
     doLast {
         ant.replaceregexp(match: ', \\) \\{', replace: '\\) \\{', flags: 'g', byline: true) {
             fileset(dir: 'build/generated/src/main/java/com/kryptokrauts')

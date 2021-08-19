@@ -3,8 +3,8 @@ package com.kryptokrauts.aeternity.test.integration;
 import com.kryptokrauts.aeternity.sdk.constants.AENS;
 import com.kryptokrauts.aeternity.sdk.domain.secret.KeyPair;
 import com.kryptokrauts.aeternity.sdk.service.account.domain.AccountResult;
-import com.kryptokrauts.aeternity.sdk.service.indaex.domain.NameAuctionsResult;
 import com.kryptokrauts.aeternity.sdk.service.info.domain.TransactionResult;
+import com.kryptokrauts.aeternity.sdk.service.mdw.domain.NameAuctionsResult;
 import com.kryptokrauts.aeternity.sdk.service.name.domain.NameEntryResult;
 import com.kryptokrauts.aeternity.sdk.service.transaction.domain.PostTransactionResult;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.model.NameClaimTransactionModel;
@@ -333,7 +333,7 @@ public class TransactionNameServiceTest extends BaseTest {
             _logger.info("name has {} chars", name.split("\\.")[0].length());
 
             NameAuctionsResult oldNameAuctionsResult =
-                this.aeternityServiceNative.indaex.blockingGetNameAuctions();
+                this.aeternityServiceNative.mdw.blockingGetNameAuctions();
             _logger.info("active auctions: {}", oldNameAuctionsResult);
             _logger.info(
                 "active auctions count: {}", oldNameAuctionsResult.getNameAuctions().size());
@@ -356,7 +356,7 @@ public class TransactionNameServiceTest extends BaseTest {
             // we expect an error (not found)
             context.assertFalse(
                 this.aeternityServiceNative
-                    .indaex
+                    .mdw
                     .blockingGetNameAuction(name)
                     .getAeAPIErrorMessage()
                     .isEmpty());
@@ -382,7 +382,7 @@ public class TransactionNameServiceTest extends BaseTest {
             _logger.info("NameClaimTx hash: {}", nameClaimResult.getTxHash());
 
             while (this.aeternityServiceNative
-                    .indaex
+                    .mdw
                     .blockingGetNameAuction(name)
                     .getAeAPIErrorMessage()
                 != null) {
@@ -391,7 +391,7 @@ public class TransactionNameServiceTest extends BaseTest {
             }
 
             NameAuctionsResult newNameAuctionsResult =
-                this.aeternityServiceNative.indaex.blockingGetNameAuctions();
+                this.aeternityServiceNative.mdw.blockingGetNameAuctions();
             _logger.info("active auctions: {}", newNameAuctionsResult.getNameAuctions().size());
             context.assertEquals(
                 oldNameAuctionsResult.getNameAuctions().size() + 1,
