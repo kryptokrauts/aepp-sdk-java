@@ -123,7 +123,7 @@ public abstract class BaseTest {
     vertx.close();
   }
 
-  private static String getAeternityBaseUrl() throws ConfigurationException {
+  protected static String getAeternityBaseUrl() throws ConfigurationException {
     String aeternityBaseUrl = System.getenv(AETERNITY_BASE_URL);
     if (aeternityBaseUrl == null) {
       throw new ConfigurationException("ENV variable missing: AETERNITY_BASE_URL");
