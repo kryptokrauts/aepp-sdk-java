@@ -31,9 +31,9 @@ import io.reactivex.Flowable;
 import io.reactivex.Single;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import javax.annotation.Nonnull;
 import lombok.RequiredArgsConstructor;
 import org.apache.tuweni.bytes.Bytes;
@@ -216,15 +216,18 @@ public class TransactionServiceImpl implements TransactionService {
   // if zero account for dryRun should be used, this method sets the account and amount within the
   // corresponding fields of the request model
   private DryRunRequest prepareDryRunRequest(final DryRunRequest request) {
-    if (this.config.isUseZeroAccountForDryRun()) {
+    if (this.config.isUseZeroAddressAccountForDryRun()) {
       DryRunRequest useZeroAccountAddressRequest =
           DryRunRequest.builder()
               .accounts(
-                  Arrays.asList(
-                      DryRunAccountModel.builder()
-                          .publicKey(config.getZeroAddressAccount())
-                          .amount(new BigInteger(config.getZeroAddressAccountAmount()))
-                          .build()))
+                  IntStream.range(0, request.getTxInputs().size())
+                      .mapToObj(
+                          v ->
+                              DryRunAccountModel.builder()
+                                  .publicKey(config.getZeroAddressAccount())
+                                  .amount(new BigInteger(config.getZeroAddressAccountAmount()))
+                                  .build())
+                      .collect(Collectors.toList()))
               .txInputs(
                   request.getTxInputs().stream()
                       .map(
