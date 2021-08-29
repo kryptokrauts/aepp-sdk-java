@@ -1,5 +1,7 @@
 package com.kryptokrauts.aeternity.sdk.constants;
 
+import java.math.BigInteger;
+
 public interface BaseConstants {
 
   String PREFIX_ZERO_X = "0x";
@@ -36,9 +38,15 @@ public interface BaseConstants {
   // the default testnet mdw url
   String DEFAULT_TESTNET_MDW_URL = "https://testnet.aeternity.io/mdw";
 
-  // the zero address acount used for dry run
+  // the zero address account used for dry run
   String ZERO_ADDRESS_ACCOUNT = "ak_11111111111111111111111111111111273Yts";
 
   // the amount to set for a dry run using the zero address account
   String ZERO_ADDRESS_ACCOUNT_AMOUNT = "100000000000000000000000000000000000";
+
+  // the zero address account default nonce
+  BigInteger ZERO_ADDRESS_ACCOUNT_DEFAULT_NONCE = new BigInteger("2");
+
+  // the zero address account devnet nonce
+  BigInteger ZERO_ADDRESS_ACCOUNT_DEVNET_NONCE = BigInteger.ONE;
 }
