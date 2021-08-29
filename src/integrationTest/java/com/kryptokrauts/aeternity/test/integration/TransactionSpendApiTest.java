@@ -1,6 +1,7 @@
 package com.kryptokrauts.aeternity.test.integration;
 
 import com.kryptokrauts.aeternity.sdk.domain.secret.KeyPair;
+import com.kryptokrauts.aeternity.sdk.exception.AException;
 import com.kryptokrauts.aeternity.sdk.exception.TransactionCreateException;
 import com.kryptokrauts.aeternity.sdk.service.account.domain.AccountResult;
 import com.kryptokrauts.aeternity.sdk.service.info.domain.TransactionResult;
@@ -144,6 +145,43 @@ public class TransactionSpendApiTest extends BaseTest {
             waitForTxMined(txResponse.getTxHash());
           } catch (Throwable e) {
             context.fail(e);
+          }
+        });
+  }
+
+  @Test
+  public void postSpendTxWaitForConfirmationOnErrorTest(TestContext context) {
+    this.executeTest(
+        context,
+        t -> {
+          AccountResult account = this.aeternityServiceNative.accounts.blockingGetAccount();
+
+          KeyPair kp = keyPairService.generateKeyPair();
+          String recipient = kp.getAddress();
+          BigInteger amount = new BigInteger("1000000000000000000");
+          String payload = "payload";
+          BigInteger nonce = account.getNonce().add(ONE);
+
+          SpendTransactionModel spendTx =
+              SpendTransactionModel.builder()
+                  .sender(account.getPublicKey())
+                  .recipient(recipient)
+                  .amount(amount)
+                  .payload(payload)
+                  .nonce(nonce)
+                  // fee is set on purpose way to low
+                  .fee(BigInteger.ONE)
+                  .build();
+
+          try {
+            aeternityServiceNative.transactions.blockingPostTransaction(spendTx);
+            context.fail("Test failed because no AException raised, test contains error");
+          } catch (AException spendException) {
+            context.assertTrue(
+                spendException
+                    .getMessage()
+                    .contains(
+                        "An error occured while waiting for transaction to be included in block"));
           }
         });
   }

@@ -26,6 +26,7 @@ import com.kryptokrauts.aeternity.sdk.service.transaction.type.model.PayingForTr
 import com.kryptokrauts.aeternity.sdk.util.ByteUtils;
 import com.kryptokrauts.aeternity.sdk.util.EncodingUtils;
 import com.kryptokrauts.aeternity.sdk.util.SigningUtil;
+import io.netty.util.internal.StringUtil;
 import io.reactivex.Flowable;
 import io.reactivex.Single;
 import java.math.BigInteger;
@@ -344,6 +345,12 @@ public class TransactionServiceImpl implements TransactionService {
   private PostTransactionResult waitUntilTransactionIsIncludedInBlock(
       PostTransactionResult postTransactionResult) {
     if (postTransactionResult != null) {
+      if (!StringUtil.isNullOrEmpty(postTransactionResult.getRootErrorMessage())) {
+        throw new AException(
+            "An error occured while waiting for transaction to be included in block: "
+                + postTransactionResult.getRootErrorMessage(),
+            postTransactionResult.getThrowable());
+      }
       String transactionHash = postTransactionResult.getTxHash();
       int currentBlockHeight = -1;
       SignedTx includedTransaction = null;
