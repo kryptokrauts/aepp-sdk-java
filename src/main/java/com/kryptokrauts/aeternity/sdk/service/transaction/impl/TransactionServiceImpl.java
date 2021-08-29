@@ -7,6 +7,8 @@ import com.kryptokrauts.aeternity.generated.model.DryRunResults;
 import com.kryptokrauts.aeternity.generated.model.EncodedTx;
 import com.kryptokrauts.aeternity.generated.model.SignedTx;
 import com.kryptokrauts.aeternity.sdk.constants.ApiIdentifiers;
+import com.kryptokrauts.aeternity.sdk.constants.BaseConstants;
+import com.kryptokrauts.aeternity.sdk.constants.Network;
 import com.kryptokrauts.aeternity.sdk.constants.SerializationTags;
 import com.kryptokrauts.aeternity.sdk.domain.StringResultWrapper;
 import com.kryptokrauts.aeternity.sdk.exception.AException;
@@ -31,6 +33,7 @@ import io.reactivex.Flowable;
 import io.reactivex.Single;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -238,7 +241,7 @@ public class TransactionServiceImpl implements TransactionService {
                                           tx.getCallRequest()
                                               .toBuilder()
                                               .caller(config.getZeroAddressAccount())
-                                              .nonce(BigInteger.ONE)
+                                              .nonce(getZeroAddressAccountNonce())
                                               .build())
                                       .build()
                                   : tx)
@@ -247,6 +250,13 @@ public class TransactionServiceImpl implements TransactionService {
       return useZeroAccountAddressRequest;
     }
     return request;
+  }
+
+  // get zero address accounts nonce, depending on configured network
+  private BigInteger getZeroAddressAccountNonce() {
+    if (Arrays.asList(Network.TESTNET, Network.MAINNET).contains(config.getNetwork())) {
+      return BaseConstants.ZERO_ADDRESS_ACCOUNT_DEFAULT_NONCE;
+    } else return BaseConstants.ZERO_ADDRESS_ACCOUNT_DEVNET_NONCE;
   }
 
   @Override
