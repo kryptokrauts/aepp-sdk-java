@@ -403,6 +403,4 @@ public class TransactionServiceImpl implements TransactionService {
     }
     return postTransactionResult;
   }
-
-  private void checkForZeroAddressAcountOnDryRun() {}
 }
