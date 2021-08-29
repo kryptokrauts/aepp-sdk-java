@@ -9,7 +9,7 @@ import lombok.Getter;
 import lombok.ToString;
 
 @Getter
-@Builder
+@Builder(toBuilder = true)
 @ToString
 public class DryRunCallRequestModel extends GenericInputObject<DryRunCallReq> {
 

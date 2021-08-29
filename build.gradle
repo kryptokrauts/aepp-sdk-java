@@ -35,7 +35,7 @@ ext {
     vertxVersion = "3.6.3"
     jacksonVersion = "2.9.8"
 
-    lombokVersion = "1.18.10"
+    lombokVersion = "1.18.20"
 
     bouncycastleVersion = "1.68"
     bitcoinjCoreVersion = "0.14.7"
