@@ -24,7 +24,7 @@ public class ContractCreateTransactionModel extends AbstractTransactionModel<Con
   @Mandatory private BigInteger amount;
   @Mandatory private String callData;
   @Mandatory private String contractByteCode;
-  private BigInteger deposit;
+  @Default BigInteger deposit = BigInteger.ZERO;
   @Mandatory private BigInteger gas;
   @Mandatory private BigInteger gasPrice;
   @Mandatory private BigInteger nonce;
@@ -71,6 +71,10 @@ public class ContractCreateTransactionModel extends AbstractTransactionModel<Con
 
   @Override
   public void validateInput() {
+    if (BigInteger.ZERO != this.deposit) {
+      throw new InvalidParameterException(
+          "Deposit for creation contract should be 0 otherwise deposit will be locked forever");
+    }
     if (!VirtualMachine.FATE.equals(this.virtualMachine)) {
       throw new InvalidParameterException(
           "AEVM cannot be used for the creation of contracts anymore.");

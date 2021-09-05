@@ -1,8 +1,14 @@
 package com.kryptokrauts.aeternity.test.integration;
 
+import java.math.BigInteger;
+import org.junit.FixMethodOrder;
+import org.junit.Ignore;
+import org.junit.Test;
+import org.junit.runners.MethodSorters;
 import com.kryptokrauts.aeternity.sdk.constants.BaseConstants;
 import com.kryptokrauts.aeternity.sdk.constants.Network;
 import com.kryptokrauts.aeternity.sdk.domain.ObjectResultWrapper;
+import com.kryptokrauts.aeternity.sdk.exception.InvalidParameterException;
 import com.kryptokrauts.aeternity.sdk.exception.TransactionCreateException;
 import com.kryptokrauts.aeternity.sdk.service.aeternity.AeternityServiceConfiguration;
 import com.kryptokrauts.aeternity.sdk.service.aeternity.impl.AeternityService;
@@ -15,11 +21,6 @@ import com.kryptokrauts.aeternity.sdk.service.transaction.domain.PostTransaction
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.model.ContractCallTransactionModel;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.model.ContractCreateTransactionModel;
 import io.vertx.ext.unit.TestContext;
-import java.math.BigInteger;
-import org.junit.FixMethodOrder;
-import org.junit.Ignore;
-import org.junit.Test;
-import org.junit.runners.MethodSorters;
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class TransactionContractsTest extends BaseTest {
@@ -33,154 +34,133 @@ public class TransactionContractsTest extends BaseTest {
    */
   @Test
   public void buildCreateContractTransactionTest(TestContext context) {
-    this.executeTest(
-        context,
-        t -> {
-          String ownerId = keyPair.getAddress();
-          BigInteger amount = BigInteger.valueOf(100);
-          BigInteger deposit = BigInteger.valueOf(100);
-          BigInteger ttl = BigInteger.valueOf(20000l);
-          BigInteger gas = BigInteger.valueOf(1000);
-          BigInteger gasPrice = BigInteger.valueOf(1100000000l);
-          BigInteger fee = BigInteger.valueOf(1098660000000000l);
+    this.executeTest(context, t -> {
+      String ownerId = keyPair.getAddress();
+      BigInteger amount = BigInteger.valueOf(100);
+      BigInteger deposit = BigInteger.valueOf(0);
+      BigInteger ttl = BigInteger.valueOf(20000l);
+      BigInteger gas = BigInteger.valueOf(1000);
+      BigInteger gasPrice = BigInteger.valueOf(1100000000l);
+      BigInteger fee = BigInteger.valueOf(1098660000000000l);
 
-          ContractCreateTransactionModel contractTx =
-              ContractCreateTransactionModel.builder()
-                  .amount(amount)
-                  .callData(TestConstants.testContractCallData)
-                  .contractByteCode(TestConstants.testContractByteCode)
-                  .deposit(deposit)
-                  .fee(fee)
-                  .gas(gas)
-                  .gasPrice(gasPrice)
-                  .nonce(getNextKeypairNonce())
-                  .ownerId(ownerId)
-                  .ttl(ttl)
-                  .virtualMachine(targetVM)
-                  .build();
+      ContractCreateTransactionModel contractTx = ContractCreateTransactionModel.builder()
+          .amount(amount).callData(TestConstants.testContractCallData)
+          .contractByteCode(TestConstants.testContractByteCode).deposit(deposit).fee(fee).gas(gas)
+          .gasPrice(gasPrice).nonce(getNextKeypairNonce()).ownerId(ownerId).ttl(ttl)
+          .virtualMachine(targetVM).build();
 
-          String unsignedTxNative =
-              aeternityServiceNative
-                  .transactions
-                  .blockingCreateUnsignedTransaction(contractTx)
-                  .getResult();
+      String unsignedTxNative = aeternityServiceNative.transactions
+          .blockingCreateUnsignedTransaction(contractTx).getResult();
 
-          String unsignedTxDebug =
-              this.aeternityServiceDebug
-                  .transactions
-                  .blockingCreateUnsignedTransaction(contractTx)
-                  .getResult();
+      String unsignedTxDebug = this.aeternityServiceDebug.transactions
+          .blockingCreateUnsignedTransaction(contractTx).getResult();
 
-          _logger.debug("Call contract tx hash (debug unsigned): " + unsignedTxDebug);
+      _logger.debug("Call contract tx hash (debug unsigned): " + unsignedTxDebug);
 
-          context.assertEquals(unsignedTxDebug, unsignedTxNative);
-        });
+      context.assertEquals(unsignedTxDebug, unsignedTxNative);
+    });
+  }
+
+  @Test
+  public void buildCreateContractTransactionFailTest(TestContext context) {
+    this.executeTest(context, t -> {
+      String ownerId = keyPair.getAddress();
+      BigInteger amount = BigInteger.valueOf(100);
+      BigInteger deposit = BigInteger.valueOf(100);
+      BigInteger ttl = BigInteger.valueOf(20000l);
+      BigInteger gas = BigInteger.valueOf(1000);
+      BigInteger gasPrice = BigInteger.valueOf(1100000000l);
+      BigInteger fee = BigInteger.valueOf(1098660000000000l);
+
+      ContractCreateTransactionModel contractTx = ContractCreateTransactionModel.builder()
+          .amount(amount).callData(TestConstants.testContractCallData)
+          .contractByteCode(TestConstants.testContractByteCode).deposit(deposit).fee(fee).gas(gas)
+          .gasPrice(gasPrice).nonce(getNextKeypairNonce()).ownerId(ownerId).ttl(ttl)
+          .virtualMachine(targetVM).build();
+
+      try {
+        aeternityServiceNative.transactions.blockingCreateUnsignedTransaction(contractTx)
+            .getResult();
+      } catch (Exception e) {
+        context.assertEquals(e.getClass().getName(), InvalidParameterException.class.getName());
+        context.assertTrue(e.getMessage().contains(
+            "Deposit for creation contract should be 0 otherwise deposit will be locked forever"));
+      }
+
+
+    });
   }
 
   @Test
   public void buildCallContractTransactionTest(TestContext context) {
-    this.executeTest(
-        context,
-        t -> {
-          String callerId = keyPair.getAddress();
-          BigInteger ttl = BigInteger.valueOf(20000);
-          BigInteger gas = BigInteger.valueOf(1000);
-          BigInteger gasPrice = BigInteger.valueOf(1000000000);
-          BigInteger nonce = getNextKeypairNonce();
-          String callContractCalldata = TestConstants.encodedServiceCall;
+    this.executeTest(context, t -> {
+      String callerId = keyPair.getAddress();
+      BigInteger ttl = BigInteger.valueOf(20000);
+      BigInteger gas = BigInteger.valueOf(1000);
+      BigInteger gasPrice = BigInteger.valueOf(1000000000);
+      BigInteger nonce = getNextKeypairNonce();
+      String callContractCalldata = TestConstants.encodedServiceCall;
 
-          ContractCallTransactionModel callTx =
-              ContractCallTransactionModel.builder()
-                  .callData(callContractCalldata)
-                  .contractId(localDeployedContractId)
-                  .gas(gas)
-                  .gasPrice(gasPrice)
-                  .nonce(nonce)
-                  .callerId(callerId)
-                  .ttl(ttl)
-                  .fee(BigInteger.valueOf(1454500000000000l))
-                  .virtualMachine(targetVM)
-                  .build();
+      ContractCallTransactionModel callTx = ContractCallTransactionModel.builder()
+          .callData(callContractCalldata).contractId(localDeployedContractId).gas(gas)
+          .gasPrice(gasPrice).nonce(nonce).callerId(callerId).ttl(ttl)
+          .fee(BigInteger.valueOf(1454500000000000l)).virtualMachine(targetVM).build();
 
-          String unsignedTxNative =
-              this.aeternityServiceNative
-                  .transactions
-                  .blockingCreateUnsignedTransaction(callTx)
-                  .getResult();
+      String unsignedTxNative = this.aeternityServiceNative.transactions
+          .blockingCreateUnsignedTransaction(callTx).getResult();
 
-          _logger.info("Call contract tx hash (native unsigned): " + unsignedTxNative);
+      _logger.info("Call contract tx hash (native unsigned): " + unsignedTxNative);
 
-          String unsignedTxDebug =
-              this.aeternityServiceDebug
-                  .transactions
-                  .blockingCreateUnsignedTransaction(callTx)
-                  .getResult();
+      String unsignedTxDebug = this.aeternityServiceDebug.transactions
+          .blockingCreateUnsignedTransaction(callTx).getResult();
 
-          _logger.info("Call contract tx hash (debug unsigned): " + unsignedTxDebug);
+      _logger.info("Call contract tx hash (debug unsigned): " + unsignedTxDebug);
 
-          context.assertEquals(unsignedTxDebug, unsignedTxNative);
-        });
+      context.assertEquals(unsignedTxDebug, unsignedTxNative);
+    });
   }
 
   @Test
   public void staticCallContractOnLocalNode(TestContext context) {
-    this.executeTest(
-        context,
-        t -> {
-          BigInteger nonce = getNextKeypairNonce();
+    this.executeTest(context, t -> {
+      BigInteger nonce = getNextKeypairNonce();
 
-          // Compile the call contract
-          String calldata =
-              encodeCalldata(
-                  TestConstants.testContractSourceCode,
-                  TestConstants.testContractFunction,
-                  TestConstants.testContractFunctionParams,
-                  null);
+      // Compile the call contract
+      String calldata = encodeCalldata(TestConstants.testContractSourceCode,
+          TestConstants.testContractFunction, TestConstants.testContractFunctionParams, null);
 
-          DryRunTransactionResults results =
-              this.aeternityServiceNative.transactions.blockingDryRunTransactions(
-                  DryRunRequest.builder()
-                      .build()
-                      .account(DryRunAccountModel.builder().publicKey(keyPair.getAddress()).build())
-                      .account(DryRunAccountModel.builder().publicKey(keyPair.getAddress()).build())
-                      .transactionInputItem(
-                          createUnsignedContractCallTx(context, nonce, calldata, null))
-                      .transactionInputItem(
-                          createUnsignedContractCallTx(context, nonce.add(ONE), calldata, null)));
+      DryRunTransactionResults results = this.aeternityServiceNative.transactions
+          .blockingDryRunTransactions(DryRunRequest.builder().build()
+              .account(DryRunAccountModel.builder().publicKey(keyPair.getAddress()).build())
+              .account(DryRunAccountModel.builder().publicKey(keyPair.getAddress()).build())
+              .transactionInputItem(createUnsignedContractCallTx(context, nonce, calldata, null))
+              .transactionInputItem(
+                  createUnsignedContractCallTx(context, nonce.add(ONE), calldata, null)));
 
-          _logger.info(results.toString());
-          for (DryRunTransactionResult result : results.getResults()) {
-            context.assertEquals("ok", result.getResult());
-          }
-        });
+      _logger.info(results.toString());
+      for (DryRunTransactionResult result : results.getResults()) {
+        context.assertEquals("ok", result.getResult());
+      }
+    });
   }
 
   @Test
   public void staticCallContractFailOnLocalNode(TestContext context) {
-    this.executeTest(
-        context,
-        t -> {
-          // Compile the call contract
-          String calldata =
-              encodeCalldata(
-                  TestConstants.testContractSourceCode,
-                  TestConstants.testContractFunction,
-                  TestConstants.testContractFunctionParams,
-                  null);
+    this.executeTest(context, t -> {
+      // Compile the call contract
+      String calldata = encodeCalldata(TestConstants.testContractSourceCode,
+          TestConstants.testContractFunction, TestConstants.testContractFunctionParams, null);
 
-          DryRunTransactionResults results =
-              this.aeternityServiceNative.transactions.blockingDryRunTransactions(
-                  DryRunRequest.builder()
-                      .build()
-                      .account(DryRunAccountModel.builder().publicKey(keyPair.getAddress()).build())
-                      .transactionInputItem(
-                          createUnsignedContractCallTx(context, ONE, calldata, null)));
+      DryRunTransactionResults results = this.aeternityServiceNative.transactions
+          .blockingDryRunTransactions(DryRunRequest.builder().build()
+              .account(DryRunAccountModel.builder().publicKey(keyPair.getAddress()).build())
+              .transactionInputItem(createUnsignedContractCallTx(context, ONE, calldata, null)));
 
-          _logger.info("DryRunResult when expecting error:\n" + results.toString());
-          for (DryRunTransactionResult result : results.getResults()) {
-            context.assertEquals("error", result.getResult());
-          }
-        });
+      _logger.info("DryRunResult when expecting error:\n" + results.toString());
+      for (DryRunTransactionResult result : results.getResults()) {
+        context.assertEquals("error", result.getResult());
+      }
+    });
   }
 
   /**
@@ -189,171 +169,123 @@ public class TransactionContractsTest extends BaseTest {
    */
   @Test
   public void callContractAfterDryRunOnLocalNode(TestContext context) throws Throwable {
-    this.executeTest(
-        context,
-        t -> {
-          // Compile the call contract
-          String calldata =
-              encodeCalldata(
-                  TestConstants.testContractSourceCode,
-                  TestConstants.testContractFunction,
-                  TestConstants.testContractFunctionParams,
-                  null);
+    this.executeTest(context, t -> {
+      // Compile the call contract
+      String calldata = encodeCalldata(TestConstants.testContractSourceCode,
+          TestConstants.testContractFunction, TestConstants.testContractFunctionParams, null);
 
-          DryRunTransactionResults results =
-              this.aeternityServiceNative.transactions.blockingDryRunTransactions(
-                  DryRunRequest.builder()
-                      .build()
-                      .account(DryRunAccountModel.builder().publicKey(keyPair.getAddress()).build())
-                      .transactionInputItem(
-                          createUnsignedContractCallTx(
-                              context, getNextKeypairNonce(), calldata, null)));
+      DryRunTransactionResults results = this.aeternityServiceNative.transactions
+          .blockingDryRunTransactions(DryRunRequest.builder().build()
+              .account(DryRunAccountModel.builder().publicKey(keyPair.getAddress()).build())
+              .transactionInputItem(
+                  createUnsignedContractCallTx(context, getNextKeypairNonce(), calldata, null)));
 
-          _logger.info("callContractAfterDryRunOnLocalNode: " + results.toString());
+      _logger.info("callContractAfterDryRunOnLocalNode: " + results.toString());
 
-          for (DryRunTransactionResult result : results.getResults()) {
-            context.assertEquals("ok", result.getResult());
+      for (DryRunTransactionResult result : results.getResults()) {
+        context.assertEquals("ok", result.getResult());
 
-            ContractCallTransactionModel callTx =
-                ContractCallTransactionModel.builder()
-                    .callData(calldata)
-                    .contractId(localDeployedContractId)
-                    .gas(result.getContractCallObject().getGasUsed())
-                    .gasPrice(result.getContractCallObject().getGasPrice())
-                    .nonce(getNextKeypairNonce())
-                    .callerId(keyPair.getAddress())
-                    .build();
+        ContractCallTransactionModel callTx = ContractCallTransactionModel.builder()
+            .callData(calldata).contractId(localDeployedContractId)
+            .gas(result.getContractCallObject().getGasUsed())
+            .gasPrice(result.getContractCallObject().getGasPrice()).nonce(getNextKeypairNonce())
+            .callerId(keyPair.getAddress()).build();
 
-            PostTransactionResult response =
-                this.aeternityServiceNative.transactions.blockingPostTransaction(callTx);
+        PostTransactionResult response =
+            this.aeternityServiceNative.transactions.blockingPostTransaction(callTx);
 
-            context.assertEquals(
-                response.getTxHash(),
-                this.aeternityServiceNative.transactions.computeTxHash(callTx));
-            _logger.info("Call contract tx hash: " + response.getTxHash());
+        context.assertEquals(response.getTxHash(),
+            this.aeternityServiceNative.transactions.computeTxHash(callTx));
+        _logger.info("Call contract tx hash: " + response.getTxHash());
 
-            // get the tx info object to resolve the result
-            try {
-              TransactionInfoResult txInfoObject = waitForTxInfoObject(response.getTxHash());
-              ObjectResultWrapper decodedValue =
-                  decodeCallResult(
-                      TestConstants.testContractSourceCode,
-                      TestConstants.testContractFunction,
-                      txInfoObject.getCallInfo().getReturnType(),
-                      txInfoObject.getCallInfo().getReturnValue());
-              context.assertTrue(decodedValue.getResult() instanceof Integer);
-              context.assertEquals(
-                  TestConstants.testContractFuntionParam, decodedValue.getResult().toString());
-            } catch (Throwable e) {
-              context.fail(e);
-            }
-          }
-        });
+        // get the tx info object to resolve the result
+        try {
+          TransactionInfoResult txInfoObject = waitForTxInfoObject(response.getTxHash());
+          ObjectResultWrapper decodedValue = decodeCallResult(TestConstants.testContractSourceCode,
+              TestConstants.testContractFunction, txInfoObject.getCallInfo().getReturnType(),
+              txInfoObject.getCallInfo().getReturnValue());
+          context.assertTrue(decodedValue.getResult() instanceof Integer);
+          context.assertEquals(TestConstants.testContractFuntionParam,
+              decodedValue.getResult().toString());
+        } catch (Throwable e) {
+          context.fail(e);
+        }
+      }
+    });
   }
 
-  private String createUnsignedContractCallTx(
-      TestContext context, BigInteger nonce, String calldata, BigInteger gasPrice) {
-    return this.aeternityServiceNative
-        .transactions
+  private String createUnsignedContractCallTx(TestContext context, BigInteger nonce,
+      String calldata, BigInteger gasPrice) {
+    return this.aeternityServiceNative.transactions
         .blockingCreateUnsignedTransaction(createCallContractModel(nonce, calldata, gasPrice))
         .getResult();
   }
 
-  private ContractCallTransactionModel createCallContractModel(
-      BigInteger nonce, String calldata, BigInteger gasPrice) {
+  private ContractCallTransactionModel createCallContractModel(BigInteger nonce, String calldata,
+      BigInteger gasPrice) {
     String callerId = keyPair.getAddress();
     BigInteger ttl = BigInteger.ZERO;
     BigInteger gas = BigInteger.valueOf(1000000);
-    ContractCallTransactionModel model =
-        ContractCallTransactionModel.builder()
-            .callData(calldata)
-            .contractId(localDeployedContractId)
-            .gas(gas)
-            .gasPrice(
-                gasPrice != null ? gasPrice : BigInteger.valueOf(BaseConstants.MINIMAL_GAS_PRICE))
-            .nonce(nonce)
-            .callerId(callerId)
-            .ttl(ttl)
-            .virtualMachine(targetVM)
-            .build();
+    ContractCallTransactionModel model = ContractCallTransactionModel.builder().callData(calldata)
+        .contractId(localDeployedContractId).gas(gas)
+        .gasPrice(gasPrice != null ? gasPrice : BigInteger.valueOf(BaseConstants.MINIMAL_GAS_PRICE))
+        .nonce(nonce).callerId(callerId).ttl(ttl).virtualMachine(targetVM).build();
     return model;
   }
 
   @Test
   public void aDeployContractNativeOnLocalNode(TestContext context) throws Throwable {
-    this.executeTest(
-        context,
-        t -> {
-          BigInteger gas = BigInteger.valueOf(1000000);
-          BigInteger gasPrice = BigInteger.valueOf(2000000000);
+    this.executeTest(context, t -> {
+      BigInteger gas = BigInteger.valueOf(1000000);
+      BigInteger gasPrice = BigInteger.valueOf(2000000000);
 
-          ContractCreateTransactionModel contractTx =
-              ContractCreateTransactionModel.builder()
-                  .amount(ZERO)
-                  .callData(TestConstants.testContractCallData)
-                  .contractByteCode(TestConstants.testContractByteCode)
-                  .deposit(ZERO)
-                  .gas(gas)
-                  .gasPrice(gasPrice)
-                  .nonce(getNextKeypairNonce())
-                  .ownerId(keyPair.getAddress())
-                  .build();
+      ContractCreateTransactionModel contractTx = ContractCreateTransactionModel.builder()
+          .amount(ZERO).callData(TestConstants.testContractCallData)
+          .contractByteCode(TestConstants.testContractByteCode).deposit(ZERO).gas(gas)
+          .gasPrice(gasPrice).nonce(getNextKeypairNonce()).ownerId(keyPair.getAddress()).build();
 
-          PostTransactionResult result =
-              this.aeternityServiceNative.transactions.blockingPostTransaction(contractTx);
-          try {
-            TransactionInfoResult txInfoObject = waitForTxInfoObject(result.getTxHash());
-            localDeployedContractId = txInfoObject.getCallInfo().getContractId();
-            _logger.info("Deployed contract - hash " + result.getTxHash() + " - " + txInfoObject);
-            _logger.info("ContractId: {}", localDeployedContractId);
-          } catch (Throwable e) {
-            context.fail(e);
-          }
-        });
+      PostTransactionResult result =
+          this.aeternityServiceNative.transactions.blockingPostTransaction(contractTx);
+      try {
+        TransactionInfoResult txInfoObject = waitForTxInfoObject(result.getTxHash());
+        localDeployedContractId = txInfoObject.getCallInfo().getContractId();
+        _logger.info("Deployed contract - hash " + result.getTxHash() + " - " + txInfoObject);
+        _logger.info("ContractId: {}", localDeployedContractId);
+      } catch (Throwable e) {
+        context.fail(e);
+      }
+    });
   }
 
   @Test
   public void callContractOnLocalNodeTest(TestContext context) throws Throwable {
-    this.executeTest(
-        context,
-        t -> {
-          String callData =
-              this.aeternityServiceNative
-                  .compiler
-                  .blockingEncodeCalldata(
-                      TestConstants.testContractSourceCode,
-                      TestConstants.testContractFunction,
-                      TestConstants.testContractFunctionParams,
-                      null)
-                  .getResult();
+    this.executeTest(context, t -> {
+      String callData = this.aeternityServiceNative.compiler
+          .blockingEncodeCalldata(TestConstants.testContractSourceCode,
+              TestConstants.testContractFunction, TestConstants.testContractFunctionParams, null)
+          .getResult();
 
-          // post the signed contract call tx
-          BigInteger nonceToVerifyHash = getNextKeypairNonce();
-          PostTransactionResult result =
-              this.aeternityServiceNative.transactions.blockingPostTransaction(
-                  createCallContractModel(nonceToVerifyHash, callData, null));
-          context.assertEquals(
-              result.getTxHash(),
-              this.aeternityServiceNative.transactions.computeTxHash(
-                  createCallContractModel(nonceToVerifyHash, callData, null)));
-          _logger.info("CreateContractTx hash: " + result.getTxHash());
+      // post the signed contract call tx
+      BigInteger nonceToVerifyHash = getNextKeypairNonce();
+      PostTransactionResult result = this.aeternityServiceNative.transactions
+          .blockingPostTransaction(createCallContractModel(nonceToVerifyHash, callData, null));
+      context.assertEquals(result.getTxHash(), this.aeternityServiceNative.transactions
+          .computeTxHash(createCallContractModel(nonceToVerifyHash, callData, null)));
+      _logger.info("CreateContractTx hash: " + result.getTxHash());
 
-          // get the tx info object to resolve the result
-          try {
-            TransactionInfoResult txInfoObject = waitForTxInfoObject(result.getTxHash());
-            ObjectResultWrapper decodedValue =
-                decodeCallResult(
-                    TestConstants.testContractSourceCode,
-                    TestConstants.testContractFunction,
-                    txInfoObject.getCallInfo().getReturnType(),
-                    txInfoObject.getCallInfo().getReturnValue());
-            context.assertTrue(decodedValue.getResult() instanceof Integer);
-            context.assertEquals(
-                TestConstants.testContractFuntionParam, decodedValue.getResult().toString());
-          } catch (Throwable e) {
-            context.fail(e);
-          }
-        });
+      // get the tx info object to resolve the result
+      try {
+        TransactionInfoResult txInfoObject = waitForTxInfoObject(result.getTxHash());
+        ObjectResultWrapper decodedValue = decodeCallResult(TestConstants.testContractSourceCode,
+            TestConstants.testContractFunction, txInfoObject.getCallInfo().getReturnType(),
+            txInfoObject.getCallInfo().getReturnValue());
+        context.assertTrue(decodedValue.getResult() instanceof Integer);
+        context.assertEquals(TestConstants.testContractFuntionParam,
+            decodedValue.getResult().toString());
+      } catch (Throwable e) {
+        context.fail(e);
+      }
+    });
   }
 
   @Test
@@ -364,13 +296,9 @@ public class TransactionContractsTest extends BaseTest {
     String privateKey = "";
     keyPair = keyPairService.recoverKeyPair(privateKey);
 
-    AeternityService testnetService =
-        new AeternityService(
-            AeternityServiceConfiguration.configure()
-                .baseUrl(BaseConstants.DEFAULT_TESTNET_URL)
-                .network(Network.TESTNET)
-                .vertx(rule.vertx())
-                .compile());
+    AeternityService testnetService = new AeternityService(
+        AeternityServiceConfiguration.configure().baseUrl(BaseConstants.DEFAULT_TESTNET_URL)
+            .network(Network.TESTNET).vertx(rule.vertx()).compile());
 
     String ownerId = keyPair.getAddress();
     BigInteger amount = BigInteger.ZERO;
@@ -379,22 +307,15 @@ public class TransactionContractsTest extends BaseTest {
     BigInteger gasPrice = BigInteger.valueOf(1100000000);
     BigInteger nonce = getNextKeypairNonce();
 
-    ContractCreateTransactionModel testnetCreateTx =
-        ContractCreateTransactionModel.builder()
-            .amount(amount)
-            .callData(TestConstants.testContractCallData)
-            .contractByteCode(TestConstants.testContractByteCode)
-            .deposit(deposit)
-            .gas(gas)
-            .gasPrice(gasPrice)
-            .nonce(nonce)
-            .ownerId(ownerId)
-            .build();
+    ContractCreateTransactionModel testnetCreateTx = ContractCreateTransactionModel.builder()
+        .amount(amount).callData(TestConstants.testContractCallData)
+        .contractByteCode(TestConstants.testContractByteCode).deposit(deposit).gas(gas)
+        .gasPrice(gasPrice).nonce(nonce).ownerId(ownerId).build();
 
     PostTransactionResult result =
         testnetService.transactions.blockingPostTransaction(testnetCreateTx);
 
-    context.assertEquals(
-        result.getTxHash(), testnetService.transactions.computeTxHash(testnetCreateTx));
+    context.assertEquals(result.getTxHash(),
+        testnetService.transactions.computeTxHash(testnetCreateTx));
   }
 }
