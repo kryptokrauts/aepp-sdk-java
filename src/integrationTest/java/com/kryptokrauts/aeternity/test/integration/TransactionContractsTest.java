@@ -3,6 +3,7 @@ package com.kryptokrauts.aeternity.test.integration;
 import com.kryptokrauts.aeternity.sdk.constants.BaseConstants;
 import com.kryptokrauts.aeternity.sdk.constants.Network;
 import com.kryptokrauts.aeternity.sdk.domain.ObjectResultWrapper;
+import com.kryptokrauts.aeternity.sdk.exception.InvalidParameterException;
 import com.kryptokrauts.aeternity.sdk.exception.TransactionCreateException;
 import com.kryptokrauts.aeternity.sdk.service.aeternity.AeternityServiceConfiguration;
 import com.kryptokrauts.aeternity.sdk.service.aeternity.impl.AeternityService;
@@ -38,7 +39,7 @@ public class TransactionContractsTest extends BaseTest {
         t -> {
           String ownerId = keyPair.getAddress();
           BigInteger amount = BigInteger.valueOf(100);
-          BigInteger deposit = BigInteger.valueOf(100);
+          BigInteger deposit = BigInteger.valueOf(0);
           BigInteger ttl = BigInteger.valueOf(20000l);
           BigInteger gas = BigInteger.valueOf(1000);
           BigInteger gasPrice = BigInteger.valueOf(1100000000l);
@@ -74,6 +75,49 @@ public class TransactionContractsTest extends BaseTest {
           _logger.debug("Call contract tx hash (debug unsigned): " + unsignedTxDebug);
 
           context.assertEquals(unsignedTxDebug, unsignedTxNative);
+        });
+  }
+
+  @Test
+  public void buildCreateContractTransactionFailTest(TestContext context) {
+    this.executeTest(
+        context,
+        t -> {
+          String ownerId = keyPair.getAddress();
+          BigInteger amount = BigInteger.valueOf(100);
+          BigInteger deposit = BigInteger.valueOf(100);
+          BigInteger ttl = BigInteger.valueOf(20000l);
+          BigInteger gas = BigInteger.valueOf(1000);
+          BigInteger gasPrice = BigInteger.valueOf(1100000000l);
+          BigInteger fee = BigInteger.valueOf(1098660000000000l);
+
+          ContractCreateTransactionModel contractTx =
+              ContractCreateTransactionModel.builder()
+                  .amount(amount)
+                  .callData(TestConstants.testContractCallData)
+                  .contractByteCode(TestConstants.testContractByteCode)
+                  .deposit(deposit)
+                  .fee(fee)
+                  .gas(gas)
+                  .gasPrice(gasPrice)
+                  .nonce(getNextKeypairNonce())
+                  .ownerId(ownerId)
+                  .ttl(ttl)
+                  .virtualMachine(targetVM)
+                  .build();
+
+          try {
+            aeternityServiceNative
+                .transactions
+                .blockingCreateUnsignedTransaction(contractTx)
+                .getResult();
+          } catch (Exception e) {
+            context.assertEquals(e.getClass().getName(), InvalidParameterException.class.getName());
+            context.assertTrue(
+                e.getMessage()
+                    .contains(
+                        "Deposit for creation contract should be 0 otherwise deposit will be locked forever"));
+          }
         });
   }
 
