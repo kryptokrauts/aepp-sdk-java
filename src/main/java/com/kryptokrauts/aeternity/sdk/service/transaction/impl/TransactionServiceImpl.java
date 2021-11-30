@@ -19,6 +19,7 @@ import com.kryptokrauts.aeternity.sdk.service.info.InfoService;
 import com.kryptokrauts.aeternity.sdk.service.info.domain.TransactionResult;
 import com.kryptokrauts.aeternity.sdk.service.transaction.TransactionService;
 import com.kryptokrauts.aeternity.sdk.service.transaction.domain.DryRunAccountModel;
+import com.kryptokrauts.aeternity.sdk.service.transaction.domain.DryRunCallRequestModel;
 import com.kryptokrauts.aeternity.sdk.service.transaction.domain.DryRunInputItemModel;
 import com.kryptokrauts.aeternity.sdk.service.transaction.domain.DryRunRequest;
 import com.kryptokrauts.aeternity.sdk.service.transaction.domain.DryRunTransactionResults;
@@ -36,7 +37,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 import javax.annotation.Nonnull;
 import lombok.RequiredArgsConstructor;
 import org.apache.tuweni.bytes.Bytes;
@@ -217,34 +217,41 @@ public class TransactionServiceImpl implements TransactionService {
   }
 
   // if zero account for dryRun should be used, this method sets the account and amount within the
-  // corresponding fields of the request model
+  // corresponding fields of the request model but only if there is none already set!
   private DryRunRequest prepareDryRunRequest(final DryRunRequest request) {
     if (this.config.isUseZeroAddressAccountForDryRun()) {
       DryRunRequest useZeroAccountAddressRequest =
           DryRunRequest.builder()
               .accounts(
-                  IntStream.range(0, request.getTxInputs().size())
-                      .mapToObj(
-                          v ->
-                              DryRunAccountModel.builder()
+                  request.getAccounts().stream()
+                      .map(
+                          v -> {
+                            if (v.getPublicKey() != null && v.getPublicKey().trim().length() > 0)
+                              return v;
+                            else
+                              return DryRunAccountModel.builder()
                                   .publicKey(config.getZeroAddressAccount())
                                   .amount(new BigInteger(config.getZeroAddressAccountAmount()))
-                                  .build())
+                                  .build();
+                          })
                       .collect(Collectors.toList()))
               .txInputs(
                   request.getTxInputs().stream()
                       .map(
-                          tx ->
-                              tx.getCallRequest() != null
-                                  ? DryRunInputItemModel.builder()
-                                      .callRequest(
-                                          tx.getCallRequest()
-                                              .toBuilder()
-                                              .caller(config.getZeroAddressAccount())
-                                              .nonce(getZeroAddressAccountNonce())
-                                              .build())
-                                      .build()
-                                  : tx)
+                          t -> {
+                            if ((t.getCallRequest() != null
+                                    && t.getCallRequest().getCaller() != null
+                                    && t.getCallRequest().getCaller().trim().length() > 0)
+                                || t.getTx() != null) return t;
+                            else
+                              return DryRunInputItemModel.builder()
+                                  .callRequest(
+                                      DryRunCallRequestModel.builder()
+                                          .caller(config.getZeroAddressAccount())
+                                          .nonce(getZeroAddressAccountNonce())
+                                          .build())
+                                  .build();
+                          })
                       .collect(Collectors.toList()))
               .build();
       return useZeroAccountAddressRequest;
