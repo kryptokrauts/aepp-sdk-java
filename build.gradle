@@ -41,7 +41,7 @@ ext {
     bitcoinjCoreVersion = "0.14.7"
     tuweniVersion = "0.8.2"
 
-    junitVersion = "5.4.2"
+    junitVersion = "5.8.1"
     junitPlatformVersion = "1.4.2"
     spectrumVersion = "1.2.0"
 

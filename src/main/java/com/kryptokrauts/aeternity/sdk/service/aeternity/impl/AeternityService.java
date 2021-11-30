@@ -19,6 +19,8 @@ import com.kryptokrauts.aeternity.sdk.service.oracle.OracleService;
 import com.kryptokrauts.aeternity.sdk.service.oracle.impl.OracleServiceImpl;
 import com.kryptokrauts.aeternity.sdk.service.transaction.TransactionService;
 import com.kryptokrauts.aeternity.sdk.service.transaction.impl.TransactionServiceImpl;
+import com.kryptokrauts.mdw.generated.api.MiddlewareApiImpl;
+import com.kryptokrauts.mdw.generated.api.rxjava.MiddlewareApi;
 import com.kryptokrauts.sophia.compiler.generated.api.DefaultApiImpl;
 import com.kryptokrauts.sophia.compiler.generated.api.rxjava.DefaultApi;
 import lombok.NonNull;
@@ -37,7 +39,7 @@ public class AeternityService {
 
   private DefaultApi compilerApi;
 
-  private com.kryptokrauts.mdw.generated.api.rxjava.MiddlewareApi mdwApi;
+  private MiddlewareApi mdwApi;
 
   public TransactionService transactions;
 
@@ -58,9 +60,7 @@ public class AeternityService {
     this.externalApi = new ExternalApi(new ExternalApiImpl(config.getApiClient()));
     this.internalApi = new InternalApi(new InternalApiImpl(config.getDebugApiClient()));
     this.compilerApi = new DefaultApi(new DefaultApiImpl(config.getCompilerApiClient()));
-    this.mdwApi =
-        new com.kryptokrauts.mdw.generated.api.rxjava.MiddlewareApi(
-            new com.kryptokrauts.mdw.generated.api.MiddlewareApiImpl(config.getMdwApiClient()));
+    this.mdwApi = new MiddlewareApi(new MiddlewareApiImpl(config.getMdwApiClient()));
     this.accounts = new AccountServiceImpl(this.config, this.externalApi);
     this.compiler = new SophiaCompilerServiceImpl(this.config, this.compilerApi);
     this.mdw = new MiddlewareServiceImpl(this.mdwApi);
