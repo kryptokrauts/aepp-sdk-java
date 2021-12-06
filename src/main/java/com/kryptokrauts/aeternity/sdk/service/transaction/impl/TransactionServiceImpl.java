@@ -41,6 +41,7 @@ import javax.annotation.Nonnull;
 import lombok.RequiredArgsConstructor;
 import org.apache.tuweni.bytes.Bytes;
 import org.apache.tuweni.rlp.RLP;
+import org.bouncycastle.util.encoders.Hex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -149,6 +150,29 @@ public class TransactionServiceImpl implements TransactionService {
                 blockingCreateUnsignedTransaction(tx).getResult(),
                 this.config.getKeyPair().getEncodedPrivateKey()));
     return EncodingUtils.hashEncode(signed, ApiIdentifiers.TRANSACTION_HASH);
+  }
+
+  @Override
+  public String computeGAInnerTxHash(final AbstractTransactionModel<?> tx)
+      throws TransactionCreateException {
+
+    StringResultWrapper unsignedInnerTxResult = this.blockingCreateUnsignedTransaction(tx);
+
+    if (!StringUtil.isNullOrEmpty(unsignedInnerTxResult.getAeAPIErrorMessage())) {
+      return unsignedInnerTxResult.getAeAPIErrorMessage();
+    }
+    if (!StringUtil.isNullOrEmpty(unsignedInnerTxResult.getRootErrorMessage())) {
+      return unsignedInnerTxResult.getRootErrorMessage();
+    }
+
+    byte[] networkDataWithAdditionalPrefix =
+        (config.getNetwork().getId()).getBytes(StandardCharsets.UTF_8);
+    byte[] txAndNetwork =
+        ByteUtils.concatenate(
+            networkDataWithAdditionalPrefix,
+            EncodingUtils.decodeCheckWithIdentifier(unsignedInnerTxResult.getResult()));
+
+    return new String(Hex.encode(EncodingUtils.hash(txAndNetwork)));
   }
 
   @Override
