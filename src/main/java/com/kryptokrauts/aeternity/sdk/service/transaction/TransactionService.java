@@ -173,7 +173,7 @@ public interface TransactionService {
   /**
    * synchronously creates an unsigned transaction out of the given AbstractTransactionModel and
    * append network data to the resulting byte array. This hash is intended to be used for
-   * generalize accounts which provide their own authentication mechanism
+   * generalized accounts which provide their own authentication mechanism
    *
    * @param transaction model
    * @return hash of created unsigned transaction appended with network data
