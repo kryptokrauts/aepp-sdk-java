@@ -150,7 +150,7 @@ public interface TransactionService {
    * @param numOfConfirmations the amount of keyblocks required to consider a transaction to be
    *     confirmed/mined
    * @return the actual {@link TransactionResult} of the transaction at the confirmation height
-   *     <p>Note:
+   *     <p>Note: @Override
    *     <p>- check getRootErrorMessage(): if a rootErrorMessage is present the transaction is
    *     probably not mined.
    *     <p>- check getBlockHeight():if the blockHeight is -1 it means the transaction isn't mined.
@@ -169,4 +169,15 @@ public interface TransactionService {
   String signPayingForInnerTransaction(
       final AbstractTransactionModel<?> model, final String privateKey)
       throws TransactionCreateException;
+
+  /**
+   * synchronously creates an unsigned transaction out of the given AbstractTransactionModel and
+   * append network data to the resulting byte array. This hash is intended to be used for
+   * generalized accounts which provide their own authentication mechanism
+   *
+   * @param transaction model
+   * @return hash of created unsigned transaction appended with network data
+   * @throws TransactionCreateException
+   */
+  String computeGAInnerTxHash(AbstractTransactionModel<?> tx) throws TransactionCreateException;
 }
