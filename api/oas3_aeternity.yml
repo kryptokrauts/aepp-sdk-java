@@ -529,7 +529,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
-  /accounts/{pubkey}/next-nonce:
+  "/accounts/{pubkey}/next-nonce":
     get:
       tags:
         - external
@@ -1961,7 +1961,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
-  /debug/token-supply/height/{height}:
+  "/debug/token-supply/height/{height}":
     get:
       tags:
         - internal
@@ -1984,7 +1984,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
-  /node/operator/mempool/hash/{hash}:
+  "/node/operator/mempool/hash/{hash}":
     delete:
       tags:
         - internal
@@ -2041,9 +2041,11 @@ components:
           maximum: 18446744073709552000
         - type: string
     TxBlockHeight:
-      type: integer
-      minimum: -1
-      maximum: 18446744073709552000
+      oneOf:
+        - type: integer
+          minimum: -1
+          maximum: 18446744073709552000
+        - type: string
     EncodedHash:
       description: Base58Check encoded tagged hash
       type: string
