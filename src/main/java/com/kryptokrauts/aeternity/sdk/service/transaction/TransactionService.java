@@ -3,6 +3,7 @@ package com.kryptokrauts.aeternity.sdk.service.transaction;
 import com.kryptokrauts.aeternity.sdk.domain.StringResultWrapper;
 import com.kryptokrauts.aeternity.sdk.exception.TransactionCreateException;
 import com.kryptokrauts.aeternity.sdk.service.info.domain.TransactionResult;
+import com.kryptokrauts.aeternity.sdk.service.transaction.domain.CheckTxInPoolResult;
 import com.kryptokrauts.aeternity.sdk.service.transaction.domain.DryRunRequest;
 import com.kryptokrauts.aeternity.sdk.service.transaction.domain.DryRunTransactionResults;
 import com.kryptokrauts.aeternity.sdk.service.transaction.domain.PostTransactionResult;
@@ -175,9 +176,16 @@ public interface TransactionService {
    * append network data to the resulting byte array. This hash is intended to be used for
    * generalized accounts which provide their own authentication mechanism
    *
-   * @param transaction model
+   * @param tx instance of a specific TransactionModel-class that extends {@link
+   *     AbstractTransactionModel}
    * @return hash of created unsigned transaction appended with network data
    * @throws TransactionCreateException
    */
   String computeGAInnerTxHash(AbstractTransactionModel<?> tx) throws TransactionCreateException;
+
+  /**
+   * @param txHash the tx-hash of the transaction to be confirmed
+   * @return info if tx can be included by miners or if it is blocked for some reason
+   */
+  CheckTxInPoolResult blockingCheckTxInPool(String txHash);
 }

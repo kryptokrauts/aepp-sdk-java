@@ -5,6 +5,7 @@ import com.kryptokrauts.aeternity.sdk.constants.VirtualMachine;
 import com.kryptokrauts.aeternity.sdk.domain.ObjectResultWrapper;
 import com.kryptokrauts.aeternity.sdk.domain.secret.KeyPair;
 import com.kryptokrauts.aeternity.sdk.service.account.domain.AccountResult;
+import com.kryptokrauts.aeternity.sdk.service.account.domain.NextNonceStrategy;
 import com.kryptokrauts.aeternity.sdk.service.aeternity.AeternityServiceConfiguration;
 import com.kryptokrauts.aeternity.sdk.service.aeternity.AeternityServiceFactory;
 import com.kryptokrauts.aeternity.sdk.service.aeternity.impl.AeternityService;
@@ -92,6 +93,7 @@ public abstract class BaseTest {
             .getService(
                 AeternityServiceConfiguration.configure()
                     .baseUrl(getAeternityBaseUrl())
+                    .debugBaseUrl(getAeternityBaseUrl())
                     .compilerBaseUrl(getCompilerBaseUrl())
                     .mdwBaseUrl(getMdwBaseUrl())
                     .network(Network.DEVNET)
@@ -161,7 +163,11 @@ public abstract class BaseTest {
   }
 
   protected BigInteger getNextKeypairNonce() {
-    return getAccount(this.keyPair.getAddress()).getNonce().add(ONE);
+    return getNextKeypairNonce(NextNonceStrategy.MAX);
+  }
+
+  protected BigInteger getNextKeypairNonce(NextNonceStrategy nextNonceStrategy) {
+    return aeternityServiceNative.accounts.blockingGetNextNonce(nextNonceStrategy);
   }
 
   protected AccountResult getAccount(String publicKey) {

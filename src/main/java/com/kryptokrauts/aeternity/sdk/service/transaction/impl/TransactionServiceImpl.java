@@ -18,6 +18,7 @@ import com.kryptokrauts.aeternity.sdk.service.aeternity.AeternityServiceConfigur
 import com.kryptokrauts.aeternity.sdk.service.info.InfoService;
 import com.kryptokrauts.aeternity.sdk.service.info.domain.TransactionResult;
 import com.kryptokrauts.aeternity.sdk.service.transaction.TransactionService;
+import com.kryptokrauts.aeternity.sdk.service.transaction.domain.CheckTxInPoolResult;
 import com.kryptokrauts.aeternity.sdk.service.transaction.domain.DryRunAccountModel;
 import com.kryptokrauts.aeternity.sdk.service.transaction.domain.DryRunCallRequestModel;
 import com.kryptokrauts.aeternity.sdk.service.transaction.domain.DryRunInputItemModel;
@@ -173,6 +174,13 @@ public class TransactionServiceImpl implements TransactionService {
             EncodingUtils.decodeCheckWithIdentifier(unsignedInnerTxResult.getResult()));
 
     return new String(Hex.encode(EncodingUtils.hash(txAndNetwork)));
+  }
+
+  @Override
+  public CheckTxInPoolResult blockingCheckTxInPool(final String txHash) {
+    return CheckTxInPoolResult.builder()
+        .build()
+        .blockingGet(internalApi.rxGetCheckTxInPool(txHash, false));
   }
 
   @Override

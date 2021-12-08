@@ -4,7 +4,9 @@ import com.kryptokrauts.aeternity.sdk.domain.secret.KeyPair;
 import com.kryptokrauts.aeternity.sdk.exception.AException;
 import com.kryptokrauts.aeternity.sdk.exception.TransactionCreateException;
 import com.kryptokrauts.aeternity.sdk.service.account.domain.AccountResult;
+import com.kryptokrauts.aeternity.sdk.service.account.domain.NextNonceStrategy;
 import com.kryptokrauts.aeternity.sdk.service.info.domain.TransactionResult;
+import com.kryptokrauts.aeternity.sdk.service.transaction.domain.CheckTxInPoolResult;
 import com.kryptokrauts.aeternity.sdk.service.transaction.domain.PostTransactionResult;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.model.SpendTransactionModel;
 import io.reactivex.Single;
@@ -350,6 +352,80 @@ public class TransactionSpendApiTest extends BaseTest {
                 throwable -> {
                   context.fail(throwable);
                 });
+          } catch (Throwable e) {
+            context.fail(e);
+          }
+        });
+  }
+
+  @Test
+  public void checkTxInPoolAndNextNonceContinuityTest(TestContext context)
+      throws TransactionCreateException {
+    this.executeTest(
+        context,
+        t -> {
+          try {
+            // we are using asyncPostTransaction to avoid "waitUntilTransactionIsIncludedInBlock"
+            // which is active by default for blockingPostTransaction
+            KeyPair recipient = keyPairService.generateKeyPair();
+            SpendTransactionModel spendTx =
+                SpendTransactionModel.builder()
+                    .sender(recipient.getAddress())
+                    .recipient(this.keyPair.getAddress())
+                    .amount(new BigInteger("1000000000000000000"))
+                    .payload("cannot work until sender has a balance")
+                    .nonce(BigInteger.ONE)
+                    .build();
+            PostTransactionResult txResponse =
+                aeternityServiceNative
+                    .transactions
+                    .asyncPostTransaction(spendTx, recipient.getEncodedPrivateKey())
+                    .blockingGet();
+            String txHashOfSenderWithoutBalance = txResponse.getTxHash();
+            _logger.info("SpendTx hash: " + txHashOfSenderWithoutBalance);
+            CheckTxInPoolResult checkTxInPoolResult =
+                aeternityServiceNative.transactions.blockingCheckTxInPool(
+                    txHashOfSenderWithoutBalance);
+            context.assertEquals("account_not_found", checkTxInPoolResult.getStatus());
+
+            spendTx =
+                SpendTransactionModel.builder()
+                    .sender(this.keyPair.getAddress())
+                    .recipient(recipient.getAddress())
+                    .amount(new BigInteger("500000000000000000"))
+                    .payload("sending a gift with some delay due to gap in nonce")
+                    .nonce(getNextKeypairNonce().add(ONE))
+                    .build();
+            txResponse =
+                aeternityServiceNative.transactions.asyncPostTransaction(spendTx).blockingGet();
+            String txHashOfSenderWithNonceGap = txResponse.getTxHash();
+            checkTxInPoolResult =
+                aeternityServiceNative.transactions.blockingCheckTxInPool(
+                    txHashOfSenderWithNonceGap);
+            context.assertEquals("tx_nonce_too_high_for_account", checkTxInPoolResult.getStatus());
+
+            spendTx =
+                SpendTransactionModel.builder()
+                    .sender(this.keyPair.getAddress())
+                    .recipient(recipient.getAddress())
+                    .amount(new BigInteger("550000000000000000"))
+                    .payload("now we should be good to go with all transactions")
+                    .nonce(getNextKeypairNonce(NextNonceStrategy.CONTINUITY))
+                    .build();
+            txResponse = aeternityServiceNative.transactions.blockingPostTransaction(spendTx);
+            checkTxInPoolResult =
+                aeternityServiceNative.transactions.blockingCheckTxInPool(txResponse.getTxHash());
+            context.assertEquals("included", checkTxInPoolResult.getStatus());
+            waitForTxMined(txHashOfSenderWithNonceGap);
+            checkTxInPoolResult =
+                aeternityServiceNative.transactions.blockingCheckTxInPool(
+                    txHashOfSenderWithNonceGap);
+            context.assertEquals("included", checkTxInPoolResult.getStatus());
+            waitForTxMined(txHashOfSenderWithoutBalance);
+            checkTxInPoolResult =
+                aeternityServiceNative.transactions.blockingCheckTxInPool(
+                    txHashOfSenderWithoutBalance);
+            context.assertEquals("included", checkTxInPoolResult.getStatus());
           } catch (Throwable e) {
             context.fail(e);
           }
