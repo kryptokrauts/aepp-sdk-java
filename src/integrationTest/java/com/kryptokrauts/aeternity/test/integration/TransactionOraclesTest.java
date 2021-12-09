@@ -68,7 +68,7 @@ public class TransactionOraclesTest extends BaseTest {
           try {
             BigInteger nonce = getAccount(oracleKeyPair.getAddress()).getNonce().add(ONE);
             BigInteger currentHeight =
-                this.aeternityServiceNative.info.blockingGetCurrentKeyBlock().getHeight();
+                this.aeternityService.info.blockingGetCurrentKeyBlock().getHeight();
             initialOracleTtl = currentHeight.add(BigInteger.valueOf(5000));
 
             OracleRegisterTransactionModel oracleRegisterTx =
@@ -116,7 +116,7 @@ public class TransactionOraclesTest extends BaseTest {
             _logger.info(postResult.getTxHash());
             queryId = EncodingUtils.queryId(keyPair.getAddress(), nonce, oracleId);
             OracleQueryResult oracleQuery =
-                this.aeternityServiceNative.oracles.blockingGetOracleQuery(oracleId, queryId);
+                this.aeternityService.oracles.blockingGetOracleQuery(oracleId, queryId);
             _logger.debug(oracleQuery.toString());
           } catch (Throwable e) {
             context.fail(e);
@@ -131,7 +131,7 @@ public class TransactionOraclesTest extends BaseTest {
         t -> {
           try {
             OracleQueriesResult oracleQueriesResult =
-                this.aeternityServiceNative.oracles.blockingGetOracleQueries(
+                this.aeternityService.oracles.blockingGetOracleQueries(
                     oracleKeyPair.getOracleAddress());
             _logger.info("OracleQueriesResult: {}", oracleQueriesResult);
             _logger.info("OracleQuery count: {}", oracleQueriesResult.getQueryResults().size());
@@ -156,7 +156,7 @@ public class TransactionOraclesTest extends BaseTest {
                 this.blockingPostTx(oracleRespondTx, oracleKeyPair.getEncodedPrivateKey());
             _logger.info(postResult.getTxHash());
             oracleQueryResult =
-                aeternityServiceNative.oracles.blockingGetOracleQuery(
+                aeternityService.oracles.blockingGetOracleQuery(
                     oracleKeyPair.getOracleAddress(), oracleQueryResult.getId());
             context.assertEquals(responseString, oracleQueryResult.getResponse());
           } catch (Throwable e) {
@@ -186,7 +186,7 @@ public class TransactionOraclesTest extends BaseTest {
             _logger.info(postResult.getTxHash());
 
             RegisteredOracleResult registeredOracle =
-                this.aeternityServiceNative.oracles.blockingGetRegisteredOracle(oracleId);
+                this.aeternityService.oracles.blockingGetRegisteredOracle(oracleId);
             context.assertEquals(initialOracleTtl.add(additionalTtl), registeredOracle.getTtl());
             _logger.info(registeredOracle.toString());
           } catch (Throwable e) {

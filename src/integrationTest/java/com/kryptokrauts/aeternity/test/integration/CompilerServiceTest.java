@@ -20,7 +20,7 @@ public class CompilerServiceTest extends BaseTest {
         context,
         t -> {
           String calldata =
-              this.aeternityServiceNative
+              this.aeternityService
                   .compiler
                   .blockingEncodeCalldata(
                       TestConstants.testContractSourceCode,
@@ -39,7 +39,7 @@ public class CompilerServiceTest extends BaseTest {
         t -> {
           try {
             ObjectResultWrapper callData =
-                this.aeternityServiceNative.compiler.blockingDecodeCalldata(
+                this.aeternityService.compiler.blockingDecodeCalldata(
                     TestConstants.encodedServiceCallAnswer, "int");
             _logger.info(callData.getResult().toString());
             context.assertEquals(
@@ -60,7 +60,7 @@ public class CompilerServiceTest extends BaseTest {
         context,
         t -> {
           String calldata =
-              this.aeternityServiceNative
+              this.aeternityService
                   .compiler
                   .blockingEncodeCalldata(TestConstants.testContractSourceCode, "init", null, null)
                   .getResult();
@@ -81,7 +81,7 @@ public class CompilerServiceTest extends BaseTest {
             String paymentSplitterSource =
                 IOUtils.toString(inputStream, StandardCharsets.UTF_8.toString());
             ACIResult aci =
-                this.aeternityServiceNative.compiler.blockingGenerateACI(
+                this.aeternityService.compiler.blockingGenerateACI(
                     paymentSplitterSource, null, null);
             _logger.info(aci.getEncodedAci().toString());
             context.assertEquals(TestConstants.paymentSplitterACI, aci.getEncodedAci().toString());

@@ -32,45 +32,6 @@ public class TransactionNameServiceTest extends BaseTest {
   static String validName = invalidName + TestConstants.NAMESPACE;
 
   /**
-   * create an unsigned native namepreclaim transaction
-   *
-   * @param context
-   */
-  @Test
-  public void buildNativeNamePreclaimTransactionTest(TestContext context) {
-    this.executeTest(
-        context,
-        t -> {
-          String sender = keyPairService.generateKeyPair().getAddress();
-          BigInteger salt = CryptoUtils.generateNamespaceSalt();
-          BigInteger ttl = BigInteger.valueOf(100);
-
-          NamePreclaimTransactionModel preclaim =
-              NamePreclaimTransactionModel.builder()
-                  .accountId(sender)
-                  .name(validName)
-                  .salt(salt)
-                  .nonce(getNextKeypairNonce())
-                  .ttl(ttl)
-                  .build();
-
-          String unsignedTxNative =
-              this.aeternityServiceNative
-                  .transactions
-                  .blockingCreateUnsignedTransaction(preclaim)
-                  .getResult();
-
-          String unsignedTxDebug =
-              this.aeternityServiceDebug
-                  .transactions
-                  .blockingCreateUnsignedTransaction(preclaim)
-                  .getResult();
-
-          context.assertEquals(unsignedTxDebug, unsignedTxNative);
-        });
-  }
-
-  /**
    * @param context
    * @throws Throwable
    */
@@ -95,7 +56,7 @@ public class TransactionNameServiceTest extends BaseTest {
             _logger.info("NamePreclaimTx hash: " + result.getTxHash());
             context.assertEquals(
                 result.getTxHash(),
-                this.aeternityServiceNative.transactions.computeTxHash(namePreclaimTx));
+                this.aeternityService.transactions.computeTxHash(namePreclaimTx));
 
             NameClaimTransactionModel nameClaimTx =
                 NameClaimTransactionModel.builder()
@@ -106,7 +67,7 @@ public class TransactionNameServiceTest extends BaseTest {
                     .build();
 
             _logger.info(
-                this.aeternityServiceNative
+                this.aeternityService
                     .transactions
                     .blockingCreateUnsignedTransaction(nameClaimTx)
                     .getResult());
@@ -119,7 +80,7 @@ public class TransactionNameServiceTest extends BaseTest {
             _logger.info("NameClaimTx hash: " + result.getTxHash());
 
             TransactionResult genericSignedTx =
-                this.aeternityServiceNative.info.blockingGetTransactionByHash(result.getTxHash());
+                this.aeternityService.info.blockingGetTransactionByHash(result.getTxHash());
             context.assertTrue(genericSignedTx.getBlockHeight().intValue() > 0);
             // NameClaimTx typedTx = (NameClaimTx) genericSignedTx.gett
             // _logger.info("Successfully claimed aens " +
@@ -159,7 +120,7 @@ public class TransactionNameServiceTest extends BaseTest {
 
             context.assertEquals(
                 namePreclaimResult.getTxHash(),
-                this.aeternityServiceNative.transactions.computeTxHash(namePreclaimTx));
+                this.aeternityService.transactions.computeTxHash(namePreclaimTx));
 
             NameClaimTransactionModel nameClaimTx =
                 NameClaimTransactionModel.builder()
@@ -175,8 +136,7 @@ public class TransactionNameServiceTest extends BaseTest {
                     name, salt, EncodingUtils.generateCommitmentHash(name, salt)));
             _logger.info("NameClaimTx hash: " + nameClaimResult.getTxHash());
 
-            NameEntryResult nameEntryResult =
-                this.aeternityServiceNative.names.blockingGetNameId(name);
+            NameEntryResult nameEntryResult = this.aeternityService.names.blockingGetNameId(name);
             BigInteger initialTTL = nameEntryResult.getTtl();
 
             _logger.info(
@@ -226,9 +186,9 @@ public class TransactionNameServiceTest extends BaseTest {
 
             context.assertEquals(
                 nameUpdateResult.getTxHash(),
-                this.aeternityServiceNative.transactions.computeTxHash(nameUpdateTx));
+                this.aeternityService.transactions.computeTxHash(nameUpdateTx));
 
-            nameEntryResult = this.aeternityServiceNative.names.blockingGetNameId(name);
+            nameEntryResult = this.aeternityService.names.blockingGetNameId(name);
             _logger.info(
                 String.format(
                     "Updated namespace %s with salt %s and nameEntry %s in tx %s for update test",
@@ -263,11 +223,11 @@ public class TransactionNameServiceTest extends BaseTest {
                     .nonce(getNextKeypairNonce())
                     .build();
             PostTransactionResult txResponse =
-                aeternityServiceNative.transactions.blockingPostTransaction(spendTx);
+                aeternityService.transactions.blockingPostTransaction(spendTx);
             _logger.info("SpendTx hash: " + txResponse.getTxHash());
             waitForTxMined(txResponse.getTxHash());
             AccountResult recipientAccount =
-                this.aeternityServiceNative.accounts.blockingGetAccount(accountPointer);
+                this.aeternityService.accounts.blockingGetAccount(accountPointer);
             _logger.info("Account result for recipient {}", recipientAccount);
             context.assertEquals(aettos, recipientAccount.getBalance());
             _logger.info("--------------------- postUpdateAndSpendTxTest ---------------------");
@@ -288,7 +248,7 @@ public class TransactionNameServiceTest extends BaseTest {
         t -> {
           try {
             _logger.info("--------------------- postRevokeTxTest ---------------------");
-            String nameId = this.aeternityServiceNative.names.blockingGetNameId(validName).getId();
+            String nameId = this.aeternityService.names.blockingGetNameId(validName).getId();
 
             NameRevokeTransactionModel nameRevokeTx =
                 NameRevokeTransactionModel.builder()
@@ -302,9 +262,9 @@ public class TransactionNameServiceTest extends BaseTest {
 
             context.assertEquals(
                 nameRevokeResult.getTxHash(),
-                this.aeternityServiceNative.transactions.computeTxHash(nameRevokeTx));
+                this.aeternityService.transactions.computeTxHash(nameRevokeTx));
 
-            NameEntryResult result = this.aeternityServiceNative.names.blockingGetNameId(validName);
+            NameEntryResult result = this.aeternityService.names.blockingGetNameId(validName);
             context.assertTrue(
                 "{\"reason\":\"Name revoked\"}".contentEquals(result.getRootErrorMessage()));
 
@@ -333,7 +293,7 @@ public class TransactionNameServiceTest extends BaseTest {
             _logger.info("name has {} chars", name.split("\\.")[0].length());
 
             NameAuctionsResult oldNameAuctionsResult =
-                this.aeternityServiceNative.mdw.blockingGetNameAuctions();
+                this.aeternityService.mdw.blockingGetNameAuctions();
             _logger.info("active auctions: {}", oldNameAuctionsResult);
             _logger.info(
                 "active auctions count: {}", oldNameAuctionsResult.getNameAuctions().size());
@@ -350,12 +310,12 @@ public class TransactionNameServiceTest extends BaseTest {
             _logger.info("NamePreclaimTx hash: {}", namePreclaimResult.getTxHash());
             context.assertEquals(
                 namePreclaimResult.getTxHash(),
-                this.aeternityServiceNative.transactions.computeTxHash(namePreclaimTx));
+                this.aeternityService.transactions.computeTxHash(namePreclaimTx));
 
             // currently we do not have an active auction
             // we expect an error (not found)
             context.assertFalse(
-                this.aeternityServiceNative
+                this.aeternityService
                     .mdw
                     .blockingGetNameAuction(name)
                     .getAeAPIErrorMessage()
@@ -381,17 +341,14 @@ public class TransactionNameServiceTest extends BaseTest {
                     name, salt, EncodingUtils.generateCommitmentHash(name, salt)));
             _logger.info("NameClaimTx hash: {}", nameClaimResult.getTxHash());
 
-            while (this.aeternityServiceNative
-                    .mdw
-                    .blockingGetNameAuction(name)
-                    .getAeAPIErrorMessage()
+            while (this.aeternityService.mdw.blockingGetNameAuction(name).getAeAPIErrorMessage()
                 != null) {
               _logger.info("waiting for auction of name {}", name);
               Thread.sleep(1000);
             }
 
             NameAuctionsResult newNameAuctionsResult =
-                this.aeternityServiceNative.mdw.blockingGetNameAuctions();
+                this.aeternityService.mdw.blockingGetNameAuctions();
             _logger.info("active auctions: {}", newNameAuctionsResult.getNameAuctions().size());
             context.assertEquals(
                 oldNameAuctionsResult.getNameAuctions().size() + 1,
@@ -399,8 +356,7 @@ public class TransactionNameServiceTest extends BaseTest {
 
             _logger.info("found auction for name {}", name);
             /** name cannot be found due to running auction */
-            NameEntryResult nameEntryResult =
-                this.aeternityServiceNative.names.blockingGetNameId(name);
+            NameEntryResult nameEntryResult = this.aeternityService.names.blockingGetNameId(name);
             context.assertTrue(
                 nameEntryResult.getRootErrorMessage() != null
                     && nameEntryResult.getRootErrorMessage().contains("Name not found"));
@@ -418,7 +374,7 @@ public class TransactionNameServiceTest extends BaseTest {
                 UnitConversionUtil.fromAettos(nextNameFee.toString(), UnitConversionUtil.Unit.AE));
 
             /** create and fund other account to claim the same name with nextNameFee */
-            AccountResult account = this.aeternityServiceNative.accounts.blockingGetAccount();
+            AccountResult account = this.aeternityService.accounts.blockingGetAccount();
             KeyPair kpNextClaimer = keyPairService.generateKeyPair();
             String recipient = kpNextClaimer.getAddress();
             BigInteger amount =
@@ -434,11 +390,11 @@ public class TransactionNameServiceTest extends BaseTest {
             PostTransactionResult txResponse = this.blockingPostTx(spendTx);
             _logger.info("SpendTx hash: " + txResponse.getTxHash());
             context.assertEquals(
-                txResponse.getTxHash(), aeternityServiceNative.transactions.computeTxHash(spendTx));
+                txResponse.getTxHash(), aeternityService.transactions.computeTxHash(spendTx));
 
             /** get funded account and create next nameClaimTx */
             AccountResult otherAccount =
-                this.aeternityServiceNative.accounts.blockingGetAccount(recipient);
+                this.aeternityService.accounts.blockingGetAccount(recipient);
             NameClaimTransactionModel nextNameClaimTx =
                 nameClaimTx
                     .toBuilder()
@@ -456,7 +412,7 @@ public class TransactionNameServiceTest extends BaseTest {
             _logger.info("claim will be final at block {}", finalBlockHeight);
 
             waitForBlockHeight(finalBlockHeight, 5000l);
-            nameEntryResult = this.aeternityServiceNative.names.blockingGetNameId(name);
+            nameEntryResult = this.aeternityService.names.blockingGetNameId(name);
             context.assertTrue(nameEntryResult.getRootErrorMessage() == null);
             _logger.info("NameEntryResult: {}", nameEntryResult);
             context.assertEquals(kpNextClaimer.getAddress(), nameEntryResult.getOwner());
