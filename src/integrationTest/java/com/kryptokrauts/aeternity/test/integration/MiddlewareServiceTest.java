@@ -11,7 +11,7 @@ public class MiddlewareServiceTest extends BaseTest {
     this.executeTest(
         context,
         t -> {
-          StatusResult statusResult = this.aeternityServiceNative.mdw.blockingGetStatus();
+          StatusResult statusResult = this.aeternityService.mdw.blockingGetStatus();
           _logger.info(statusResult.toString());
           context.assertEquals("6.3.0", statusResult.getNodeVersion());
           context.assertEquals("1.3.0", statusResult.getMdwVersion());

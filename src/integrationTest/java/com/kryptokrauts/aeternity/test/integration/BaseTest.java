@@ -62,9 +62,7 @@ public abstract class BaseTest {
 
   protected KeyPairService keyPairService;
 
-  protected AeternityService aeternityServiceNative;
-
-  protected AeternityService aeternityServiceDebug;
+  protected AeternityService aeternityService;
 
   protected KeyPair keyPair;
 
@@ -88,7 +86,7 @@ public abstract class BaseTest {
 
     keyPair = keyPairService.recoverKeyPair(TestConstants.BENEFICIARY_PRIVATE_KEY);
 
-    aeternityServiceNative =
+    aeternityService =
         new AeternityServiceFactory()
             .getService(
                 AeternityServiceConfiguration.configure()
@@ -102,20 +100,6 @@ public abstract class BaseTest {
                     .vertx(vertx)
                     .targetVM(targetVM)
                     .millisBetweenTrailsToWaitForConfirmation(500l)
-                    .compile());
-    aeternityServiceDebug =
-        new AeternityServiceFactory()
-            .getService(
-                AeternityServiceConfiguration.configure()
-                    .baseUrl(getAeternityBaseUrl())
-                    .debugBaseUrl(getAeternityBaseUrl())
-                    .compilerBaseUrl(getCompilerBaseUrl())
-                    .mdwBaseUrl(getMdwBaseUrl())
-                    .network(Network.DEVNET)
-                    .nativeMode(false)
-                    .keyPair(keyPair)
-                    .vertx(vertx)
-                    .targetVM(targetVM)
                     .compile());
   }
 
@@ -167,19 +151,19 @@ public abstract class BaseTest {
   }
 
   protected BigInteger getNextKeypairNonce(NextNonceStrategy nextNonceStrategy) {
-    return aeternityServiceNative.accounts.blockingGetNextNonce(nextNonceStrategy);
+    return aeternityService.accounts.blockingGetNextNonce(nextNonceStrategy);
   }
 
   protected AccountResult getAccount(String publicKey) {
     if (publicKey == null) {
-      return aeternityServiceNative.accounts.blockingGetAccount();
+      return aeternityService.accounts.blockingGetAccount();
     }
-    return aeternityServiceNative.accounts.blockingGetAccount(publicKey);
+    return aeternityService.accounts.blockingGetAccount(publicKey);
   }
 
   protected TransactionInfoResult waitForTxInfoObject(String txHash) throws Throwable {
     return callMethodAndGetResult(
-        () -> aeternityServiceNative.info.asyncGetTransactionInfoByHash(txHash),
+        () -> aeternityService.info.asyncGetTransactionInfoByHash(txHash),
         TransactionInfoResult.class);
   }
 
@@ -193,7 +177,7 @@ public abstract class BaseTest {
       privateKey = this.keyPair.getEncodedPrivateKey();
     }
     PostTransactionResult postTxResponse =
-        this.aeternityServiceNative.transactions.blockingPostTransaction(tx, privateKey);
+        this.aeternityService.transactions.blockingPostTransaction(tx, privateKey);
     _logger.info("PostTx hash: " + postTxResponse.getTxHash());
     TransactionResult txValue = waitForTxMined(postTxResponse.getTxHash());
     _logger.info(
@@ -207,7 +191,7 @@ public abstract class BaseTest {
   protected PostTransactionResult postTx(AbstractTransactionModel<?> tx) throws Throwable {
     PostTransactionResult postTxResponse =
         callMethodAndGetResult(
-            () -> this.aeternityServiceNative.transactions.asyncPostTransaction(tx),
+            () -> this.aeternityService.transactions.asyncPostTransaction(tx),
             PostTransactionResult.class);
     _logger.info("PostTx hash: " + postTxResponse.getTxHash());
     TransactionResult txValue = waitForTxMined(postTxResponse.getTxHash());
@@ -227,7 +211,7 @@ public abstract class BaseTest {
     while (blockHeight == -1 && doneTrials < TestConstants.NUM_TRIALS_DEFAULT) {
       minedTx =
           callMethodAndGetResult(
-              () -> aeternityServiceNative.info.asyncGetTransactionByHash(txHash),
+              () -> aeternityService.info.asyncGetTransactionByHash(txHash),
               TransactionResult.class);
       if (minedTx.getBlockHeight().intValue() > 1) {
         _logger.debug("Mined tx: " + minedTx);
@@ -258,7 +242,7 @@ public abstract class BaseTest {
         blockHeight,
         timeoutMilli / 1000d);
     while (currentBlockHeight.compareTo(blockHeight) == -1) {
-      currentBlockHeight = aeternityServiceNative.info.blockingGetCurrentKeyBlock().getHeight();
+      currentBlockHeight = aeternityService.info.blockingGetCurrentKeyBlock().getHeight();
       _logger.info("current blockHeight: {}", currentBlockHeight);
       Thread.sleep(timeoutMilli);
     }
@@ -269,7 +253,7 @@ public abstract class BaseTest {
       String contractFunction,
       List<String> contractFunctionParams,
       Map<String, String> fileSystem) {
-    return this.aeternityServiceNative
+    return this.aeternityService
         .compiler
         .blockingEncodeCalldata(
             contractSourceCode, contractFunction, contractFunctionParams, fileSystem)
@@ -278,13 +262,12 @@ public abstract class BaseTest {
 
   protected JsonObject decodeCalldata(String encodedValue, String sophiaReturnType) {
     return JsonObject.mapFrom(
-        this.aeternityServiceNative.compiler.blockingDecodeCalldata(
-            encodedValue, sophiaReturnType));
+        this.aeternityService.compiler.blockingDecodeCalldata(encodedValue, sophiaReturnType));
   }
 
   protected ObjectResultWrapper decodeCallResult(
       String source, String function, String callResult, String callValue) {
-    return this.aeternityServiceNative.compiler.blockingDecodeCallResult(
+    return this.aeternityService.compiler.blockingDecodeCallResult(
         source, function, callResult, callValue, null);
   }
 

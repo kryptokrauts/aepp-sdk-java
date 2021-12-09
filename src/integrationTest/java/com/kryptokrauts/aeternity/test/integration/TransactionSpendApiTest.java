@@ -20,52 +20,6 @@ import org.junit.runners.MethodSorters;
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class TransactionSpendApiTest extends BaseTest {
 
-  /**
-   * create an unsigned native spend transaction
-   *
-   * @param context
-   */
-  @Test
-  public void buildNativeSpendTransactionTest(TestContext context) {
-    this.executeTest(
-        context,
-        t -> {
-          String sender = keyPairService.generateKeyPair().getAddress();
-          String recipient = keyPairService.generateKeyPair().getAddress();
-          BigInteger amount = BigInteger.valueOf(1000);
-          String payload = "payload";
-          BigInteger ttl = BigInteger.valueOf(100);
-          BigInteger nonce = BigInteger.valueOf(5);
-
-          // sender, recipient, amount, payload, ttl, nonce
-
-          SpendTransactionModel spendTx =
-              SpendTransactionModel.builder()
-                  .sender(sender)
-                  .recipient(recipient)
-                  .amount(amount)
-                  .payload(payload)
-                  .ttl(ttl)
-                  .nonce(nonce)
-                  .build();
-
-          String unsignedTxNative =
-              aeternityServiceNative
-                  .transactions
-                  .asyncCreateUnsignedTransaction(spendTx)
-                  .blockingGet()
-                  .getResult();
-
-          String unsignedTxDebug =
-              aeternityServiceDebug
-                  .transactions
-                  .blockingCreateUnsignedTransaction(spendTx)
-                  .getResult();
-
-          context.assertEquals(unsignedTxDebug, unsignedTxNative);
-        });
-  }
-
   @Test
   public void postSpendSelfSignTxTest(TestContext context) {
     this.executeTest(
@@ -74,7 +28,7 @@ public class TransactionSpendApiTest extends BaseTest {
 
           // get the currents accounts nonce in case a transaction is already
           // created and increase it by one
-          AccountResult account = this.aeternityServiceNative.accounts.blockingGetAccount();
+          AccountResult account = this.aeternityService.accounts.blockingGetAccount();
 
           KeyPair kp = keyPairService.generateKeyPair();
           String recipient = kp.getAddress();
@@ -92,10 +46,10 @@ public class TransactionSpendApiTest extends BaseTest {
                   .build();
 
           PostTransactionResult txResponse =
-              aeternityServiceNative.transactions.blockingPostTransaction(spendTx);
+              aeternityService.transactions.blockingPostTransaction(spendTx);
           _logger.info("SpendTx hash: " + txResponse.getTxHash());
           context.assertEquals(
-              txResponse.getTxHash(), aeternityServiceNative.transactions.computeTxHash(spendTx));
+              txResponse.getTxHash(), aeternityService.transactions.computeTxHash(spendTx));
           try {
             waitForTxMined(txResponse.getTxHash());
           } catch (Throwable e) {
@@ -109,7 +63,7 @@ public class TransactionSpendApiTest extends BaseTest {
     this.executeTest(
         context,
         t -> {
-          AccountResult account = this.aeternityServiceNative.accounts.blockingGetAccount();
+          AccountResult account = this.aeternityService.accounts.blockingGetAccount();
 
           KeyPair kp = keyPairService.generateKeyPair();
           String recipient = kp.getAddress();
@@ -127,22 +81,22 @@ public class TransactionSpendApiTest extends BaseTest {
                   .build();
 
           String unsignedTxNative =
-              aeternityServiceNative
+              aeternityService
                   .transactions
                   .asyncCreateUnsignedTransaction(spendTx)
                   .blockingGet()
                   .getResult();
 
           String signedTxNative =
-              aeternityServiceNative.transactions.signTransaction(
+              aeternityService.transactions.signTransaction(
                   unsignedTxNative, keyPair.getEncodedPrivateKey());
 
           PostTransactionResult txResponse =
-              aeternityServiceNative.transactions.blockingPostTransaction(signedTxNative);
+              aeternityService.transactions.blockingPostTransaction(signedTxNative);
 
           _logger.info("SpendTx hash: " + txResponse.getTxHash());
           context.assertEquals(
-              txResponse.getTxHash(), aeternityServiceNative.transactions.computeTxHash(spendTx));
+              txResponse.getTxHash(), aeternityService.transactions.computeTxHash(spendTx));
           try {
             waitForTxMined(txResponse.getTxHash());
           } catch (Throwable e) {
@@ -156,7 +110,7 @@ public class TransactionSpendApiTest extends BaseTest {
     this.executeTest(
         context,
         t -> {
-          AccountResult account = this.aeternityServiceNative.accounts.blockingGetAccount();
+          AccountResult account = this.aeternityService.accounts.blockingGetAccount();
 
           KeyPair kp = keyPairService.generateKeyPair();
           String recipient = kp.getAddress();
@@ -176,7 +130,7 @@ public class TransactionSpendApiTest extends BaseTest {
                   .build();
 
           try {
-            aeternityServiceNative.transactions.blockingPostTransaction(spendTx);
+            aeternityService.transactions.blockingPostTransaction(spendTx);
             context.fail("Test failed because no AException raised, test contains error");
           } catch (AException spendException) {
             context.assertTrue(
@@ -205,11 +159,11 @@ public class TransactionSpendApiTest extends BaseTest {
                     .nonce(getNextKeypairNonce())
                     .build();
             PostTransactionResult txResponse =
-                aeternityServiceNative.transactions.blockingPostTransaction(spendTx);
+                aeternityService.transactions.blockingPostTransaction(spendTx);
             _logger.info("SpendTx hash: " + txResponse.getTxHash());
             waitForTxMined(txResponse.getTxHash());
             context.assertEquals(
-                txResponse.getTxHash(), aeternityServiceNative.transactions.computeTxHash(spendTx));
+                txResponse.getTxHash(), aeternityService.transactions.computeTxHash(spendTx));
           } catch (Throwable e) {
             context.fail(e);
           }
@@ -232,11 +186,11 @@ public class TransactionSpendApiTest extends BaseTest {
                     .nonce(getNextKeypairNonce())
                     .build();
             PostTransactionResult txResponse =
-                aeternityServiceNative.transactions.blockingPostTransaction(spendTx);
+                aeternityService.transactions.blockingPostTransaction(spendTx);
             _logger.info("SpendTx hash: " + txResponse.getTxHash());
             waitForTxMined(txResponse.getTxHash());
             AccountResult recipientAccount =
-                this.aeternityServiceNative.accounts.blockingGetAccount(recipient.getAddress());
+                this.aeternityService.accounts.blockingGetAccount(recipient.getAddress());
             _logger.info("Account result for recipient {}", recipientAccount);
             // now send amount back
             long recipientAccountBalance = recipientAccount.getBalance().longValue();
@@ -250,12 +204,12 @@ public class TransactionSpendApiTest extends BaseTest {
                     .build();
             _logger.info("Sending back {}", spendTx);
             txResponse =
-                aeternityServiceNative.transactions.blockingPostTransaction(
+                aeternityService.transactions.blockingPostTransaction(
                     spendTx, recipient.getEncodedPrivateKey());
             _logger.info("SpendTx hash: " + txResponse.getTxHash());
             waitForTxMined(txResponse.getTxHash());
             recipientAccount =
-                this.aeternityServiceNative.accounts.blockingGetAccount(recipient.getAddress());
+                this.aeternityService.accounts.blockingGetAccount(recipient.getAddress());
             context.assertEquals(
                 recipientAccount.getBalance().longValue(),
                 recipientAccountBalance
@@ -285,12 +239,12 @@ public class TransactionSpendApiTest extends BaseTest {
                     .nonce(getNextKeypairNonce())
                     .build();
             Single<PostTransactionResult> postTransactionResultSingle =
-                aeternityServiceNative.transactions.asyncPostTransaction(spendTx);
+                aeternityService.transactions.asyncPostTransaction(spendTx);
             postTransactionResultSingle.subscribe(
                 postTransactionResult -> {
                   _logger.info("SpendTx hash: " + postTransactionResult.getTxHash());
                   Single<TransactionResult> transactionResultSingle =
-                      aeternityServiceNative.transactions.asyncWaitForConfirmation(
+                      aeternityService.transactions.asyncWaitForConfirmation(
                           postTransactionResult.getTxHash());
                   transactionResultSingle.subscribe(
                       transactionResult -> {
@@ -331,10 +285,10 @@ public class TransactionSpendApiTest extends BaseTest {
                     .payload("wait for confirmation fails :-(")
                     .nonce(getNextKeypairNonce())
                     .build();
-            String computedTxHash = aeternityServiceNative.transactions.computeTxHash(spendTx);
+            String computedTxHash = aeternityService.transactions.computeTxHash(spendTx);
             _logger.info("Computed txHash: " + computedTxHash);
             Single<TransactionResult> transactionResultSingle =
-                aeternityServiceNative.transactions.asyncWaitForConfirmation(computedTxHash);
+                aeternityService.transactions.asyncWaitForConfirmation(computedTxHash);
             transactionResultSingle.subscribe(
                 transactionResult -> {
                   _logger.info(transactionResult.toString());
@@ -377,15 +331,14 @@ public class TransactionSpendApiTest extends BaseTest {
                     .nonce(BigInteger.ONE)
                     .build();
             PostTransactionResult txResponse =
-                aeternityServiceNative
+                aeternityService
                     .transactions
                     .asyncPostTransaction(spendTx, recipient.getEncodedPrivateKey())
                     .blockingGet();
             String txHashOfSenderWithoutBalance = txResponse.getTxHash();
             _logger.info("SpendTx hash: " + txHashOfSenderWithoutBalance);
             CheckTxInPoolResult checkTxInPoolResult =
-                aeternityServiceNative.transactions.blockingCheckTxInPool(
-                    txHashOfSenderWithoutBalance);
+                aeternityService.transactions.blockingCheckTxInPool(txHashOfSenderWithoutBalance);
             context.assertEquals("account_not_found", checkTxInPoolResult.getStatus());
 
             spendTx =
@@ -396,12 +349,10 @@ public class TransactionSpendApiTest extends BaseTest {
                     .payload("sending a gift with some delay due to gap in nonce")
                     .nonce(getNextKeypairNonce().add(ONE))
                     .build();
-            txResponse =
-                aeternityServiceNative.transactions.asyncPostTransaction(spendTx).blockingGet();
+            txResponse = aeternityService.transactions.asyncPostTransaction(spendTx).blockingGet();
             String txHashOfSenderWithNonceGap = txResponse.getTxHash();
             checkTxInPoolResult =
-                aeternityServiceNative.transactions.blockingCheckTxInPool(
-                    txHashOfSenderWithNonceGap);
+                aeternityService.transactions.blockingCheckTxInPool(txHashOfSenderWithNonceGap);
             context.assertEquals("tx_nonce_too_high_for_account", checkTxInPoolResult.getStatus());
 
             spendTx =
@@ -412,19 +363,17 @@ public class TransactionSpendApiTest extends BaseTest {
                     .payload("now we should be good to go with all transactions")
                     .nonce(getNextKeypairNonce(NextNonceStrategy.CONTINUITY))
                     .build();
-            txResponse = aeternityServiceNative.transactions.blockingPostTransaction(spendTx);
+            txResponse = aeternityService.transactions.blockingPostTransaction(spendTx);
             checkTxInPoolResult =
-                aeternityServiceNative.transactions.blockingCheckTxInPool(txResponse.getTxHash());
+                aeternityService.transactions.blockingCheckTxInPool(txResponse.getTxHash());
             context.assertEquals("included", checkTxInPoolResult.getStatus());
             waitForTxMined(txHashOfSenderWithNonceGap);
             checkTxInPoolResult =
-                aeternityServiceNative.transactions.blockingCheckTxInPool(
-                    txHashOfSenderWithNonceGap);
+                aeternityService.transactions.blockingCheckTxInPool(txHashOfSenderWithNonceGap);
             context.assertEquals("included", checkTxInPoolResult.getStatus());
             waitForTxMined(txHashOfSenderWithoutBalance);
             checkTxInPoolResult =
-                aeternityServiceNative.transactions.blockingCheckTxInPool(
-                    txHashOfSenderWithoutBalance);
+                aeternityService.transactions.blockingCheckTxInPool(txHashOfSenderWithoutBalance);
             context.assertEquals("included", checkTxInPoolResult.getStatus());
           } catch (Throwable e) {
             context.fail(e);

@@ -34,7 +34,7 @@ public class TransactionGeneralizedAccountsTest extends BaseTest {
         context,
         t -> {
           gaAccountKeyPair = keyPairService.generateKeyPair();
-          AccountResult account = this.aeternityServiceNative.accounts.blockingGetAccount();
+          AccountResult account = this.aeternityService.accounts.blockingGetAccount();
           BigInteger amount = unitConversionService.toSmallestUnit(BigDecimal.TEN);
           BigInteger nonce = account.getNonce().add(ONE);
           SpendTransactionModel spendTx =
@@ -44,19 +44,18 @@ public class TransactionGeneralizedAccountsTest extends BaseTest {
                   .amount(amount)
                   .nonce(nonce)
                   .build();
-          aeternityServiceNative.transactions.blockingPostTransaction(spendTx);
+          aeternityService.transactions.blockingPostTransaction(spendTx);
           AccountResult gaTestAccount =
-              this.aeternityServiceNative.accounts.blockingGetAccount(
-                  gaAccountKeyPair.getAddress());
+              this.aeternityService.accounts.blockingGetAccount(gaAccountKeyPair.getAddress());
           _logger.info("account: {}", gaTestAccount);
           context.assertEquals("basic", gaTestAccount.getKind());
 
           StringResultWrapper resultWrapper =
-              this.aeternityServiceNative.compiler.blockingCompile(
+              this.aeternityService.compiler.blockingCompile(
                   TestConstants.testGABlindAuthContract, null, null);
           String code = resultWrapper.getResult();
           resultWrapper =
-              this.aeternityServiceNative.compiler.blockingEncodeCalldata(
+              this.aeternityService.compiler.blockingEncodeCalldata(
                   TestConstants.testGABlindAuthContract,
                   "init",
                   Arrays.asList(gaTestAccount.getPublicKey()),
@@ -77,14 +76,14 @@ public class TransactionGeneralizedAccountsTest extends BaseTest {
                   .build();
 
           String unsignedTx =
-              aeternityServiceNative
+              aeternityService
                   .transactions
                   .blockingCreateUnsignedTransaction(gaAttachTx)
                   .getResult();
           _logger.info("Unsigned Tx - hash - dryRun: " + unsignedTx);
 
           DryRunTransactionResults dryRunResults =
-              this.aeternityServiceNative.transactions.blockingDryRunTransactions(
+              this.aeternityService.transactions.blockingDryRunTransactions(
                   DryRunRequest.builder()
                       .build()
                       .account(
@@ -109,13 +108,12 @@ public class TransactionGeneralizedAccountsTest extends BaseTest {
                   .ownerId(gaTestAccount.getPublicKey())
                   .build();
           PostTransactionResult result =
-              this.aeternityServiceNative.transactions.blockingPostTransaction(
+              this.aeternityService.transactions.blockingPostTransaction(
                   gaAttachTx, gaAccountKeyPair.getEncodedPrivateKey());
           _logger.info("gaAttachTx result: {}", result);
 
           gaTestAccount =
-              this.aeternityServiceNative.accounts.blockingGetAccount(
-                  gaAccountKeyPair.getAddress());
+              this.aeternityService.accounts.blockingGetAccount(gaAccountKeyPair.getAddress());
           _logger.info("account: {}", gaTestAccount);
           context.assertEquals("generalized", gaTestAccount.getKind());
 
@@ -151,11 +149,11 @@ public class TransactionGeneralizedAccountsTest extends BaseTest {
                   // .tx(encodedInnerTx)
                   .innerTxModel(gaInnerSpendTx)
                   .build();
-          result = this.aeternityServiceNative.transactions.blockingPostTransaction(gaMetaTx);
+          result = this.aeternityService.transactions.blockingPostTransaction(gaMetaTx);
           _logger.info("gaMetaTx result: {}", result);
 
           AccountResult otherRecipientAcc =
-              this.aeternityServiceNative
+              this.aeternityService
                   .accounts
                   .asyncGetAccount(otherRecipient.getAddress())
                   .blockingGet();

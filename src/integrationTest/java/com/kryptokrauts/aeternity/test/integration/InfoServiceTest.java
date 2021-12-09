@@ -11,7 +11,7 @@ public class InfoServiceTest extends BaseTest {
     this.executeTest(
         context,
         t -> {
-          KeyBlockResult keyBlock = this.aeternityServiceNative.info.blockingGetCurrentKeyBlock();
+          KeyBlockResult keyBlock = this.aeternityService.info.blockingGetCurrentKeyBlock();
           context.assertTrue(keyBlock.getHeight().longValue() > 0);
           context.assertFalse(keyBlock.getHeight().longValue() == 0);
           _logger.info("Height:" + keyBlock.getHeight());

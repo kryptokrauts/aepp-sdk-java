@@ -25,7 +25,7 @@ public class TransactionPayingForTest extends BaseTest {
         t -> {
           // funding delegation account for testing
           delegationKeypair = keyPairService.generateKeyPair();
-          AccountResult account = this.aeternityServiceNative.accounts.blockingGetAccount();
+          AccountResult account = this.aeternityService.accounts.blockingGetAccount();
           BigInteger amount = unitConversionService.toSmallestUnit(BigDecimal.valueOf(2));
           BigInteger nonce = account.getNonce().add(ONE);
           SpendTransactionModel spendTx =
@@ -35,10 +35,9 @@ public class TransactionPayingForTest extends BaseTest {
                   .amount(amount)
                   .nonce(nonce)
                   .build();
-          aeternityServiceNative.transactions.blockingPostTransaction(spendTx);
+          aeternityService.transactions.blockingPostTransaction(spendTx);
           AccountResult delegationTestAccount =
-              this.aeternityServiceNative.accounts.blockingGetAccount(
-                  delegationKeypair.getAddress());
+              this.aeternityService.accounts.blockingGetAccount(delegationKeypair.getAddress());
           _logger.info("delegationTestAccount: {}", delegationTestAccount);
           testContext.assertEquals(amount, delegationTestAccount.getBalance());
 
@@ -56,17 +55,16 @@ public class TransactionPayingForTest extends BaseTest {
           PayingForTransactionModel payingForTx =
               PayingForTransactionModel.builder()
                   .payerId(account.getPublicKey())
-                  .nonce(
-                      this.aeternityServiceNative.accounts.blockingGetAccount().getNonce().add(ONE))
+                  .nonce(this.aeternityService.accounts.blockingGetAccount().getNonce().add(ONE))
                   .innerTx(
-                      aeternityServiceNative.transactions.signPayingForInnerTransaction(
+                      aeternityService.transactions.signPayingForInnerTransaction(
                           spendTx, delegationKeypair.getEncodedPrivateKey()))
                   .build();
           PostTransactionResult payingForTxResult =
-              aeternityServiceNative.transactions.blockingPostTransaction(payingForTx);
+              aeternityService.transactions.blockingPostTransaction(payingForTx);
           _logger.info("PayingForTx-Result: {}", payingForTxResult);
           delegationTestAccount =
-              aeternityServiceNative.accounts.blockingGetAccount(delegationKeypair.getAddress());
+              aeternityService.accounts.blockingGetAccount(delegationKeypair.getAddress());
           _logger.info("delegationTestAccount: {}", delegationTestAccount);
           testContext.assertEquals(ZERO, delegationTestAccount.getBalance());
         });
@@ -78,15 +76,14 @@ public class TransactionPayingForTest extends BaseTest {
         testContext,
         t -> {
           delegationKeypair = keyPairService.generateKeyPair();
-          AccountResult account = this.aeternityServiceNative.accounts.blockingGetAccount();
+          AccountResult account = this.aeternityService.accounts.blockingGetAccount();
           PayingForTransactionModel payingForAsInnerTx =
               PayingForTransactionModel.builder()
                   .payerId(account.getPublicKey())
-                  .nonce(
-                      this.aeternityServiceNative.accounts.blockingGetAccount().getNonce().add(ONE))
+                  .nonce(this.aeternityService.accounts.blockingGetAccount().getNonce().add(ONE))
                   .build();
           try {
-            aeternityServiceNative.transactions.signPayingForInnerTransaction(
+            aeternityService.transactions.signPayingForInnerTransaction(
                 payingForAsInnerTx, delegationKeypair.getEncodedPrivateKey());
           } catch (Exception e) {
             testContext.assertEquals(e.getClass(), TransactionCreateException.class);
