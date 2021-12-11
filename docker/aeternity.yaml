@@ -27,7 +27,7 @@ mining:
       edge_bits: 15
 
 fork_management:
-  network_id: local_iris_testnet
+  network_id: ae_devnet
 
 logging:
   level: debug

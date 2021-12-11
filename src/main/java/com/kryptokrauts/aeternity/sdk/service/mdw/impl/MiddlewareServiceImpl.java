@@ -29,7 +29,7 @@ public class MiddlewareServiceImpl implements MiddlewareService {
   @Override
   public NameAuctionsResult blockingGetNameAuctions() {
     return this.blockingGetNameAuctions(
-        AuctionSortBy.EXPIRATION, SortDirection.BACKWARD, BigInteger.ONE, BigInteger.valueOf(1000));
+        AuctionSortBy.EXPIRATION, SortDirection.BACKWARD, BigInteger.ONE, BigInteger.valueOf(100));
   }
 
   @Override
