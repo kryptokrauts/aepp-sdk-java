@@ -53,6 +53,6 @@ nav:
       - Middleware: usage-guides/mdw.md
       - Oracles: usage-guides/oracles.md
       - PayingForTx: usage-guides/payingfortx.md
-  - API Reference: https://www.javadoc.io/doc/com.kryptokrauts/aepp-sdk-java
   - Example applications: example-apps.md
+  - Javadoc: https://www.javadoc.io/doc/com.kryptokrauts/aepp-sdk-java
   - Changelog: changelog.md
