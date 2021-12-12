@@ -1,7 +1,9 @@
 # Project information
 site_name: "aepp-sdk-java"
+site_url: ""
 site_description: |
   The official documentation of the aepp-sdk-java provided by kryptokrauts.com
+use_directory_urls: false
 
 # Repository
 repo_name: 'kryptokrauts/aepp-sdk-java'
@@ -9,12 +11,45 @@ repo_url: 'https://github.com/kryptokrauts/aepp-sdk-java'
 
 # Theme
 theme:
-  name: readthedocs
+  name: material
+  language: en
+  palette:
+    - scheme: default
+      primary: green
+      accent: green
+      toggle:
+        icon: material/weather-night
+        name: Switch to dark mode
+    - scheme: slate
+      primary: green
+      accent: green
+      toggle:
+        icon: material/weather-sunny
+        name: Switch to light mode
+  features:
+    - content.tabs.link
+    - search.highlight
+    - search.share
+    - search.suggest
+  # Don't include MkDocs' JavaScript
+  include_search_page: false
+  search_index_only: true
 
 extra:
   repo_icon: 'github'
 
+markdown_extensions:
+  - pymdownx.highlight
+  - pymdownx.superfences
+
 # Navigation
 nav:
   - Getting Started: index.md
+  - SDK initialization: sdk-initialization.md
+  - Usage Guides:
+      - æternity naming system: usage-guides/aens.md
+      - Contracts: usage-guides/contracts.md
+      - Oracles: usage-guides/oracles.md
+      - PayingForTx: usage-guides/payingfortx.md
+  - API Reference: https://www.javadoc.io/doc/com.kryptokrauts/aepp-sdk-java
   - Changelog: changelog.md
