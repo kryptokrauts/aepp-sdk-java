@@ -35,7 +35,7 @@ Within the `AeternityServiceConfiguration` class, different parameters can be se
 | `targetVM`                                        | the VM to target, since Iris only FATE is supported for new contracts                                                     | [VirtualMachine](https://github.com/kryptokrauts/aepp-sdk-java/blob/master/src/main/java/com/kryptokrauts/aeternity/sdk/constants/VirtualMachine.java) . `FATE` |
 | `nativeMode`                                      | native mode builds transaction model with SDK. set to false to build via API call to node                                 | `true` |
 | `debugDryRun`                                     | use debug dry-run endpoint instead of protected dry-run endpoint                                                          | `false` |
-| `minimalGasPrice`                                 | default gas price to be used in contract related transactions                                                             | `1000000000` |
+| `defaultGasPrice`                                 | default gas price to be used in contract related transactions                                                             | `1000000000` |
 | `waitForTxIncludedInBlockEnabled`                 | wait for tx to be included in a block (only relevant in synchronous functions)                                            | `true` |
 | `numTrialsToWaitForTxIncludedInBlock`             | number of trials to wait for a tx to be included in a block before throwing a `TransactionWaitTimeoutExpiredException`    | `60` |
 | `millisBetweenTrialsToWaitForTxIncludedInBlock`   | milliseconds to wait between trials for checking a tx to be included in a block                                           | `1000` |
