@@ -65,7 +65,7 @@ public class TransactionServiceImpl implements TransactionService {
         .build()
         .asyncGet(
             tx.buildTransaction(externalApi, internalApi)
-                .createUnsignedTransaction(config.isNativeMode(), config.getMinimalGasPrice())
+                .createUnsignedTransaction(config.isNativeMode(), config.getDefaultGasPrice())
                 .map(single -> single.getTx()));
   }
 
@@ -75,7 +75,7 @@ public class TransactionServiceImpl implements TransactionService {
         .build()
         .blockingGet(
             tx.buildTransaction(externalApi, internalApi)
-                .createUnsignedTransaction(config.isNativeMode(), config.getMinimalGasPrice())
+                .createUnsignedTransaction(config.isNativeMode(), config.getDefaultGasPrice())
                 .map(result -> result.getTx()));
   }
 

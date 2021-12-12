@@ -14,7 +14,7 @@ public class AeternityServiceConfiguration extends ServiceConfiguration {
 
   @Default private boolean debugDryRun = false;
 
-  @Default private long minimalGasPrice = BaseConstants.MINIMAL_GAS_PRICE.longValue();
+  @Default private long defaultGasPrice = BaseConstants.MINIMAL_GAS_PRICE.longValue();
 
   @Default private boolean waitForTxIncludedInBlockEnabled = true;
 
