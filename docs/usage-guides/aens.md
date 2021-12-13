@@ -119,7 +119,6 @@ NameUpdateTransactionModel nameUpdateTx =
     NameUpdateTransactionModel.builder()
         .accountId(aeternityService.keyPairAddress) // this account must be owner of the name
         .nameId(AENS.getNameId("userguide.chain")) // get the correct nameId for a name
-        .nameTtl(AENS.MAX_TTL) // extend as long as possible
         .pointers(
             new HashMap<String, String>() {
               {
@@ -149,11 +148,26 @@ PostTransactionResult nameUpdateTxResult = aeternityService
 Note:
 
 - You can set up to 32 pointers in total for each name.
+- The name will be extended for `AENS.MAX_TTL` (180000) by default.
 
 ## 3. Transfer ownership of a name
 In some cases you might want to transfer the ownership of a name to another account. Of course this is also possible and you can do that as follows:
 
-TODO (we have an open issue xD)
+```java
+// we select a random new owner
+KeyPair newOwnerKeyPair = keyPairService.generateKeyPair();
+NameTransferTransactionModel nameTransferTx =
+    NameTransferTransactionModel.builder()
+        .accountId(aeternityService.keyPairAddress) // this account must be owner of the name
+        .nameId(AENS.getNameId("userguide.chain")) // get the correct nameId for a name
+        .recipientId(newOwnerKeyPair.getAddress())
+        .nonce(aeternityService.accounts.blockingGetNextNonce())
+        .build();
+
+PostTransactionResult nameTransferTxResult = aeternityService
+                                                   .transactions
+                                                   .blockingPostTransaction(nameTransferTx);
+```
 
 ## 4. Revoke a name
 In case you want to revoke a name prior to its expiration for whatever reason you can do that as follows:
