@@ -32,9 +32,8 @@ public class NameUpdateTransactionModel extends AbstractTransactionModel<NameUpd
   @Mandatory private BigInteger nonce;
   @Mandatory private String nameId;
   @Default private BigInteger ttl = BigInteger.ZERO;
-
-  private BigInteger nameTtl;
-  private BigInteger clientTtl;
+  @Default private BigInteger nameTtl = AENS.MAX_TTL;
+  @Default private BigInteger clientTtl = BigInteger.ZERO;
 
   @Default private Map<String, String> pointers = new HashMap<>();
 
@@ -96,6 +95,12 @@ public class NameUpdateTransactionModel extends AbstractTransactionModel<NameUpd
         "validateNameUpdateTransaction",
         Arrays.asList("pointers"),
         ValidationUtil.INVALID_STANDARD_POINTER);
+    ValidationUtil.checkParameters(
+        validate -> pointers.size() <= 32,
+        pointers,
+        "validateNameUpdateTransaction",
+        Arrays.asList("pointers"),
+        ValidationUtil.POINTER_LIMIT_EXCEEDED);
   }
 
   @Override
