@@ -2,6 +2,7 @@ package com.kryptokrauts.aeternity.test.integration;
 
 import com.kryptokrauts.aeternity.sdk.constants.AENS;
 import com.kryptokrauts.aeternity.sdk.domain.secret.KeyPair;
+import com.kryptokrauts.aeternity.sdk.exception.InvalidParameterException;
 import com.kryptokrauts.aeternity.sdk.service.account.domain.AccountResult;
 import com.kryptokrauts.aeternity.sdk.service.info.domain.TransactionResult;
 import com.kryptokrauts.aeternity.sdk.service.mdw.domain.NameAuctionsResult;
@@ -15,9 +16,11 @@ import com.kryptokrauts.aeternity.sdk.service.transaction.type.model.SpendTransa
 import com.kryptokrauts.aeternity.sdk.util.CryptoUtils;
 import com.kryptokrauts.aeternity.sdk.util.EncodingUtils;
 import com.kryptokrauts.aeternity.sdk.util.UnitConversionUtil;
+import com.kryptokrauts.aeternity.sdk.util.ValidationUtil;
 import io.vertx.ext.unit.TestContext;
 import java.math.BigInteger;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Random;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
@@ -145,7 +148,6 @@ public class TransactionNameServiceTest extends BaseTest {
                     name, salt, nameEntryResult, nameClaimResult.getTxHash()));
             /** finished creating namespace */
             BigInteger nameTtl = BigInteger.valueOf(10000l);
-            BigInteger clientTtl = BigInteger.valueOf(50l);
 
             KeyPair recipient = keyPairService.generateKeyPair();
             String accountPointer = recipient.getAddress();
@@ -159,9 +161,8 @@ public class TransactionNameServiceTest extends BaseTest {
             NameUpdateTransactionModel nameUpdateTx =
                 NameUpdateTransactionModel.builder()
                     .accountId(keyPair.getAddress())
-                    .nameId(nameEntryResult.getId())
+                    .nameId(AENS.getNameId(name))
                     .nonce(getNextKeypairNonce())
-                    .clientTtl(clientTtl)
                     .nameTtl(nameTtl)
                     .pointers(
                         new HashMap<String, String>() {
@@ -173,6 +174,7 @@ public class TransactionNameServiceTest extends BaseTest {
                             put("arbitrary-account-pointer-key", anotherKeyPair.getAddress());
                             put(
                                 "arbitrary-channel-pointer-key",
+                                // workaround to set a valid channel id
                                 anotherKeyPair.getAddress().replace("ak_", "ch_"));
                             put(
                                 "arbitrary-contract-pointer-key",
@@ -231,6 +233,66 @@ public class TransactionNameServiceTest extends BaseTest {
             _logger.info("Account result for recipient {}", recipientAccount);
             context.assertEquals(aettos, recipientAccount.getBalance());
             _logger.info("--------------------- postUpdateAndSpendTxTest ---------------------");
+          } catch (Throwable e) {
+            context.fail(e);
+          }
+        });
+  }
+
+  @Test
+  public void postUpdateFailsByExceedingPointersLimit(TestContext context) {
+    this.executeTest(
+        context,
+        t -> {
+          try {
+            BigInteger salt = CryptoUtils.generateNamespaceSalt();
+            String name = TestConstants.NAME + random.nextInt() + TestConstants.NAMESPACE;
+            NamePreclaimTransactionModel namePreclaimTx =
+                NamePreclaimTransactionModel.builder()
+                    .accountId(keyPair.getAddress())
+                    .name(name)
+                    .salt(salt)
+                    .nonce(getNextKeypairNonce())
+                    .build();
+
+            PostTransactionResult namePreclaimResult = this.blockingPostTx(namePreclaimTx);
+            _logger.info("NamePreclaimTx hash: " + namePreclaimResult.getTxHash());
+
+            context.assertEquals(
+                namePreclaimResult.getTxHash(),
+                this.aeternityService.transactions.computeTxHash(namePreclaimTx));
+
+            NameClaimTransactionModel nameClaimTx =
+                NameClaimTransactionModel.builder()
+                    .accountId(keyPair.getAddress())
+                    .name(name)
+                    .nameSalt(salt)
+                    .nonce(getNextKeypairNonce())
+                    .build();
+            PostTransactionResult nameClaimResult = this.blockingPostTx(nameClaimTx);
+            _logger.info("NameClaimTx hash: " + nameClaimResult.getTxHash());
+            Map<String, String> pointers = new HashMap<>();
+            // exceed pointer limit
+            for (int i = 0; i < 33; i++) {
+              pointers.put("name" + i, keyPair.getAddress());
+            }
+            NameUpdateTransactionModel nameUpdateTx =
+                NameUpdateTransactionModel.builder()
+                    .accountId(keyPair.getAddress())
+                    .nameId(AENS.getNameId(name))
+                    .nonce(getNextKeypairNonce())
+                    .nameTtl(AENS.MAX_TTL)
+                    .pointers(pointers)
+                    .build();
+            try {
+              this.blockingPostTx(nameUpdateTx);
+              context.fail("expected InvalidParameterException");
+            } catch (InvalidParameterException invalidParameterException) {
+              context.assertTrue(
+                  invalidParameterException
+                      .getMessage()
+                      .contains(ValidationUtil.POINTER_LIMIT_EXCEEDED));
+            }
           } catch (Throwable e) {
             context.fail(e);
           }
