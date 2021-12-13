@@ -19,8 +19,8 @@ The **aepp-sdk-java** is a community developed Java SDK to interact with the æt
 - [changelog](docs/changelog.md)
 
 ## Documentation
-The documentation is hosted on gitbook:
-- https://kryptokrauts.gitbook.io/aepp-sdk-java/
+The documentation placed in the `/docs` folder is generated via MkDocs and served via gh-pages:
+- https://kryptokrauts.github.io/aepp-sdk-java
 
 ## License
 

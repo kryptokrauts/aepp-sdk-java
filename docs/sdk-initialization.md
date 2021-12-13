@@ -2,14 +2,16 @@
 The central access point to all services is made available through the [AeternityService](https://github.com/kryptokrauts/aepp-sdk-java/blob/master/src/main/java/com/kryptokrauts/aeternity/sdk/service/aeternity/impl/AeternityService.java) which can be obtained via the [AeternityServiceFactory](https://github.com/kryptokrauts/aepp-sdk-java/blob/master/src/main/java/com/kryptokrauts/aeternity/sdk/service/aeternity/AeternityServiceFactory.java).
 Necessary parameters to f.e. identify the network to use or the endpoints to act against, are defined via the [AeternityServiceConfiguration](https://github.com/kryptokrauts/aepp-sdk-java/blob/master/src/main/java/com/kryptokrauts/aeternity/sdk/service/aeternity/AeternityServiceConfiguration.java).
 
-## Initialization
+Of course it is also possible to initialize each Service (such as [AccountService](https://github.com/kryptokrauts/aepp-sdk-java/blob/master/src/main/java/com/kryptokrauts/aeternity/sdk/service/account/AccountService.java) or [TransactionService](https://github.com/kryptokrauts/aepp-sdk-java/blob/master/src/main/java/com/kryptokrauts/aeternity/sdk/service/transaction/TransactionService.java)) independently by providing the required `AeternityServiceConfiguration`.
+
+## Initialize `AeternityService`
 The following code-snippet is an example how to initialize the `AeternityService` with a fresh generated KeyPair:
 
 ```java
 KeyPairService keyPairService = new KeyPairServiceFactory().getService();
 KeyPair keyPair = keyPairService.generateKeyPair();
 
-AeternityService aeternityServiceNative =
+AeternityService aeternityService =
         new AeternityServiceFactory()
             .getService(
                 AeternityServiceConfiguration.configure()
@@ -21,7 +23,11 @@ AeternityService aeternityServiceNative =
                     .compile());
 ```
 
-## Configuration
+In many transaction models that you will build for the different transaction types that æternity provides you will need
+to define the id of the sender or the account that performs the transaction.
+You can access the address of the KeyPair configured for the AeternityService easily by calling `aeternityService.keyPairAddress`.
+
+## Service Configuration
 Within the `AeternityServiceConfiguration` class, different parameters can be set:
 
 | **Paramenter**                                    | **Description**                                                                                                           | **Default** |
