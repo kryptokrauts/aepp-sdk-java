@@ -11,6 +11,7 @@ import com.kryptokrauts.aeternity.sdk.service.transaction.domain.PostTransaction
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.model.NameClaimTransactionModel;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.model.NamePreclaimTransactionModel;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.model.NameRevokeTransactionModel;
+import com.kryptokrauts.aeternity.sdk.service.transaction.type.model.NameTransferTransactionModel;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.model.NameUpdateTransactionModel;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.model.SpendTransactionModel;
 import com.kryptokrauts.aeternity.sdk.util.CryptoUtils;
@@ -85,9 +86,7 @@ public class TransactionNameServiceTest extends BaseTest {
             TransactionResult genericSignedTx =
                 this.aeternityService.info.blockingGetTransactionByHash(result.getTxHash());
             context.assertTrue(genericSignedTx.getBlockHeight().intValue() > 0);
-            // NameClaimTx typedTx = (NameClaimTx) genericSignedTx.gett
-            // _logger.info("Successfully claimed aens " +
-            // typedTx.getName());
+            context.assertTrue("NameClaimTx".equals(genericSignedTx.getTxType()));
             _logger.info("--------------------- postNameClaimTxTest ---------------------");
           } catch (Throwable e) {
             context.fail(e);
@@ -310,29 +309,67 @@ public class TransactionNameServiceTest extends BaseTest {
         t -> {
           try {
             _logger.info("--------------------- postRevokeTxTest ---------------------");
-            String nameId = this.aeternityService.names.blockingGetNameId(validName).getId();
+            String revokeTxTestName = "revokeTxTestName.chain";
+            BigInteger salt = CryptoUtils.generateNamespaceSalt();
+            NamePreclaimTransactionModel namePreclaimTx =
+                NamePreclaimTransactionModel.builder()
+                    .accountId(keyPair.getAddress())
+                    .name(revokeTxTestName)
+                    .salt(salt)
+                    .nonce(getNextKeypairNonce())
+                    .build();
+            this.blockingPostTx(namePreclaimTx);
+            NameClaimTransactionModel nameClaimTx =
+                NameClaimTransactionModel.builder()
+                    .accountId(keyPair.getAddress())
+                    .name(revokeTxTestName)
+                    .nameSalt(salt)
+                    .nonce(getNextKeypairNonce())
+                    .build();
+            this.blockingPostTx(nameClaimTx);
 
             NameRevokeTransactionModel nameRevokeTx =
                 NameRevokeTransactionModel.builder()
                     .accountId(keyPair.getAddress())
-                    .nameId(nameId)
+                    .nameId(AENS.getNameId(revokeTxTestName))
                     .nonce(getNextKeypairNonce())
                     .build();
-
             PostTransactionResult nameRevokeResult = this.blockingPostTx(nameRevokeTx);
             _logger.info("NameRevokeTx hash: " + nameRevokeResult.getTxHash());
-
             context.assertEquals(
                 nameRevokeResult.getTxHash(),
                 this.aeternityService.transactions.computeTxHash(nameRevokeTx));
-
-            NameEntryResult result = this.aeternityService.names.blockingGetNameId(validName);
+            NameEntryResult result =
+                this.aeternityService.names.blockingGetNameId(revokeTxTestName);
             context.assertTrue(
                 "{\"reason\":\"Name revoked\"}".contentEquals(result.getRootErrorMessage()));
-
-            _logger.info(String.format("Validated, that namespace %s is revoked", validName));
-
+            _logger.info(
+                String.format("Validated, that namespace %s is revoked", revokeTxTestName));
             _logger.info("--------------------- postRevokeTxTest ---------------------");
+          } catch (Throwable e) {
+            context.fail(e);
+          }
+        });
+  }
+
+  @Test
+  public void postTransferTxTest(TestContext context) {
+    this.executeTest(
+        context,
+        t -> {
+          try {
+            KeyPair newOwnerKeyPair = keyPairService.generateKeyPair();
+            NameTransferTransactionModel nameTransferTx =
+                NameTransferTransactionModel.builder()
+                    .accountId(keyPair.getAddress())
+                    .nameId(AENS.getNameId(validName))
+                    .recipientId(newOwnerKeyPair.getAddress())
+                    .nonce(getNextKeypairNonce())
+                    .build();
+            PostTransactionResult result = this.blockingPostTx(nameTransferTx);
+            _logger.info("NameTransferTx hash: {}", result.getTxHash());
+            NameEntryResult nameEntryResult = aeternityService.names.blockingGetNameId(validName);
+            context.assertEquals(newOwnerKeyPair.getAddress(), nameEntryResult.getOwner());
           } catch (Throwable e) {
             context.fail(e);
           }
