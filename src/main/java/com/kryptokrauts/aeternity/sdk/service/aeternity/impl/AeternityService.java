@@ -55,6 +55,8 @@ public class AeternityService {
 
   public OracleService oracles;
 
+  public String keyPairAddress;
+
   public AeternityService(AeternityServiceConfiguration config) {
     this.config = config;
     this.externalApi = new ExternalApi(new ExternalApiImpl(config.getApiClient()));
@@ -69,5 +71,6 @@ public class AeternityService {
     this.oracles = new OracleServiceImpl(this.config, this.externalApi);
     this.transactions =
         new TransactionServiceImpl(this.config, this.externalApi, this.internalApi, this.info);
+    this.keyPairAddress = config.getKeyPair().getAddress();
   }
 }

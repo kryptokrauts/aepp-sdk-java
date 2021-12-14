@@ -27,6 +27,8 @@ public class ValidationUtil {
 
   public static final String INVALID_STANDARD_POINTER = "Invalid value for a default pointer key.";
 
+  public static final String POINTER_LIMIT_EXCEEDED = "Exceeded the limit of 32 pointers.";
+
   public static final String NAME_FEE_TOO_LOW =
       "The provided nameFee is too low. Minimum '%s' is required.";
 

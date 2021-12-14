@@ -12,6 +12,8 @@ public interface AENS {
 
   BigInteger FEE_MULTIPLIER = new BigInteger("100000000000000");
 
+  BigInteger MAX_TTL = new BigInteger("180000");
+
   BigInteger SMALLEST_FEE = new BigInteger("3").multiply(FEE_MULTIPLIER);
 
   String POINTER_KEY_ACCOUNT = "account_pubkey";
