@@ -58,13 +58,17 @@ public interface TransactionService {
    * convenience function to perform a dry-run for a single tx by providing one of {@link
    * com.kryptokrauts.aeternity.sdk.service.transaction.type.AbstractTransaction}
    *
+   * <p>using the zeroAddress for the dry-run MUST be used if no KeyPair is provided in the {@link
+   * com.kryptokrauts.aeternity.sdk.service.ServiceConfiguration}
+   *
    * @param contractCall the {@link ContractCallTransactionModel}
-   * @param staticReadOnly true to use the zero address for a static contract call, false if account
-   *     in configuration should be used to simulate a stateful tx
+   * @param useZeroAddress true to use the zero address which makes sense for for a non-stateful
+   *     (ready-only) contract call, false if account in configuration should be used to simulate a
+   *     stateful tx
    * @return instance of {@link DryRunTransactionResult}
    */
   DryRunTransactionResult blockingDryRunContractCall(
-      ContractCallTransactionModel contractCall, boolean staticReadOnly);
+      ContractCallTransactionModel contractCall, boolean useZeroAddress);
 
   /**
    * synchronously dry run unsigned transactions to estimate gas (!) please make sure to use
