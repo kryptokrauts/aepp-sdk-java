@@ -317,9 +317,10 @@ public class TransactionContractsTest extends BaseTest {
               aeternityService.info.blockingGetTransactionInfoByHash(createTxResult.getTxHash());
           String contractId = createTxInfoResult.getCallInfo().getContractId();
 
-          AeternityService staticCallService = null;
+          AeternityService readOnlyService = null;
           try {
-            staticCallService =
+            // initializing a service without providing a keyPair for read-only calls only
+            readOnlyService =
                 new AeternityServiceFactory()
                     .getService(
                         AeternityServiceConfiguration.configure()
@@ -342,7 +343,7 @@ public class TransactionContractsTest extends BaseTest {
                   .build();
 
           DryRunTransactionResult dryRunResult =
-              staticCallService.transactions.blockingDryRunContractCall(contractCall, true);
+              readOnlyService.transactions.blockingDryRunContractCall(contractCall, true);
           _logger.info(dryRunResult.toString());
           context.assertEquals("ok", dryRunResult.getResult());
 
