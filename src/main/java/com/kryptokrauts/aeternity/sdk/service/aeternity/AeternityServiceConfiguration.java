@@ -26,8 +26,6 @@ public class AeternityServiceConfiguration extends ServiceConfiguration {
 
   @Default private long millisBetweenTrailsToWaitForConfirmation = 10000l;
 
-  @Default private boolean useZeroAddressAccountForDryRun = true;
-
   @Default private String zeroAddressAccount = BaseConstants.ZERO_ADDRESS_ACCOUNT;
 
   @Default private String zeroAddressAccountAmount = BaseConstants.ZERO_ADDRESS_ACCOUNT_AMOUNT;

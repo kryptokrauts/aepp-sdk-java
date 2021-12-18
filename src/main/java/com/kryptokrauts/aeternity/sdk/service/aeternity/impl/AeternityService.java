@@ -4,6 +4,8 @@ import com.kryptokrauts.aeternity.generated.api.ExternalApiImpl;
 import com.kryptokrauts.aeternity.generated.api.InternalApiImpl;
 import com.kryptokrauts.aeternity.generated.api.rxjava.ExternalApi;
 import com.kryptokrauts.aeternity.generated.api.rxjava.InternalApi;
+import com.kryptokrauts.aeternity.sdk.constants.BaseConstants;
+import com.kryptokrauts.aeternity.sdk.exception.InvalidParameterException;
 import com.kryptokrauts.aeternity.sdk.service.account.AccountService;
 import com.kryptokrauts.aeternity.sdk.service.account.impl.AccountServiceImpl;
 import com.kryptokrauts.aeternity.sdk.service.aeternity.AeternityServiceConfiguration;
@@ -24,11 +26,13 @@ import com.kryptokrauts.mdw.generated.api.rxjava.MiddlewareApi;
 import com.kryptokrauts.sophia.compiler.generated.api.DefaultApiImpl;
 import com.kryptokrauts.sophia.compiler.generated.api.rxjava.DefaultApi;
 import lombok.NonNull;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * the central service to access all provided functions. these are classified into their purpose for
  * better organization
  */
+@Slf4j
 public class AeternityService {
 
   @NonNull protected AeternityServiceConfiguration config;
@@ -55,7 +59,7 @@ public class AeternityService {
 
   public OracleService oracles;
 
-  public String keyPairAddress;
+  public String keyPairAddress = BaseConstants.ZERO_ADDRESS_ACCOUNT;
 
   public AeternityService(AeternityServiceConfiguration config) {
     this.config = config;
@@ -71,6 +75,10 @@ public class AeternityService {
     this.oracles = new OracleServiceImpl(this.config, this.externalApi);
     this.transactions =
         new TransactionServiceImpl(this.config, this.externalApi, this.internalApi, this.info);
-    this.keyPairAddress = config.getKeyPair().getAddress();
+    try {
+      this.keyPairAddress = config.getKeyPair().getAddress();
+    } catch (InvalidParameterException e) {
+      log.warn("No KeyPair provided. The Service cannot be used to sign transactions.");
+    }
   }
 }

@@ -266,9 +266,9 @@ public abstract class BaseTest {
   }
 
   protected ObjectResultWrapper decodeCallResult(
-      String source, String function, String callResult, String callValue) {
+      String source, String function, String type, String value) {
     return this.aeternityService.compiler.blockingDecodeCallResult(
-        source, function, callResult, callValue, null);
+        source, function, type, value, null);
   }
 
   protected <T> T callMethodAndAwaitException(

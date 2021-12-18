@@ -19,20 +19,23 @@ import lombok.ToString;
 @ToString
 public class DryRunRequest extends GenericInputObject<DryRunInput> {
 
-  private String block;
+  private String top;
 
   @NonNull @Default private List<DryRunAccountModel> accounts = new LinkedList<>();
 
   @NonNull @Default private List<DryRunInputItemModel> txInputs = new LinkedList<>();
 
+  @Default private Boolean txEvents = false;
+
   public DryRunInput mapToModel() {
     return new DryRunInput()
-        .top(block)
+        .top(top)
         .txs(txInputs.stream().map(input -> input.toGeneratedModel()).collect(Collectors.toList()))
         .accounts(
             accounts.stream()
                 .map(account -> account.toGeneratedModel())
-                .collect(Collectors.toList()));
+                .collect(Collectors.toList()))
+        .txEvents(txEvents);
   }
 
   @Override
@@ -106,6 +109,11 @@ public class DryRunRequest extends GenericInputObject<DryRunInput> {
                       .build())
               .build());
     }
+    return this;
+  }
+
+  public DryRunRequest txEvents(Boolean txEvents) {
+    this.txEvents = txEvents;
     return this;
   }
 }
