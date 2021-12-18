@@ -3,6 +3,7 @@ package com.kryptokrauts.aeternity.test.integration;
 import com.kryptokrauts.aeternity.sdk.constants.BaseConstants;
 import com.kryptokrauts.aeternity.sdk.constants.Network;
 import com.kryptokrauts.aeternity.sdk.domain.ObjectResultWrapper;
+import com.kryptokrauts.aeternity.sdk.exception.AException;
 import com.kryptokrauts.aeternity.sdk.exception.InvalidParameterException;
 import com.kryptokrauts.aeternity.sdk.exception.TransactionCreateException;
 import com.kryptokrauts.aeternity.sdk.service.aeternity.AeternityServiceConfiguration;
@@ -23,6 +24,7 @@ import javax.naming.ConfigurationException;
 import org.junit.FixMethodOrder;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
 import org.junit.runners.MethodSorters;
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
@@ -355,6 +357,63 @@ public class TransactionContractsTest extends BaseTest {
                   dryRunResult.getContractCallObject().getReturnValue(),
                   null);
           context.assertEquals("Hello, kryptokrauts", resultWrapper.getResult());
+        });
+  }
+
+  @Test
+  public void dryRunFailTest(TestContext context) throws TransactionCreateException {
+    this.executeTest(
+        context,
+        t -> {
+          try {
+            String sourceCode =
+                "@compiler >= 6\ninclude \"String.aes\"\ncontract ChatBot =\n    datatype event = Greeting(string)\n    entrypoint greet(name: string) : string =\n        Chain.event(Greeting(name))\n        String.concat(\"Hello, \", name)";
+            String byteCode =
+                aeternityService.compiler.blockingCompile(sourceCode, null).getResult();
+            context.assertEquals(
+                "cb_+QECRgOgDItCecy4LjX1HPPJyJDbPPSszAMNIR74Sf/AQuUrSfPAuNW4kv4FLNoIADcBd3cMAQBE/BMCAAICAxFlpeAPDwJvgibPDAEADAMdSGVsbG8sIAQDEauIMtH+RNZEHwA3ADcAGg6CPwEDP/5lpeAPAjcBhwE3AXc3AEY2AAAAYQ4AnwGBKqgAJCNem2S/XWUMHZW/mRgT6P3fxzcxrmpAFqv6dEMBAz/+q4gy0QI3And3dzoUAAIAuDwvBBEFLNoIFWdyZWV0EUTWRB8RaW5pdBFlpeAPLUNoYWluLmV2ZW50EauIMtE5LlN0cmluZy5jb25jYXSCLwCFNi4xLjAAvOW1NA==",
+                byteCode);
+
+            ContractCreateTransactionModel contractCreate =
+                ContractCreateTransactionModel.builder()
+                    .callData(BaseConstants.CONTRACT_EMPTY_INIT_CALLDATA)
+                    .contractByteCode(byteCode)
+                    .nonce(aeternityService.accounts.blockingGetNextNonce())
+                    .ownerId(aeternityService.keyPairAddress)
+                    .build();
+
+            PostTransactionResult createTxResult =
+                aeternityService.transactions.blockingPostTransaction(contractCreate);
+            TransactionInfoResult createTxInfoResult =
+                aeternityService.info.blockingGetTransactionInfoByHash(createTxResult.getTxHash());
+            String contractId = createTxInfoResult.getCallInfo().getContractId();
+
+            AeternityService wrongConfigured =
+                new AeternityServiceFactory()
+                    .getService(
+                        AeternityServiceConfiguration.configure()
+                            .baseUrl("http://does-not.exist")
+                            .compile());
+
+            String callData =
+                aeternityService
+                    .compiler
+                    .blockingEncodeCalldata(
+                        sourceCode, "greet", Arrays.asList("\"kryptokrauts\""), null)
+                    .getResult();
+            ContractCallTransactionModel contractCall =
+                ContractCallTransactionModel.builder()
+                    .contractId(contractId)
+                    .callData(callData)
+                    .build();
+
+            Assertions.assertThrows(
+                AException.class,
+                () -> wrongConfigured.transactions.blockingDryRunContractCall(contractCall, true));
+
+          } catch (Throwable e) {
+            context.fail(e);
+          }
         });
   }
 
