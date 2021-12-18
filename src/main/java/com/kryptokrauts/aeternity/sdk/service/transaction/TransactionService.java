@@ -62,10 +62,10 @@ public interface TransactionService {
    * com.kryptokrauts.aeternity.sdk.service.ServiceConfiguration}
    *
    * @param contractCall the {@link ContractCallTransactionModel}
-   * @param useZeroAddress true to use the zero address which makes sense for for a non-stateful
+   * @param useZeroAddress true to use the zero address which makes sense for a non-stateful
    *     (ready-only) contract call, false if account in configuration should be used to simulate a
    *     stateful tx
-   * @return instance of {@link DryRunTransactionResult}
+   * @return instance of {@link DryRunTransactionResult} if call was successful, null otherwise
    */
   DryRunTransactionResult blockingDryRunContractCall(
       ContractCallTransactionModel contractCall, boolean useZeroAddress);

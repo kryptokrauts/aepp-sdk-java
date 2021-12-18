@@ -123,7 +123,10 @@ public class TransactionServiceImpl implements TransactionService {
   @Override
   public PostTransactionResult blockingPostTransaction(
       AbstractTransactionModel<?> tx, String privateKey) throws TransactionCreateException {
-    // ga transactions have inner tx model which for an unsigned tx needs to be created
+    /*
+     * ga transactions have an inner tx model, for which an unsigned tx needs to be
+     * created
+     */
     if (tx.hasInnerTx()) {
       blockingCreateUnsignedTransaction(tx.getInnerTxModel());
     }
@@ -267,11 +270,10 @@ public class TransactionServiceImpl implements TransactionService {
       dryRunResultsSingle =
           this.externalApi.rxProtectedDryRunTxs(request.toGeneratedModel(), false);
     }
-    return DryRunTransactionResults.builder()
-        .build()
-        .blockingGet(dryRunResultsSingle)
-        .getResults()
-        .get(0);
+    return DryRunTransactionResults.builder().build().blockingGet(dryRunResultsSingle).getResults()
+        .stream()
+        .findFirst()
+        .orElse(null);
   }
 
   @Override
