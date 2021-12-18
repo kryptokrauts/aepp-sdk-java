@@ -273,7 +273,8 @@ public class TransactionServiceImpl implements TransactionService {
     return DryRunTransactionResults.builder().build().blockingGet(dryRunResultsSingle).getResults()
         .stream()
         .findFirst()
-        .orElse(null);
+        .orElseThrow(
+            () -> new AException("DryRun call returned no result, please check environment"));
   }
 
   @Override
