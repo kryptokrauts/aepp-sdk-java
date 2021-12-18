@@ -59,7 +59,7 @@ public class ContractCreateTransaction extends AbstractTransaction<ContractCreat
               this.checkZeroAndWriteValue(rlpWriter, model.getTtl());
               this.checkZeroAndWriteValue(rlpWriter, model.getDeposit());
               this.checkZeroAndWriteValue(rlpWriter, model.getAmount());
-              this.checkZeroAndWriteValue(rlpWriter, model.getGas());
+              this.checkZeroAndWriteValue(rlpWriter, model.getGasLimit());
               this.checkZeroAndWriteValue(rlpWriter, model.getGasPrice());
               rlpWriter.writeByteArray(
                   EncodingUtils.decodeCheckWithIdentifier(model.getCallData()));

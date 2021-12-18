@@ -5,6 +5,7 @@ import com.kryptokrauts.aeternity.generated.api.rxjava.InternalApi;
 import com.kryptokrauts.aeternity.generated.model.GAAttachTx;
 import com.kryptokrauts.aeternity.generated.model.Tx;
 import com.kryptokrauts.aeternity.sdk.annotations.Mandatory;
+import com.kryptokrauts.aeternity.sdk.constants.BaseConstants;
 import com.kryptokrauts.aeternity.sdk.constants.VirtualMachine;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.AbstractTransaction;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.impl.GeneralizedAccountsAttachTransaction;
@@ -24,8 +25,8 @@ public class GeneralizedAccountsAttachTransactionModel
   @Mandatory private String authFun;
   @Mandatory private String callData;
   @Mandatory private String code;
-  @Mandatory private BigInteger gas;
-  @Mandatory private BigInteger gasPrice;
+  @Default private BigInteger gasLimit = BaseConstants.CONTRACT_DEFAULT_GAS_LIMIT;
+  @Default private BigInteger gasPrice = BaseConstants.MINIMAL_GAS_PRICE;
   @Mandatory private BigInteger nonce;
   @Mandatory private String ownerId;
   @Default private BigInteger ttl = BigInteger.ZERO;
@@ -39,7 +40,7 @@ public class GeneralizedAccountsAttachTransactionModel
     gaAttachTx.callData(callData);
     gaAttachTx.code(code);
     gaAttachTx.fee(fee);
-    gaAttachTx.gas(gas);
+    gaAttachTx.gas(gasLimit);
     gaAttachTx.gasPrice(gasPrice);
     gaAttachTx.nonce(nonce);
     gaAttachTx.ownerId(ownerId);
@@ -59,7 +60,7 @@ public class GeneralizedAccountsAttachTransactionModel
             .callData(tx.getCallData())
             .code(tx.getCode())
             .fee(tx.getFee())
-            .gas(tx.getGas())
+            .gasLimit(tx.getGas())
             .ownerId(tx.getOwnerId())
             .gasPrice(tx.getGasPrice())
             .ttl(tx.getTtl())

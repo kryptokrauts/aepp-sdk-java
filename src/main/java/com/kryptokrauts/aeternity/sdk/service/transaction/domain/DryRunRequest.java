@@ -100,7 +100,7 @@ public class DryRunRequest extends GenericInputObject<DryRunInput> {
                       .calldata(contractCallModel.getCallData())
                       .caller(contractCallModel.getCallerId())
                       .contract(contractCallModel.getContractId())
-                      .gas(contractCallModel.getGas())
+                      .gas(contractCallModel.getGasLimit())
                       .abiVersion(contractCallModel.getVirtualMachine().getAbiVersion())
                       .nonce(contractCallModel.getNonce())
                       .build())

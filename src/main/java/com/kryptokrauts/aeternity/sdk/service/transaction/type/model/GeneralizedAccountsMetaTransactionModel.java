@@ -24,8 +24,8 @@ public class GeneralizedAccountsMetaTransactionModel extends AbstractTransaction
 
   @Mandatory private String gaId;
   @Mandatory private String authData;
-  @Default private BigInteger gas = BigInteger.valueOf(50000);
-  @Default private BigInteger gasPrice = BigInteger.valueOf(BaseConstants.MINIMAL_GAS_PRICE);
+  @Default private BigInteger gasLimit = BaseConstants.CONTRACT_DEFAULT_GAS_LIMIT;
+  @Default private BigInteger gasPrice = BaseConstants.MINIMAL_GAS_PRICE;
   @Default private VirtualMachine virtualMachine = VirtualMachine.FATE;
   @Mandatory private AbstractTransactionModel<?> innerTxModel;
 
@@ -36,7 +36,7 @@ public class GeneralizedAccountsMetaTransactionModel extends AbstractTransaction
     gaMetaTx.authData(authData);
     gaMetaTx.abiVersion(virtualMachine.getAbiVersion());
     gaMetaTx.fee(fee);
-    gaMetaTx.gas(gas);
+    gaMetaTx.gas(gasLimit);
     gaMetaTx.gasPrice(gasPrice);
     /**
      * we cannot map the inner tx because we need a GenericSignedTx here which cannot be produced
@@ -68,7 +68,7 @@ public class GeneralizedAccountsMetaTransactionModel extends AbstractTransaction
             .gaId(tx.getGaId())
             .authData(tx.getAuthData())
             .fee(tx.getFee())
-            .gas(tx.getGas())
+            .gasLimit(tx.getGas())
             .gasPrice(tx.getGasPrice())
             .virtualMachine(VirtualMachine.getVirtualMachine(tx.getAbiVersion()))
             .innerTxModel(ApiModelMapper.mapToTransactionModel(tx.getTx().getTx()))

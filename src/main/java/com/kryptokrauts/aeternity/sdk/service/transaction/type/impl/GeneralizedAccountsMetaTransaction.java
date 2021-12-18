@@ -48,7 +48,7 @@ public class GeneralizedAccountsMetaTransaction
                   EncodingUtils.decodeCheckWithIdentifier(model.getAuthData()));
               this.checkZeroAndWriteValue(rlpWriter, model.getVirtualMachine().getAbiVersion());
               this.checkZeroAndWriteValue(rlpWriter, model.getFee());
-              this.checkZeroAndWriteValue(rlpWriter, model.getGas());
+              this.checkZeroAndWriteValue(rlpWriter, model.getGasLimit());
               this.checkZeroAndWriteValue(rlpWriter, model.getGasPrice());
               rlpWriter.writeValue(wrapSignedTransactionForGA(this.innerTxRLPEncodedList));
             });

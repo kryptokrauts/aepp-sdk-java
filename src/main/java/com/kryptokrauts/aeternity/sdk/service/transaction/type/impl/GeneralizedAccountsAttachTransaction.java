@@ -54,7 +54,7 @@ public class GeneralizedAccountsAttachTransaction
               this.checkZeroAndWriteValue(rlpWriter, this.calculateVersion());
               this.checkZeroAndWriteValue(rlpWriter, model.getFee());
               this.checkZeroAndWriteValue(rlpWriter, model.getTtl());
-              this.checkZeroAndWriteValue(rlpWriter, model.getGas());
+              this.checkZeroAndWriteValue(rlpWriter, model.getGasLimit());
               this.checkZeroAndWriteValue(rlpWriter, model.getGasPrice());
               rlpWriter.writeByteArray(
                   EncodingUtils.decodeCheckWithIdentifier(model.getCallData()));

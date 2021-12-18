@@ -5,6 +5,7 @@ import com.kryptokrauts.aeternity.generated.api.rxjava.InternalApi;
 import com.kryptokrauts.aeternity.generated.model.ContractCallTx;
 import com.kryptokrauts.aeternity.generated.model.Tx;
 import com.kryptokrauts.aeternity.sdk.annotations.Mandatory;
+import com.kryptokrauts.aeternity.sdk.constants.BaseConstants;
 import com.kryptokrauts.aeternity.sdk.constants.VirtualMachine;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.AbstractTransaction;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.impl.ContractCallTransaction;
@@ -24,8 +25,8 @@ public class ContractCallTransactionModel extends AbstractTransactionModel<Contr
   @Mandatory private String callData;
   @Mandatory private String callerId;
   @Mandatory private String contractId;
-  @Mandatory private BigInteger gas;
-  @Mandatory private BigInteger gasPrice;
+  @Default private BigInteger gasLimit = BaseConstants.CONTRACT_DEFAULT_GAS_LIMIT;
+  @Default private BigInteger gasPrice = BaseConstants.MINIMAL_GAS_PRICE;
   @Mandatory private BigInteger nonce;
   @Default private BigInteger ttl = BigInteger.ZERO;
   @Default private VirtualMachine virtualMachine = VirtualMachine.FATE;
@@ -39,7 +40,7 @@ public class ContractCallTransactionModel extends AbstractTransactionModel<Contr
     contractCallTx.setCallerId(callerId);
     contractCallTx.setContractId(contractId);
     contractCallTx.setFee(fee);
-    contractCallTx.setGas(gas);
+    contractCallTx.setGas(gasLimit);
     contractCallTx.setGasPrice(gasPrice);
     contractCallTx.setNonce(nonce);
     contractCallTx.setTtl(ttl);
@@ -56,7 +57,7 @@ public class ContractCallTransactionModel extends AbstractTransactionModel<Contr
             .callerId(tx.getCallerId())
             .contractId(tx.getContractId())
             .fee(tx.getFee())
-            .gas(tx.getGas())
+            .gasLimit(tx.getGas())
             .gasPrice(tx.getGasPrice())
             .ttl(tx.getTtl())
             .virtualMachine(VirtualMachine.getVirtualMachine(tx.getAbiVersion()))

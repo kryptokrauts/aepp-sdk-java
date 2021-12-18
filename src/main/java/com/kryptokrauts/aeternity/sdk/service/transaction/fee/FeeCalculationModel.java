@@ -15,6 +15,6 @@ public interface FeeCalculationModel {
    * @param transaction the tx-object
    * @return the actual fee
    */
-  public BigInteger calculateFee(
+  BigInteger calculateFee(
       int tx_byte_size, long minimalGasPrice, AbstractTransaction<?> transaction);
 }

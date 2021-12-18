@@ -60,7 +60,7 @@ public abstract class AbstractTransaction<TxModel extends AbstractTransactionMod
    * transaction attributes using the fee calculation model
    *
    * @param nativeMode native or debug mode
-   * @param minimalGasPrice the minimal gas price, which the fee is multiplied with *
+   * @param minimalGasPrice the minimal gas price, which the fee is multiplied with
    * @return a single-wrapped unsignedTx object
    */
   public Single<UnsignedTx> createUnsignedTransaction(boolean nativeMode, long minimalGasPrice) {
