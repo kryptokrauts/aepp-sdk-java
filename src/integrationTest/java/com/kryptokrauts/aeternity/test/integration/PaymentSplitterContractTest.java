@@ -188,24 +188,19 @@ public class PaymentSplitterContractTest extends BaseTest {
                     .getResult();
             _logger.info("Contract ID: " + localDeployedContractId);
 
-            DryRunTransactionResults dryRunResults =
-                this.aeternityService.transactions.blockingDryRunTransactions(
-                    DryRunRequest.builder()
-                        .build()
-                        .account(
-                            DryRunAccountModel.builder().publicKey(keyPair.getAddress()).build())
-                        .transactionInputItem(
-                            ContractCallTransactionModel.builder()
-                                .callData(calldata)
-                                .contractId(localDeployedContractId)
-                                .amount(paymentValue.toBigInteger())
-                                .nonce(getNextKeypairNonce())
-                                .callerId(keyPair.getAddress())
-                                .build()));
+            DryRunTransactionResult dryRunResult =
+                aeternityService.transactions.blockingDryRunContractCall(
+                    ContractCallTransactionModel.builder()
+                        .callData(calldata)
+                        .contractId(localDeployedContractId)
+                        .amount(paymentValue.toBigInteger())
+                        .nonce(getNextKeypairNonce())
+                        .callerId(keyPair.getAddress())
+                        .build(),
+                    false);
 
-            _logger.info("callContractAfterDryRunOnLocalNode: " + dryRunResults.toString());
-            context.assertEquals(1, dryRunResults.getResults().size());
-            DryRunTransactionResult dryRunResult = dryRunResults.getResults().get(0);
+            _logger.info(dryRunResult.toString());
+
             context.assertEquals("ok", dryRunResult.getResult());
 
             ContractCallTransactionModel contractAfterDryRun =
@@ -273,24 +268,17 @@ public class PaymentSplitterContractTest extends BaseTest {
                     .getResult();
             _logger.info("Contract ID: " + localDeployedContractId);
 
-            DryRunTransactionResults dryRunResults =
-                this.aeternityService.transactions.blockingDryRunTransactions(
-                    DryRunRequest.builder()
-                        .build()
-                        .account(
-                            DryRunAccountModel.builder().publicKey(keyPair.getAddress()).build())
-                        .transactionInputItem(
-                            ContractCallTransactionModel.builder()
-                                .callData(calldata)
-                                .contractId(localDeployedContractId)
-                                .amount(paymentValue.toBigInteger())
-                                .nonce(getNextKeypairNonce())
-                                .callerId(keyPair.getAddress())
-                                .build()));
+            DryRunTransactionResult dryRunResult =
+                this.aeternityService.transactions.blockingDryRunContractCall(
+                    ContractCallTransactionModel.builder()
+                        .callData(calldata)
+                        .contractId(localDeployedContractId)
+                        .amount(paymentValue.toBigInteger())
+                        .nonce(getNextKeypairNonce())
+                        .callerId(keyPair.getAddress())
+                        .build(),
+                    true);
 
-            _logger.info("callContractAfterDryRunOnLocalNode: " + dryRunResults.toString());
-            context.assertEquals(1, dryRunResults.getResults().size());
-            DryRunTransactionResult dryRunResult = dryRunResults.getResults().get(0);
             context.assertEquals("ok", dryRunResult.getResult());
 
             Object decodedValue =
@@ -321,24 +309,17 @@ public class PaymentSplitterContractTest extends BaseTest {
                     .getResult();
             _logger.info("Contract ID: " + localDeployedContractId);
 
-            DryRunTransactionResults dryRunResults =
-                this.aeternityService.transactions.blockingDryRunTransactions(
-                    DryRunRequest.builder()
-                        .build()
-                        .account(
-                            DryRunAccountModel.builder().publicKey(keyPair.getAddress()).build())
-                        .transactionInputItem(
-                            ContractCallTransactionModel.builder()
-                                .callData(calldata)
-                                .contractId(localDeployedContractId)
-                                .amount(paymentValue.toBigInteger())
-                                .nonce(getNextKeypairNonce())
-                                .callerId(keyPair.getAddress())
-                                .build()));
+            DryRunTransactionResult dryRunResult =
+                aeternityService.transactions.blockingDryRunContractCall(
+                    ContractCallTransactionModel.builder()
+                        .callData(calldata)
+                        .contractId(localDeployedContractId)
+                        .amount(paymentValue.toBigInteger())
+                        .nonce(getNextKeypairNonce())
+                        .callerId(keyPair.getAddress())
+                        .build(),
+                    true);
 
-            _logger.info("callContractAfterDryRunOnLocalNode: " + dryRunResults.toString());
-            context.assertEquals(1, dryRunResults.getResults().size());
-            DryRunTransactionResult dryRunResult = dryRunResults.getResults().get(0);
             context.assertEquals("ok", dryRunResult.getResult());
 
             Object decodedValue =

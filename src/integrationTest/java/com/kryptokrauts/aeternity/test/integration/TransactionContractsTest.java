@@ -6,6 +6,7 @@ import com.kryptokrauts.aeternity.sdk.domain.ObjectResultWrapper;
 import com.kryptokrauts.aeternity.sdk.exception.InvalidParameterException;
 import com.kryptokrauts.aeternity.sdk.exception.TransactionCreateException;
 import com.kryptokrauts.aeternity.sdk.service.aeternity.AeternityServiceConfiguration;
+import com.kryptokrauts.aeternity.sdk.service.aeternity.AeternityServiceFactory;
 import com.kryptokrauts.aeternity.sdk.service.aeternity.impl.AeternityService;
 import com.kryptokrauts.aeternity.sdk.service.info.domain.TransactionInfoResult;
 import com.kryptokrauts.aeternity.sdk.service.transaction.domain.DryRunAccountModel;
@@ -17,6 +18,8 @@ import com.kryptokrauts.aeternity.sdk.service.transaction.type.model.ContractCal
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.model.ContractCreateTransactionModel;
 import io.vertx.ext.unit.TestContext;
 import java.math.BigInteger;
+import java.util.Arrays;
+import javax.naming.ConfigurationException;
 import org.junit.FixMethodOrder;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -285,6 +288,72 @@ public class TransactionContractsTest extends BaseTest {
           } catch (Throwable e) {
             context.fail(e);
           }
+        });
+  }
+
+  @Test
+  public void chatBotTestContract(TestContext context) {
+    this.executeTest(
+        context,
+        t -> {
+          String sourceCode =
+              "@compiler >= 6\ninclude \"String.aes\"\ncontract ChatBot =\n    datatype event = Greeting(string)\n    entrypoint greet(name: string) : string =\n        Chain.event(Greeting(name))\n        String.concat(\"Hello, \", name)";
+          String byteCode = aeternityService.compiler.blockingCompile(sourceCode, null).getResult();
+          context.assertEquals(
+              "cb_+QECRgOgDItCecy4LjX1HPPJyJDbPPSszAMNIR74Sf/AQuUrSfPAuNW4kv4FLNoIADcBd3cMAQBE/BMCAAICAxFlpeAPDwJvgibPDAEADAMdSGVsbG8sIAQDEauIMtH+RNZEHwA3ADcAGg6CPwEDP/5lpeAPAjcBhwE3AXc3AEY2AAAAYQ4AnwGBKqgAJCNem2S/XWUMHZW/mRgT6P3fxzcxrmpAFqv6dEMBAz/+q4gy0QI3And3dzoUAAIAuDwvBBEFLNoIFWdyZWV0EUTWRB8RaW5pdBFlpeAPLUNoYWluLmV2ZW50EauIMtE5LlN0cmluZy5jb25jYXSCLwCFNi4xLjAAvOW1NA==",
+              byteCode);
+
+          ContractCreateTransactionModel contractCreate =
+              ContractCreateTransactionModel.builder()
+                  .callData(BaseConstants.CONTRACT_EMPTY_INIT_CALLDATA)
+                  .contractByteCode(byteCode)
+                  .nonce(aeternityService.accounts.blockingGetNextNonce())
+                  .ownerId(aeternityService.keyPairAddress)
+                  .build();
+
+          PostTransactionResult createTxResult =
+              aeternityService.transactions.blockingPostTransaction(contractCreate);
+          TransactionInfoResult createTxInfoResult =
+              aeternityService.info.blockingGetTransactionInfoByHash(createTxResult.getTxHash());
+          String contractId = createTxInfoResult.getCallInfo().getContractId();
+
+          AeternityService staticCallService = null;
+          try {
+            staticCallService =
+                new AeternityServiceFactory()
+                    .getService(
+                        AeternityServiceConfiguration.configure()
+                            .baseUrl(getAeternityBaseUrl())
+                            .network(Network.DEVNET)
+                            .compile());
+          } catch (ConfigurationException e) {
+            context.fail("Error loading aeternity base url.");
+          }
+          String callData =
+              aeternityService
+                  .compiler
+                  .blockingEncodeCalldata(
+                      sourceCode, "greet", Arrays.asList("\"kryptokrauts\""), null)
+                  .getResult();
+          ContractCallTransactionModel contractCall =
+              ContractCallTransactionModel.builder()
+                  .contractId(contractId)
+                  .callData(callData)
+                  .build();
+
+          DryRunTransactionResult dryRunResult =
+              staticCallService.transactions.blockingDryRunContractCall(contractCall, true);
+          _logger.info(dryRunResult.toString());
+          context.assertEquals("ok", dryRunResult.getResult());
+
+          ObjectResultWrapper resultWrapper =
+              aeternityService.compiler.blockingDecodeCallResult(
+                  sourceCode,
+                  "greet",
+                  dryRunResult.getContractCallObject().getReturnType(),
+                  dryRunResult.getContractCallObject().getReturnValue(),
+                  null);
+          context.assertEquals("Hello, kryptokrauts", resultWrapper.getResult());
         });
   }
 

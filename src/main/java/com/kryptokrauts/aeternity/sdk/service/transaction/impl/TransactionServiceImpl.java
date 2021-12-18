@@ -20,12 +20,12 @@ import com.kryptokrauts.aeternity.sdk.service.info.domain.TransactionResult;
 import com.kryptokrauts.aeternity.sdk.service.transaction.TransactionService;
 import com.kryptokrauts.aeternity.sdk.service.transaction.domain.CheckTxInPoolResult;
 import com.kryptokrauts.aeternity.sdk.service.transaction.domain.DryRunAccountModel;
-import com.kryptokrauts.aeternity.sdk.service.transaction.domain.DryRunCallRequestModel;
-import com.kryptokrauts.aeternity.sdk.service.transaction.domain.DryRunInputItemModel;
 import com.kryptokrauts.aeternity.sdk.service.transaction.domain.DryRunRequest;
+import com.kryptokrauts.aeternity.sdk.service.transaction.domain.DryRunTransactionResult;
 import com.kryptokrauts.aeternity.sdk.service.transaction.domain.DryRunTransactionResults;
 import com.kryptokrauts.aeternity.sdk.service.transaction.domain.PostTransactionResult;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.model.AbstractTransactionModel;
+import com.kryptokrauts.aeternity.sdk.service.transaction.type.model.ContractCallTransactionModel;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.model.PayingForTransactionModel;
 import com.kryptokrauts.aeternity.sdk.util.ByteUtils;
 import com.kryptokrauts.aeternity.sdk.util.EncodingUtils;
@@ -37,7 +37,6 @@ import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 import lombok.RequiredArgsConstructor;
 import org.apache.tuweni.bytes.Bytes;
@@ -225,70 +224,65 @@ public class TransactionServiceImpl implements TransactionService {
   @Override
   public Single<DryRunTransactionResults> asyncDryRunTransactions(DryRunRequest input) {
     Single<DryRunResults> dryRunResultsSingle;
-    DryRunRequest request = prepareDryRunRequest(input);
     if (config.isDebugDryRun()) {
-      dryRunResultsSingle = this.internalApi.rxDryRunTxs(request.toGeneratedModel(), false);
+      dryRunResultsSingle = this.internalApi.rxDryRunTxs(input.toGeneratedModel(), false);
     } else {
-      dryRunResultsSingle =
-          this.externalApi.rxProtectedDryRunTxs(request.toGeneratedModel(), false);
+      dryRunResultsSingle = this.externalApi.rxProtectedDryRunTxs(input.toGeneratedModel(), false);
     }
     return DryRunTransactionResults.builder().build().asyncGet(dryRunResultsSingle);
   }
 
   @Override
-  public DryRunTransactionResults blockingDryRunTransactions(DryRunRequest input) {
+  public DryRunTransactionResult blockingDryRunContractCall(
+      ContractCallTransactionModel contractCall, boolean staticReadOnly) {
+    DryRunRequest request;
+    if (staticReadOnly) {
+      ContractCallTransactionModel contractCallTransactionModel =
+          contractCall
+              .toBuilder()
+              .callerId(config.getZeroAddressAccount())
+              .nonce(getZeroAddressAccountNonce())
+              .build();
+      _logger.info(contractCallTransactionModel.toString());
+      request =
+          DryRunRequest.builder()
+              .build()
+              .account(
+                  DryRunAccountModel.builder()
+                      .amount(new BigInteger(config.getZeroAddressAccountAmount()))
+                      .publicKey(config.getZeroAddressAccount())
+                      .build())
+              .transactionInputItem(contractCallTransactionModel);
+    } else {
+      request =
+          DryRunRequest.builder()
+              .build()
+              .account(DryRunAccountModel.builder().publicKey(contractCall.getCallerId()).build())
+              .transactionInputItem(contractCall);
+    }
     Single<DryRunResults> dryRunResultsSingle;
-    DryRunRequest request = prepareDryRunRequest(input);
     if (config.isDebugDryRun()) {
       dryRunResultsSingle = this.internalApi.rxDryRunTxs(request.toGeneratedModel(), false);
     } else {
       dryRunResultsSingle =
           this.externalApi.rxProtectedDryRunTxs(request.toGeneratedModel(), false);
     }
-    return DryRunTransactionResults.builder().build().blockingGet(dryRunResultsSingle);
+    return DryRunTransactionResults.builder()
+        .build()
+        .blockingGet(dryRunResultsSingle)
+        .getResults()
+        .get(0);
   }
 
-  // if zero account for dryRun should be used, this method sets the account and amount within the
-  // corresponding fields of the request model but only if there is none already set!
-  private DryRunRequest prepareDryRunRequest(final DryRunRequest request) {
-    if (this.config.isUseZeroAddressAccountForDryRun()) {
-      DryRunRequest useZeroAccountAddressRequest =
-          DryRunRequest.builder()
-              .accounts(
-                  request.getAccounts().stream()
-                      .map(
-                          v -> {
-                            if (v.getPublicKey() != null && v.getPublicKey().trim().length() > 0)
-                              return v;
-                            else
-                              return DryRunAccountModel.builder()
-                                  .publicKey(config.getZeroAddressAccount())
-                                  .amount(new BigInteger(config.getZeroAddressAccountAmount()))
-                                  .build();
-                          })
-                      .collect(Collectors.toList()))
-              .txInputs(
-                  request.getTxInputs().stream()
-                      .map(
-                          t -> {
-                            if ((t.getCallRequest() != null
-                                    && t.getCallRequest().getCaller() != null
-                                    && t.getCallRequest().getCaller().trim().length() > 0)
-                                || t.getTx() != null) return t;
-                            else
-                              return DryRunInputItemModel.builder()
-                                  .callRequest(
-                                      DryRunCallRequestModel.builder()
-                                          .caller(config.getZeroAddressAccount())
-                                          .nonce(getZeroAddressAccountNonce())
-                                          .build())
-                                  .build();
-                          })
-                      .collect(Collectors.toList()))
-              .build();
-      return useZeroAccountAddressRequest;
+  @Override
+  public DryRunTransactionResults blockingDryRunTransactions(DryRunRequest input) {
+    Single<DryRunResults> dryRunResultsSingle;
+    if (config.isDebugDryRun()) {
+      dryRunResultsSingle = this.internalApi.rxDryRunTxs(input.toGeneratedModel(), false);
+    } else {
+      dryRunResultsSingle = this.externalApi.rxProtectedDryRunTxs(input.toGeneratedModel(), false);
     }
-    return request;
+    return DryRunTransactionResults.builder().build().blockingGet(dryRunResultsSingle);
   }
 
   // get zero address accounts nonce, depending on configured network

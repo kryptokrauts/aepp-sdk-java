@@ -5,9 +5,11 @@ import com.kryptokrauts.aeternity.sdk.exception.TransactionCreateException;
 import com.kryptokrauts.aeternity.sdk.service.info.domain.TransactionResult;
 import com.kryptokrauts.aeternity.sdk.service.transaction.domain.CheckTxInPoolResult;
 import com.kryptokrauts.aeternity.sdk.service.transaction.domain.DryRunRequest;
+import com.kryptokrauts.aeternity.sdk.service.transaction.domain.DryRunTransactionResult;
 import com.kryptokrauts.aeternity.sdk.service.transaction.domain.DryRunTransactionResults;
 import com.kryptokrauts.aeternity.sdk.service.transaction.domain.PostTransactionResult;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.model.AbstractTransactionModel;
+import com.kryptokrauts.aeternity.sdk.service.transaction.type.model.ContractCallTransactionModel;
 import io.reactivex.Single;
 import java.util.List;
 
@@ -51,6 +53,18 @@ public interface TransactionService {
    * @return asynchronous result handler (RxJava Single) for {@link DryRunTransactionResults}
    */
   Single<DryRunTransactionResults> asyncDryRunTransactions(DryRunRequest input);
+
+  /**
+   * convenience function to perform a dry-run for a single tx by providing one of {@link
+   * com.kryptokrauts.aeternity.sdk.service.transaction.type.AbstractTransaction}
+   *
+   * @param contractCall the {@link ContractCallTransactionModel}
+   * @param staticReadOnly true to use the zero address for a static contract call, false if account
+   *     in configuration should be used to simulate a stateful tx
+   * @return instance of {@link DryRunTransactionResult}
+   */
+  DryRunTransactionResult blockingDryRunContractCall(
+      ContractCallTransactionModel contractCall, boolean staticReadOnly);
 
   /**
    * synchronously dry run unsigned transactions to estimate gas (!) please make sure to use
