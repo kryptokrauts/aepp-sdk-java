@@ -1,6 +1,7 @@
 package com.kryptokrauts.aeternity.sdk.service.transaction;
 
 import com.kryptokrauts.aeternity.sdk.domain.StringResultWrapper;
+import com.kryptokrauts.aeternity.sdk.exception.AException;
 import com.kryptokrauts.aeternity.sdk.exception.TransactionCreateException;
 import com.kryptokrauts.aeternity.sdk.service.info.domain.TransactionResult;
 import com.kryptokrauts.aeternity.sdk.service.transaction.domain.CheckTxInPoolResult;
@@ -65,7 +66,8 @@ public interface TransactionService {
    * @param useZeroAddress true to use the zero address which makes sense for a non-stateful
    *     (ready-only) contract call, false if account in configuration should be used to simulate a
    *     stateful tx
-   * @return instance of {@link DryRunTransactionResult} if call was successful, null otherwise
+   * @return instance of {@link DryRunTransactionResult} if call was successful, otherwise throws
+   *     {@link AException}
    */
   DryRunTransactionResult blockingDryRunContractCall(
       ContractCallTransactionModel contractCall, boolean useZeroAddress);
