@@ -234,9 +234,9 @@ public class TransactionServiceImpl implements TransactionService {
 
   @Override
   public DryRunTransactionResult blockingDryRunContractCall(
-      ContractCallTransactionModel contractCall, boolean staticReadOnly) {
+      ContractCallTransactionModel contractCall, boolean useZeroAddress) {
     DryRunRequest request;
-    if (staticReadOnly) {
+    if (useZeroAddress) {
       ContractCallTransactionModel contractCallTransactionModel =
           contractCall
               .toBuilder()

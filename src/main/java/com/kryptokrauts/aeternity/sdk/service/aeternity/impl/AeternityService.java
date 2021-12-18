@@ -4,7 +4,6 @@ import com.kryptokrauts.aeternity.generated.api.ExternalApiImpl;
 import com.kryptokrauts.aeternity.generated.api.InternalApiImpl;
 import com.kryptokrauts.aeternity.generated.api.rxjava.ExternalApi;
 import com.kryptokrauts.aeternity.generated.api.rxjava.InternalApi;
-import com.kryptokrauts.aeternity.sdk.constants.BaseConstants;
 import com.kryptokrauts.aeternity.sdk.exception.InvalidParameterException;
 import com.kryptokrauts.aeternity.sdk.service.account.AccountService;
 import com.kryptokrauts.aeternity.sdk.service.account.impl.AccountServiceImpl;
@@ -59,7 +58,7 @@ public class AeternityService {
 
   public OracleService oracles;
 
-  public String keyPairAddress = BaseConstants.ZERO_ADDRESS_ACCOUNT;
+  public String keyPairAddress;
 
   public AeternityService(AeternityServiceConfiguration config) {
     this.config = config;
@@ -78,7 +77,7 @@ public class AeternityService {
     try {
       this.keyPairAddress = config.getKeyPair().getAddress();
     } catch (InvalidParameterException e) {
-      log.warn("No KeyPair provided. The Service cannot be used to sign transactions.");
+      log.info("No KeyPair provided. Initialized AeternityService in read-only mode.");
     }
   }
 }
