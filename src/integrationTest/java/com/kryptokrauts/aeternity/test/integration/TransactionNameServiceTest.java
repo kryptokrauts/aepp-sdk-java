@@ -23,6 +23,7 @@ import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
+import java.util.UUID;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
@@ -309,7 +310,8 @@ public class TransactionNameServiceTest extends BaseTest {
         t -> {
           try {
             _logger.info("--------------------- postRevokeTxTest ---------------------");
-            String revokeTxTestName = "revokeTxTestName.chain";
+            String revokeTxTestName =
+                "revokeTxTestName" + UUID.randomUUID().toString().substring(0, 8) + ".chain";
             BigInteger salt = CryptoUtils.generateNamespaceSalt();
             NamePreclaimTransactionModel namePreclaimTx =
                 NamePreclaimTransactionModel.builder()
