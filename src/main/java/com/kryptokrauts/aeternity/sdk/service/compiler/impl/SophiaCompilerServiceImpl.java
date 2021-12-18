@@ -51,6 +51,12 @@ public final class SophiaCompilerServiceImpl implements CompilerService {
                 .map(calldata -> calldata.getCalldata()));
   }
 
+  @Override
+  public Single<StringResultWrapper> asyncCompile(
+      String contractCode, Map<String, String> fileSystem) {
+    return asyncCompile(contractCode, null, fileSystem);
+  }
+
   private FunctionCallInput buildFunctionCallInput(
       String sourceCode, String function, List<String> arguments, Map<String, String> fileSystem) {
     FunctionCallInput body = new FunctionCallInput();
@@ -153,14 +159,15 @@ public final class SophiaCompilerServiceImpl implements CompilerService {
 
   @Override
   public Single<ACIResult> asyncGenerateACI(
-      String contractCode, String srcFile, Object fileSystem) {
+      String contractCode, String srcFile, Map<String, String> fileSystem) {
     return ACIResult.builder()
         .build()
         .asyncGet(this.compilerApi.rxGenerateACI(buildACIBody(contractCode, srcFile, fileSystem)));
   }
 
   @Override
-  public ACIResult blockingGenerateACI(String contractCode, String srcFile, Object fileSystem) {
+  public ACIResult blockingGenerateACI(
+      String contractCode, String srcFile, Map<String, String> fileSystem) {
     return ACIResult.builder()
         .build()
         .blockingGet(
@@ -183,7 +190,7 @@ public final class SophiaCompilerServiceImpl implements CompilerService {
 
   @Override
   public Single<StringResultWrapper> asyncCompile(
-      String contractCode, String srcFile, Object fileSystem) {
+      String contractCode, String srcFile, Map<String, String> fileSystem) {
     return StringResultWrapper.builder()
         .build()
         .asyncGet(
@@ -193,8 +200,13 @@ public final class SophiaCompilerServiceImpl implements CompilerService {
   }
 
   @Override
+  public StringResultWrapper blockingCompile(String contractCode, Map<String, String> fileSystem) {
+    return blockingCompile(contractCode, null, fileSystem);
+  }
+
+  @Override
   public StringResultWrapper blockingCompile(
-      String contractCode, String srcFile, Object fileSystem) {
+      String contractCode, String srcFile, Map<String, String> fileSystem) {
     return StringResultWrapper.builder()
         .build()
         .blockingGet(

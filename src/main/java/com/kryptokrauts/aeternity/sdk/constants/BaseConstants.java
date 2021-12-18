@@ -17,7 +17,12 @@ public interface BaseConstants {
   long GAS_PER_BYTE = 20;
 
   // https://github.com/aeternity/protocol/blob/master/consensus/consensus.md#common-fields-for-transactions
-  long MINIMAL_GAS_PRICE = 1000000000;
+  BigInteger MINIMAL_GAS_PRICE = BigInteger.valueOf(1000000000);
+
+  BigInteger CONTRACT_DEFAULT_GAS_LIMIT = BigInteger.valueOf(25000);
+
+  // default calldata for empty init function
+  String CONTRACT_EMPTY_INIT_CALLDATA = "cb_KxFE1kQfP4oEp9E=";
 
   // average time between key-blocks in minutes
   long KEY_BLOCK_INTERVAL = 3;

@@ -47,7 +47,7 @@ public class TransactionContractsTest extends BaseTest {
                   .contractByteCode(TestConstants.testContractByteCode)
                   .deposit(deposit)
                   .fee(fee)
-                  .gas(gas)
+                  .gasLimit(gas)
                   .gasPrice(gasPrice)
                   .nonce(getNextKeypairNonce())
                   .ownerId(ownerId)
@@ -163,7 +163,7 @@ public class TransactionContractsTest extends BaseTest {
                 ContractCallTransactionModel.builder()
                     .callData(calldata)
                     .contractId(localDeployedContractId)
-                    .gas(result.getContractCallObject().getGasUsed())
+                    .gasLimit(result.getContractCallObject().getGasUsed())
                     .gasPrice(result.getContractCallObject().getGasPrice())
                     .nonce(getNextKeypairNonce())
                     .callerId(keyPair.getAddress())
@@ -206,18 +206,13 @@ public class TransactionContractsTest extends BaseTest {
   private ContractCallTransactionModel createCallContractModel(
       BigInteger nonce, String calldata, BigInteger gasPrice) {
     String callerId = keyPair.getAddress();
-    BigInteger ttl = BigInteger.ZERO;
-    BigInteger gas = BigInteger.valueOf(1000000);
     ContractCallTransactionModel model =
         ContractCallTransactionModel.builder()
             .callData(calldata)
             .contractId(localDeployedContractId)
-            .gas(gas)
-            .gasPrice(
-                gasPrice != null ? gasPrice : BigInteger.valueOf(BaseConstants.MINIMAL_GAS_PRICE))
+            .gasPrice(gasPrice != null ? gasPrice : BaseConstants.MINIMAL_GAS_PRICE)
             .nonce(nonce)
             .callerId(callerId)
-            .ttl(ttl)
             .virtualMachine(targetVM)
             .build();
     return model;
@@ -228,17 +223,10 @@ public class TransactionContractsTest extends BaseTest {
     this.executeTest(
         context,
         t -> {
-          BigInteger gas = BigInteger.valueOf(1000000);
-          BigInteger gasPrice = BigInteger.valueOf(2000000000);
-
           ContractCreateTransactionModel contractTx =
               ContractCreateTransactionModel.builder()
-                  .amount(ZERO)
                   .callData(TestConstants.testContractCallData)
                   .contractByteCode(TestConstants.testContractByteCode)
-                  .deposit(ZERO)
-                  .gas(gas)
-                  .gasPrice(gasPrice)
                   .nonce(getNextKeypairNonce())
                   .ownerId(keyPair.getAddress())
                   .build();
@@ -317,20 +305,12 @@ public class TransactionContractsTest extends BaseTest {
                 .compile());
 
     String ownerId = keyPair.getAddress();
-    BigInteger amount = BigInteger.ZERO;
-    BigInteger deposit = BigInteger.ZERO;
-    BigInteger gas = BigInteger.valueOf(1000);
-    BigInteger gasPrice = BigInteger.valueOf(1100000000);
     BigInteger nonce = getNextKeypairNonce();
 
     ContractCreateTransactionModel testnetCreateTx =
         ContractCreateTransactionModel.builder()
-            .amount(amount)
             .callData(TestConstants.testContractCallData)
             .contractByteCode(TestConstants.testContractByteCode)
-            .deposit(deposit)
-            .gas(gas)
-            .gasPrice(gasPrice)
             .nonce(nonce)
             .ownerId(ownerId)
             .build();

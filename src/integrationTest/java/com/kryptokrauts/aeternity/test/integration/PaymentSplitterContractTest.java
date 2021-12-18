@@ -1,6 +1,5 @@
 package com.kryptokrauts.aeternity.test.integration;
 
-import com.kryptokrauts.aeternity.sdk.constants.BaseConstants;
 import com.kryptokrauts.aeternity.sdk.domain.secret.KeyPair;
 import com.kryptokrauts.aeternity.sdk.service.info.domain.TransactionInfoResult;
 import com.kryptokrauts.aeternity.sdk.service.keypair.KeyPairServiceFactory;
@@ -90,7 +89,7 @@ public class PaymentSplitterContractTest extends BaseTest {
             String byteCode =
                 this.aeternityService
                     .compiler
-                    .blockingCompile(paymentSplitterSource, null, null)
+                    .blockingCompile(paymentSplitterSource, null)
                     .getResult();
             String callData =
                 this.aeternityService
@@ -105,16 +104,10 @@ public class PaymentSplitterContractTest extends BaseTest {
             _logger.info("contract bytecode: " + byteCode);
             _logger.info("contract calldata: " + callData);
 
-            BigInteger gasPrice = BigInteger.valueOf(BaseConstants.MINIMAL_GAS_PRICE);
-
             ContractCreateTransactionModel contractCreate =
                 ContractCreateTransactionModel.builder()
-                    .amount(ZERO)
                     .callData(callData)
                     .contractByteCode(byteCode)
-                    .deposit(ZERO)
-                    .gas(BigInteger.valueOf(800000))
-                    .gasPrice(gasPrice)
                     .nonce(getNextKeypairNonce())
                     .ownerId(keyPair.getAddress())
                     .build();
@@ -142,7 +135,7 @@ public class PaymentSplitterContractTest extends BaseTest {
             contractCreate =
                 contractCreate
                     .toBuilder()
-                    .gas(dryRunResult.getContractCallObject().getGasUsed())
+                    .gasLimit(dryRunResult.getContractCallObject().getGasUsed())
                     .gasPrice(dryRunResult.getContractCallObject().getGasPrice())
                     .build();
 
@@ -204,9 +197,7 @@ public class PaymentSplitterContractTest extends BaseTest {
                         .transactionInputItem(
                             ContractCallTransactionModel.builder()
                                 .callData(calldata)
-                                .gas(BigInteger.valueOf(1000000))
                                 .contractId(localDeployedContractId)
-                                .gasPrice(BigInteger.valueOf(BaseConstants.MINIMAL_GAS_PRICE))
                                 .amount(paymentValue.toBigInteger())
                                 .nonce(getNextKeypairNonce())
                                 .callerId(keyPair.getAddress())
@@ -221,14 +212,7 @@ public class PaymentSplitterContractTest extends BaseTest {
                 ContractCallTransactionModel.builder()
                     .callData(calldata)
                     .contractId(localDeployedContractId)
-                    .gas(dryRunResult.getContractCallObject().getGasUsed())
-                    /**
-                     * the result delivers the default consensus gasPrice which is to low because
-                     * the tx is not added to the mempool, so we set the minimal gas price manually
-                     *
-                     * <p>.gasPrice(dryRunResult.getContractCallObject().getGasPrice())
-                     */
-                    .gasPrice(BigInteger.valueOf(BaseConstants.MINIMAL_GAS_PRICE))
+                    .gasLimit(dryRunResult.getContractCallObject().getGasUsed())
                     .nonce(getNextKeypairNonce())
                     .callerId(keyPair.getAddress())
                     .amount(paymentValue.toBigInteger())
@@ -298,9 +282,7 @@ public class PaymentSplitterContractTest extends BaseTest {
                         .transactionInputItem(
                             ContractCallTransactionModel.builder()
                                 .callData(calldata)
-                                .gas(BigInteger.valueOf(1000000))
                                 .contractId(localDeployedContractId)
-                                .gasPrice(BigInteger.valueOf(BaseConstants.MINIMAL_GAS_PRICE))
                                 .amount(paymentValue.toBigInteger())
                                 .nonce(getNextKeypairNonce())
                                 .callerId(keyPair.getAddress())
@@ -348,9 +330,7 @@ public class PaymentSplitterContractTest extends BaseTest {
                         .transactionInputItem(
                             ContractCallTransactionModel.builder()
                                 .callData(calldata)
-                                .gas(BigInteger.valueOf(1000000))
                                 .contractId(localDeployedContractId)
-                                .gasPrice(BigInteger.valueOf(BaseConstants.MINIMAL_GAS_PRICE))
                                 .amount(paymentValue.toBigInteger())
                                 .nonce(getNextKeypairNonce())
                                 .callerId(keyPair.getAddress())

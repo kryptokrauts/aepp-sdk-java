@@ -37,11 +37,30 @@ public interface CompilerService {
    * asynchronously gets the contract bytecode for this contractCode
    *
    * @param contractCode the sourcecode of the contract
+   * @param fileSystem map with libraryName and code which is passed to the compiler
+   * @return asynchronous result handler (RxJava Single) for byteCode of the compiled contract
+   */
+  Single<StringResultWrapper> asyncCompile(String contractCode, Map<String, String> fileSystem);
+
+  /**
+   * asynchronously gets the contract bytecode for this contractCode
+   *
+   * @param contractCode the sourcecode of the contract
    * @param srcFile untested compileOpts value: set null
    * @param fileSystem map with libraryName and code which is passed to the compiler
    * @return asynchronous result handler (RxJava Single) for byteCode of the compiled contract
    */
-  Single<StringResultWrapper> asyncCompile(String contractCode, String srcFile, Object fileSystem);
+  Single<StringResultWrapper> asyncCompile(
+      String contractCode, String srcFile, Map<String, String> fileSystem);
+
+  /**
+   * synchronously gets the contract bytecode for this contractCode
+   *
+   * @param contractCode the sourcecode of the contract
+   * @param fileSystem map with libraryName and code which is passed to the compiler
+   * @return byteCode of the compiled contract
+   */
+  StringResultWrapper blockingCompile(String contractCode, Map<String, String> fileSystem);
 
   /**
    * synchronously gets the contract bytecode for this contractCode
@@ -51,7 +70,8 @@ public interface CompilerService {
    * @param fileSystem map with libraryName and code which is passed to the compiler
    * @return byteCode of the compiled contract
    */
-  StringResultWrapper blockingCompile(String contractCode, String srcFile, Object fileSystem);
+  StringResultWrapper blockingCompile(
+      String contractCode, String srcFile, Map<String, String> fileSystem);
 
   /**
    * asynchronously decodes a calldata
@@ -114,7 +134,8 @@ public interface CompilerService {
    * @param fileSystem map with libraryName and code which is passed to the compiler
    * @return asynchronous result handler (RxJava Single) for {@link ACIResult}
    */
-  Single<ACIResult> asyncGenerateACI(String contractCode, String srcFile, Object fileSystem);
+  Single<ACIResult> asyncGenerateACI(
+      String contractCode, String srcFile, Map<String, String> fileSystem);
 
   /**
    * synchronously generates the ACI for this contractCode
@@ -125,5 +146,6 @@ public interface CompilerService {
    * @param fileSystem map with libraryName and code which is passed to the compiler
    * @return result of {@link ACIResult}
    */
-  ACIResult blockingGenerateACI(String contractCode, String srcFile, Object fileSystem);
+  ACIResult blockingGenerateACI(
+      String contractCode, String srcFile, Map<String, String> fileSystem);
 }

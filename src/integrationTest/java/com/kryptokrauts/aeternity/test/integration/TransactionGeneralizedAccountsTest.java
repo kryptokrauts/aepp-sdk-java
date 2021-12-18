@@ -1,6 +1,5 @@
 package com.kryptokrauts.aeternity.test.integration;
 
-import com.kryptokrauts.aeternity.sdk.constants.BaseConstants;
 import com.kryptokrauts.aeternity.sdk.domain.StringResultWrapper;
 import com.kryptokrauts.aeternity.sdk.domain.secret.KeyPair;
 import com.kryptokrauts.aeternity.sdk.service.account.domain.AccountResult;
@@ -34,15 +33,13 @@ public class TransactionGeneralizedAccountsTest extends BaseTest {
         context,
         t -> {
           gaAccountKeyPair = keyPairService.generateKeyPair();
-          AccountResult account = this.aeternityService.accounts.blockingGetAccount();
           BigInteger amount = unitConversionService.toSmallestUnit(BigDecimal.TEN);
-          BigInteger nonce = account.getNonce().add(ONE);
           SpendTransactionModel spendTx =
               SpendTransactionModel.builder()
-                  .sender(account.getPublicKey())
+                  .sender(aeternityService.keyPairAddress)
                   .recipient(gaAccountKeyPair.getAddress())
                   .amount(amount)
-                  .nonce(nonce)
+                  .nonce(aeternityService.accounts.blockingGetNextNonce())
                   .build();
           aeternityService.transactions.blockingPostTransaction(spendTx);
           AccountResult gaTestAccount =
@@ -52,7 +49,7 @@ public class TransactionGeneralizedAccountsTest extends BaseTest {
 
           StringResultWrapper resultWrapper =
               this.aeternityService.compiler.blockingCompile(
-                  TestConstants.testGABlindAuthContract, null, null);
+                  TestConstants.testGABlindAuthContract, null);
           String code = resultWrapper.getResult();
           resultWrapper =
               this.aeternityService.compiler.blockingEncodeCalldata(
@@ -62,15 +59,11 @@ public class TransactionGeneralizedAccountsTest extends BaseTest {
                   Collections.emptyMap());
           String callData = resultWrapper.getResult();
 
-          BigInteger gas = BigInteger.valueOf(800000);
-          BigInteger gasPrice = BigInteger.valueOf(BaseConstants.MINIMAL_GAS_PRICE);
           GeneralizedAccountsAttachTransactionModel gaAttachTx =
               GeneralizedAccountsAttachTransactionModel.builder()
                   .authFun(EncodingUtils.generateAuthFunHash("authorize"))
                   .callData(callData)
                   .code(code)
-                  .gas(gas)
-                  .gasPrice(gasPrice)
                   .nonce(gaTestAccount.getNonce().add(ONE))
                   .ownerId(gaTestAccount.getPublicKey())
                   .build();
@@ -102,7 +95,7 @@ public class TransactionGeneralizedAccountsTest extends BaseTest {
                   .authFun(EncodingUtils.generateAuthFunHash("authorize"))
                   .callData(callData)
                   .code(code)
-                  .gas(dryRunResult.getContractCallObject().getGasUsed())
+                  .gasLimit(dryRunResult.getContractCallObject().getGasUsed())
                   .gasPrice(dryRunResult.getContractCallObject().getGasPrice())
                   .nonce(gaTestAccount.getNonce().add(ONE))
                   .ownerId(gaTestAccount.getPublicKey())

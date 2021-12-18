@@ -5,6 +5,7 @@ import com.kryptokrauts.aeternity.generated.api.rxjava.InternalApi;
 import com.kryptokrauts.aeternity.generated.model.ContractCreateTx;
 import com.kryptokrauts.aeternity.generated.model.Tx;
 import com.kryptokrauts.aeternity.sdk.annotations.Mandatory;
+import com.kryptokrauts.aeternity.sdk.constants.BaseConstants;
 import com.kryptokrauts.aeternity.sdk.constants.VirtualMachine;
 import com.kryptokrauts.aeternity.sdk.exception.InvalidParameterException;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.AbstractTransaction;
@@ -21,12 +22,12 @@ import lombok.experimental.SuperBuilder;
 @ToString
 public class ContractCreateTransactionModel extends AbstractTransactionModel<ContractCreateTx> {
 
-  @Mandatory private BigInteger amount;
+  @Default private BigInteger amount = BigInteger.ZERO;
   @Mandatory private String callData;
   @Mandatory private String contractByteCode;
   @Default BigInteger deposit = BigInteger.ZERO;
-  @Mandatory private BigInteger gas;
-  @Mandatory private BigInteger gasPrice;
+  @Default private BigInteger gasLimit = BaseConstants.CONTRACT_DEFAULT_GAS_LIMIT;
+  @Default private BigInteger gasPrice = BaseConstants.MINIMAL_GAS_PRICE;
   @Mandatory private BigInteger nonce;
   @Mandatory private String ownerId;
   @Default private BigInteger ttl = BigInteger.ZERO;
@@ -41,7 +42,7 @@ public class ContractCreateTransactionModel extends AbstractTransactionModel<Con
     contractCreateTx.setCode(contractByteCode);
     contractCreateTx.setDeposit(deposit);
     contractCreateTx.setFee(fee);
-    contractCreateTx.setGas(gas);
+    contractCreateTx.setGas(gasLimit);
     contractCreateTx.setGasPrice(gasPrice);
     contractCreateTx.setNonce(nonce);
     contractCreateTx.setOwnerId(ownerId);
@@ -60,7 +61,7 @@ public class ContractCreateTransactionModel extends AbstractTransactionModel<Con
             .contractByteCode(tx.getCode())
             .deposit(tx.getDeposit())
             .fee(tx.getFee())
-            .gas(tx.getGas())
+            .gasLimit(tx.getGas())
             .ownerId(tx.getOwnerId())
             .gasPrice(tx.getGasPrice())
             .ttl(tx.getTtl())
