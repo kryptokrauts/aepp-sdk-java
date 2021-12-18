@@ -34,21 +34,79 @@ contract ChatBot =
 ```
 
 ### Compile a contract
+By using the [CompilerService](https://github.com/kryptokrauts/aepp-sdk-java/blob/master/src/main/java/com/kryptokrauts/aeternity/sdk/service/compiler/CompilerService.java)
+you can easily interact with the hosted Sophia http compiler and get the bytecode in return.
 
 ```java
-// TODO simple example for compilation
+String sourceCode = "..."; // use source code of ChatBot contract
+String bytecode = aeternityService.compiler.blockingCompile(sourceCode, null)
+                                           .getResult();
 ```
 
+#### Handle includes
+In case your contract contains custom includes (contracts/interfaces placed in other files) you need to provide a map in the `fileSystem` param with the name of the include as key and the source code of the include as value.
+
 ### Deploy a contract
+When you have the bytecode you are basically ready to deploy the contract. This example contract doesn't expect any param in the `init` method.
+In this case you don't have to use the `CompilerService` to encode the calldata. You can simply use a default constant for the empty calldata.
 
 ```java
-// TODO: Simple example for a deployment.
+// build the tx model with all the required attributes
+ContractCreateTransactionModel contractCreate =
+  ContractCreateTransactionModel.builder()
+      .callData(BaseConstants.CONTRACT_EMPTY_INIT_CALLDATA)
+      .contractByteCode(byteCode)
+      .nonce(aeternityService.accounts.blockingGetNextNonce())
+      .ownerId(aeternityService.keyPairAddress)
+      .build();
+
+// by default this action will wait until the tx is included in a block)
+PostTransactionResult createTxResult =
+  aeternityService.transactions.blockingPostTransaction(contractCreate);
+
+// after the tx is included you can fetch the tx-info to determine the contractId
+TransactionInfoResult createTxInfoResult =
+  aeternityService.info.blockingGetTransactionInfoByHash(createTxResult.getTxHash());
+String contractId = createTxInfoResult.getCallInfo().getContractId();
 ```
 
 ### Call a contract entrypoint
 
 ```java
-// TODO: Simple example for a contract call.
+AeternityService staticCallService =
+    new AeternityServiceFactory()
+        .getService(
+            AeternityServiceConfiguration.configure()
+                .baseUrl(getAeternityBaseUrl())
+                .network(Network.DEVNET)
+                .compile());
+String callData =
+    aeternityService
+        .compiler
+        .blockingEncodeCalldata(
+            // for the params we currently have no mapping, this will be added in a future release
+            // as the contract has no includes we provide "null" for the fileSystem param
+            sourceCode, "greet", Arrays.asList("\"kryptokrauts\""), null)
+        .getResult();
+ContractCallTransactionModel contractCall =
+    ContractCallTransactionModel.builder()
+        .contractId(contractId)
+        .callData(callData)
+        .build();
+
+DryRunTransactionResult dryRunResult =
+    staticCallService.transactions.blockingDryRunContractCall(contractCall, true);
+
+// currently there is no typemapping in place so every callResult will be embedded in an ObjectResultWrapper
+ObjectResultWrapper resultWrapper =
+    aeternityService.compiler.blockingDecodeCallResult(
+        sourceCode,
+        "greet",
+        dryRunResult.getContractCallObject().getReturnType(),
+        dryRunResult.getContractCallObject().getReturnValue(),
+        null);
+
+resultWrapper.getResult(); // "Hello, kryptokrauts"
 ```
 
 ## Additional topics
@@ -56,13 +114,7 @@ contract ChatBot =
 ### Gas estimation
 
 ```java
-// TODO: Explanation & simple example for usage of dry-run
-```
-
-### Contract events
-
-```java
-// TODO: Provide example how to handle events
+// TODO: Explanation & simple example for usage of a stateful dry-run
 ```
 
 ## Plugins
