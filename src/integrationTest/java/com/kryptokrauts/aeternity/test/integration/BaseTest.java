@@ -196,7 +196,8 @@ public abstract class BaseTest {
     PostTransactionResult postTxResponse =
         this.aeternityService.transactions.blockingPostTransaction(tx, privateKey);
     _logger.info("PostTx hash: " + postTxResponse.getTxHash());
-    TransactionResult txValue = waitForTxMined(postTxResponse.getTxHash());
+    TransactionResult txValue =
+        aeternityService.info.blockingGetTransactionByHash(postTxResponse.getTxHash());
     _logger.info(
         String.format(
             "Transaction of type %s is mined at block %s with height %s",
