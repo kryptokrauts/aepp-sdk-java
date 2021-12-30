@@ -6,10 +6,7 @@ import com.kryptokrauts.aeternity.sdk.service.compiler.domain.ACIResult;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.unit.TestContext;
 import java.io.IOException;
-import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
 import java.util.Map;
-import org.apache.commons.io.IOUtils;
 import org.junit.Test;
 
 public class CompilerServiceTest extends BaseTest {
@@ -73,21 +70,10 @@ public class CompilerServiceTest extends BaseTest {
     this.executeTest(
         context,
         t -> {
-          try {
-            final InputStream inputStream =
-                Thread.currentThread()
-                    .getContextClassLoader()
-                    .getResourceAsStream("contracts/PaymentSplitter.aes");
-            String paymentSplitterSource =
-                IOUtils.toString(inputStream, StandardCharsets.UTF_8.toString());
-            ACIResult aci =
-                this.aeternityService.compiler.blockingGenerateACI(
-                    paymentSplitterSource, null, null);
-            _logger.info(aci.getEncodedAci().toString());
-            context.assertEquals(TestConstants.paymentSplitterACI, aci.getEncodedAci().toString());
-          } catch (IOException e) {
-            context.fail(e);
-          }
+          ACIResult aci =
+              this.aeternityService.compiler.blockingGenerateACI(paymentSplitterSource, null, null);
+          _logger.info(aci.getEncodedAci().toString());
+          context.assertEquals(TestConstants.paymentSplitterACI, aci.getEncodedAci().toString());
         });
   }
 }

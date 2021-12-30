@@ -1,0 +1,12 @@
+contract GaBlindAuth =
+    record state = { owner : address }
+
+    entrypoint init(owner' : address) = { owner = owner' }
+
+    stateful entrypoint authorize(r: int) : bool =
+        switch(Auth.tx_hash)
+            None => abort("Not in Auth context")
+            Some(tx_hash) => true
+
+    entrypoint to_sign(h : hash, n : int) : hash =
+        Crypto.blake2b((h, n))

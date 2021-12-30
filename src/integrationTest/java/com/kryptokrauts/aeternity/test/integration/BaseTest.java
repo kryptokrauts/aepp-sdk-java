@@ -15,6 +15,8 @@ import com.kryptokrauts.aeternity.sdk.service.keypair.KeyPairService;
 import com.kryptokrauts.aeternity.sdk.service.keypair.KeyPairServiceFactory;
 import com.kryptokrauts.aeternity.sdk.service.transaction.domain.PostTransactionResult;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.model.AbstractTransactionModel;
+import com.kryptokrauts.aeternity.sdk.service.unit.UnitConversionService;
+import com.kryptokrauts.aeternity.sdk.service.unit.impl.DefaultUnitConversionServiceImpl;
 import io.reactivex.Single;
 import io.reactivex.observers.TestObserver;
 import io.vertx.core.Vertx;
@@ -25,12 +27,16 @@ import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.RunTestOnContext;
 import io.vertx.ext.unit.junit.Timeout;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
+import java.io.IOException;
+import java.io.InputStream;
 import java.math.BigInteger;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 import javax.naming.ConfigurationException;
+import org.apache.commons.io.IOUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -65,6 +71,13 @@ public abstract class BaseTest {
   protected AeternityService aeternityService;
 
   protected KeyPair keyPair;
+
+  protected static String paymentSplitterSource,
+      ethereumSignaturesSource,
+      chatBotSource,
+      gaBlindAuthSource;
+
+  protected UnitConversionService unitConversionService = new DefaultUnitConversionServiceImpl();
 
   @Rule
   public RunTestOnContext rule =
@@ -134,7 +147,7 @@ public abstract class BaseTest {
   }
 
   @BeforeClass
-  public static void startup() throws ConfigurationException {
+  public static void startup() throws ConfigurationException, IOException {
     _logger.info(
         String.format(
             "--------------------------- %s ---------------------------",
@@ -144,6 +157,10 @@ public abstract class BaseTest {
     _logger.info(String.format("%s: %s", MDW_BASE_URL, getMdwBaseUrl()));
     _logger.info(
         "-----------------------------------------------------------------------------------");
+    paymentSplitterSource = getContractSourceCode("PaymentSplitter.aes");
+    ethereumSignaturesSource = getContractSourceCode("EthereumSignatures.aes");
+    chatBotSource = getContractSourceCode("ChatBot.aes");
+    gaBlindAuthSource = getContractSourceCode("GaBlindAuth.aes");
   }
 
   protected BigInteger getNextKeypairNonce() {
@@ -329,5 +346,11 @@ public abstract class BaseTest {
             context.fail(result.cause());
           }
         });
+  }
+
+  private static String getContractSourceCode(String filename) throws IOException {
+    final InputStream inputStream =
+        Thread.currentThread().getContextClassLoader().getResourceAsStream("contracts/" + filename);
+    return IOUtils.toString(inputStream, StandardCharsets.UTF_8.toString());
   }
 }

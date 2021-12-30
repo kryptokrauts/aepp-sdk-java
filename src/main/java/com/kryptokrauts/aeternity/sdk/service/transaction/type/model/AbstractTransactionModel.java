@@ -9,6 +9,7 @@ import java.lang.reflect.Field;
 import java.math.BigInteger;
 import java.util.function.Function;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 import lombok.extern.slf4j.Slf4j;
@@ -16,6 +17,7 @@ import lombok.extern.slf4j.Slf4j;
 @Getter
 @Setter
 @SuperBuilder(toBuilder = true)
+@NoArgsConstructor
 @Slf4j
 public abstract class AbstractTransactionModel<GeneratedTxModel> {
 

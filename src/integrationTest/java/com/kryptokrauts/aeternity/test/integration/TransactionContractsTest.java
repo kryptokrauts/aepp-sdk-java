@@ -14,6 +14,7 @@ import com.kryptokrauts.aeternity.sdk.service.aeternity.AeternityServiceConfigur
 import com.kryptokrauts.aeternity.sdk.service.aeternity.AeternityServiceFactory;
 import com.kryptokrauts.aeternity.sdk.service.aeternity.impl.AeternityService;
 import com.kryptokrauts.aeternity.sdk.service.info.domain.TransactionInfoResult;
+import com.kryptokrauts.aeternity.sdk.service.transaction.domain.ContractTxResult;
 import com.kryptokrauts.aeternity.sdk.service.transaction.domain.DryRunAccountModel;
 import com.kryptokrauts.aeternity.sdk.service.transaction.domain.DryRunRequest;
 import com.kryptokrauts.aeternity.sdk.service.transaction.domain.DryRunTransactionResult;
@@ -95,8 +96,7 @@ public class TransactionContractsTest extends BaseTest {
 
           try {
             aeternityService.transactions.blockingCreateUnsignedTransaction(contractTx).getResult();
-          } catch (Exception e) {
-            context.assertEquals(e.getClass().getName(), InvalidParameterException.class.getName());
+          } catch (InvalidParameterException e) {
             context.assertTrue(
                 e.getMessage()
                     .contains(
@@ -331,27 +331,9 @@ public class TransactionContractsTest extends BaseTest {
     this.executeTest(
         context,
         t -> {
-          String sourceCode =
-              "@compiler >= 6\ninclude \"String.aes\"\ncontract ChatBot =\n    datatype event = Greeting(string)\n    entrypoint greet(name: string) : string =\n        Chain.event(Greeting(name))\n        String.concat(\"Hello, \", name)";
-          String byteCode = aeternityService.compiler.blockingCompile(sourceCode, null).getResult();
-          context.assertEquals(
-              "cb_+QECRgOgDItCecy4LjX1HPPJyJDbPPSszAMNIR74Sf/AQuUrSfPAuNW4kv4FLNoIADcBd3cMAQBE/BMCAAICAxFlpeAPDwJvgibPDAEADAMdSGVsbG8sIAQDEauIMtH+RNZEHwA3ADcAGg6CPwEDP/5lpeAPAjcBhwE3AXc3AEY2AAAAYQ4AnwGBKqgAJCNem2S/XWUMHZW/mRgT6P3fxzcxrmpAFqv6dEMBAz/+q4gy0QI3And3dzoUAAIAuDwvBBEFLNoIFWdyZWV0EUTWRB8RaW5pdBFlpeAPLUNoYWluLmV2ZW50EauIMtE5LlN0cmluZy5jb25jYXSCLwCFNi4xLjAAvOW1NA==",
-              byteCode);
-
-          ContractCreateTransactionModel contractCreate =
-              ContractCreateTransactionModel.builder()
-                  .callData(BaseConstants.CONTRACT_EMPTY_INIT_CALLDATA)
-                  .contractByteCode(byteCode)
-                  .nonce(aeternityService.accounts.blockingGetNextNonce())
-                  .ownerId(aeternityService.keyPairAddress)
-                  .build();
-
-          PostTransactionResult createTxResult =
-              aeternityService.transactions.blockingPostTransaction(contractCreate);
-          TransactionInfoResult createTxInfoResult =
-              aeternityService.info.blockingGetTransactionInfoByHash(createTxResult.getTxHash());
-          String contractId = createTxInfoResult.getCallInfo().getContractId();
-
+          ContractTxResult contractTxResult =
+              aeternityService.transactions.blockingContractCreate(null, null, chatBotSource, null);
+          String contractId = contractTxResult.getCallResult().getContractId();
           AeternityService readOnlyService = null;
           try {
             // initializing a service without providing a keyPair for read-only calls only
@@ -367,7 +349,11 @@ public class TransactionContractsTest extends BaseTest {
           }
           Object decodedResult =
               readOnlyService.transactions.blockingReadOnlyContractCall(
-                  sourceCode, null, contractId, "greet", List.of(new SophiaString("kryptokrauts")));
+                  contractId,
+                  "greet",
+                  List.of(new SophiaString("kryptokrauts")),
+                  chatBotSource,
+                  null);
           context.assertEquals("Hello, kryptokrauts", decodedResult);
         });
   }
@@ -378,27 +364,10 @@ public class TransactionContractsTest extends BaseTest {
         context,
         t -> {
           try {
-            String sourceCode =
-                "@compiler >= 6\ninclude \"String.aes\"\ncontract ChatBot =\n    datatype event = Greeting(string)\n    entrypoint greet(name: string) : string =\n        Chain.event(Greeting(name))\n        String.concat(\"Hello, \", name)";
-            String byteCode =
-                aeternityService.compiler.blockingCompile(sourceCode, null).getResult();
-            context.assertEquals(
-                "cb_+QECRgOgDItCecy4LjX1HPPJyJDbPPSszAMNIR74Sf/AQuUrSfPAuNW4kv4FLNoIADcBd3cMAQBE/BMCAAICAxFlpeAPDwJvgibPDAEADAMdSGVsbG8sIAQDEauIMtH+RNZEHwA3ADcAGg6CPwEDP/5lpeAPAjcBhwE3AXc3AEY2AAAAYQ4AnwGBKqgAJCNem2S/XWUMHZW/mRgT6P3fxzcxrmpAFqv6dEMBAz/+q4gy0QI3And3dzoUAAIAuDwvBBEFLNoIFWdyZWV0EUTWRB8RaW5pdBFlpeAPLUNoYWluLmV2ZW50EauIMtE5LlN0cmluZy5jb25jYXSCLwCFNi4xLjAAvOW1NA==",
-                byteCode);
-
-            ContractCreateTransactionModel contractCreate =
-                ContractCreateTransactionModel.builder()
-                    .callData(BaseConstants.CONTRACT_EMPTY_INIT_CALLDATA)
-                    .contractByteCode(byteCode)
-                    .nonce(aeternityService.accounts.blockingGetNextNonce())
-                    .ownerId(aeternityService.keyPairAddress)
-                    .build();
-
-            PostTransactionResult createTxResult =
-                aeternityService.transactions.blockingPostTransaction(contractCreate);
-            TransactionInfoResult createTxInfoResult =
-                aeternityService.info.blockingGetTransactionInfoByHash(createTxResult.getTxHash());
-            String contractId = createTxInfoResult.getCallInfo().getContractId();
+            ContractTxResult contractTxResult =
+                aeternityService.transactions.blockingContractCreate(
+                    null, null, chatBotSource, null);
+            String contractId = contractTxResult.getCallResult().getContractId();
 
             AeternityService wrongConfigured =
                 new AeternityServiceFactory()
@@ -411,7 +380,7 @@ public class TransactionContractsTest extends BaseTest {
                 aeternityService
                     .compiler
                     .blockingEncodeCalldata(
-                        sourceCode,
+                        chatBotSource,
                         "greet",
                         SophiaTypeTransformer.toCompilerInput(
                             List.of(new SophiaString("kryptokrauts"))),
@@ -425,7 +394,7 @@ public class TransactionContractsTest extends BaseTest {
 
             Assertions.assertThrows(
                 AException.class,
-                () -> wrongConfigured.transactions.blockingDryRunContractCall(contractCall, true));
+                () -> wrongConfigured.transactions.blockingDryRunContractTx(contractCall, true));
 
           } catch (Throwable e) {
             context.fail(e);
@@ -438,9 +407,8 @@ public class TransactionContractsTest extends BaseTest {
     this.executeTest(
         context,
         t -> {
-          String sourceCode =
-              "@compiler >= 6\n\ninclude \"String.aes\"\n\ncontract EthereumSignatures =\n\n    entrypoint keccak256(msg: string) : hash =\n        String.sha3(msg)\n\n    entrypoint ethereum_prefixed_hash(msg: string) : hash =\n        let prefixed_msg = String.concat(\"\\x19Ethereum Signed Message:\\n\", String.concat(Int.to_str(String.length(msg)), msg))\n        String.sha3(prefixed_msg)\n\n    entrypoint ecrecover_secp256k1(msg: hash, sig : bytes(65)) : option(bytes(20)) =\n        Crypto.ecrecover_secp256k1(msg, sig)";
-          String byteCode = aeternityService.compiler.blockingCompile(sourceCode, null).getResult();
+          String byteCode =
+              aeternityService.compiler.blockingCompile(ethereumSignaturesSource, null).getResult();
           ContractCreateTransactionModel contractCreate =
               ContractCreateTransactionModel.builder()
                   .callData(BaseConstants.CONTRACT_EMPTY_INIT_CALLDATA)
@@ -458,11 +426,11 @@ public class TransactionContractsTest extends BaseTest {
 
           Object decodedResult =
               aeternityService.transactions.blockingReadOnlyContractCall(
-                  sourceCode,
-                  null,
                   contractId,
                   "ethereum_prefixed_hash",
-                  List.of(sophiaTestString));
+                  List.of(sophiaTestString),
+                  ethereumSignaturesSource,
+                  null);
 
           SophiaHash ethereumPrefixedHashFromContract = new SophiaHash(decodedResult.toString());
           byte[] ethereumPrefixedHash = web3jKeccak256("test", true);
@@ -486,11 +454,11 @@ public class TransactionContractsTest extends BaseTest {
 
           decodedResult =
               aeternityService.transactions.blockingReadOnlyContractCall(
-                  sourceCode,
-                  null,
                   contractId,
                   "ecrecover_secp256k1",
-                  List.of(ethereumPrefixedHashFromContract, sophiaBytes65SignatureWithPrefix));
+                  List.of(ethereumPrefixedHashFromContract, sophiaBytes65SignatureWithPrefix),
+                  ethereumSignaturesSource,
+                  null);
 
           String sophiaEcrecoverResult = decodedResult.toString();
           _logger.info(sophiaEcrecoverResult);
@@ -498,7 +466,11 @@ public class TransactionContractsTest extends BaseTest {
 
           decodedResult =
               aeternityService.transactions.blockingReadOnlyContractCall(
-                  sourceCode, null, contractId, "keccak256", List.of(sophiaTestString));
+                  contractId,
+                  "keccak256",
+                  List.of(sophiaTestString),
+                  ethereumSignaturesSource,
+                  null);
           SophiaHash hashFromContract = new SophiaHash(decodedResult.toString());
           byte[] hashedMessage = web3jKeccak256("test", false);
           context.assertEquals(
@@ -512,11 +484,11 @@ public class TransactionContractsTest extends BaseTest {
 
           decodedResult =
               aeternityService.transactions.blockingReadOnlyContractCall(
-                  sourceCode,
-                  null,
                   contractId,
                   "ecrecover_secp256k1",
-                  List.of(hashFromContract, sophiaBytes65Signature));
+                  List.of(hashFromContract, sophiaBytes65Signature),
+                  ethereumSignaturesSource,
+                  null);
 
           sophiaEcrecoverResult = decodedResult.toString();
           _logger.info(sophiaEcrecoverResult);

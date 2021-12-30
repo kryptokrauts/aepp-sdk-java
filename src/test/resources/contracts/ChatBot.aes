@@ -1,0 +1,10 @@
+@compiler >= 6
+
+include "String.aes"
+
+contract ChatBot =
+    datatype event = Greeting(string)
+
+    entrypoint greet(name: string) : string =
+        Chain.event(Greeting(name))
+        String.concat("Hello, ", name)

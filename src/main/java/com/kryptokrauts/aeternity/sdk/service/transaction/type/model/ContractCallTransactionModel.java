@@ -31,6 +31,26 @@ public class ContractCallTransactionModel extends AbstractTransactionModel<Contr
   @Default private BigInteger ttl = BigInteger.ZERO;
   @Default private VirtualMachine virtualMachine = VirtualMachine.FATE;
 
+  public ContractCallTransactionModel(
+      String contractId,
+      String callData,
+      String callerId,
+      BigInteger amount,
+      BigInteger nonce,
+      BigInteger gasLimit,
+      BigInteger gasPrice,
+      BigInteger ttl) {
+    this.contractId = contractId;
+    this.callData = callData;
+    this.callerId = callerId;
+    this.amount = amount != null ? amount : BigInteger.ZERO;
+    this.nonce = nonce;
+    this.gasLimit = gasLimit != null ? gasLimit : BaseConstants.CONTRACT_DEFAULT_GAS_LIMIT;
+    this.gasPrice = gasPrice != null ? gasPrice : BaseConstants.MINIMAL_GAS_PRICE;
+    this.ttl = ttl != null ? ttl : BigInteger.ZERO;
+    this.virtualMachine = VirtualMachine.FATE;
+  }
+
   @Override
   public ContractCallTx toApiModel() {
     ContractCallTx contractCallTx = new ContractCallTx();
