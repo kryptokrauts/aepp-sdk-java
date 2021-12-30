@@ -73,7 +73,8 @@ public class AeternityService {
     this.names = new NameServiceImpl(this.config, this.externalApi);
     this.oracles = new OracleServiceImpl(this.config, this.externalApi);
     this.transactions =
-        new TransactionServiceImpl(this.config, this.externalApi, this.internalApi, this.info);
+        new TransactionServiceImpl(
+            this.config, this.externalApi, this.internalApi, this.info, this.compiler);
     try {
       this.keyPairAddress = config.getKeyPair().getAddress();
     } catch (InvalidParameterException e) {

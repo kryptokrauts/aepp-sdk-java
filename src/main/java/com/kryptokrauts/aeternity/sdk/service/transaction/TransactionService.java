@@ -13,6 +13,7 @@ import com.kryptokrauts.aeternity.sdk.service.transaction.type.model.AbstractTra
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.model.ContractCallTransactionModel;
 import io.reactivex.Single;
 import java.util.List;
+import java.util.Map;
 
 public interface TransactionService {
 
@@ -80,6 +81,26 @@ public interface TransactionService {
    * @return instance of {@link DryRunTransactionResults}
    */
   DryRunTransactionResults blockingDryRunTransactions(DryRunRequest input);
+
+  /**
+   * convenience method to perform a read-only contract call and return the decoded call result.
+   * performs following steps under the hood: 1. encode calldata via compiler, 2. dry-run the
+   * contract call via node, 3. decode result calldata via compiler
+   *
+   * @param sourceCode the source code of the contract
+   * @param filesystem the includes map for the contract (key = include-name, value = source code of
+   *     the include)
+   * @param contractId the id of the contract (ct_...)
+   * @param entrypoint the name of the entrypoint
+   * @param params the list of params
+   * @return the decoded rawResult as String
+   */
+  Object blockingReadOnlyContractCall(
+      String sourceCode,
+      Map<String, String> filesystem,
+      String contractId,
+      String entrypoint,
+      List<Object> params);
 
   /**
    * asynchronously post a transaction for given model

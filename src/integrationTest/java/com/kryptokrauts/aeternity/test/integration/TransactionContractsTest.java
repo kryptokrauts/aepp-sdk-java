@@ -3,6 +3,10 @@ package com.kryptokrauts.aeternity.test.integration;
 import com.kryptokrauts.aeternity.sdk.constants.BaseConstants;
 import com.kryptokrauts.aeternity.sdk.constants.Network;
 import com.kryptokrauts.aeternity.sdk.domain.ObjectResultWrapper;
+import com.kryptokrauts.aeternity.sdk.domain.sophia.SophiaBytes;
+import com.kryptokrauts.aeternity.sdk.domain.sophia.SophiaHash;
+import com.kryptokrauts.aeternity.sdk.domain.sophia.SophiaString;
+import com.kryptokrauts.aeternity.sdk.domain.sophia.SophiaTypeTransformer;
 import com.kryptokrauts.aeternity.sdk.exception.AException;
 import com.kryptokrauts.aeternity.sdk.exception.InvalidParameterException;
 import com.kryptokrauts.aeternity.sdk.exception.TransactionCreateException;
@@ -19,18 +23,47 @@ import com.kryptokrauts.aeternity.sdk.service.transaction.type.model.ContractCal
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.model.ContractCreateTransactionModel;
 import io.vertx.ext.unit.TestContext;
 import java.math.BigInteger;
-import java.util.Arrays;
+import java.nio.charset.StandardCharsets;
+import java.util.List;
 import javax.naming.ConfigurationException;
+import org.bouncycastle.util.encoders.Hex;
 import org.junit.FixMethodOrder;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.jupiter.api.Assertions;
 import org.junit.runners.MethodSorters;
+import org.web3j.crypto.Credentials;
+import org.web3j.crypto.ECKeyPair;
+import org.web3j.crypto.Hash;
+import org.web3j.crypto.Sign;
+import org.web3j.crypto.Sign.SignatureData;
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class TransactionContractsTest extends BaseTest {
 
   static String localDeployedContractId;
+
+  private byte[] web3jSignMessage(byte[] hashedMessage, ECKeyPair keyPair) {
+    SignatureData signatureData = Sign.signMessage(hashedMessage, keyPair, false);
+    byte[] signature = new byte[65];
+
+    // note FATE/Sophia requires the recovery identifier "V" to be placed as first byte in the
+    // signature in order to recover correctly via "ecrecover_secp256k1"
+    System.arraycopy(signatureData.getV(), 0, signature, 0, 1);
+    System.arraycopy(signatureData.getR(), 0, signature, 1, 32);
+    System.arraycopy(signatureData.getS(), 0, signature, 33, 32);
+    return signature;
+  }
+
+  private byte[] web3jKeccak256(String msg, boolean ethereumPrefix) {
+    byte[] hashedMessage;
+    if (ethereumPrefix) {
+      hashedMessage = Sign.getEthereumMessageHash(msg.getBytes(StandardCharsets.UTF_8));
+    } else {
+      hashedMessage = Hash.sha3(msg.getBytes(StandardCharsets.UTF_8));
+    }
+    return hashedMessage;
+  }
 
   @Test
   public void buildCreateContractTransactionFailTest(TestContext context) {
@@ -332,31 +365,10 @@ public class TransactionContractsTest extends BaseTest {
           } catch (ConfigurationException e) {
             context.fail("Error loading aeternity base url.");
           }
-          String callData =
-              aeternityService
-                  .compiler
-                  .blockingEncodeCalldata(
-                      sourceCode, "greet", Arrays.asList("\"kryptokrauts\""), null)
-                  .getResult();
-          ContractCallTransactionModel contractCall =
-              ContractCallTransactionModel.builder()
-                  .contractId(contractId)
-                  .callData(callData)
-                  .build();
-
-          DryRunTransactionResult dryRunResult =
-              readOnlyService.transactions.blockingDryRunContractCall(contractCall, true);
-          _logger.info(dryRunResult.toString());
-          context.assertEquals("ok", dryRunResult.getResult());
-
-          ObjectResultWrapper resultWrapper =
-              aeternityService.compiler.blockingDecodeCallResult(
-                  sourceCode,
-                  "greet",
-                  dryRunResult.getContractCallObject().getReturnType(),
-                  dryRunResult.getContractCallObject().getReturnValue(),
-                  null);
-          context.assertEquals("Hello, kryptokrauts", resultWrapper.getResult());
+          Object decodedResult =
+              readOnlyService.transactions.blockingReadOnlyContractCall(
+                  sourceCode, null, contractId, "greet", List.of(new SophiaString("kryptokrauts")));
+          context.assertEquals("Hello, kryptokrauts", decodedResult);
         });
   }
 
@@ -399,7 +411,11 @@ public class TransactionContractsTest extends BaseTest {
                 aeternityService
                     .compiler
                     .blockingEncodeCalldata(
-                        sourceCode, "greet", Arrays.asList("\"kryptokrauts\""), null)
+                        sourceCode,
+                        "greet",
+                        SophiaTypeTransformer.toCompilerInput(
+                            List.of(new SophiaString("kryptokrauts"))),
+                        null)
                     .getResult();
             ContractCallTransactionModel contractCall =
                 ContractCallTransactionModel.builder()
@@ -414,6 +430,97 @@ public class TransactionContractsTest extends BaseTest {
           } catch (Throwable e) {
             context.fail(e);
           }
+        });
+  }
+
+  @Test
+  public void ethereumSignatureTest(TestContext context) {
+    this.executeTest(
+        context,
+        t -> {
+          String sourceCode =
+              "@compiler >= 6\n\ninclude \"String.aes\"\n\ncontract EthereumSignatures =\n\n    entrypoint keccak256(msg: string) : hash =\n        String.sha3(msg)\n\n    entrypoint ethereum_prefixed_hash(msg: string) : hash =\n        let prefixed_msg = String.concat(\"\\x19Ethereum Signed Message:\\n\", String.concat(Int.to_str(String.length(msg)), msg))\n        String.sha3(prefixed_msg)\n\n    entrypoint ecrecover_secp256k1(msg: hash, sig : bytes(65)) : option(bytes(20)) =\n        Crypto.ecrecover_secp256k1(msg, sig)";
+          String byteCode = aeternityService.compiler.blockingCompile(sourceCode, null).getResult();
+          ContractCreateTransactionModel contractCreate =
+              ContractCreateTransactionModel.builder()
+                  .callData(BaseConstants.CONTRACT_EMPTY_INIT_CALLDATA)
+                  .contractByteCode(byteCode)
+                  .nonce(aeternityService.accounts.blockingGetNextNonce())
+                  .ownerId(aeternityService.keyPairAddress)
+                  .build();
+          PostTransactionResult createTxResult =
+              aeternityService.transactions.blockingPostTransaction(contractCreate);
+          TransactionInfoResult createTxInfoResult =
+              aeternityService.info.blockingGetTransactionInfoByHash(createTxResult.getTxHash());
+          String contractId = createTxInfoResult.getCallInfo().getContractId();
+
+          SophiaString sophiaTestString = new SophiaString("test");
+
+          Object decodedResult =
+              aeternityService.transactions.blockingReadOnlyContractCall(
+                  sourceCode,
+                  null,
+                  contractId,
+                  "ethereum_prefixed_hash",
+                  List.of(sophiaTestString));
+
+          SophiaHash ethereumPrefixedHashFromContract = new SophiaHash(decodedResult.toString());
+          byte[] ethereumPrefixedHash = web3jKeccak256("test", true);
+          context.assertEquals(
+              ethereumPrefixedHashFromContract.getSophiaValue().substring(1),
+              Hex.toHexString(ethereumPrefixedHash));
+
+          Credentials credentials =
+              Credentials.create(
+                  "9a4a5c038e7ce00f0ad216894afc00de6b41bbca1d4d7742104cb9f078c6d2df");
+          String ethereumAddress = "0xe53e2125f377d5c62a1ffbfeeb89a0826e9de54c";
+          context.assertEquals(ethereumAddress, credentials.getAddress());
+
+          byte[] signatureWithPrefix =
+              web3jSignMessage(ethereumPrefixedHash, credentials.getEcKeyPair());
+          SophiaBytes sophiaBytes65SignatureWithPrefix =
+              new SophiaBytes(Hex.toHexString(signatureWithPrefix), 65);
+
+          _logger.info(ethereumPrefixedHashFromContract.getSophiaValue());
+          _logger.info(sophiaBytes65SignatureWithPrefix.getSophiaValue());
+
+          decodedResult =
+              aeternityService.transactions.blockingReadOnlyContractCall(
+                  sourceCode,
+                  null,
+                  contractId,
+                  "ecrecover_secp256k1",
+                  List.of(ethereumPrefixedHashFromContract, sophiaBytes65SignatureWithPrefix));
+
+          String sophiaEcrecoverResult = decodedResult.toString();
+          _logger.info(sophiaEcrecoverResult);
+          context.assertTrue(sophiaEcrecoverResult.contains(ethereumAddress.substring(2)));
+
+          decodedResult =
+              aeternityService.transactions.blockingReadOnlyContractCall(
+                  sourceCode, null, contractId, "keccak256", List.of(sophiaTestString));
+          SophiaHash hashFromContract = new SophiaHash(decodedResult.toString());
+          byte[] hashedMessage = web3jKeccak256("test", false);
+          context.assertEquals(
+              hashFromContract.getSophiaValue().substring(1), Hex.toHexString(hashedMessage));
+
+          byte[] signature = web3jSignMessage(hashedMessage, credentials.getEcKeyPair());
+          SophiaBytes sophiaBytes65Signature = new SophiaBytes(Hex.toHexString(signature), 65);
+
+          _logger.info(hashFromContract.getSophiaValue());
+          _logger.info(sophiaBytes65Signature.getSophiaValue());
+
+          decodedResult =
+              aeternityService.transactions.blockingReadOnlyContractCall(
+                  sourceCode,
+                  null,
+                  contractId,
+                  "ecrecover_secp256k1",
+                  List.of(hashFromContract, sophiaBytes65Signature));
+
+          sophiaEcrecoverResult = decodedResult.toString();
+          _logger.info(sophiaEcrecoverResult);
+          context.assertTrue(sophiaEcrecoverResult.contains(ethereumAddress.substring(2)));
         });
   }
 

@@ -1,6 +1,7 @@
 package com.kryptokrauts.aeternity.test.integration;
 
 import com.kryptokrauts.aeternity.sdk.domain.secret.KeyPair;
+import com.kryptokrauts.aeternity.sdk.domain.sophia.SophiaTypeTransformer;
 import com.kryptokrauts.aeternity.sdk.service.info.domain.TransactionInfoResult;
 import com.kryptokrauts.aeternity.sdk.service.keypair.KeyPairServiceFactory;
 import com.kryptokrauts.aeternity.sdk.service.transaction.domain.DryRunAccountModel;
@@ -18,13 +19,10 @@ import java.io.InputStream;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
 import org.apache.commons.io.IOUtils;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
@@ -72,14 +70,6 @@ public class PaymentSplitterContractTest extends BaseTest {
         });
   }
 
-  private String generateMapParam(Map<String, Integer> recipientConditions) {
-    Set<String> recipientConditionSet = new HashSet<>();
-    recipientConditions.forEach((k, v) -> recipientConditionSet.add("[" + k + "] = " + v));
-    System.out.println(
-        "{" + recipientConditionSet.stream().collect(Collectors.joining(", ")) + "}");
-    return "{" + recipientConditionSet.stream().collect(Collectors.joining(", ")) + "}";
-  }
-
   @Test
   public void a_deployPaymentSplitterTest(TestContext context) throws Throwable {
     this.executeTest(
@@ -97,7 +87,7 @@ public class PaymentSplitterContractTest extends BaseTest {
                     .blockingEncodeCalldata(
                         paymentSplitterSource,
                         "init",
-                        Arrays.asList(generateMapParam(initialWeights)),
+                        SophiaTypeTransformer.toCompilerInput(List.of(initialWeights)),
                         null)
                     .getResult();
 
@@ -188,36 +178,20 @@ public class PaymentSplitterContractTest extends BaseTest {
                     .getResult();
             _logger.info("Contract ID: " + localDeployedContractId);
 
-            DryRunTransactionResult dryRunResult =
-                aeternityService.transactions.blockingDryRunContractCall(
-                    ContractCallTransactionModel.builder()
-                        .callData(calldata)
-                        .contractId(localDeployedContractId)
-                        .amount(paymentValue.toBigInteger())
-                        .nonce(getNextKeypairNonce())
-                        .callerId(keyPair.getAddress())
-                        .build(),
-                    false);
-
-            _logger.info(dryRunResult.toString());
-
-            context.assertEquals("ok", dryRunResult.getResult());
-
-            ContractCallTransactionModel contractAfterDryRun =
+            ContractCallTransactionModel contractCallTransactionModel =
                 ContractCallTransactionModel.builder()
                     .callData(calldata)
                     .contractId(localDeployedContractId)
-                    .gasLimit(dryRunResult.getContractCallObject().getGasUsed())
+                    .amount(paymentValue.toBigInteger())
                     .nonce(getNextKeypairNonce())
                     .callerId(keyPair.getAddress())
-                    .amount(paymentValue.toBigInteger())
                     .build();
 
             PostTransactionResult postTransactionResult =
-                aeternityService.transactions.blockingPostTransaction(contractAfterDryRun);
+                aeternityService.transactions.blockingPostTransaction(contractCallTransactionModel);
             context.assertEquals(
                 postTransactionResult.getTxHash(),
-                aeternityService.transactions.computeTxHash(contractAfterDryRun));
+                aeternityService.transactions.computeTxHash(contractCallTransactionModel));
             _logger.info("CreateContractTx hash: " + postTransactionResult.getTxHash());
 
             // we wait until the tx is available and the payment should have
@@ -260,35 +234,15 @@ public class PaymentSplitterContractTest extends BaseTest {
         t -> {
           try {
             BigDecimal paymentValue = UnitConversionUtil.toAettos("0", Unit.AE);
-            String calldata =
-                aeternityService
-                    .compiler
-                    .blockingEncodeCalldata(
-                        paymentSplitterSource, "getTotalAmountSplitted", null, null)
-                    .getResult();
-            _logger.info("Contract ID: " + localDeployedContractId);
-
-            DryRunTransactionResult dryRunResult =
-                this.aeternityService.transactions.blockingDryRunContractCall(
-                    ContractCallTransactionModel.builder()
-                        .callData(calldata)
-                        .contractId(localDeployedContractId)
-                        .amount(paymentValue.toBigInteger())
-                        .nonce(getNextKeypairNonce())
-                        .callerId(keyPair.getAddress())
-                        .build(),
-                    true);
-
-            context.assertEquals("ok", dryRunResult.getResult());
-
             Object decodedValue =
-                decodeCallResult(
+                aeternityService.transactions.blockingReadOnlyContractCall(
                     paymentSplitterSource,
+                    null,
+                    localDeployedContractId,
                     "getTotalAmountSplitted",
-                    dryRunResult.getContractCallObject().getReturnType(),
-                    dryRunResult.getContractCallObject().getReturnValue());
-
-            System.out.println(decodedValue);
+                    null);
+            _logger.info(decodedValue.toString());
+            context.assertEquals(1000000000000000000l, decodedValue);
           } catch (Throwable e) {
             context.fail(e);
           }
@@ -302,34 +256,12 @@ public class PaymentSplitterContractTest extends BaseTest {
         t -> {
           try {
             BigDecimal paymentValue = UnitConversionUtil.toAettos("0", Unit.AE);
-            String calldata =
-                aeternityService
-                    .compiler
-                    .blockingEncodeCalldata(paymentSplitterSource, "getOwner", null, null)
-                    .getResult();
-            _logger.info("Contract ID: " + localDeployedContractId);
-
-            DryRunTransactionResult dryRunResult =
-                aeternityService.transactions.blockingDryRunContractCall(
-                    ContractCallTransactionModel.builder()
-                        .callData(calldata)
-                        .contractId(localDeployedContractId)
-                        .amount(paymentValue.toBigInteger())
-                        .nonce(getNextKeypairNonce())
-                        .callerId(keyPair.getAddress())
-                        .build(),
-                    true);
-
-            context.assertEquals("ok", dryRunResult.getResult());
-
             Object decodedValue =
-                decodeCallResult(
-                    paymentSplitterSource,
-                    "getOwner",
-                    dryRunResult.getContractCallObject().getReturnType(),
-                    dryRunResult.getContractCallObject().getReturnValue());
-
-            System.out.println(decodedValue);
+                aeternityService.transactions.blockingReadOnlyContractCall(
+                    paymentSplitterSource, null, localDeployedContractId, "getOwner", null);
+            _logger.info(decodedValue.toString());
+            context.assertEquals(
+                "ak_twR4h7dEcUtc2iSEDv8kB7UFJJDGiEDQCXr85C3fYF8FdVdyo", decodedValue);
           } catch (Throwable e) {
             context.fail(e);
           }

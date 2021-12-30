@@ -188,21 +188,6 @@ public abstract class BaseTest {
     return postTxResponse;
   }
 
-  protected PostTransactionResult postTx(AbstractTransactionModel<?> tx) throws Throwable {
-    PostTransactionResult postTxResponse =
-        callMethodAndGetResult(
-            () -> this.aeternityService.transactions.asyncPostTransaction(tx),
-            PostTransactionResult.class);
-    _logger.info("PostTx hash: " + postTxResponse.getTxHash());
-    TransactionResult txValue = waitForTxMined(postTxResponse.getTxHash());
-    _logger.info(
-        String.format(
-            "Transaction of type %s is mined at block %s with height %s",
-            txValue.getTxType(), txValue.getBlockHash(), txValue.getBlockHeight()));
-
-    return postTxResponse;
-  }
-
   protected TransactionResult waitForTxMined(String txHash) throws Throwable {
     int blockHeight = -1;
     TransactionResult minedTx = null;
@@ -269,12 +254,6 @@ public abstract class BaseTest {
       String source, String function, String type, String value) {
     return this.aeternityService.compiler.blockingDecodeCallResult(
         source, function, type, value, null);
-  }
-
-  protected <T> T callMethodAndAwaitException(
-      Supplier<Single<T>> observerMethod, Class<T> exception) throws Throwable {
-    return callMethodAndGetResult(
-        TestConstants.NUM_TRIALS_DEFAULT, observerMethod, exception, true);
   }
 
   protected <T> T callMethodAndGetResult(Supplier<Single<T>> observerMethod, Class<T> type)

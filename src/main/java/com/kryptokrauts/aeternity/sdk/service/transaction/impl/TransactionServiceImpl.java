@@ -10,11 +10,14 @@ import com.kryptokrauts.aeternity.sdk.constants.ApiIdentifiers;
 import com.kryptokrauts.aeternity.sdk.constants.BaseConstants;
 import com.kryptokrauts.aeternity.sdk.constants.Network;
 import com.kryptokrauts.aeternity.sdk.constants.SerializationTags;
+import com.kryptokrauts.aeternity.sdk.domain.ObjectResultWrapper;
 import com.kryptokrauts.aeternity.sdk.domain.StringResultWrapper;
+import com.kryptokrauts.aeternity.sdk.domain.sophia.SophiaTypeTransformer;
 import com.kryptokrauts.aeternity.sdk.exception.AException;
 import com.kryptokrauts.aeternity.sdk.exception.TransactionCreateException;
 import com.kryptokrauts.aeternity.sdk.exception.TransactionWaitTimeoutExpiredException;
 import com.kryptokrauts.aeternity.sdk.service.aeternity.AeternityServiceConfiguration;
+import com.kryptokrauts.aeternity.sdk.service.compiler.CompilerService;
 import com.kryptokrauts.aeternity.sdk.service.info.InfoService;
 import com.kryptokrauts.aeternity.sdk.service.info.domain.TransactionResult;
 import com.kryptokrauts.aeternity.sdk.service.transaction.TransactionService;
@@ -36,6 +39,8 @@ import io.reactivex.Single;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import javax.annotation.Nonnull;
 import lombok.RequiredArgsConstructor;
@@ -57,6 +62,8 @@ public class TransactionServiceImpl implements TransactionService {
   @Nonnull private InternalApi internalApi;
 
   @Nonnull private InfoService infoService;
+
+  @Nonnull private CompilerService compilerService;
 
   @Override
   public Single<StringResultWrapper> asyncCreateUnsignedTransaction(
@@ -286,6 +293,35 @@ public class TransactionServiceImpl implements TransactionService {
       dryRunResultsSingle = this.externalApi.rxProtectedDryRunTxs(input.toGeneratedModel(), false);
     }
     return DryRunTransactionResults.builder().build().blockingGet(dryRunResultsSingle);
+  }
+
+  @Override
+  public Object blockingReadOnlyContractCall(
+      String sourceCode,
+      Map<String, String> filesystem,
+      String contractId,
+      String entrypoint,
+      List<Object> params) {
+    String calldata =
+        this.compilerService
+            .blockingEncodeCalldata(
+                sourceCode, entrypoint, SophiaTypeTransformer.toCompilerInput(params), filesystem)
+            .getResult();
+    DryRunTransactionResult dryRunResult =
+        this.blockingDryRunContractCall(
+            ContractCallTransactionModel.builder()
+                .contractId(contractId)
+                .callData(calldata)
+                .build(),
+            true);
+    ObjectResultWrapper objectResultWrapper =
+        this.compilerService.blockingDecodeCallResult(
+            sourceCode,
+            entrypoint,
+            dryRunResult.getContractCallObject().getReturnType(),
+            dryRunResult.getContractCallObject().getReturnValue(),
+            filesystem);
+    return objectResultWrapper.getResult();
   }
 
   // get zero address accounts nonce, depending on configured network
