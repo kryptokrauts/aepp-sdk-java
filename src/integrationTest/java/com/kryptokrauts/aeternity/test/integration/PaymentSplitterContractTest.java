@@ -2,6 +2,7 @@ package com.kryptokrauts.aeternity.test.integration;
 
 import com.kryptokrauts.aeternity.sdk.domain.secret.KeyPair;
 import com.kryptokrauts.aeternity.sdk.service.keypair.KeyPairServiceFactory;
+import com.kryptokrauts.aeternity.sdk.service.transaction.domain.ContractTxOptions;
 import com.kryptokrauts.aeternity.sdk.service.transaction.domain.ContractTxResult;
 import com.kryptokrauts.aeternity.sdk.util.UnitConversionUtil;
 import com.kryptokrauts.aeternity.sdk.util.UnitConversionUtil.Unit;
@@ -54,7 +55,8 @@ public class PaymentSplitterContractTest extends BaseTest {
           try {
             ContractTxResult contractTxResult =
                 aeternityService.transactions.blockingContractCreate(
-                    List.of(initialWeights), null, paymentSplitterSource, null);
+                    paymentSplitterSource,
+                    ContractTxOptions.builder().params(List.of(initialWeights)).build());
             contractId = contractTxResult.getCallResult().getContractId();
           } catch (Throwable e) {
             context.fail(e);
@@ -90,10 +92,8 @@ public class PaymentSplitterContractTest extends BaseTest {
                 aeternityService.transactions.blockingStatefulContractCall(
                     contractId,
                     "payAndSplit",
-                    null,
-                    paymentValue.toBigInteger(),
                     paymentSplitterSource,
-                    null);
+                    ContractTxOptions.builder().amount(paymentValue.toBigInteger()).build());
 
             _logger.info(contractTxResult.toString());
 
@@ -123,7 +123,7 @@ public class PaymentSplitterContractTest extends BaseTest {
           try {
             Object decodedValue =
                 aeternityService.transactions.blockingReadOnlyContractCall(
-                    contractId, "getTotalAmountSplitted", null, paymentSplitterSource, null);
+                    contractId, "getTotalAmountSplitted", paymentSplitterSource);
             _logger.info(decodedValue.toString());
             context.assertEquals(1000000000000000000L, decodedValue);
           } catch (Throwable e) {
@@ -140,7 +140,7 @@ public class PaymentSplitterContractTest extends BaseTest {
           try {
             Object decodedValue =
                 aeternityService.transactions.blockingReadOnlyContractCall(
-                    contractId, "getOwner", null, paymentSplitterSource, null);
+                    contractId, "getOwner", paymentSplitterSource);
             _logger.info(decodedValue.toString());
             context.assertEquals(
                 "ak_twR4h7dEcUtc2iSEDv8kB7UFJJDGiEDQCXr85C3fYF8FdVdyo", decodedValue);

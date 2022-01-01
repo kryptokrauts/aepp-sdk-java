@@ -36,8 +36,8 @@ public class SophiaTypeTransformer {
           .forEach((k, v) -> mutationSet.add("[" + transformParam(k) + "] = " + transformParam(v)));
       return "{" + mutationSet.stream().collect(Collectors.joining(", ")) + "}";
     } else if (param instanceof List) {
-      // TODO
-      return "";
+      return ((List<?>) param)
+          .stream().map(v -> transformParam(v)).collect(Collectors.toList()).toString();
     } else if (param instanceof Optional) {
       // TODO
       return "";

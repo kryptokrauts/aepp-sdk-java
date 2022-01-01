@@ -25,6 +25,7 @@ import com.kryptokrauts.aeternity.sdk.service.info.domain.TransactionInfoResult;
 import com.kryptokrauts.aeternity.sdk.service.info.domain.TransactionResult;
 import com.kryptokrauts.aeternity.sdk.service.transaction.TransactionService;
 import com.kryptokrauts.aeternity.sdk.service.transaction.domain.CheckTxInPoolResult;
+import com.kryptokrauts.aeternity.sdk.service.transaction.domain.ContractTxOptions;
 import com.kryptokrauts.aeternity.sdk.service.transaction.domain.ContractTxResult;
 import com.kryptokrauts.aeternity.sdk.service.transaction.domain.DryRunAccountModel;
 import com.kryptokrauts.aeternity.sdk.service.transaction.domain.DryRunRequest;
@@ -46,7 +47,6 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import javax.annotation.Nonnull;
@@ -253,7 +253,7 @@ public class TransactionServiceImpl implements TransactionService {
 
   @Override
   public DryRunTransactionResult blockingDryRunContractTx(
-      AbstractTransactionModel contractTx, boolean useZeroAddress) {
+      AbstractTransactionModel<?> contractTx, boolean useZeroAddress) {
     if (!(contractTx instanceof ContractCreateTransactionModel)
         && !(contractTx instanceof ContractCallTransactionModel)) {
       throw new InvalidParameterException(
@@ -321,47 +321,51 @@ public class TransactionServiceImpl implements TransactionService {
   }
 
   @Override
-  public ContractTxResult blockingContractCreate(
-      List<Object> params,
-      BigInteger amount,
-      BigInteger nonce,
-      BigInteger gasLimit,
-      BigInteger gasPrice,
-      BigInteger ttl,
-      String sourceCode,
-      Map<String, String> filesystem) {
-    if (sourceCode == null) {
-      throw new InvalidParameterException("sourceCode must not be null");
+  public ContractTxResult blockingContractCreate(String sourceCode, ContractTxOptions txOptions) {
+    if (sourceCode == null || txOptions == null) {
+      throw new InvalidParameterException("Arguments must not be null.");
     }
     String entrypoint = "init";
-    String byteCode = this.compilerService.blockingCompile(sourceCode, filesystem).getResult();
+    String byteCode =
+        this.compilerService.blockingCompile(sourceCode, txOptions.getFilesystem()).getResult();
     String callData =
         this.compilerService
             .blockingEncodeCalldata(
-                sourceCode, entrypoint, SophiaTypeTransformer.toCompilerInput(params), filesystem)
+                sourceCode,
+                entrypoint,
+                SophiaTypeTransformer.toCompilerInput(txOptions.getParams()),
+                txOptions.getFilesystem())
             .getResult();
-    nonce = nonce != null ? nonce : this.accountService.blockingGetNextNonce();
+    BigInteger nonce;
+    nonce =
+        txOptions.getNonce() != null
+            ? txOptions.getNonce()
+            : this.accountService.blockingGetNextNonce();
     ContractCreateTransactionModel contractCreateModel =
         new ContractCreateTransactionModel(
             byteCode,
             callData,
             this.config.getKeyPair().getAddress(),
-            amount,
+            txOptions.getAmount(),
             nonce,
-            gasLimit,
-            gasPrice,
-            ttl);
+            txOptions.getGasLimit(),
+            txOptions.getGasPrice(),
+            txOptions.getTtl());
     ObjectResultWrapper objectResultWrapper;
     if (this.config.isDryRunStatefulCalls()) {
       DryRunTransactionResult dryRunResult = blockingDryRunContractTx(contractCreateModel, false);
-      objectResultWrapper =
-          this.compilerService.blockingDecodeCallResult(
-              sourceCode,
-              entrypoint,
-              dryRunResult.getContractCallObject().getReturnType(),
-              dryRunResult.getContractCallObject().getReturnValue(),
-              filesystem);
-      handleContractTxError(dryRunResult.getResult(), objectResultWrapper, entrypoint);
+      if (!("ok".equals(dryRunResult.getResult())
+          && BaseConstants.CONTRACT_EMPTY_RETURN_DATA.equals(
+              dryRunResult.getContractCallObject().getReturnValue()))) {
+        objectResultWrapper =
+            this.compilerService.blockingDecodeCallResult(
+                sourceCode,
+                entrypoint,
+                dryRunResult.getContractCallObject().getReturnType(),
+                dryRunResult.getContractCallObject().getReturnValue(),
+                txOptions.getFilesystem());
+        handleContractTxError(dryRunResult.getResult(), objectResultWrapper, entrypoint);
+      }
       _logger.debug("Gas used in dry-run: {}", dryRunResult.getContractCallObject().getGasUsed());
       BigInteger gasLimitWithMargin =
           getGasLimitWithReserveMargin(dryRunResult.getContractCallObject().getGasUsed());
@@ -378,43 +382,45 @@ public class TransactionServiceImpl implements TransactionService {
     }
     TransactionInfoResult contractCallPostTxInfo =
         this.infoService.blockingGetTransactionInfoByHash(contractCreatePostTxResult.getTxHash());
-    objectResultWrapper =
-        this.compilerService.blockingDecodeCallResult(
-            sourceCode,
-            entrypoint,
-            contractCallPostTxInfo.getCallInfo().getReturnType(),
-            contractCallPostTxInfo.getCallInfo().getReturnValue(),
-            filesystem);
-    handleContractTxError(
-        contractCallPostTxInfo.getCallInfo().getReturnType(), objectResultWrapper, entrypoint);
+    Object decodedValue = null;
+    if (!BaseConstants.CONTRACT_EMPTY_RETURN_DATA.equals(
+        contractCallPostTxInfo.getCallInfo().getReturnValue())) {
+      objectResultWrapper =
+          this.compilerService.blockingDecodeCallResult(
+              sourceCode,
+              entrypoint,
+              contractCallPostTxInfo.getCallInfo().getReturnType(),
+              contractCallPostTxInfo.getCallInfo().getReturnValue(),
+              txOptions.getFilesystem());
+      handleContractTxError(
+          contractCallPostTxInfo.getCallInfo().getReturnType(), objectResultWrapper, entrypoint);
+      decodedValue = objectResultWrapper.getResult();
+    }
     return ContractTxResult.builder()
         .txHash(contractCreatePostTxResult.getTxHash())
         .callResult(contractCallPostTxInfo.getCallInfo())
-        .decodedValue(objectResultWrapper.getResult())
+        .decodedValue(decodedValue)
         .build();
   }
 
   @Override
-  public ContractTxResult blockingContractCreate(
-      List<Object> params, BigInteger amount, String sourceCode, Map<String, String> filesystem) {
-    return blockingContractCreate(params, amount, null, null, null, null, sourceCode, filesystem);
+  public ContractTxResult blockingContractCreate(String sourceCode) {
+    return blockingContractCreate(sourceCode, ContractTxOptions.builder().build());
   }
 
   @Override
   public Object blockingReadOnlyContractCall(
-      String contractId,
-      String entrypoint,
-      List<Object> params,
-      String sourceCode,
-      Map<String, String> filesystem) {
-    if (contractId == null || entrypoint == null || sourceCode == null) {
-      throw new InvalidParameterException(
-          "One of required arguments is null: contractId, entrypoint, sourceCode");
+      String contractId, String entrypoint, String sourceCode, ContractTxOptions txOptions) {
+    if (contractId == null || entrypoint == null || sourceCode == null || txOptions == null) {
+      throw new InvalidParameterException("Arguments must not be null.");
     }
     String calldata =
         this.compilerService
             .blockingEncodeCalldata(
-                sourceCode, entrypoint, SophiaTypeTransformer.toCompilerInput(params), filesystem)
+                sourceCode,
+                entrypoint,
+                SophiaTypeTransformer.toCompilerInput(txOptions.getParams()),
+                txOptions.getFilesystem())
             .getResult();
     DryRunTransactionResult dryRunResult =
         this.blockingDryRunContractTx(
@@ -429,9 +435,16 @@ public class TransactionServiceImpl implements TransactionService {
             entrypoint,
             dryRunResult.getContractCallObject().getReturnType(),
             dryRunResult.getContractCallObject().getReturnValue(),
-            filesystem);
+            txOptions.getFilesystem());
     handleContractTxError(dryRunResult.getResult(), objectResultWrapper, entrypoint);
     return objectResultWrapper.getResult();
+  }
+
+  @Override
+  public Object blockingReadOnlyContractCall(
+      String contractId, String entrypoint, String sourceCode) {
+    return blockingReadOnlyContractCall(
+        contractId, entrypoint, sourceCode, ContractTxOptions.builder().build());
   }
 
   private void handleContractTxError(
@@ -459,47 +472,48 @@ public class TransactionServiceImpl implements TransactionService {
 
   @Override
   public ContractTxResult blockingStatefulContractCall(
-      String contractId,
-      String entrypoint,
-      List<Object> params,
-      BigInteger amount,
-      BigInteger nonce,
-      BigInteger gasLimit,
-      BigInteger gasPrice,
-      BigInteger ttl,
-      String sourceCode,
-      Map<String, String> filesystem) {
-    if (contractId == null || entrypoint == null || sourceCode == null) {
-      throw new InvalidParameterException(
-          "One of required arguments is null: contractId, entrypoint, sourceCode");
+      String contractId, String entrypoint, String sourceCode, ContractTxOptions txOptions) {
+    if (contractId == null || entrypoint == null || sourceCode == null || txOptions == null) {
+      throw new InvalidParameterException("Arguments must not be null.");
     }
     String calldata =
         this.compilerService
             .blockingEncodeCalldata(
-                sourceCode, entrypoint, SophiaTypeTransformer.toCompilerInput(params), filesystem)
+                sourceCode,
+                entrypoint,
+                SophiaTypeTransformer.toCompilerInput(txOptions.getParams()),
+                txOptions.getFilesystem())
             .getResult();
-    nonce = nonce != null ? nonce : this.accountService.blockingGetNextNonce();
+    BigInteger nonce;
+    nonce =
+        txOptions.getNonce() != null
+            ? txOptions.getNonce()
+            : this.accountService.blockingGetNextNonce();
     ContractCallTransactionModel contractCallModel =
         new ContractCallTransactionModel(
             contractId,
             calldata,
             this.config.getKeyPair().getAddress(),
-            amount,
+            txOptions.getAmount(),
             nonce,
-            gasLimit,
-            gasPrice,
-            ttl);
+            txOptions.getGasLimit(),
+            txOptions.getGasPrice(),
+            txOptions.getTtl());
     ObjectResultWrapper objectResultWrapper;
     if (this.config.isDryRunStatefulCalls()) {
       DryRunTransactionResult dryRunResult = blockingDryRunContractTx(contractCallModel, false);
-      objectResultWrapper =
-          this.compilerService.blockingDecodeCallResult(
-              sourceCode,
-              entrypoint,
-              dryRunResult.getContractCallObject().getReturnType(),
-              dryRunResult.getContractCallObject().getReturnValue(),
-              filesystem);
-      handleContractTxError(dryRunResult.getResult(), objectResultWrapper, entrypoint);
+      if (!("ok".equals(dryRunResult.getResult())
+          && BaseConstants.CONTRACT_EMPTY_RETURN_DATA.equals(
+              dryRunResult.getContractCallObject().getReturnValue()))) {
+        objectResultWrapper =
+            this.compilerService.blockingDecodeCallResult(
+                sourceCode,
+                entrypoint,
+                dryRunResult.getContractCallObject().getReturnType(),
+                dryRunResult.getContractCallObject().getReturnValue(),
+                txOptions.getFilesystem());
+        handleContractTxError(dryRunResult.getResult(), objectResultWrapper, entrypoint);
+      }
       _logger.debug("Gas used in dry-run: {}", dryRunResult.getContractCallObject().getGasUsed());
       BigInteger gasLimitWithMargin =
           getGasLimitWithReserveMargin(dryRunResult.getContractCallObject().getGasUsed());
@@ -516,20 +530,32 @@ public class TransactionServiceImpl implements TransactionService {
     }
     TransactionInfoResult contractCallPostTxInfo =
         this.infoService.blockingGetTransactionInfoByHash(contractCallPostTxResult.getTxHash());
-    objectResultWrapper =
-        this.compilerService.blockingDecodeCallResult(
-            sourceCode,
-            entrypoint,
-            contractCallPostTxInfo.getCallInfo().getReturnType(),
-            contractCallPostTxInfo.getCallInfo().getReturnValue(),
-            filesystem);
-    handleContractTxError(
-        contractCallPostTxInfo.getCallInfo().getReturnType(), objectResultWrapper, entrypoint);
+    Object decodedValue = null;
+    if (!BaseConstants.CONTRACT_EMPTY_RETURN_DATA.equals(
+        contractCallPostTxInfo.getCallInfo().getReturnValue())) {
+      objectResultWrapper =
+          this.compilerService.blockingDecodeCallResult(
+              sourceCode,
+              entrypoint,
+              contractCallPostTxInfo.getCallInfo().getReturnType(),
+              contractCallPostTxInfo.getCallInfo().getReturnValue(),
+              txOptions.getFilesystem());
+      handleContractTxError(
+          contractCallPostTxInfo.getCallInfo().getReturnType(), objectResultWrapper, entrypoint);
+      decodedValue = objectResultWrapper.getResult();
+    }
     return ContractTxResult.builder()
         .txHash(contractCallPostTxResult.getTxHash())
         .callResult(contractCallPostTxInfo.getCallInfo())
-        .decodedValue(objectResultWrapper.getResult())
+        .decodedValue(decodedValue)
         .build();
+  }
+
+  @Override
+  public ContractTxResult blockingStatefulContractCall(
+      String contractId, String entrypoint, String sourceCode) {
+    return blockingStatefulContractCall(
+        contractId, entrypoint, sourceCode, ContractTxOptions.builder().build());
   }
 
   private BigInteger getGasLimitWithReserveMargin(BigInteger dryRunGasUsed) {
@@ -538,23 +564,13 @@ public class TransactionServiceImpl implements TransactionService {
         .toBigInteger();
   }
 
-  @Override
-  public ContractTxResult blockingStatefulContractCall(
-      String contractId,
-      String entrypoint,
-      List<Object> params,
-      BigInteger amount,
-      String sourceCode,
-      Map<String, String> filesystem) {
-    return this.blockingStatefulContractCall(
-        contractId, entrypoint, params, amount, null, null, null, null, sourceCode, filesystem);
-  }
-
   // get zero address accounts nonce, depending on configured network
   private BigInteger getZeroAddressAccountNonce() {
     if (Arrays.asList(Network.TESTNET, Network.MAINNET).contains(config.getNetwork())) {
       return BaseConstants.ZERO_ADDRESS_ACCOUNT_DEFAULT_NONCE;
-    } else return BaseConstants.ZERO_ADDRESS_ACCOUNT_DEVNET_NONCE;
+    } else {
+      return BaseConstants.ZERO_ADDRESS_ACCOUNT_DEVNET_NONCE;
+    }
   }
 
   @Override

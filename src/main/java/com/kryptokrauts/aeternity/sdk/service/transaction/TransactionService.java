@@ -5,6 +5,7 @@ import com.kryptokrauts.aeternity.sdk.exception.AException;
 import com.kryptokrauts.aeternity.sdk.exception.TransactionCreateException;
 import com.kryptokrauts.aeternity.sdk.service.info.domain.TransactionResult;
 import com.kryptokrauts.aeternity.sdk.service.transaction.domain.CheckTxInPoolResult;
+import com.kryptokrauts.aeternity.sdk.service.transaction.domain.ContractTxOptions;
 import com.kryptokrauts.aeternity.sdk.service.transaction.domain.ContractTxResult;
 import com.kryptokrauts.aeternity.sdk.service.transaction.domain.DryRunRequest;
 import com.kryptokrauts.aeternity.sdk.service.transaction.domain.DryRunTransactionResult;
@@ -14,9 +15,7 @@ import com.kryptokrauts.aeternity.sdk.service.transaction.type.model.AbstractTra
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.model.ContractCallTransactionModel;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.model.ContractCreateTransactionModel;
 import io.reactivex.Single;
-import java.math.BigInteger;
 import java.util.List;
-import java.util.Map;
 
 public interface TransactionService {
 
@@ -75,7 +74,7 @@ public interface TransactionService {
    *     {@link AException}
    */
   DryRunTransactionResult blockingDryRunContractTx(
-      AbstractTransactionModel contractTx, boolean useZeroAddress);
+      AbstractTransactionModel<?> contractTx, boolean useZeroAddress);
 
   /**
    * synchronously dry run unsigned transactions to estimate gas (!) please make sure to use
@@ -95,29 +94,12 @@ public interface TransactionService {
    * in a microblock, 5. fetch the tx-info from node, 6. decode result calldata via compiler, 7.
    * return the {@link ContractTxResult}
    *
-   * @param params the list of params or null if the entrypoint expects no params
-   * @param amount the amount in ættos or null if no value should be provided
-   * @param gasLimit a custom gas limit or null to use the default (CONTRACT_DEFAULT_GAS_LIMIT in
-   *     {@link com.kryptokrauts.aeternity.sdk.constants.BaseConstants})
-   * @param gasPrice a custom gas price or null to use the default (MINIMAL_GAS_PRICE in {@link
-   *     com.kryptokrauts.aeternity.sdk.constants.BaseConstants})
-   * @param nonce a custom nonce or null to fetch the nonce automatically from the node
-   * @param ttl a custom nonce or null to use the default (ZERO)
    * @param sourceCode the source code of the contract
-   * @param filesystem the includes map for the contract (key = include-name, value = source code of
-   *     the include) or null if there are no custom includes
+   * @param txOptions custom tx-options as defined in the {@link ContractTxOptions} class
    * @return the result of the contract creation (deployment) including the tx-hash and other useful
    *     information related to the tx
    */
-  ContractTxResult blockingContractCreate(
-      List<Object> params,
-      BigInteger amount,
-      BigInteger nonce,
-      BigInteger gasLimit,
-      BigInteger gasPrice,
-      BigInteger ttl,
-      String sourceCode,
-      Map<String, String> filesystem);
+  ContractTxResult blockingContractCreate(String sourceCode, ContractTxOptions txOptions);
 
   /**
    * convenience method to deploy a contract and return the tx-hash along with the decoded result
@@ -128,16 +110,11 @@ public interface TransactionService {
    * in a microblock, 5. fetch the tx-info from node, 6. decode result calldata via compiler, 7.
    * return the {@link ContractTxResult}
    *
-   * @param params the list of params or null if the entrypoint expects no params
-   * @param amount the amount in ættos or null if no value should be provided
    * @param sourceCode the source code of the contract
-   * @param filesystem the includes map for the contract (key = include-name, value = source code of
-   *     the include) or null if there are no custom includes
    * @return the result of the contract creation (deployment) including the tx-hash and other useful
    *     information related to the tx
    */
-  ContractTxResult blockingContractCreate(
-      List<Object> params, BigInteger amount, String sourceCode, Map<String, String> filesystem);
+  ContractTxResult blockingContractCreate(String sourceCode);
 
   /**
    * convenience method to perform a read-only contract call and return the decoded call result.
@@ -146,18 +123,25 @@ public interface TransactionService {
    *
    * @param contractId the id of the contract (ct_...)
    * @param entrypoint the name of the entrypoint
-   * @param params the list of params or null if the entrypoint expects no params
    * @param sourceCode the source code of the contract
-   * @param filesystem the includes map for the contract (key = include-name, value = source code of
-   *     the include) or null if there are no custom includes
+   * @param txOptions custom tx-options as defined in the {@link ContractTxOptions} class. only the
+   *     attributes "params" and "filesystem" are relevant here. other attributes will be ignored
    * @return the decoded rawResult as String
    */
   Object blockingReadOnlyContractCall(
-      String contractId,
-      String entrypoint,
-      List<Object> params,
-      String sourceCode,
-      Map<String, String> filesystem);
+      String contractId, String entrypoint, String sourceCode, ContractTxOptions txOptions);
+
+  /**
+   * convenience method to perform a read-only contract call and return the decoded call result.
+   * performs following steps under the hood: 1. encode calldata via compiler, 2. dry-run the
+   * contract call via node, 3. decode result calldata via compiler
+   *
+   * @param contractId the id of the contract (ct_...)
+   * @param entrypoint the name of the entrypoint
+   * @param sourceCode the source code of the contract
+   * @return the decoded rawResult as String
+   */
+  Object blockingReadOnlyContractCall(String contractId, String entrypoint, String sourceCode);
 
   /**
    * convenience method to perform a stateful contract call and return the tx-hash along with the
@@ -169,31 +153,13 @@ public interface TransactionService {
    *
    * @param contractId the id of the contract (ct_...)
    * @param entrypoint the name of the entrypoint
-   * @param params the list of params or null if the entrypoint expects no params
-   * @param amount the amount in ættos or null if no value should be provided
-   * @param gasLimit a custom gas limit or null to use the default (CONTRACT_DEFAULT_GAS_LIMIT in
-   *     {@link com.kryptokrauts.aeternity.sdk.constants.BaseConstants})
-   * @param gasPrice a custom gas price or null to use the default (MINIMAL_GAS_PRICE in {@link
-   *     com.kryptokrauts.aeternity.sdk.constants.BaseConstants})
-   * @param nonce a custom nonce or null to fetch the nonce automatically from the node
-   * @param ttl a custom nonce or null to use the default (ZERO)
    * @param sourceCode the source code of the contract
-   * @param filesystem the includes map for the contract (key = include-name, value = source code of
-   *     the include) or null if there are no custom includes
+   * @param txOptions custom tx-options as defined in the {@link ContractTxOptions} class
    * @return the result of the contract call including the tx-hash and other useful information
    *     related to the tx
    */
   ContractTxResult blockingStatefulContractCall(
-      String contractId,
-      String entrypoint,
-      List<Object> params,
-      BigInteger amount,
-      BigInteger nonce,
-      BigInteger gasLimit,
-      BigInteger gasPrice,
-      BigInteger ttl,
-      String sourceCode,
-      Map<String, String> filesystem);
+      String contractId, String entrypoint, String sourceCode, ContractTxOptions txOptions);
 
   /**
    * convenience method to perform a stateful contract call and return the tx-hash along with the
@@ -205,21 +171,12 @@ public interface TransactionService {
    *
    * @param contractId the id of the contract (ct_...)
    * @param entrypoint the name of the entrypoint
-   * @param params the list of params or null if the entrypoint expects no params
-   * @param amount the amount in ættos or null if no value should be provided
    * @param sourceCode the source code of the contract
-   * @param filesystem the includes map for the contract (key = include-name, value = source code of
-   *     the include) or null if there are no custom includes
    * @return the result of the contract call including the tx-hash and other useful information
    *     related to the tx
    */
   ContractTxResult blockingStatefulContractCall(
-      String contractId,
-      String entrypoint,
-      List<Object> params,
-      BigInteger amount,
-      String sourceCode,
-      Map<String, String> filesystem);
+      String contractId, String entrypoint, String sourceCode);
 
   /**
    * asynchronously post a transaction for given model

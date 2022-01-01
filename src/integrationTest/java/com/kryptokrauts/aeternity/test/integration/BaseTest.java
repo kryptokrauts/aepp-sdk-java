@@ -75,7 +75,8 @@ public abstract class BaseTest {
   protected static String paymentSplitterSource,
       ethereumSignaturesSource,
       chatBotSource,
-      gaBlindAuthSource;
+      gaBlindAuthSource,
+      sophiaTypesSource;
 
   protected UnitConversionService unitConversionService = new DefaultUnitConversionServiceImpl();
 
@@ -92,7 +93,7 @@ public abstract class BaseTest {
   Vertx vertx;
 
   @Before
-  public void setupApiClient(TestContext context) throws ConfigurationException {
+  public void setupTestEnv(TestContext context) throws ConfigurationException {
     vertx = rule.vertx();
 
     keyPairService = new KeyPairServiceFactory().getService();
@@ -117,7 +118,7 @@ public abstract class BaseTest {
   }
 
   @After
-  public void shutdownClient(TestContext context) {
+  public void shutdownTestEnv(TestContext context) {
     _logger.info("Closing vertx");
     vertx.close();
   }
@@ -161,6 +162,7 @@ public abstract class BaseTest {
     ethereumSignaturesSource = getContractSourceCode("EthereumSignatures.aes");
     chatBotSource = getContractSourceCode("ChatBot.aes");
     gaBlindAuthSource = getContractSourceCode("GaBlindAuth.aes");
+    sophiaTypesSource = getContractSourceCode("SophiaTypes.aes");
   }
 
   protected BigInteger getNextKeypairNonce() {

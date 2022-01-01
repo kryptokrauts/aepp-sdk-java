@@ -24,6 +24,8 @@ public interface BaseConstants {
   // default calldata for empty init function
   String CONTRACT_EMPTY_INIT_CALLDATA = "cb_KxFE1kQfP4oEp9E=";
 
+  String CONTRACT_EMPTY_RETURN_DATA = "cb_Xfbg4g==";
+
   // average time between key-blocks in minutes
   long KEY_BLOCK_INTERVAL = 3;
 
