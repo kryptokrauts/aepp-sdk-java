@@ -1,12 +1,15 @@
 package com.kryptokrauts.aeternity.test.integration;
 
 import com.kryptokrauts.aeternity.sdk.domain.secret.KeyPair;
+import com.kryptokrauts.aeternity.sdk.domain.sophia.SophiaAENSName;
+import com.kryptokrauts.aeternity.sdk.domain.sophia.SophiaAENSPointee;
+import com.kryptokrauts.aeternity.sdk.domain.sophia.SophiaAENSPointee.Type;
 import com.kryptokrauts.aeternity.sdk.domain.sophia.SophiaBytes;
+import com.kryptokrauts.aeternity.sdk.domain.sophia.SophiaChainTTL;
 import com.kryptokrauts.aeternity.sdk.domain.sophia.SophiaHash;
-import com.kryptokrauts.aeternity.sdk.domain.sophia.SophiaPointee;
-import com.kryptokrauts.aeternity.sdk.domain.sophia.SophiaPointee.Type;
 import com.kryptokrauts.aeternity.sdk.domain.sophia.SophiaSignature;
 import com.kryptokrauts.aeternity.sdk.domain.sophia.SophiaString;
+import com.kryptokrauts.aeternity.sdk.domain.sophia.SophiaTypeTransformer;
 import com.kryptokrauts.aeternity.sdk.service.transaction.domain.ContractTxOptions;
 import com.kryptokrauts.aeternity.sdk.service.transaction.domain.ContractTxResult;
 import com.kryptokrauts.aeternity.sdk.util.EncodingUtils;
@@ -202,7 +205,8 @@ public class SophiaTypesContractTest extends BaseTest {
     this.executeTest(
         context,
         t -> {
-          SophiaPointee testPointeeParam = new SophiaPointee(testKeyPair.getContractAddress());
+          SophiaAENSPointee testPointeeParam =
+              new SophiaAENSPointee(testKeyPair.getContractAddress());
           context.assertEquals(Type.ContractPt, testPointeeParam.getType());
           readOnlyResult =
               aeternityService.transactions.blockingReadOnlyContractCall(
@@ -221,17 +225,18 @@ public class SophiaTypesContractTest extends BaseTest {
     this.executeTest(
         context,
         t -> {
-          SophiaPointee accountPointee = new SophiaPointee(testKeyPair.getAddress());
+          SophiaAENSPointee accountPointee = new SophiaAENSPointee(testKeyPair.getAddress());
           context.assertEquals(Type.AccountPt, accountPointee.getType());
-          SophiaPointee channelPointee =
-              new SophiaPointee(testKeyPair.getAddress().replace("ak_", "ch_"));
+          SophiaAENSPointee channelPointee =
+              new SophiaAENSPointee(testKeyPair.getAddress().replace("ak_", "ch_"));
           context.assertEquals(Type.ChannelPt, channelPointee.getType());
-          SophiaPointee contractPointee = new SophiaPointee(testKeyPair.getContractAddress());
+          SophiaAENSPointee contractPointee =
+              new SophiaAENSPointee(testKeyPair.getContractAddress());
           context.assertEquals(Type.ContractPt, contractPointee.getType());
-          SophiaPointee oraclePointee = new SophiaPointee(testKeyPair.getOracleAddress());
+          SophiaAENSPointee oraclePointee = new SophiaAENSPointee(testKeyPair.getOracleAddress());
           context.assertEquals(Type.OraclePt, oraclePointee.getType());
 
-          List<SophiaPointee> testPointeeListParam =
+          List<SophiaAENSPointee> testPointeeListParam =
               List.of(accountPointee, channelPointee, contractPointee, oraclePointee);
           readOnlyResult =
               aeternityService.transactions.blockingReadOnlyContractCall(
@@ -247,6 +252,31 @@ public class SophiaTypesContractTest extends BaseTest {
                   .add(new JsonObject().put("AENS.ContractPt", List.of(testKeyPair.getAddress())))
                   .add(new JsonObject().put("AENS.OraclePt", List.of(testKeyPair.getAddress())));
           context.assertEquals(expectedPointeeListResult, readOnlyResult);
+        });
+  }
+
+  @Test
+  public void testAensName(TestContext context) {
+    this.executeTest(
+        context,
+        t -> {
+          SophiaChainTTL chainTTL =
+              new SophiaChainTTL(BigInteger.valueOf(1337L), SophiaChainTTL.Type.FixedTTL);
+          SophiaAENSName aensName = new SophiaAENSName(testKeyPair.getAddress(), chainTTL, null);
+          SophiaAENSPointee accountPointee = new SophiaAENSPointee(testKeyPair.getAddress());
+          SophiaAENSPointee contractPointee =
+              new SophiaAENSPointee(testKeyPair.getContractAddress());
+          aensName.addPointer("account_test", accountPointee);
+          aensName.addPointer("contract_test", contractPointee);
+          readOnlyResult =
+              aeternityService.transactions.blockingReadOnlyContractCall(
+                  contractId,
+                  "testAensName",
+                  sophiaTypesSource,
+                  ContractTxOptions.builder().params(List.of(aensName)).build());
+          SophiaAENSName mappedResult =
+              SophiaTypeTransformer.getMappedResult(readOnlyResult, SophiaAENSName.class);
+          context.assertEquals(aensName, mappedResult);
         });
   }
 }

@@ -3,6 +3,7 @@ package com.kryptokrauts.aeternity.sdk.domain.sophia;
 import com.kryptokrauts.aeternity.sdk.exception.InvalidParameterException;
 
 public class SophiaSignature extends SophiaType {
+
   private String signature;
   int length = 128;
 
@@ -33,7 +34,7 @@ public class SophiaSignature extends SophiaType {
   }
 
   @Override
-  public String getSophiaValue() {
+  public String getCompilerValue() {
     return signature;
   }
 }

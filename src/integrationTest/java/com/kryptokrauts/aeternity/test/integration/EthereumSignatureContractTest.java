@@ -69,13 +69,13 @@ public class EthereumSignatureContractTest extends BaseTest {
           SophiaHash hashFromContract = new SophiaHash(readOnlyResult.toString());
           byte[] hashedMessage = web3jKeccak256("test", false);
           context.assertEquals(
-              hashFromContract.getSophiaValue().substring(1), Hex.toHexString(hashedMessage));
+              hashFromContract.getCompilerValue().substring(1), Hex.toHexString(hashedMessage));
 
           byte[] signature = web3jSignMessage(hashedMessage, credentials.getEcKeyPair());
           SophiaBytes sophiaBytes65Signature = new SophiaBytes(Hex.toHexString(signature), 65);
 
-          _logger.info(hashFromContract.getSophiaValue());
-          _logger.info(sophiaBytes65Signature.getSophiaValue());
+          _logger.info(hashFromContract.getCompilerValue());
+          _logger.info(sophiaBytes65Signature.getCompilerValue());
 
           readOnlyResult =
               aeternityService.transactions.blockingReadOnlyContractCall(
@@ -107,7 +107,7 @@ public class EthereumSignatureContractTest extends BaseTest {
           SophiaHash ethereumPrefixedHashFromContract = new SophiaHash(readOnlyResult.toString());
           byte[] ethereumPrefixedHash = web3jKeccak256("test", true);
           context.assertEquals(
-              ethereumPrefixedHashFromContract.getSophiaValue().substring(1),
+              ethereumPrefixedHashFromContract.getCompilerValue().substring(1),
               Hex.toHexString(ethereumPrefixedHash));
 
           context.assertEquals(ethereumAddress, credentials.getAddress());
@@ -117,8 +117,8 @@ public class EthereumSignatureContractTest extends BaseTest {
           SophiaBytes sophiaBytes65SignatureWithPrefix =
               new SophiaBytes(Hex.toHexString(signatureWithPrefix), 65);
 
-          _logger.info(ethereumPrefixedHashFromContract.getSophiaValue());
-          _logger.info(sophiaBytes65SignatureWithPrefix.getSophiaValue());
+          _logger.info(ethereumPrefixedHashFromContract.getCompilerValue());
+          _logger.info(sophiaBytes65SignatureWithPrefix.getCompilerValue());
 
           readOnlyResult =
               aeternityService.transactions.blockingReadOnlyContractCall(

@@ -3,6 +3,7 @@ package com.kryptokrauts.aeternity.sdk.domain.sophia;
 import com.kryptokrauts.aeternity.sdk.exception.InvalidParameterException;
 
 public class SophiaHash extends SophiaType {
+
   private String hash;
   int length = 64;
 
@@ -33,7 +34,7 @@ public class SophiaHash extends SophiaType {
   }
 
   @Override
-  public String getSophiaValue() {
+  public String getCompilerValue() {
     return hash;
   }
 }

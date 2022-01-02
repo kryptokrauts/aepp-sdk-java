@@ -3,6 +3,7 @@ package com.kryptokrauts.aeternity.sdk.domain.sophia;
 import com.kryptokrauts.aeternity.sdk.exception.InvalidParameterException;
 
 public class SophiaBytes extends SophiaType {
+
   private String bytes;
 
   public SophiaBytes(String bytes, int size) {
@@ -34,7 +35,7 @@ public class SophiaBytes extends SophiaType {
   }
 
   @Override
-  public String getSophiaValue() {
+  public String getCompilerValue() {
     return bytes;
   }
 }

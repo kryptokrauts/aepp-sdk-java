@@ -3,14 +3,17 @@ package com.kryptokrauts.aeternity.sdk.domain.sophia;
 import com.kryptokrauts.aeternity.sdk.constants.ApiIdentifiers;
 import com.kryptokrauts.aeternity.sdk.exception.InvalidParameterException;
 import com.kryptokrauts.aeternity.sdk.util.EncodingUtils;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
-public class SophiaPointee extends SophiaType {
+@ToString
+@EqualsAndHashCode
+public class SophiaAENSPointee extends SophiaType {
 
-  protected String address;
+  private String address;
+  private Type type;
 
-  protected Type type;
-
-  public SophiaPointee(String target) {
+  public SophiaAENSPointee(String target) {
     String type = target.substring(0, 2);
     if (!ApiIdentifiers.ACCOUNT_PUBKEY.equals(type)
         && !ApiIdentifiers.CHANNEL.equals(type)
@@ -49,43 +52,14 @@ public class SophiaPointee extends SophiaType {
   }
 
   @Override
-  public String getSophiaValue() {
+  public String getCompilerValue() {
     return "AENS." + this.getType() + "(" + this.address + ")";
-  }
-
-  public String toString() {
-    return "{" + this.type + "=" + address + "}";
-  }
-
-  public boolean equals(Object obj) {
-    if (this == obj) {
-      return true;
-    }
-    if (obj == null) {
-      return false;
-    }
-    if (getClass() != obj.getClass()) {
-      return false;
-    }
-    SophiaPointee other = (SophiaPointee) obj;
-    if (address == null) {
-      if (other.address == null) {
-        return false;
-      }
-    } else if (!address.equals(other.address)) {
-      return false;
-    }
-    ;
-    return true;
   }
 
   public enum Type {
     AccountPt,
-
     OraclePt,
-
     ContractPt,
-
     ChannelPt
   }
 }
