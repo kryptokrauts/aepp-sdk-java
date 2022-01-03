@@ -1,0 +1,20 @@
+@compiler >= 6
+
+include "String.aes"
+
+contract ChatBot =
+
+    record state = { last_name: string }
+
+    datatype event = Greeting(string)
+
+    entrypoint init() = { last_name = "" }
+
+    entrypoint greet(name: string) : string =
+        Chain.event(Greeting(name))
+        String.concat("Hello, ", name)
+
+    stateful entrypoint greet_and_remember(name: string) : string =
+        Chain.event(Greeting(name))
+        put(state{last_name=name})
+        String.concat("Hello, ", name)

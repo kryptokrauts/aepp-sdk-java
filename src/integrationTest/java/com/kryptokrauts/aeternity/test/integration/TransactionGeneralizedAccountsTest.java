@@ -11,21 +11,17 @@ import com.kryptokrauts.aeternity.sdk.service.transaction.domain.PostTransaction
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.model.GeneralizedAccountsAttachTransactionModel;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.model.GeneralizedAccountsMetaTransactionModel;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.model.SpendTransactionModel;
-import com.kryptokrauts.aeternity.sdk.service.unit.UnitConversionService;
-import com.kryptokrauts.aeternity.sdk.service.unit.impl.DefaultUnitConversionServiceImpl;
 import com.kryptokrauts.aeternity.sdk.util.EncodingUtils;
 import io.vertx.ext.unit.TestContext;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Random;
 import org.junit.Test;
 
 public class TransactionGeneralizedAccountsTest extends BaseTest {
 
   static KeyPair gaAccountKeyPair;
-  static UnitConversionService unitConversionService = new DefaultUnitConversionServiceImpl();
 
   @Test
   public void testGaBlindAuthContract(TestContext context) {
@@ -48,15 +44,11 @@ public class TransactionGeneralizedAccountsTest extends BaseTest {
           context.assertEquals("basic", gaTestAccount.getKind());
 
           StringResultWrapper resultWrapper =
-              this.aeternityService.compiler.blockingCompile(
-                  TestConstants.testGABlindAuthContract, null);
+              this.aeternityService.compiler.blockingCompile(gaBlindAuthSource, null);
           String code = resultWrapper.getResult();
           resultWrapper =
               this.aeternityService.compiler.blockingEncodeCalldata(
-                  TestConstants.testGABlindAuthContract,
-                  "init",
-                  Arrays.asList(gaTestAccount.getPublicKey()),
-                  Collections.emptyMap());
+                  gaBlindAuthSource, "init", Arrays.asList(gaTestAccount.getPublicKey()), null);
           String callData = resultWrapper.getResult();
 
           GeneralizedAccountsAttachTransactionModel gaAttachTx =
@@ -130,7 +122,7 @@ public class TransactionGeneralizedAccountsTest extends BaseTest {
 
           String authData =
               encodeCalldata(
-                  TestConstants.testGABlindAuthContract,
+                  gaBlindAuthSource,
                   "authorize",
                   Arrays.asList(String.valueOf(new Random().nextInt())),
                   null);

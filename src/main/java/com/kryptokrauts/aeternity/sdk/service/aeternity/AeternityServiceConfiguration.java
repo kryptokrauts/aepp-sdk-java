@@ -20,13 +20,17 @@ public class AeternityServiceConfiguration extends ServiceConfiguration {
 
   @Default private int numTrialsToWaitForTxIncludedInBlock = 60;
 
-  @Default private long millisBetweenTrialsToWaitForTxIncludedInBlock = 1000l;
+  @Default private long millisBetweenTrialsToWaitForTxIncludedInBlock = 1000L;
 
   @Default private int numOfConfirmations = 10;
 
-  @Default private long millisBetweenTrailsToWaitForConfirmation = 10000l;
+  @Default private long millisBetweenTrailsToWaitForConfirmation = 10000L;
 
   @Default private String zeroAddressAccount = BaseConstants.ZERO_ADDRESS_ACCOUNT;
 
   @Default private String zeroAddressAccountAmount = BaseConstants.ZERO_ADDRESS_ACCOUNT_AMOUNT;
+
+  @Default private boolean dryRunStatefulCalls = true;
+
+  @Default private float dryRunGasReserveMargin = 1.25f;
 }

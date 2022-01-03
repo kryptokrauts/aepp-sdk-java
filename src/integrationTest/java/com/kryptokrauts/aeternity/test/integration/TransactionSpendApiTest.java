@@ -50,11 +50,9 @@ public class TransactionSpendApiTest extends BaseTest {
           _logger.info("SpendTx hash: " + txResponse.getTxHash());
           context.assertEquals(
               txResponse.getTxHash(), aeternityService.transactions.computeTxHash(spendTx));
-          try {
-            waitForTxMined(txResponse.getTxHash());
-          } catch (Throwable e) {
-            context.fail(e);
-          }
+          TransactionResult transactionResult =
+              aeternityService.info.blockingGetTransactionByHash(txResponse.getTxHash());
+          context.assertEquals(txResponse.getTxHash(), transactionResult.getHash());
         });
   }
 
@@ -97,11 +95,9 @@ public class TransactionSpendApiTest extends BaseTest {
           _logger.info("SpendTx hash: " + txResponse.getTxHash());
           context.assertEquals(
               txResponse.getTxHash(), aeternityService.transactions.computeTxHash(spendTx));
-          try {
-            waitForTxMined(txResponse.getTxHash());
-          } catch (Throwable e) {
-            context.fail(e);
-          }
+          TransactionResult transactionResult =
+              aeternityService.info.blockingGetTransactionByHash(txResponse.getTxHash());
+          context.assertEquals(txResponse.getTxHash(), transactionResult.getHash());
         });
   }
 
@@ -161,9 +157,11 @@ public class TransactionSpendApiTest extends BaseTest {
             PostTransactionResult txResponse =
                 aeternityService.transactions.blockingPostTransaction(spendTx);
             _logger.info("SpendTx hash: " + txResponse.getTxHash());
-            waitForTxMined(txResponse.getTxHash());
             context.assertEquals(
                 txResponse.getTxHash(), aeternityService.transactions.computeTxHash(spendTx));
+            TransactionResult transactionResult =
+                aeternityService.info.blockingGetTransactionByHash(txResponse.getTxHash());
+            context.assertEquals(txResponse.getTxHash(), transactionResult.getHash());
           } catch (Throwable e) {
             context.fail(e);
           }
@@ -188,7 +186,9 @@ public class TransactionSpendApiTest extends BaseTest {
             PostTransactionResult txResponse =
                 aeternityService.transactions.blockingPostTransaction(spendTx);
             _logger.info("SpendTx hash: " + txResponse.getTxHash());
-            waitForTxMined(txResponse.getTxHash());
+            TransactionResult transactionResult =
+                aeternityService.info.blockingGetTransactionByHash(txResponse.getTxHash());
+            context.assertEquals(txResponse.getTxHash(), transactionResult.getHash());
             AccountResult recipientAccount =
                 this.aeternityService.accounts.blockingGetAccount(recipient.getAddress());
             _logger.info("Account result for recipient {}", recipientAccount);
@@ -207,7 +207,9 @@ public class TransactionSpendApiTest extends BaseTest {
                 aeternityService.transactions.blockingPostTransaction(
                     spendTx, recipient.getEncodedPrivateKey());
             _logger.info("SpendTx hash: " + txResponse.getTxHash());
-            waitForTxMined(txResponse.getTxHash());
+            transactionResult =
+                aeternityService.info.blockingGetTransactionByHash(txResponse.getTxHash());
+            context.assertEquals(txResponse.getTxHash(), transactionResult.getHash());
             recipientAccount =
                 this.aeternityService.accounts.blockingGetAccount(recipient.getAddress());
             context.assertEquals(
