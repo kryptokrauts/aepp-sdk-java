@@ -3,7 +3,8 @@ package com.kryptokrauts.aeternity.sdk.domain;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.kryptokrauts.aeternity.generated.ApiException;
-import com.kryptokrauts.aeternity.sdk.exception.DebugModeNodeEnabledException;
+import com.kryptokrauts.aeternity.sdk.exception.DebugModeNotEnabledException;
+import com.kryptokrauts.aeternity.sdk.service.transaction.domain.DryRunTransactionResult;
 import io.reactivex.Single;
 import java.util.Optional;
 import lombok.Getter;
@@ -43,15 +44,17 @@ public abstract class GenericResultObject<T, V extends GenericResultObject<?, ?>
       return map(generatedResultObjectSingle.blockingGet());
     } catch (Exception e) {
       V result = createErrorResult(e);
-      /*
-       * if exception contains "Not Found" or "Forbidden" it indicates, that debug resp internal
-       * endpoint is not available, thus throw a meaningful exception
+      /**
+       * if expected result is of type {@link DryRunTransactionResult} and the exception contains
+       * "Not Found" or "Forbidden" it indicates, that debug resp internal endpoint is not
+       * available, thus throw a meaningful exception
        */
       String rootCauseMessage = e.getCause().getMessage();
-      if (e.getCause() instanceof ApiException
+      if (this.getClass().equals(DryRunTransactionResult.class)
+          && e.getCause() instanceof ApiException
           && ("Not Found".equals(rootCauseMessage) || "Forbidden".equals(rootCauseMessage))
           && result.getRootErrorMessage() == null) {
-        throw new DebugModeNodeEnabledException("Debug endpoint not enabled, check environment");
+        throw new DebugModeNotEnabledException("Debug endpoint not enabled, check environment");
       }
       return result;
     }
