@@ -5,7 +5,7 @@ import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
 @ToString
-@EqualsAndHashCode
+@EqualsAndHashCode(callSuper = false)
 public class SophiaChainTTL extends SophiaType {
 
   private BigInteger ttl;
@@ -27,28 +27,6 @@ public class SophiaChainTTL extends SophiaType {
   @Override
   public String getCompilerValue() {
     return ttlType.toString() + "(" + ttl + ")";
-  }
-
-  public boolean equals(Object obj) {
-    if (this == obj) {
-      return true;
-    }
-    if (obj == null) {
-      return false;
-    }
-    if (getClass() != obj.getClass()) {
-      return false;
-    }
-    SophiaChainTTL other = (SophiaChainTTL) obj;
-    if (ttl == null) {
-      if (other.ttl == null) {
-        return false;
-      }
-    } else if (!ttl.equals(other.ttl)) {
-      return false;
-    }
-    ;
-    return true;
   }
 
   public enum Type {

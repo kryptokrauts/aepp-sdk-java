@@ -7,7 +7,7 @@ import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
 @ToString
-@EqualsAndHashCode
+@EqualsAndHashCode(callSuper = false)
 public class SophiaAENSPointee extends SophiaType {
 
   private String address;

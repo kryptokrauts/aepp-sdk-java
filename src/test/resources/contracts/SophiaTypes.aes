@@ -21,12 +21,6 @@ contract SophiaTypes =
          firstname: string,
          lastname: string }
 
-    record complexType =
-      {  test: option(list(int)),
-      	 test2: option(map(string, int)),
-      	 test3: (int * bool),
-      	 test4: (string * int * int)}
-
     entrypoint testString(stringValue: string) : string =
         stringValue
 
@@ -78,10 +72,7 @@ contract SophiaTypes =
     entrypoint testOptionList(optionValue: option(list(int))) : option(list(int)) =
         optionValue
 
-    entrypoint testSingle(singleValue: int) : (int) =
-        singleValue
-
-    entrypoint testTuple(tupleValue: int * bool) : (int * bool) =
+    entrypoint testTuple(tupleValue: int * string * bool) : (int * string * bool) =
         tupleValue
 
     entrypoint testListString(listStringValue: list(string)) : list(string) =
@@ -99,25 +90,11 @@ contract SophiaTypes =
     entrypoint testListListMap(mapValue: list(list(map(int, int)))) : list(list(map(int, int))) =
         mapValue
 
+    entrypoint testEmployee(employeeValue: employee) : employee =
+        employeeValue
+
     entrypoint testCompanyAddress(companyAddressValue: companyAddress) : companyAddress =
         companyAddressValue
 
     entrypoint testCompany(companyValue: company) : company =
         companyValue
-
-    entrypoint testEmployee(employeeValue: employee) : employee =
-        employeeValue
-
-    entrypoint testCompanyRecord(companyRecordValue: company) : company =
-        companyRecordValue
-
-    entrypoint testMapStringAddress(mapStringAddressValue: map(string, address)) : map(string, address) =
-        mapStringAddressValue
-
-    entrypoint testComplexRecord() : complexType =
-    	let complexReturnValue = {
-    	 test = Some([1,2,3]),
-      	 test2 = Some({["somekey"]=3,["someOtherKey"]=90832}),
-      	 test3 = (42,true),
-      	 test4 = ("anotherString",42,12) }
-      	complexReturnValue

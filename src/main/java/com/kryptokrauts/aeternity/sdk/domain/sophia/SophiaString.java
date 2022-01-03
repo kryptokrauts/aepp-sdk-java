@@ -5,10 +5,10 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 public class SophiaString extends SophiaType {
 
-  private String rawValue;
+  private String value;
 
   @Override
   public String getCompilerValue() {
-    return "\"" + rawValue + "\"";
+    return "\"" + value + "\"";
   }
 }
