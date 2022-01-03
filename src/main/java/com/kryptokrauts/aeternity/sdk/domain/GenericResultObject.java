@@ -3,7 +3,9 @@ package com.kryptokrauts.aeternity.sdk.domain;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.kryptokrauts.aeternity.generated.ApiException;
+import com.kryptokrauts.aeternity.sdk.exception.DebugModeNodeEnabledException;
 import io.reactivex.Single;
+import java.util.Optional;
 import lombok.Getter;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
@@ -40,7 +42,18 @@ public abstract class GenericResultObject<T, V extends GenericResultObject<?, ?>
     try {
       return map(generatedResultObjectSingle.blockingGet());
     } catch (Exception e) {
-      return createErrorResult(e);
+      V result = createErrorResult(e);
+      /*
+       * if exception contains "Not Found" or "Forbidden" it indicates, that debug resp internal
+       * endpoint is not available, thus throw a meaningful exception
+       */
+      String rootCauseMessage = e.getCause().getMessage();
+      if (e.getCause() instanceof ApiException
+          && ("Not Found".equals(rootCauseMessage) || "Forbidden".equals(rootCauseMessage))
+          && result.getRootErrorMessage() == null) {
+        throw new DebugModeNodeEnabledException("Debug endpoint not enabled, check environment");
+      }
+      return result;
     }
   }
 
@@ -78,7 +91,7 @@ public abstract class GenericResultObject<T, V extends GenericResultObject<?, ?>
     }
     _logger.warn(
         String.format(
-            "Error mapping GenericResultObject to class %s\ncause: %s\nroot cause:\n%s",
+            "\nError mapping GenericResultObject to class %s\ncaused by: %s, root cause was: %s",
             getResultObjectClassName(), result.aeAPIErrorMessage, prettyErrorMessage));
     if (_logger.isDebugEnabled()) {
       result.throwable = e;
@@ -90,17 +103,17 @@ public abstract class GenericResultObject<T, V extends GenericResultObject<?, ?>
     if (e != null) {
       if (e instanceof ApiException) {
         ApiException ex = (ApiException) e;
-        return ex.getResponseBody();
+        return Optional.ofNullable(ex.getResponseBody()).orElse(ex.getLocalizedMessage());
       }
       if (e instanceof com.kryptokrauts.sophia.compiler.generated.ApiException) {
         com.kryptokrauts.sophia.compiler.generated.ApiException ex =
             (com.kryptokrauts.sophia.compiler.generated.ApiException) e;
-        return ex.getResponseBody();
+        return Optional.ofNullable(ex.getResponseBody()).orElse(ex.getLocalizedMessage());
       }
       if (e instanceof com.kryptokrauts.mdw.generated.ApiException) {
         com.kryptokrauts.mdw.generated.ApiException ex =
             (com.kryptokrauts.mdw.generated.ApiException) e;
-        return ex.getResponseBody();
+        return Optional.ofNullable(ex.getResponseBody()).orElse(ex.getLocalizedMessage());
       } else return determineRootErrorMessage(e.getCause());
     }
     return "Root cause error message cannot be determined";
