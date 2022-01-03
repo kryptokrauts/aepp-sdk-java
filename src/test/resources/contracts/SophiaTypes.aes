@@ -1,0 +1,100 @@
+@compiler >= 6
+
+include "List.aes"
+include "Option.aes"
+
+contract SophiaTypes =
+
+    record company =
+      {  ceo: address,
+         shareholders: map(address, int),
+         employees: list(employee),
+         location: companyAddress }
+
+    record companyAddress =
+      {  zip: int,
+         street: string,
+         city: string }
+
+    record employee =
+      {  address: address,
+         firstname: string,
+         lastname: string }
+
+    entrypoint testString(stringValue: string) : string =
+        stringValue
+
+    entrypoint testInt(intValue: int) : int =
+        intValue
+
+    entrypoint testBool(boolValue: bool) : bool =
+        boolValue
+
+    entrypoint testHash(hashValue: hash) : hash =
+        hashValue
+
+    entrypoint test4Bytes(bytesValue: bytes(4)) : bytes(4) =
+        bytesValue
+
+    entrypoint test12Bytes(bytesValue: bytes(12)) : bytes(12) =
+        bytesValue
+
+    entrypoint testAddress(addressValue: address) : address =
+        addressValue
+
+    entrypoint testSignature(signatureValue: signature) : signature =
+        signatureValue
+
+    entrypoint testOracle(oracle: oracle(string, int)) : oracle(string, int) =
+    	oracle
+
+    entrypoint testPointee(ptr : AENS.pointee) : AENS.pointee =
+    	ptr
+
+    entrypoint testPointeeList(ptrs : list(AENS.pointee)) : list(AENS.pointee) =
+        ptrs
+
+    entrypoint testAensName(name : AENS.name) : AENS.name =
+  		name
+
+    entrypoint testTtl(ttl : Chain.ttl) : Chain.ttl =
+    	ttl
+
+    entrypoint testOracleQuery(oracle_query: oracle_query(string, string)) : oracle_query(string, string) =
+    	oracle_query
+
+    entrypoint testOptionInt(optionValue: option(int)) : option(int) =
+        optionValue
+
+    entrypoint testOptionStr(optionValue: option(string)) : option(string) =
+        optionValue
+
+    entrypoint testOptionList(optionValue: option(list(int))) : option(list(int)) =
+        optionValue
+
+    entrypoint testTuple(tupleValue: int * string * bool) : (int * string * bool) =
+        tupleValue
+
+    entrypoint testListString(listStringValue: list(string)) : list(string) =
+        listStringValue
+
+    entrypoint testListInt(listIntValue: list(int)) : list(int) =
+        listIntValue
+
+    entrypoint testListAddressInt(listAddressIntValue: list(address * int)) : list(address * int) =
+        listAddressIntValue
+
+    entrypoint testMapOfMaps(mapofmaps: map(int, map(int, int))) : map(int, map(int, int)) =
+ 		mapofmaps
+
+    entrypoint testListListMap(mapValue: list(list(map(int, int)))) : list(list(map(int, int))) =
+        mapValue
+
+    entrypoint testEmployee(employeeValue: employee) : employee =
+        employeeValue
+
+    entrypoint testCompanyAddress(companyAddressValue: companyAddress) : companyAddress =
+        companyAddressValue
+
+    entrypoint testCompany(companyValue: company) : company =
+        companyValue

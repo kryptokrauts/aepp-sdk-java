@@ -1,0 +1,15 @@
+@compiler >= 6
+
+include "String.aes"
+
+contract EthereumSignatures =
+
+    entrypoint keccak256(msg: string) : hash =
+        String.sha3(msg)
+
+    entrypoint ethereum_prefixed_hash(msg: string) : hash =
+        let prefixed_msg = String.concat("\x19Ethereum Signed Message:\n", String.concat(Int.to_str(String.length(msg)), msg))
+        String.sha3(prefixed_msg)
+
+    entrypoint ecrecover_secp256k1(msg: hash, sig : bytes(65)) : option(bytes(20)) =
+        Crypto.ecrecover_secp256k1(msg, sig)

@@ -33,6 +33,27 @@ public class ContractCreateTransactionModel extends AbstractTransactionModel<Con
   @Default private BigInteger ttl = BigInteger.ZERO;
   @Default private VirtualMachine virtualMachine = VirtualMachine.FATE;
 
+  public ContractCreateTransactionModel(
+      String byteCode,
+      String callData,
+      String ownerId,
+      BigInteger amount,
+      BigInteger nonce,
+      BigInteger gasLimit,
+      BigInteger gasPrice,
+      BigInteger ttl) {
+    this.contractByteCode = byteCode;
+    this.callData = callData;
+    this.ownerId = ownerId;
+    this.amount = amount != null ? amount : BigInteger.ZERO;
+    this.deposit = BigInteger.ZERO; // must be enforced to avoid loss of funds
+    this.nonce = nonce;
+    this.gasLimit = gasLimit != null ? gasLimit : BaseConstants.CONTRACT_DEFAULT_GAS_LIMIT;
+    this.gasPrice = gasPrice != null ? gasPrice : BaseConstants.MINIMAL_GAS_PRICE;
+    this.ttl = ttl != null ? ttl : BigInteger.ZERO;
+    this.virtualMachine = VirtualMachine.FATE;
+  }
+
   @Override
   public ContractCreateTx toApiModel() {
     ContractCreateTx contractCreateTx = new ContractCreateTx();

@@ -15,6 +15,8 @@ import com.kryptokrauts.aeternity.sdk.service.keypair.KeyPairService;
 import com.kryptokrauts.aeternity.sdk.service.keypair.KeyPairServiceFactory;
 import com.kryptokrauts.aeternity.sdk.service.transaction.domain.PostTransactionResult;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.model.AbstractTransactionModel;
+import com.kryptokrauts.aeternity.sdk.service.unit.UnitConversionService;
+import com.kryptokrauts.aeternity.sdk.service.unit.impl.DefaultUnitConversionServiceImpl;
 import io.reactivex.Single;
 import io.reactivex.observers.TestObserver;
 import io.vertx.core.Vertx;
@@ -25,12 +27,16 @@ import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.RunTestOnContext;
 import io.vertx.ext.unit.junit.Timeout;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
+import java.io.IOException;
+import java.io.InputStream;
 import java.math.BigInteger;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 import javax.naming.ConfigurationException;
+import org.apache.commons.io.IOUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -66,6 +72,14 @@ public abstract class BaseTest {
 
   protected KeyPair keyPair;
 
+  protected static String paymentSplitterSource,
+      ethereumSignaturesSource,
+      chatBotSource,
+      gaBlindAuthSource,
+      sophiaTypesSource;
+
+  protected UnitConversionService unitConversionService = new DefaultUnitConversionServiceImpl();
+
   @Rule
   public RunTestOnContext rule =
       new RunTestOnContext(
@@ -79,7 +93,7 @@ public abstract class BaseTest {
   Vertx vertx;
 
   @Before
-  public void setupApiClient(TestContext context) throws ConfigurationException {
+  public void setupTestEnv(TestContext context) throws ConfigurationException {
     vertx = rule.vertx();
 
     keyPairService = new KeyPairServiceFactory().getService();
@@ -104,7 +118,7 @@ public abstract class BaseTest {
   }
 
   @After
-  public void shutdownClient(TestContext context) {
+  public void shutdownTestEnv(TestContext context) {
     _logger.info("Closing vertx");
     vertx.close();
   }
@@ -134,7 +148,7 @@ public abstract class BaseTest {
   }
 
   @BeforeClass
-  public static void startup() throws ConfigurationException {
+  public static void startup() throws ConfigurationException, IOException {
     _logger.info(
         String.format(
             "--------------------------- %s ---------------------------",
@@ -144,6 +158,11 @@ public abstract class BaseTest {
     _logger.info(String.format("%s: %s", MDW_BASE_URL, getMdwBaseUrl()));
     _logger.info(
         "-----------------------------------------------------------------------------------");
+    paymentSplitterSource = getContractSourceCode("PaymentSplitter.aes");
+    ethereumSignaturesSource = getContractSourceCode("EthereumSignatures.aes");
+    chatBotSource = getContractSourceCode("ChatBot.aes");
+    gaBlindAuthSource = getContractSourceCode("GaBlindAuth.aes");
+    sophiaTypesSource = getContractSourceCode("SophiaTypes.aes");
   }
 
   protected BigInteger getNextKeypairNonce() {
@@ -179,22 +198,8 @@ public abstract class BaseTest {
     PostTransactionResult postTxResponse =
         this.aeternityService.transactions.blockingPostTransaction(tx, privateKey);
     _logger.info("PostTx hash: " + postTxResponse.getTxHash());
-    TransactionResult txValue = waitForTxMined(postTxResponse.getTxHash());
-    _logger.info(
-        String.format(
-            "Transaction of type %s is mined at block %s with height %s",
-            txValue.getTxType(), txValue.getBlockHash(), txValue.getBlockHeight()));
-
-    return postTxResponse;
-  }
-
-  protected PostTransactionResult postTx(AbstractTransactionModel<?> tx) throws Throwable {
-    PostTransactionResult postTxResponse =
-        callMethodAndGetResult(
-            () -> this.aeternityService.transactions.asyncPostTransaction(tx),
-            PostTransactionResult.class);
-    _logger.info("PostTx hash: " + postTxResponse.getTxHash());
-    TransactionResult txValue = waitForTxMined(postTxResponse.getTxHash());
+    TransactionResult txValue =
+        aeternityService.info.blockingGetTransactionByHash(postTxResponse.getTxHash());
     _logger.info(
         String.format(
             "Transaction of type %s is mined at block %s with height %s",
@@ -271,12 +276,6 @@ public abstract class BaseTest {
         source, function, type, value, null);
   }
 
-  protected <T> T callMethodAndAwaitException(
-      Supplier<Single<T>> observerMethod, Class<T> exception) throws Throwable {
-    return callMethodAndGetResult(
-        TestConstants.NUM_TRIALS_DEFAULT, observerMethod, exception, true);
-  }
-
   protected <T> T callMethodAndGetResult(Supplier<Single<T>> observerMethod, Class<T> type)
       throws Throwable {
     return callMethodAndGetResult(TestConstants.NUM_TRIALS_DEFAULT, observerMethod, type, false);
@@ -350,5 +349,11 @@ public abstract class BaseTest {
             context.fail(result.cause());
           }
         });
+  }
+
+  private static String getContractSourceCode(String filename) throws IOException {
+    final InputStream inputStream =
+        Thread.currentThread().getContextClassLoader().getResourceAsStream("contracts/" + filename);
+    return IOUtils.toString(inputStream, StandardCharsets.UTF_8.toString());
   }
 }

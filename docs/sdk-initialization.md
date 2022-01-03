@@ -44,7 +44,9 @@ Within the `AeternityServiceConfiguration` class, different parameters can be se
 | `defaultGasPrice`                                 | default gas price to be used in contract related transactions                                                             | `1000000000` |
 | `waitForTxIncludedInBlockEnabled`                 | wait for tx to be included in a block (only relevant in synchronous functions)                                            | `true` |
 | `numTrialsToWaitForTxIncludedInBlock`             | number of trials to wait for a tx to be included in a block before throwing a `TransactionWaitTimeoutExpiredException`    | `60` |
-| `millisBetweenTrialsToWaitForTxIncludedInBlock`   | milliseconds to wait between trials for checking a tx to be included in a block                                           | `1000` |
+| `millisBetweenTrialsToWaitForTxIncludedInBlock`   | milliseconds to wait between trials for checking a tx to be included in a block                                           | `1000L` |
 | `numOfConfirmations`                              | number of confirmations to wait for accepting a tx                                                                        | `10` |
-| `millisBetweenTrailsToWaitForConfirmation`        | milliseconds to wait between trials for checking the confirmation                                                         | `10000` |
+| `millisBetweenTrailsToWaitForConfirmation`        | milliseconds to wait between trials for checking the confirmation                                                         | `10000L` |
 | `useZeroAddressAccountForDryRun`                  | use zero-address-account for dry-run                                                                                      | `true` |
+| `dryRunStatefulCalls`                             | perform a dry-run for stateful contract calls by default                                                                  | `true` |
+| `dryRunGasReserveMargin`                          | the reserve margin to use for gasLimit in stateful contract calls                                                         | `1.25f` |

@@ -10,15 +10,23 @@ import com.kryptokrauts.aeternity.sdk.constants.ApiIdentifiers;
 import com.kryptokrauts.aeternity.sdk.constants.BaseConstants;
 import com.kryptokrauts.aeternity.sdk.constants.Network;
 import com.kryptokrauts.aeternity.sdk.constants.SerializationTags;
+import com.kryptokrauts.aeternity.sdk.domain.ObjectResultWrapper;
 import com.kryptokrauts.aeternity.sdk.domain.StringResultWrapper;
+import com.kryptokrauts.aeternity.sdk.domain.sophia.SophiaTypeTransformer;
 import com.kryptokrauts.aeternity.sdk.exception.AException;
+import com.kryptokrauts.aeternity.sdk.exception.InvalidParameterException;
 import com.kryptokrauts.aeternity.sdk.exception.TransactionCreateException;
 import com.kryptokrauts.aeternity.sdk.exception.TransactionWaitTimeoutExpiredException;
+import com.kryptokrauts.aeternity.sdk.service.account.AccountService;
 import com.kryptokrauts.aeternity.sdk.service.aeternity.AeternityServiceConfiguration;
+import com.kryptokrauts.aeternity.sdk.service.compiler.CompilerService;
 import com.kryptokrauts.aeternity.sdk.service.info.InfoService;
+import com.kryptokrauts.aeternity.sdk.service.info.domain.TransactionInfoResult;
 import com.kryptokrauts.aeternity.sdk.service.info.domain.TransactionResult;
 import com.kryptokrauts.aeternity.sdk.service.transaction.TransactionService;
 import com.kryptokrauts.aeternity.sdk.service.transaction.domain.CheckTxInPoolResult;
+import com.kryptokrauts.aeternity.sdk.service.transaction.domain.ContractTxOptions;
+import com.kryptokrauts.aeternity.sdk.service.transaction.domain.ContractTxResult;
 import com.kryptokrauts.aeternity.sdk.service.transaction.domain.DryRunAccountModel;
 import com.kryptokrauts.aeternity.sdk.service.transaction.domain.DryRunRequest;
 import com.kryptokrauts.aeternity.sdk.service.transaction.domain.DryRunTransactionResult;
@@ -26,6 +34,7 @@ import com.kryptokrauts.aeternity.sdk.service.transaction.domain.DryRunTransacti
 import com.kryptokrauts.aeternity.sdk.service.transaction.domain.PostTransactionResult;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.model.AbstractTransactionModel;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.model.ContractCallTransactionModel;
+import com.kryptokrauts.aeternity.sdk.service.transaction.type.model.ContractCreateTransactionModel;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.model.PayingForTransactionModel;
 import com.kryptokrauts.aeternity.sdk.util.ByteUtils;
 import com.kryptokrauts.aeternity.sdk.util.EncodingUtils;
@@ -33,9 +42,12 @@ import com.kryptokrauts.aeternity.sdk.util.SigningUtil;
 import io.netty.util.internal.StringUtil;
 import io.reactivex.Flowable;
 import io.reactivex.Single;
+import io.vertx.core.json.JsonObject;
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import javax.annotation.Nonnull;
 import lombok.RequiredArgsConstructor;
@@ -57,6 +69,10 @@ public class TransactionServiceImpl implements TransactionService {
   @Nonnull private InternalApi internalApi;
 
   @Nonnull private InfoService infoService;
+
+  @Nonnull private CompilerService compilerService;
+
+  @Nonnull private AccountService accountService;
 
   @Override
   public Single<StringResultWrapper> asyncCreateUnsignedTransaction(
@@ -236,32 +252,48 @@ public class TransactionServiceImpl implements TransactionService {
   }
 
   @Override
-  public DryRunTransactionResult blockingDryRunContractCall(
-      ContractCallTransactionModel contractCall, boolean useZeroAddress) {
-    DryRunRequest request;
+  public DryRunTransactionResult blockingDryRunContractTx(
+      AbstractTransactionModel<?> contractTx, boolean useZeroAddress) {
+    if (!(contractTx instanceof ContractCreateTransactionModel)
+        && !(contractTx instanceof ContractCallTransactionModel)) {
+      throw new InvalidParameterException(
+          "contractTx must be one of: ContractCreateTransactionModel, ContractCallTransactionModel");
+    }
+    DryRunRequest request = null;
     if (useZeroAddress) {
-      ContractCallTransactionModel contractCallTransactionModel =
-          contractCall
-              .toBuilder()
-              .callerId(config.getZeroAddressAccount())
-              .nonce(getZeroAddressAccountNonce())
-              .build();
-      _logger.info(contractCallTransactionModel.toString());
-      request =
-          DryRunRequest.builder()
-              .build()
-              .account(
-                  DryRunAccountModel.builder()
-                      .amount(new BigInteger(config.getZeroAddressAccountAmount()))
-                      .publicKey(config.getZeroAddressAccount())
-                      .build())
-              .transactionInputItem(contractCallTransactionModel);
+      if (contractTx instanceof ContractCallTransactionModel) {
+        ContractCallTransactionModel contractCallTransactionModel =
+            ((ContractCallTransactionModel) contractTx)
+                .toBuilder()
+                .callerId(config.getZeroAddressAccount())
+                .nonce(getZeroAddressAccountNonce())
+                .build();
+        request =
+            DryRunRequest.builder()
+                .build()
+                .account(
+                    DryRunAccountModel.builder()
+                        .amount(new BigInteger(config.getZeroAddressAccountAmount()))
+                        .publicKey(config.getZeroAddressAccount())
+                        .build())
+                .transactionInputItem(contractCallTransactionModel);
+      } else {
+        throw new InvalidParameterException(
+            "usage of zeroAddress is only allowed for ContractCallTransactionModel");
+      }
     } else {
+      String dryRunAccount;
+      if (contractTx instanceof ContractCreateTransactionModel) {
+        dryRunAccount = ((ContractCreateTransactionModel) contractTx).getOwnerId();
+      } else {
+        dryRunAccount = ((ContractCallTransactionModel) contractTx).getCallerId();
+      }
+      String unsignedTx = blockingCreateUnsignedTransaction(contractTx).getResult();
       request =
           DryRunRequest.builder()
               .build()
-              .account(DryRunAccountModel.builder().publicKey(contractCall.getCallerId()).build())
-              .transactionInputItem(contractCall);
+              .account(DryRunAccountModel.builder().publicKey(dryRunAccount).build())
+              .transactionInputItem(unsignedTx);
     }
     Single<DryRunResults> dryRunResultsSingle;
     if (config.isDebugDryRun()) {
@@ -288,11 +320,257 @@ public class TransactionServiceImpl implements TransactionService {
     return DryRunTransactionResults.builder().build().blockingGet(dryRunResultsSingle);
   }
 
+  @Override
+  public ContractTxResult blockingContractCreate(String sourceCode, ContractTxOptions txOptions) {
+    if (sourceCode == null || txOptions == null) {
+      throw new InvalidParameterException("Arguments must not be null.");
+    }
+    String entrypoint = "init";
+    String byteCode =
+        this.compilerService.blockingCompile(sourceCode, txOptions.getFilesystem()).getResult();
+    String callData =
+        this.compilerService
+            .blockingEncodeCalldata(
+                sourceCode,
+                entrypoint,
+                SophiaTypeTransformer.toCompilerInput(txOptions.getParams()),
+                txOptions.getFilesystem())
+            .getResult();
+    BigInteger nonce;
+    nonce =
+        txOptions.getNonce() != null
+            ? txOptions.getNonce()
+            : this.accountService.blockingGetNextNonce();
+    ContractCreateTransactionModel contractCreateModel =
+        new ContractCreateTransactionModel(
+            byteCode,
+            callData,
+            this.config.getKeyPair().getAddress(),
+            txOptions.getAmount(),
+            nonce,
+            txOptions.getGasLimit(),
+            txOptions.getGasPrice(),
+            txOptions.getTtl());
+    ObjectResultWrapper objectResultWrapper;
+    if (this.config.isDryRunStatefulCalls()) {
+      DryRunTransactionResult dryRunResult = blockingDryRunContractTx(contractCreateModel, false);
+      if (!("ok".equals(dryRunResult.getResult())
+          && BaseConstants.CONTRACT_EMPTY_RETURN_DATA.equals(
+              dryRunResult.getContractCallObject().getReturnValue()))) {
+        objectResultWrapper =
+            this.compilerService.blockingDecodeCallResult(
+                sourceCode,
+                entrypoint,
+                dryRunResult.getContractCallObject().getReturnType(),
+                dryRunResult.getContractCallObject().getReturnValue(),
+                txOptions.getFilesystem());
+        handleContractTxError(dryRunResult.getResult(), objectResultWrapper, entrypoint);
+      }
+      _logger.debug("Gas used in dry-run: {}", dryRunResult.getContractCallObject().getGasUsed());
+      BigInteger gasLimitWithMargin =
+          getGasLimitWithReserveMargin(dryRunResult.getContractCallObject().getGasUsed());
+      _logger.debug(
+          "Gas with reserve margin of {}: {}",
+          this.config.getDryRunGasReserveMargin(),
+          gasLimitWithMargin);
+      contractCreateModel = contractCreateModel.toBuilder().gasLimit(gasLimitWithMargin).build();
+    }
+    PostTransactionResult contractCreatePostTxResult =
+        this.blockingPostTransaction(contractCreateModel);
+    if (contractCreatePostTxResult == null) {
+      throw new RuntimeException("Unexpected error: transaction not broadcasted.");
+    }
+    TransactionInfoResult contractCallPostTxInfo =
+        this.infoService.blockingGetTransactionInfoByHash(contractCreatePostTxResult.getTxHash());
+    Object decodedValue = null;
+    if (!BaseConstants.CONTRACT_EMPTY_RETURN_DATA.equals(
+        contractCallPostTxInfo.getCallInfo().getReturnValue())) {
+      objectResultWrapper =
+          this.compilerService.blockingDecodeCallResult(
+              sourceCode,
+              entrypoint,
+              contractCallPostTxInfo.getCallInfo().getReturnType(),
+              contractCallPostTxInfo.getCallInfo().getReturnValue(),
+              txOptions.getFilesystem());
+      handleContractTxError(
+          contractCallPostTxInfo.getCallInfo().getReturnType(), objectResultWrapper, entrypoint);
+      decodedValue = objectResultWrapper.getResult();
+    }
+    return ContractTxResult.builder()
+        .txHash(contractCreatePostTxResult.getTxHash())
+        .callResult(contractCallPostTxInfo.getCallInfo())
+        .decodedValue(decodedValue)
+        .build();
+  }
+
+  @Override
+  public ContractTxResult blockingContractCreate(String sourceCode) {
+    return blockingContractCreate(sourceCode, ContractTxOptions.builder().build());
+  }
+
+  @Override
+  public Object blockingReadOnlyContractCall(
+      String contractId, String entrypoint, String sourceCode, ContractTxOptions txOptions) {
+    if (contractId == null || entrypoint == null || sourceCode == null || txOptions == null) {
+      throw new InvalidParameterException("Arguments must not be null.");
+    }
+    String calldata =
+        this.compilerService
+            .blockingEncodeCalldata(
+                sourceCode,
+                entrypoint,
+                SophiaTypeTransformer.toCompilerInput(txOptions.getParams()),
+                txOptions.getFilesystem())
+            .getResult();
+    DryRunTransactionResult dryRunResult =
+        this.blockingDryRunContractTx(
+            ContractCallTransactionModel.builder()
+                .contractId(contractId)
+                .callData(calldata)
+                .build(),
+            true);
+    ObjectResultWrapper objectResultWrapper =
+        this.compilerService.blockingDecodeCallResult(
+            sourceCode,
+            entrypoint,
+            dryRunResult.getContractCallObject().getReturnType(),
+            dryRunResult.getContractCallObject().getReturnValue(),
+            txOptions.getFilesystem());
+    handleContractTxError(dryRunResult.getResult(), objectResultWrapper, entrypoint);
+    return objectResultWrapper.getResult();
+  }
+
+  @Override
+  public Object blockingReadOnlyContractCall(
+      String contractId, String entrypoint, String sourceCode) {
+    return blockingReadOnlyContractCall(
+        contractId, entrypoint, sourceCode, ContractTxOptions.builder().build());
+  }
+
+  private void handleContractTxError(
+      final String returnType,
+      final ObjectResultWrapper objectResultWrapper,
+      final String entrypoint) {
+    if ("ok".equalsIgnoreCase(returnType)) {
+      if (objectResultWrapper != null && objectResultWrapper.getResult() instanceof Map) {
+        JsonObject resultJSONMap = JsonObject.mapFrom(objectResultWrapper.getResult());
+        if (resultJSONMap.containsKey("abort")) {
+          throw new AException(
+              String.format(
+                  "Calling entrypoint %s was aborted due to %s",
+                  entrypoint, resultJSONMap.getValue("abort")));
+        }
+        if (resultJSONMap.containsKey("error")) {
+          throw new AException(
+              String.format(
+                  "An error occured calling entrypoint %s: %s",
+                  entrypoint, resultJSONMap.getValue("error")));
+        }
+      }
+    }
+  }
+
+  @Override
+  public ContractTxResult blockingStatefulContractCall(
+      String contractId, String entrypoint, String sourceCode, ContractTxOptions txOptions) {
+    if (contractId == null || entrypoint == null || sourceCode == null || txOptions == null) {
+      throw new InvalidParameterException("Arguments must not be null.");
+    }
+    String calldata =
+        this.compilerService
+            .blockingEncodeCalldata(
+                sourceCode,
+                entrypoint,
+                SophiaTypeTransformer.toCompilerInput(txOptions.getParams()),
+                txOptions.getFilesystem())
+            .getResult();
+    BigInteger nonce;
+    nonce =
+        txOptions.getNonce() != null
+            ? txOptions.getNonce()
+            : this.accountService.blockingGetNextNonce();
+    ContractCallTransactionModel contractCallModel =
+        new ContractCallTransactionModel(
+            contractId,
+            calldata,
+            this.config.getKeyPair().getAddress(),
+            txOptions.getAmount(),
+            nonce,
+            txOptions.getGasLimit(),
+            txOptions.getGasPrice(),
+            txOptions.getTtl());
+    ObjectResultWrapper objectResultWrapper;
+    if (this.config.isDryRunStatefulCalls()) {
+      DryRunTransactionResult dryRunResult = blockingDryRunContractTx(contractCallModel, false);
+      if (!("ok".equals(dryRunResult.getResult())
+          && BaseConstants.CONTRACT_EMPTY_RETURN_DATA.equals(
+              dryRunResult.getContractCallObject().getReturnValue()))) {
+        objectResultWrapper =
+            this.compilerService.blockingDecodeCallResult(
+                sourceCode,
+                entrypoint,
+                dryRunResult.getContractCallObject().getReturnType(),
+                dryRunResult.getContractCallObject().getReturnValue(),
+                txOptions.getFilesystem());
+        handleContractTxError(dryRunResult.getResult(), objectResultWrapper, entrypoint);
+      }
+      _logger.debug("Gas used in dry-run: {}", dryRunResult.getContractCallObject().getGasUsed());
+      BigInteger gasLimitWithMargin =
+          getGasLimitWithReserveMargin(dryRunResult.getContractCallObject().getGasUsed());
+      _logger.debug(
+          "Gas with reserve margin of {}: {}",
+          this.config.getDryRunGasReserveMargin(),
+          gasLimitWithMargin);
+      contractCallModel = contractCallModel.toBuilder().gasLimit(gasLimitWithMargin).build();
+    }
+    PostTransactionResult contractCallPostTxResult =
+        this.blockingPostTransaction(contractCallModel);
+    if (contractCallPostTxResult == null) {
+      throw new RuntimeException("Unexpected error: transaction not broadcasted.");
+    }
+    TransactionInfoResult contractCallPostTxInfo =
+        this.infoService.blockingGetTransactionInfoByHash(contractCallPostTxResult.getTxHash());
+    Object decodedValue = null;
+    if (!BaseConstants.CONTRACT_EMPTY_RETURN_DATA.equals(
+        contractCallPostTxInfo.getCallInfo().getReturnValue())) {
+      objectResultWrapper =
+          this.compilerService.blockingDecodeCallResult(
+              sourceCode,
+              entrypoint,
+              contractCallPostTxInfo.getCallInfo().getReturnType(),
+              contractCallPostTxInfo.getCallInfo().getReturnValue(),
+              txOptions.getFilesystem());
+      handleContractTxError(
+          contractCallPostTxInfo.getCallInfo().getReturnType(), objectResultWrapper, entrypoint);
+      decodedValue = objectResultWrapper.getResult();
+    }
+    return ContractTxResult.builder()
+        .txHash(contractCallPostTxResult.getTxHash())
+        .callResult(contractCallPostTxInfo.getCallInfo())
+        .decodedValue(decodedValue)
+        .build();
+  }
+
+  @Override
+  public ContractTxResult blockingStatefulContractCall(
+      String contractId, String entrypoint, String sourceCode) {
+    return blockingStatefulContractCall(
+        contractId, entrypoint, sourceCode, ContractTxOptions.builder().build());
+  }
+
+  private BigInteger getGasLimitWithReserveMargin(BigInteger dryRunGasUsed) {
+    return new BigDecimal(dryRunGasUsed)
+        .multiply(new BigDecimal(this.config.getDryRunGasReserveMargin()))
+        .toBigInteger();
+  }
+
   // get zero address accounts nonce, depending on configured network
   private BigInteger getZeroAddressAccountNonce() {
     if (Arrays.asList(Network.TESTNET, Network.MAINNET).contains(config.getNetwork())) {
       return BaseConstants.ZERO_ADDRESS_ACCOUNT_DEFAULT_NONCE;
-    } else return BaseConstants.ZERO_ADDRESS_ACCOUNT_DEVNET_NONCE;
+    } else {
+      return BaseConstants.ZERO_ADDRESS_ACCOUNT_DEVNET_NONCE;
+    }
   }
 
   @Override

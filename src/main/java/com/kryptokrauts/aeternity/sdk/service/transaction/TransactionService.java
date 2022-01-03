@@ -5,12 +5,15 @@ import com.kryptokrauts.aeternity.sdk.exception.AException;
 import com.kryptokrauts.aeternity.sdk.exception.TransactionCreateException;
 import com.kryptokrauts.aeternity.sdk.service.info.domain.TransactionResult;
 import com.kryptokrauts.aeternity.sdk.service.transaction.domain.CheckTxInPoolResult;
+import com.kryptokrauts.aeternity.sdk.service.transaction.domain.ContractTxOptions;
+import com.kryptokrauts.aeternity.sdk.service.transaction.domain.ContractTxResult;
 import com.kryptokrauts.aeternity.sdk.service.transaction.domain.DryRunRequest;
 import com.kryptokrauts.aeternity.sdk.service.transaction.domain.DryRunTransactionResult;
 import com.kryptokrauts.aeternity.sdk.service.transaction.domain.DryRunTransactionResults;
 import com.kryptokrauts.aeternity.sdk.service.transaction.domain.PostTransactionResult;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.model.AbstractTransactionModel;
 import com.kryptokrauts.aeternity.sdk.service.transaction.type.model.ContractCallTransactionModel;
+import com.kryptokrauts.aeternity.sdk.service.transaction.type.model.ContractCreateTransactionModel;
 import io.reactivex.Single;
 import java.util.List;
 
@@ -62,15 +65,16 @@ public interface TransactionService {
    * <p>using the zeroAddress for the dry-run MUST be used if no KeyPair is provided in the {@link
    * com.kryptokrauts.aeternity.sdk.service.ServiceConfiguration}
    *
-   * @param contractCall the {@link ContractCallTransactionModel}
+   * @param contractTx must be of type {@link ContractCreateTransactionModel} or {@link
+   *     ContractCallTransactionModel}
    * @param useZeroAddress true to use the zero address which makes sense for a non-stateful
    *     (ready-only) contract call, false if account in configuration should be used to simulate a
    *     stateful tx
    * @return instance of {@link DryRunTransactionResult} if call was successful, otherwise throws
    *     {@link AException}
    */
-  DryRunTransactionResult blockingDryRunContractCall(
-      ContractCallTransactionModel contractCall, boolean useZeroAddress);
+  DryRunTransactionResult blockingDryRunContractTx(
+      AbstractTransactionModel<?> contractTx, boolean useZeroAddress);
 
   /**
    * synchronously dry run unsigned transactions to estimate gas (!) please make sure to use
@@ -80,6 +84,99 @@ public interface TransactionService {
    * @return instance of {@link DryRunTransactionResults}
    */
   DryRunTransactionResults blockingDryRunTransactions(DryRunRequest input);
+
+  /**
+   * convenience method to deploy a contract and return the tx-hash along with the decoded result
+   * and other useful information related to the tx. performs following steps under the hood: 1.
+   * generate bytecode via compiler, 2. encode calldata via compiler, 3. sign & broadcast the
+   * ContractCreateTx with the keyPair configured in the {@link
+   * com.kryptokrauts.aeternity.sdk.service.ServiceConfiguration}, 4. wait for the tx to be included
+   * in a microblock, 5. fetch the tx-info from node, 6. decode result calldata via compiler, 7.
+   * return the {@link ContractTxResult}
+   *
+   * @param sourceCode the source code of the contract
+   * @param txOptions custom tx-options as defined in the {@link ContractTxOptions} class
+   * @return the result of the contract creation (deployment) including the tx-hash and other useful
+   *     information related to the tx
+   */
+  ContractTxResult blockingContractCreate(String sourceCode, ContractTxOptions txOptions);
+
+  /**
+   * convenience method to deploy a contract and return the tx-hash along with the decoded result
+   * and other useful information related to the tx. performs following steps under the hood: 1.
+   * generate bytecode via compiler, 2. encode calldata via compiler, 3. sign & broadcast the
+   * ContractCreateTx with the keyPair configured in the {@link
+   * com.kryptokrauts.aeternity.sdk.service.ServiceConfiguration}, 4. wait for the tx to be included
+   * in a microblock, 5. fetch the tx-info from node, 6. decode result calldata via compiler, 7.
+   * return the {@link ContractTxResult}
+   *
+   * @param sourceCode the source code of the contract
+   * @return the result of the contract creation (deployment) including the tx-hash and other useful
+   *     information related to the tx
+   */
+  ContractTxResult blockingContractCreate(String sourceCode);
+
+  /**
+   * convenience method to perform a read-only contract call and return the decoded call result.
+   * performs following steps under the hood: 1. encode calldata via compiler, 2. dry-run the
+   * contract call via node, 3. decode result calldata via compiler
+   *
+   * @param contractId the id of the contract (ct_...)
+   * @param entrypoint the name of the entrypoint
+   * @param sourceCode the source code of the contract
+   * @param txOptions custom tx-options as defined in the {@link ContractTxOptions} class. only the
+   *     attributes "params" and "filesystem" are relevant here. other attributes will be ignored
+   * @return the decoded rawResult as String
+   */
+  Object blockingReadOnlyContractCall(
+      String contractId, String entrypoint, String sourceCode, ContractTxOptions txOptions);
+
+  /**
+   * convenience method to perform a read-only contract call and return the decoded call result.
+   * performs following steps under the hood: 1. encode calldata via compiler, 2. dry-run the
+   * contract call via node, 3. decode result calldata via compiler
+   *
+   * @param contractId the id of the contract (ct_...)
+   * @param entrypoint the name of the entrypoint
+   * @param sourceCode the source code of the contract
+   * @return the decoded rawResult as String
+   */
+  Object blockingReadOnlyContractCall(String contractId, String entrypoint, String sourceCode);
+
+  /**
+   * convenience method to perform a stateful contract call and return the tx-hash along with the
+   * decoded result and other useful information related to the tx. performs following steps under
+   * the hood: 1. encode calldata via compiler, 2. sign & broadcast the ContractCallTx with the
+   * keyPair configured in the {@link com.kryptokrauts.aeternity.sdk.service.ServiceConfiguration},
+   * 3. wait for the tx to be included in a microblock, 4. fetch the tx-info from node, 5. decode
+   * result calldata via compiler, 6. return the {@link ContractTxResult}
+   *
+   * @param contractId the id of the contract (ct_...)
+   * @param entrypoint the name of the entrypoint
+   * @param sourceCode the source code of the contract
+   * @param txOptions custom tx-options as defined in the {@link ContractTxOptions} class
+   * @return the result of the contract call including the tx-hash and other useful information
+   *     related to the tx
+   */
+  ContractTxResult blockingStatefulContractCall(
+      String contractId, String entrypoint, String sourceCode, ContractTxOptions txOptions);
+
+  /**
+   * convenience method to perform a stateful contract call and return the tx-hash along with the
+   * decoded result and other useful information related to the tx. performs following steps under
+   * the hood: 1. encode calldata via compiler, 2. sign & broadcast the ContractCallTx with the
+   * keyPair configured in the {@link com.kryptokrauts.aeternity.sdk.service.ServiceConfiguration},
+   * 3. wait for the tx to be included in a microblock, 4. fetch the tx-info from node, 5. decode
+   * result calldata via compiler, 6. return the {@link ContractTxResult}
+   *
+   * @param contractId the id of the contract (ct_...)
+   * @param entrypoint the name of the entrypoint
+   * @param sourceCode the source code of the contract
+   * @return the result of the contract call including the tx-hash and other useful information
+   *     related to the tx
+   */
+  ContractTxResult blockingStatefulContractCall(
+      String contractId, String entrypoint, String sourceCode);
 
   /**
    * asynchronously post a transaction for given model

@@ -26,10 +26,19 @@ include "String.aes"
 
 contract ChatBot =
 
+    record state = { last_name: string }
+
     datatype event = Greeting(string)
+
+    entrypoint init() = { last_name = "" }
 
     entrypoint greet(name: string) : string =
         Chain.event(Greeting(name))
+        String.concat("Hello, ", name)
+
+    stateful entrypoint greet_and_remember(name: string) : string =
+        Chain.event(Greeting(name))
+        put(state{last_name=name})
         String.concat("Hello, ", name)
 ```
 
@@ -50,10 +59,20 @@ In case your contract contains custom includes (contracts/interfaces placed in o
 When you have the bytecode you are basically ready to deploy the contract. This example contract doesn't expect any param in the `init` method.
 In this case you don't have to use the `CompilerService` to encode the calldata. You can simply use a default constant for the empty calldata.
 
+#### Convenient way
+
+```java
+ContractTxResult contractTxResult = aeternityService.transactions.blockingContractCreate(sourceCode);
+String contractId = contractTxResult.getCallResult().getContractId();
+```
+
+#### Explicit way
+
 ```java
 // build the tx model with all the required attributes
 ContractCreateTransactionModel contractCreate =
   ContractCreateTransactionModel.builder()
+      // in case the init entrypoint doesn't require a param you can simply use this constant value
       .callData(BaseConstants.CONTRACT_EMPTY_INIT_CALLDATA)
       .contractByteCode(byteCode)
       .nonce(aeternityService.accounts.blockingGetNextNonce())
@@ -70,22 +89,30 @@ TransactionInfoResult createTxInfoResult =
 String contractId = createTxInfoResult.getCallInfo().getContractId();
 ```
 
-### Call a contract entrypoint
+### Call a contract (read-only)
+
+#### Convenient way
 
 ```java
-AeternityService staticCallService =
-    new AeternityServiceFactory()
-        .getService(
-            AeternityServiceConfiguration.configure()
-                .baseUrl(getAeternityBaseUrl())
-                .network(Network.DEVNET)
-                .compile());
+AeternityService readOnlyService = new AeternityServiceFactory().getService();
+Object decodedResult = readOnlyService.transactions.blockingReadOnlyContractCall(
+                                  contractId,
+                                  "greet",
+                                  sourceCode,
+                                  ContractTxOptions.builder()
+                                      .params(List.of(new SophiaString("kryptokrauts")))
+                                      .build());
+log.info(decodedResult.toString()); // "Hello, kryptokrauts"
+```
+
+#### Explicit way
+
+```java
+AeternityService readOnlyService = new AeternityServiceFactory().getService();
 String callData =
-    aeternityService
+    readOnlyService
         .compiler
         .blockingEncodeCalldata(
-            // for the params we currently have no mapping, this will be added in a future release
-            // as the contract has no includes we provide "null" for the fileSystem param
             sourceCode, "greet", Arrays.asList("\"kryptokrauts\""), null)
         .getResult();
 ContractCallTransactionModel contractCall =
@@ -95,32 +122,57 @@ ContractCallTransactionModel contractCall =
         .build();
 
 DryRunTransactionResult dryRunResult =
-    staticCallService.transactions.blockingDryRunContractCall(contractCall, true);
+    readOnlyService.transactions.blockingDryRunContractCall(contractCall, true);
 
-// currently there is no typemapping in place so every callResult will be embedded in an ObjectResultWrapper
 ObjectResultWrapper resultWrapper =
-    aeternityService.compiler.blockingDecodeCallResult(
+    readOnlyService.compiler.blockingDecodeCallResult(
         sourceCode,
         "greet",
         dryRunResult.getContractCallObject().getReturnType(),
         dryRunResult.getContractCallObject().getReturnValue(),
         null);
 
-resultWrapper.getResult(); // "Hello, kryptokrauts"
+log.info(resultWrapper.getResult().toString()); // "Hello, kryptokrauts"
 ```
 
-## Additional topics
+### Call a contract (stateful)
 
-### Gas estimation
+#### Convenient way
+When using the convenient way by calling `blockingStatefulContractCall`
+you will receive an object `ContractTxResult` which includes all important information (e.g. tx-hash, gas used, ...) about the stateful contract call.
 
 ```java
-// TODO: Explanation & simple example for usage of a stateful dry-run
+ContractTxResult contractTxResult = aeternityService.transactions
+          .blockingStatefulContractCall(contractId, "greet",
+              sourceCode, ContractTxOptions.builder()
+                  .params(List.of(new SophiaString("kryptokrauts")))
+                  .build());
 ```
+
+#### Explicit way
+
+```java
+// TODO
+```
+
+### Additional topics
+
+#### Gas estimation via dry-run
+TODO
+
+#### ContractTxOptions
+TODO
+
+#### Sophia type-mapping
+TODO
 
 ## Plugins
 
 ### contraect-maven-plugin
-To provide an easy way to interact with smart contracts on the æternity blockchain we developed a plugin that uses the source code of contracts written in Sophia as input to generate Java classes. The generated classes make use of the aepp-sdk-java and provide methods to deploy contracts and call the respective entrypoint functions.
+To provide an even more convenient way to interact with smart contracts on the æternity blockchain
+we developed a plugin that uses the [ACI](https://aeternity.com/aesophia/latest/aeso_aci) of contracts
+written in Sophia as input to generate Java classes.
+The generated classes make use of the aepp-sdk-java and provide methods to deploy contracts and call the respective entrypoint functions.
 
 **Links**:
 

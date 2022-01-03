@@ -219,7 +219,8 @@ dependencies {
     testCompile "io.vertx:vertx-unit:${vertxVersion}"
     testCompile "io.vertx:vertx-junit5:${vertxVersion}"
     testCompile "org.junit.platform:junit-platform-launcher:${junitPlatformVersion}"
-    testRuntime "org.slf4j:slf4j-simple:${slf4jVersion}"
+    testCompile "org.slf4j:slf4j-simple:${slf4jVersion}"
+    testCompile "org.web3j:core:4.8.9"
 }
 
 test {

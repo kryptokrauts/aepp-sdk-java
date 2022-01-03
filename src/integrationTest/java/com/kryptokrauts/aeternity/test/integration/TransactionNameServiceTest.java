@@ -227,7 +227,6 @@ public class TransactionNameServiceTest extends BaseTest {
             PostTransactionResult txResponse =
                 aeternityService.transactions.blockingPostTransaction(spendTx);
             _logger.info("SpendTx hash: " + txResponse.getTxHash());
-            waitForTxMined(txResponse.getTxHash());
             AccountResult recipientAccount =
                 this.aeternityService.accounts.blockingGetAccount(accountPointer);
             _logger.info("Account result for recipient {}", recipientAccount);
@@ -506,7 +505,8 @@ public class TransactionNameServiceTest extends BaseTest {
                     .build();
             PostTransactionResult result =
                 this.blockingPostTx(nextNameClaimTx, kpNextClaimer.getEncodedPrivateKey());
-            TransactionResult transactionResult = waitForTxMined(result.getTxHash());
+            TransactionResult transactionResult =
+                aeternityService.info.blockingGetTransactionByHash(result.getTxHash());
             _logger.info("next claimTx result: {}", transactionResult);
             BigInteger finalBlockHeight =
                 transactionResult.getBlockHeight().add(AENS.getBlockTimeout(name));
