@@ -51,7 +51,7 @@ public class ChatBotContractTest extends BaseTest {
   }
 
   @Test
-  public void greetKryptokrautsTest(TestContext context) {
+  public void greetTest(TestContext context) {
     this.executeTest(
         context,
         t -> {
@@ -64,6 +64,24 @@ public class ChatBotContractTest extends BaseTest {
                       .params(List.of(new SophiaString("kryptokrauts")))
                       .build());
           context.assertEquals("Hello, kryptokrauts", readOnlyResult);
+        });
+  }
+
+  @Test
+  public void greetAndRememberTest(TestContext context) {
+    this.executeTest(
+        context,
+        t -> {
+          ContractTxResult contractTxResult =
+              aeternityService.transactions.blockingStatefulContractCall(
+                  contractId,
+                  "greet_and_remember",
+                  chatBotSource,
+                  ContractTxOptions.builder()
+                      .params(List.of(new SophiaString("kryptokrauts")))
+                      .build());
+          _logger.info(contractTxResult.toString());
+          context.assertEquals("Hello, kryptokrauts", contractTxResult.getDecodedValue());
         });
   }
 
