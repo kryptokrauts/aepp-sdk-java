@@ -31,7 +31,7 @@ public interface MiddlewareService {
   NameAuctionsResult blockingGetNameAuctions();
 
   /**
-   * synchronously returns the result object of all name auction filtered and paginated by the given
+   * synchronously returns the result object of all name auctions filtered and paginated by the given
    * criteria
    *
    * @param sortBy sort by criteria
