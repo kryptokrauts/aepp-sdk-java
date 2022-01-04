@@ -303,7 +303,7 @@ public final class EncodingUtils {
   }
 
   /**
-   * generate commitment hash needed for name auctioning
+   * generate commitment hash needed to pre-claim a name
    *
    * @param name to generate commitment hash from
    * @param salt to generate commitment hash from
