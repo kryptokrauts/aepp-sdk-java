@@ -24,7 +24,7 @@ public interface MiddlewareService {
   NameAuctionResult blockingGetNameAuction(String name);
 
   /**
-   * synchronously returns the result object of all name auction
+   * synchronously returns the result object of all name auctions
    *
    * @return result of {@link NameAuctionsResult}
    */
