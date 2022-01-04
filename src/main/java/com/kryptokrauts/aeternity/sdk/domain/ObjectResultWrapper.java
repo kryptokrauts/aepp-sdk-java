@@ -5,8 +5,7 @@ import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
 /**
- * This object result wrapper introduces the error handling when returning simple string from node
- * calls
+ * This object result wrapper introduces the error handling when returning object from node calls
  */
 @Getter
 @SuperBuilder(toBuilder = true)
