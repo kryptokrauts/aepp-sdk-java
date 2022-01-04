@@ -88,7 +88,7 @@ public interface TransactionService {
   /**
    * convenience method to deploy a contract and return the tx-hash along with the decoded result
    * and other useful information related to the tx. performs following steps under the hood: 1.
-   * generate bytecode via compiler, 2. encode calldata via compiler, 3. sign & broadcast the
+   * generate bytecode via compiler, 2. encode calldata via compiler, 3. sign and broadcast the
    * ContractCreateTx with the keyPair configured in the {@link
    * com.kryptokrauts.aeternity.sdk.service.ServiceConfiguration}, 4. wait for the tx to be included
    * in a microblock, 5. fetch the tx-info from node, 6. decode result calldata via compiler, 7.
@@ -104,7 +104,7 @@ public interface TransactionService {
   /**
    * convenience method to deploy a contract and return the tx-hash along with the decoded result
    * and other useful information related to the tx. performs following steps under the hood: 1.
-   * generate bytecode via compiler, 2. encode calldata via compiler, 3. sign & broadcast the
+   * generate bytecode via compiler, 2. encode calldata via compiler, 3. sign and broadcast the
    * ContractCreateTx with the keyPair configured in the {@link
    * com.kryptokrauts.aeternity.sdk.service.ServiceConfiguration}, 4. wait for the tx to be included
    * in a microblock, 5. fetch the tx-info from node, 6. decode result calldata via compiler, 7.
@@ -146,7 +146,7 @@ public interface TransactionService {
   /**
    * convenience method to perform a stateful contract call and return the tx-hash along with the
    * decoded result and other useful information related to the tx. performs following steps under
-   * the hood: 1. encode calldata via compiler, 2. sign & broadcast the ContractCallTx with the
+   * the hood: 1. encode calldata via compiler, 2. sign and broadcast the ContractCallTx with the
    * keyPair configured in the {@link com.kryptokrauts.aeternity.sdk.service.ServiceConfiguration},
    * 3. wait for the tx to be included in a microblock, 4. fetch the tx-info from node, 5. decode
    * result calldata via compiler, 6. return the {@link ContractTxResult}
@@ -164,7 +164,7 @@ public interface TransactionService {
   /**
    * convenience method to perform a stateful contract call and return the tx-hash along with the
    * decoded result and other useful information related to the tx. performs following steps under
-   * the hood: 1. encode calldata via compiler, 2. sign & broadcast the ContractCallTx with the
+   * the hood: 1. encode calldata via compiler, 2. sign and broadcast the ContractCallTx with the
    * keyPair configured in the {@link com.kryptokrauts.aeternity.sdk.service.ServiceConfiguration},
    * 3. wait for the tx to be included in a microblock, 4. fetch the tx-info from node, 5. decode
    * result calldata via compiler, 6. return the {@link ContractTxResult}

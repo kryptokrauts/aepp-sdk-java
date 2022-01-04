@@ -21,7 +21,7 @@ import org.bouncycastle.crypto.digests.Blake2bDigest;
 import org.bouncycastle.util.encoders.Base64;
 import org.bouncycastle.util.encoders.Hex;
 
-/** this util class provides all encoding related methods */
+/** This util class provides all encoding related methods */
 @UtilityClass
 public final class EncodingUtils {
 
@@ -276,11 +276,24 @@ public final class EncodingUtils {
     }
   }
 
+  /**
+   * hash and encode the given input, also see {@link #encodeCheck(byte[], String)}
+   *
+   * @param input to hash
+   * @param identifier encoding identifier
+   * @return hashed and encoded input
+   */
   public static String hashEncode(final byte[] input, final String identifier) {
     byte[] hash = hash(input);
     return EncodingUtils.encodeCheck(hash, identifier);
   }
 
+  /**
+   * hash the given input using Blake2b
+   *
+   * @param input to hash
+   * @return Blake2b hashed input
+   */
   public static byte[] hash(final byte[] input) {
     Blake2bDigest digest = new Blake2bDigest(256);
     digest.update(input, 0, input.length);
@@ -289,6 +302,13 @@ public final class EncodingUtils {
     return hash;
   }
 
+  /**
+   * generate commitment hash needed for name auctioning
+   *
+   * @param name to generate commitment hash from
+   * @param salt to generate commitment hash from
+   * @return generated commitment hash
+   */
   public static String generateCommitmentHash(final String name, final BigInteger salt) {
     return encodeCheck(
         hash(
@@ -298,6 +318,12 @@ public final class EncodingUtils {
         ApiIdentifiers.COMMITMENT);
   }
 
+  /**
+   * generate authentication function name hash for generalized accounts
+   *
+   * @param authFun function name to hash
+   * @return hex encoded and hashed function name
+   */
   public static String generateAuthFunHash(final String authFun) {
     byte[] hash = hash(authFun.getBytes(StandardCharsets.UTF_8));
     // using Hex to convert bytes due to signed/unsigned problem

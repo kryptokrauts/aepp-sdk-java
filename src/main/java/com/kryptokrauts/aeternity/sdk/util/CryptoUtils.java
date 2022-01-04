@@ -8,7 +8,7 @@ import org.bouncycastle.crypto.params.Ed25519PrivateKeyParameters;
 import org.bouncycastle.crypto.params.Ed25519PublicKeyParameters;
 import org.bouncycastle.util.encoders.Hex;
 
-/** this util class provides common methods */
+/** This util class provides common methods */
 @UtilityClass
 public final class CryptoUtils {
 

@@ -1,10 +1,12 @@
 package com.kryptokrauts.aeternity.sdk.util;
 
 import com.kryptokrauts.aeternity.sdk.exception.InvalidParameterException;
+import com.kryptokrauts.aeternity.sdk.service.transaction.type.model.AbstractTransactionModel;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Function;
 
+/** Realizes the {@link AbstractTransactionModel}s input values validation */
 public class ValidationUtil {
 
   public static final int NAME_MAX_LENGTH = 253;

@@ -140,8 +140,7 @@ public class TransactionServiceImpl implements TransactionService {
   public PostTransactionResult blockingPostTransaction(
       AbstractTransactionModel<?> tx, String privateKey) throws TransactionCreateException {
     /*
-     * ga transactions have an inner tx model, for which an unsigned tx needs to be
-     * created
+     * ga transactions have an inner tx model, for which an unsigned tx needs to be created
      */
     if (tx.hasInnerTx()) {
       blockingCreateUnsignedTransaction(tx.getInnerTxModel());
@@ -660,7 +659,7 @@ public class TransactionServiceImpl implements TransactionService {
 
   private TransactionCreateException createException(Exception e) {
     return new TransactionCreateException(
-        String.format("Technical error creating exception: %s", e.getMessage()), e);
+        String.format("Technical error creating transaction: %s", e.getMessage()), e);
   }
 
   private EncodedTx createEncodedTxObject(String signedTx) {

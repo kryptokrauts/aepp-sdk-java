@@ -8,10 +8,9 @@ import lombok.experimental.SuperBuilder;
 import org.apache.tuweni.bytes.Bytes;
 
 /**
- * this abstract subclass introduces variables holding information about the inner transaction
+ * This abstract subclass introduces variables holding information about the inner transaction
  *
- * @author mitch
- * @param <T>
+ * @param <T> inner transaction, specific class of type {@link AbstractTransactionModel}
  */
 @Getter
 @SuperBuilder

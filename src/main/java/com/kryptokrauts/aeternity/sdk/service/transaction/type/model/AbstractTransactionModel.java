@@ -14,6 +14,13 @@ import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 import lombok.extern.slf4j.Slf4j;
 
+/**
+ * This abstract class defines the behaviour of all specific transaction models and is tied to the
+ * relating generated endpoint model. The specific model classes are used to encapsulate the
+ * transaction type specific parameters in a convienent way.
+ *
+ * @param <GeneratedTxModel>
+ */
 @Getter
 @Setter
 @SuperBuilder(toBuilder = true)

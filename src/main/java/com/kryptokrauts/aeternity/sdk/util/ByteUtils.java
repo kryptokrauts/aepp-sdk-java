@@ -3,7 +3,7 @@ package com.kryptokrauts.aeternity.sdk.util;
 import java.nio.ByteBuffer;
 import lombok.experimental.UtilityClass;
 
-/** this util class provides all byte related methods */
+/** This util class provides all byte related methods */
 @UtilityClass
 public class ByteUtils {
 

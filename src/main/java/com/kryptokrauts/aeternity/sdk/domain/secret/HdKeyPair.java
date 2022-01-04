@@ -4,6 +4,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
+/** Data structure to hold one derived key from the tree of hierarchic keys */
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)

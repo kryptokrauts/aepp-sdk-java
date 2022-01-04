@@ -20,7 +20,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * a lomboked class with service parameters should extend this configuration class like
+ * The SDKs basic configuration class.
+ *
+ * <p>Other configuration classes with service parameters should extend this configuration class
+ * like
  *
  * <pre>
  *
