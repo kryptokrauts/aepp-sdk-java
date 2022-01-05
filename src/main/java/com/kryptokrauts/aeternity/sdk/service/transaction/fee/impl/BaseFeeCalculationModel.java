@@ -8,7 +8,7 @@ import java.math.BigInteger;
 public class BaseFeeCalculationModel implements FeeCalculationModel {
 
   /**
-   * the fee is calculated according to the following formula
+   * The fee is calculated according to the following formula
    *
    * <p>(BASE_GAS + (byte_size * GAS_PER_BYTE)) * MINIMAL_GAS_PRICE
    */

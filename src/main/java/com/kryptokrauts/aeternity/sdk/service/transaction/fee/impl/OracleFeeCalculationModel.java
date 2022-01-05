@@ -12,7 +12,7 @@ import java.math.BigInteger;
 public class OracleFeeCalculationModel implements FeeCalculationModel {
 
   /**
-   * the fee is calculated according to the following formula
+   * The fee is calculated according to the following formula
    *
    * <p>ceiling(32000 * RelativeTTL / floor(60 * 24 * 365 / key_block_interval))+
    * byte_size(OracleRegisterTx) * GasPerByte

@@ -1,8 +1,8 @@
 package com.kryptokrauts.aeternity.sdk.constants;
 
 /**
- * needed for transaction-signature
- * https://github.com/aeternity/protocol/blob/master/consensus/consensus.md#transaction-signature
+ * List of available networks - needed for transaction-signature <a href=
+ * https://github.com/aeternity/protocol/blob/master/consensus/consensus.md#transaction-signature>transaction-signature</a>
  */
 public enum Network {
   DEVNET("ae_devnet"),

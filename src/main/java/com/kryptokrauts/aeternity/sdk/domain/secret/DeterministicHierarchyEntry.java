@@ -5,6 +5,7 @@ import java.util.Map;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+/** Data structure to hold a deterministic hierarchy entry */
 @Getter
 @NoArgsConstructor
 public class DeterministicHierarchyEntry {

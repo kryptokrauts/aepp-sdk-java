@@ -8,6 +8,10 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 import org.bouncycastle.util.encoders.Hex;
 
+/**
+ * Basic keypair holding the public and private key as raw byte array as well as human readable
+ * representation for encoded private key and address
+ */
 @Data
 @NoArgsConstructor
 public class KeyPair {

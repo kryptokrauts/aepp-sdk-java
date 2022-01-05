@@ -4,10 +4,12 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
+/**
+ * List of <a
+ * href=https://github.com/aeternity/protocol/blob/master/node/api/api_encoding.md#encoding-scheme-for-api-identifiers-and-byte-arrays>encoding
+ * identifiers </a>
+ */
 public interface ApiIdentifiers {
-
-  // API identifiers
-  // https://github.com/aeternity/protocol/blob/master/node/api/api_encoding.md#encoding-scheme-for-api-identifiers-and-byte-arrays
 
   // base58
   String ACCOUNT_PUBKEY = "ak"; // base58 Account pubkey
@@ -40,7 +42,7 @@ public interface ApiIdentifiers {
 
   String TRANSACTION_HASH = "th"; // base58 Transaction hash
 
-  // Base 64
+  // base 64
   String CONTRACT_BYTE_ARRAY = "cb"; // base64 Contract byte array
 
   String ORACLE_RESPONSE = "or"; // base64 Oracle response

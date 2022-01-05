@@ -8,6 +8,10 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import lombok.Getter;
 
+/**
+ * Data structure to hold the deterministic key hierarchy tree, based on the given master keypair
+ * {@link HdKeyPair}
+ */
 @Getter
 public class DeterministicHierarchy {
 

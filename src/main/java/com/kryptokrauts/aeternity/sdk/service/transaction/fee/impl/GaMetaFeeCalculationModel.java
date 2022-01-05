@@ -10,7 +10,7 @@ import java.math.BigInteger;
 public class GaMetaFeeCalculationModel implements FeeCalculationModel {
 
   /**
-   * the fee is calculated according to the following formula
+   * The fee is calculated according to the following formula
    *
    * <p>(5 * BASE_GAS + byte_size(GAMetaTx) - byte_size(InnerTx)) * GasPerByte
    */

@@ -14,8 +14,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * This class encapsules the generated result objects to keep the SDK stable in terms of changes
- * within the underlying AE protocol
+ * This class encapsules the mapping of generated result objects and takes care of error handling.
+ * This is done to keep the SDK stable in terms of changes within the underlying AE protocol
  *
  * @param <T> the generated ae result object class
  */

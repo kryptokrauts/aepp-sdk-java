@@ -4,11 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * This abstract factory defines the process of retrieving service implementations of different
- * versions in a uniform way by default it returns the current version
- *
- * <p>versions should only be increased when new methods are added to the service interface or
- * existing methods are changed that do not depend on domain object changes
+ * This abstract factory defines the uniform process of retrieving service implementations.
  *
  * @param <T> the service interface to be retrieved
  * @param <C> a pojo containing a set of service parameters with defaults, also see {@link

@@ -7,7 +7,7 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 
 /**
- * the fee is calculated according to the following formula
+ * The fee is calculated according to the following formula
  *
  * <p>(BASE_GAS / 5 + byte_size(PayingForTx) - byte_size(InnerTx)) * GasPerByte
  */
