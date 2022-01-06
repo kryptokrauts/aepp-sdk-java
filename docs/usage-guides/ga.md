@@ -3,7 +3,8 @@
 ## Introduction
 [Generalized Accounts](https://aeternity.com/protocol/generalized_accounts/index.html) (GAs) are mainly a way to give more flexibility when it comes to transaction integrity, in particular when it comes to signing. This is done by moving both the nonce handling and signature checking to a smart contract that is attached to the account.
 
-## Example contract
+## Example
+### ECDSAAuth contract
 The following contract can be used in order to make the æternity account a GA that expects transactions
 to be signed with the Elliptic Curve Digital Signature Algorithm known from Ethereum. This way you can for example use
 your Ethereum private key in order to sign transactions on æternity.
@@ -32,7 +33,7 @@ contract ECDSAAuth =
     state.owner
 ```
 
-## Attach the Generalized Account
+### Attach the Generalized Account
 Before actually being able to use the Ethereum private key for signing you have to first attach the contract to the account
 which makes it a GA.
 
@@ -86,7 +87,7 @@ Attention:
 
 - Be aware, there is no way back if you made your account a GA!
 
-## Perform a meta transaction for the GA
+### Perform a meta transaction for the GA
 Once the GA is attached you can perform a `GaMetaTx`.
 The `GaMetaTx` can include any type of tx supported by the æternity protocol.
 In this specific example we perform a simple `SpendTx`.
@@ -149,3 +150,7 @@ GeneralizedAccountsMetaTransactionModel gaMetaTx =
 // broadcast the tx
 aeternityService.transactions.blockingPostTransaction(gaMetaTx);
 ```
+
+## Additional examples
+
+We also created a simple **GaMultiSig** example in our [contract-maven-showcase](https://github.com/kryptokrauts/contraect-showcase-maven) repository.
