@@ -44,6 +44,11 @@ import org.junit.Rule;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.web3j.crypto.Credentials;
+import org.web3j.crypto.ECKeyPair;
+import org.web3j.crypto.Hash;
+import org.web3j.crypto.Sign;
+import org.web3j.crypto.Sign.SignatureData;
 
 @RunWith(VertxUnitRunner.class)
 public abstract class BaseTest {
@@ -76,9 +81,14 @@ public abstract class BaseTest {
       ethereumSignaturesSource,
       chatBotSource,
       gaBlindAuthSource,
-      sophiaTypesSource;
+      sophiaTypesSource,
+      ecdsaAuthSource;
 
   protected UnitConversionService unitConversionService = new DefaultUnitConversionServiceImpl();
+
+  protected static Credentials credentials =
+      Credentials.create("9a4a5c038e7ce00f0ad216894afc00de6b41bbca1d4d7742104cb9f078c6d2df");
+  protected static String ethereumAddress = "0xe53e2125f377d5c62a1ffbfeeb89a0826e9de54c";
 
   @Rule
   public RunTestOnContext rule =
@@ -163,6 +173,7 @@ public abstract class BaseTest {
     chatBotSource = getContractSourceCode("ChatBot.aes");
     gaBlindAuthSource = getContractSourceCode("GaBlindAuth.aes");
     sophiaTypesSource = getContractSourceCode("SophiaTypes.aes");
+    ecdsaAuthSource = getContractSourceCode("ECDSAAuth.aes");
   }
 
   protected BigInteger getNextKeypairNonce() {
@@ -355,5 +366,27 @@ public abstract class BaseTest {
     final InputStream inputStream =
         Thread.currentThread().getContextClassLoader().getResourceAsStream("contracts/" + filename);
     return IOUtils.toString(inputStream, StandardCharsets.UTF_8.toString());
+  }
+
+  protected byte[] web3jSignMessage(byte[] hashedMessage, ECKeyPair keyPair) {
+    SignatureData signatureData = Sign.signMessage(hashedMessage, keyPair, false);
+    byte[] signature = new byte[65];
+
+    // note FATE/Sophia requires the recovery identifier "V" to be placed as first byte in the
+    // signature in order to recover correctly via "ecrecover_secp256k1"
+    System.arraycopy(signatureData.getV(), 0, signature, 0, 1);
+    System.arraycopy(signatureData.getR(), 0, signature, 1, 32);
+    System.arraycopy(signatureData.getS(), 0, signature, 33, 32);
+    return signature;
+  }
+
+  protected byte[] web3jKeccak256(String msg, boolean ethereumPrefix) {
+    byte[] hashedMessage;
+    if (ethereumPrefix) {
+      hashedMessage = Sign.getEthereumMessageHash(msg.getBytes(StandardCharsets.UTF_8));
+    } else {
+      hashedMessage = Hash.sha3(msg.getBytes(StandardCharsets.UTF_8));
+    }
+    return hashedMessage;
   }
 }
