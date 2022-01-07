@@ -246,6 +246,9 @@ The reverse mapping not fully covered by the SDK. You need to analyze the result
 For some types there is also a reverse mapping implemented. To make use of this you have to call the `getMappedResult` method
 of the SophiaTypeTransformer and provide the expected type explicitely.
 
+If want full type support, please refer to the [contraect-maven-plugin](https://github.com/kryptokrauts/contraect-maven-plugin) which will generate a class out of your contract
+with all types and methods under the hood to easily interact with your contract.
+
 | **Sophia type** | **Java type** | **Sophia example value** |
 | ----------- | ----------- | ----------- |
 | address | `String` | `ak_2gx9MEFxKvY9vMG5YnqnXWv1hCsX7rgnfvBLJS4aQurustR1rt` |
