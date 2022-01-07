@@ -1,11 +1,11 @@
 ## Introduction
 The central access point to all services is made available through the [AeternityService](https://github.com/kryptokrauts/aepp-sdk-java/blob/master/src/main/java/com/kryptokrauts/aeternity/sdk/service/aeternity/impl/AeternityService.java) which can be obtained via the [AeternityServiceFactory](https://github.com/kryptokrauts/aepp-sdk-java/blob/master/src/main/java/com/kryptokrauts/aeternity/sdk/service/aeternity/AeternityServiceFactory.java).
-Necessary parameters to f.e. identify the network to use or the endpoints to act against, are defined via the [AeternityServiceConfiguration](https://github.com/kryptokrauts/aepp-sdk-java/blob/master/src/main/java/com/kryptokrauts/aeternity/sdk/service/aeternity/AeternityServiceConfiguration.java).
+Necessary parameters to for example identify the network to use or the endpoints to act against, are defined via the [AeternityServiceConfiguration](https://github.com/kryptokrauts/aepp-sdk-java/blob/master/src/main/java/com/kryptokrauts/aeternity/sdk/service/aeternity/AeternityServiceConfiguration.java).
 
 Of course it is also possible to initialize each Service (such as [AccountService](https://github.com/kryptokrauts/aepp-sdk-java/blob/master/src/main/java/com/kryptokrauts/aeternity/sdk/service/account/AccountService.java) or [TransactionService](https://github.com/kryptokrauts/aepp-sdk-java/blob/master/src/main/java/com/kryptokrauts/aeternity/sdk/service/transaction/TransactionService.java)) independently by providing the required `AeternityServiceConfiguration`.
 
 ## Initialize `AeternityService`
-The following code-snippet is an example how to initialize the `AeternityService` with a fresh generated KeyPair:
+The following code-snippet is an example how to initialize the `AeternityService` with a KeyPair recovered from a known private key:
 
 ```java
 KeyPairService keyPairService = new KeyPairServiceFactory().getService();
