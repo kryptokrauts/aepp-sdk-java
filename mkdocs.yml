@@ -41,6 +41,7 @@ extra:
 markdown_extensions:
   - pymdownx.highlight
   - pymdownx.superfences
+  - pymdownx.magiclink
 
 # Navigation
 nav:

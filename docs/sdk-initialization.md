@@ -9,7 +9,7 @@ The following code-snippet is an example how to initialize the `AeternityService
 
 ```java
 KeyPairService keyPairService = new KeyPairServiceFactory().getService();
-KeyPair keyPair = keyPairService.generateKeyPair();
+KeyPair keyPair = keyPairService.recoverKeyPair(<privateKey>);
 
 AeternityService aeternityService =
         new AeternityServiceFactory()
@@ -30,23 +30,23 @@ You can access the address of the KeyPair configured for the AeternityService ea
 ## Service Configuration
 Within the `AeternityServiceConfiguration` class, different parameters can be set:
 
-| **Paramenter**                                    | **Description**                                                                                                           | **Default** |
-| -----------                                       | -----------                                                                                                               | ----------- |
-| `baseUrl`                                         | endpoint of the aeternity node                                                                                            | `https://testnet.aeternity.io` |
-| `debugBaseUrl`                                    | debug endpoint of the aeternity node                                                                                      | `https://testnet.aeternity.io` |
-| `compilerBaseUrl`                                 | endpoint of the Sophia http compiler                                                                                      | `https://compiler.aeternity.io` |
-| `mdwBaseUrl`                                      | endpoint the aeternity middleware                                                                                         | `https://testnet.aeternity.io/mdw` |
-| `network`                                         | network to run against - should be aligned with endpoint of the node                                                      | [Network](https://github.com/kryptokrauts/aepp-sdk-java/blob/master/src/main/java/com/kryptokrauts/aeternity/sdk/constants/Network.java) . `TESTNET` |
-| `keyPair`                                         | the KeyPair to use for signing transactions if no KeyPair is provided explicitely                                         | - |
-| `targetVM`                                        | the VM to target, since Iris only FATE is supported for new contracts                                                     | [VirtualMachine](https://github.com/kryptokrauts/aepp-sdk-java/blob/master/src/main/java/com/kryptokrauts/aeternity/sdk/constants/VirtualMachine.java) . `FATE` |
-| `nativeMode`                                      | native mode builds transaction model with SDK. set to false to build via API call to node                                 | `true` |
-| `debugDryRun`                                     | use debug dry-run endpoint instead of protected dry-run endpoint                                                          | `false` |
-| `defaultGasPrice`                                 | default gas price to be used in contract related transactions                                                             | `1000000000` |
-| `waitForTxIncludedInBlockEnabled`                 | wait for tx to be included in a block (only relevant in synchronous functions)                                            | `true` |
-| `numTrialsToWaitForTxIncludedInBlock`             | number of trials to wait for a tx to be included in a block before throwing a `TransactionWaitTimeoutExpiredException`    | `60` |
-| `millisBetweenTrialsToWaitForTxIncludedInBlock`   | milliseconds to wait between trials for checking a tx to be included in a block                                           | `1000L` |
-| `numOfConfirmations`                              | number of confirmations to wait for accepting a tx                                                                        | `10` |
-| `millisBetweenTrailsToWaitForConfirmation`        | milliseconds to wait between trials for checking the confirmation                                                         | `10000L` |
-| `useZeroAddressAccountForDryRun`                  | use zero-address-account for dry-run                                                                                      | `true` |
-| `dryRunStatefulCalls`                             | perform a dry-run for stateful contract calls by default                                                                  | `true` |
-| `dryRunGasReserveMargin`                          | the reserve margin to use for gasLimit in stateful contract calls                                                         | `1.25f` |
+| **Paramenter**                                    | **Description**                                                                                                                   | **Default** |
+| -----------                                       | -----------                                                                                                                       | ----------- |
+| `baseUrl`                                         | endpoint of the aeternity node                                                                                                    | `https://testnet.aeternity.io` |
+| `compilerBaseUrl`                                 | endpoint of the Sophia http compiler                                                                                              | `https://compiler.aeternity.io` |
+| `debugBaseUrl`                                    | debug endpoint of the aeternity node                                                                                              | `https://testnet.aeternity.io` |
+| `debugDryRun`                                     | use debug dry-run endpoint instead of protected dry-run endpoint                                                                  | `false` |
+| `defaultGasPrice`                                 | default gas price to be used in contract related transactions                                                                     | `1000000000` |
+| `dryRunGasReserveMargin`                          | the reserve margin to use for gasLimit in stateful contract calls (only relevant in the convenience method if dry-run is active)  | `1.25f` |
+| `dryRunStatefulCalls`                             | perform a dry-run for stateful contract calls by default (only relevant in the convenience method)                                | `true` |
+| `keyPair`                                         | the KeyPair to use for signing transactions if no KeyPair is provided explicitly                                                  | - |
+| `mdwBaseUrl`                                      | endpoint the aeternity middleware                                                                                                 | `https://testnet.aeternity.io/mdw` |
+| `millisBetweenTrailsToWaitForConfirmation`        | milliseconds to wait between trials for checking the confirmation                                                                 | `10000L` |
+| `millisBetweenTrialsToWaitForTxIncludedInBlock`   | milliseconds to wait between trials for checking a tx to be included in a block                                                   | `1000L` |
+| `nativeMode`                                      | native mode builds transaction models with SDK. set to false to build via API call to node                                        | `true` |
+| `network`                                         | network to run against - should be aligned with endpoint of the node                                                              | [Network](https://github.com/kryptokrauts/aepp-sdk-java/blob/master/src/main/java/com/kryptokrauts/aeternity/sdk/constants/Network.java) . `TESTNET` |
+| `numOfConfirmations`                              | number of confirmations to wait for accepting a tx (relevance dependent on `waitForTxIncludedInBlockEnabled`)                     | `10` |
+| `numTrialsToWaitForTxIncludedInBlock`             | number of trials to wait for a tx to be included in a block (relevance dependent on `waitForTxIncludedInBlockEnabled`)            | `60` |
+| `targetVM`                                        | the VM to target, since Iris only FATE is supported for new contracts                                                             | [VirtualMachine](https://github.com/kryptokrauts/aepp-sdk-java/blob/master/src/main/java/com/kryptokrauts/aeternity/sdk/constants/VirtualMachine.java) . `FATE` |
+| `useZeroAddressAccountForDryRun`                  | use zero-address-account for dry-run                                                                                              | `true` |
+| `waitForTxIncludedInBlockEnabled`                 | wait for tx to be included in a block (only relevant in synchronous functions)                                                    | `true` |
