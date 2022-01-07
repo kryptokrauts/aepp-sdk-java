@@ -74,7 +74,6 @@ public class TransactionOraclesTest extends BaseTest {
             OracleRegisterTransactionModel oracleRegisterTx =
                 OracleRegisterTransactionModel.builder()
                     .accountId(oracleKeyPair.getAddress())
-                    .abiVersion(ZERO)
                     .nonce(nonce)
                     .oracleTtl(initialOracleTtl)
                     .oracleTtlType(OracleTTLType.BLOCK)

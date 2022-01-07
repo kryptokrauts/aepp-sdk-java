@@ -19,7 +19,7 @@ public class TransactionPayingForTest extends BaseTest {
   static UnitConversionService unitConversionService = new DefaultUnitConversionServiceImpl();
 
   @Test
-  public void testPayingForTx(TestContext testContext) {
+  public void testPayingForTxWithSpendTx(TestContext testContext) {
     this.executeTest(
         testContext,
         t -> {

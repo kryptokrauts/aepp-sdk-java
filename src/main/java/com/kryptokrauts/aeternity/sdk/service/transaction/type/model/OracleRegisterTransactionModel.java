@@ -22,7 +22,7 @@ import lombok.experimental.SuperBuilder;
 public class OracleRegisterTransactionModel extends AbstractTransactionModel<OracleRegisterTx> {
 
   @Mandatory private String accountId;
-  @Mandatory private BigInteger abiVersion;
+  @Default private BigInteger abiVersion = BigInteger.ZERO;
   @Mandatory private BigInteger nonce;
   @Mandatory private BigInteger oracleTtl;
   @Mandatory private OracleTTLType oracleTtlType;

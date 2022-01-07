@@ -11,11 +11,12 @@ If you need convenient access to any other specific API endpoint feel free to [o
 ### Get a specific auction
 
 ```java
-// TODO
+String aensName = "xyz.chain";
+NameAuctionResult nameAuctionResult = aeternityService.mdw.blockingGetNameAuction(aensName);
 ```
 
 ### Get all auctions
 
 ```java
-// TODO
+NameAuctionsResult nameAuctionsResult = aeternityService.mdw.blockingGetNameAuctions();
 ```
