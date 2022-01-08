@@ -1,0 +1,1232 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="The official documentation of the aepp-sdk-java provided by kryptokrauts.com
+">
+      
+      
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.2.3, mkdocs-material-7.1.9">
+    
+    
+      
+        <title>Contracts - aepp-sdk-java</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.ca7ac06f.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.f1a3b89f.min.css">
+        
+      
+    
+    
+    
+      
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,400i,700%7CRoboto+Mono&display=fallback">
+        <style>:root{--md-text-font-family:"Roboto";--md-code-font-family:"Roboto Mono"}</style>
+      
+    
+    
+    
+    
+      
+
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="green" data-md-color-accent="green">
+  
+    
+    <script>function __prefix(e){return new URL("..",location).pathname+"."+e}function __get(e,t=localStorage){return JSON.parse(t.getItem(__prefix(e)))}</script>
+    
+      <script>var palette=__get("__palette");if(null!==palette&&"object"==typeof palette.color)for(var key in palette.color)document.body.setAttribute("data-md-color-"+key,palette.color[key])</script>
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#contracts" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+      <header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../index.html" title="aepp-sdk-java" class="md-header__button md-logo" aria-label="aepp-sdk-java" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54z"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            aepp-sdk-java
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Contracts
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      <form class="md-header__option" data-md-component="palette">
+        
+          
+          
+          <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="green" data-md-color-accent="green"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_1">
+          
+            <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_2" hidden>
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m17.75 4.09-2.53 1.94.91 3.06-2.63-1.81-2.63 1.81.91-3.06-2.53-1.94L12.44 4l1.06-3 1.06 3 3.19.09m3.5 6.91-1.64 1.25.59 1.98-1.7-1.17-1.7 1.17.59-1.98L15.75 11l2.06-.05L18.5 9l.69 1.95 2.06.05m-2.28 4.95c.83-.08 1.72 1.1 1.19 1.85-.32.45-.66.87-1.08 1.27C15.17 23 8.84 23 4.94 19.07c-3.91-3.9-3.91-10.24 0-14.14.4-.4.82-.76 1.27-1.08.75-.53 1.93.36 1.85 1.19-.27 2.86.69 5.83 2.89 8.02a9.96 9.96 0 0 0 8.02 2.89m-1.64 2.02a12.08 12.08 0 0 1-7.8-3.47c-2.17-2.19-3.33-5-3.49-7.82-2.81 3.14-2.7 7.96.31 10.98 3.02 3.01 7.84 3.12 10.98.31z"/></svg>
+            </label>
+          
+        
+          
+          
+          <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="green" data-md-color-accent="green"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_2">
+          
+            <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_1" hidden>
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 7a5 5 0 0 1 5 5 5 5 0 0 1-5 5 5 5 0 0 1-5-5 5 5 0 0 1 5-5m0 2a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3m0-7 2.39 3.42C13.65 5.15 12.84 5 12 5c-.84 0-1.65.15-2.39.42L12 2M3.34 7l4.16-.35A7.2 7.2 0 0 0 5.94 8.5c-.44.74-.69 1.5-.83 2.29L3.34 7m.02 10 1.76-3.77a7.131 7.131 0 0 0 2.38 4.14L3.36 17M20.65 7l-1.77 3.79a7.023 7.023 0 0 0-2.38-4.15l4.15.36m-.01 10-4.14.36c.59-.51 1.12-1.14 1.54-1.86.42-.73.69-1.5.83-2.29L20.64 17M12 22l-2.41-3.44c.74.27 1.55.44 2.41.44.82 0 1.63-.17 2.37-.44L12 22z"/></svg>
+            </label>
+          
+        
+      </form>
+    
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5z"/></svg>
+      </label>
+      
+<div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" data-md-state="active" required>
+      <label class="md-search__icon md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5z"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
+      </label>
+      <button type="reset" class="md-search__icon md-icon" aria-label="Clear" tabindex="-1">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z"/></svg>
+      </button>
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+      <div class="md-header__source">
+        
+<a href="https://github.com/kryptokrauts/aepp-sdk-java/" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    kryptokrauts/aepp-sdk-java
+  </div>
+</a>
+      </div>
+    
+  </nav>
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../index.html" title="aepp-sdk-java" class="md-nav__button md-logo" aria-label="aepp-sdk-java" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54z"/></svg>
+
+    </a>
+    aepp-sdk-java
+  </label>
+  
+    <div class="md-nav__source">
+      
+<a href="https://github.com/kryptokrauts/aepp-sdk-java/" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    kryptokrauts/aepp-sdk-java
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../index.html" class="md-nav__link">
+        Getting Started
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../sdk-initialization.html" class="md-nav__link">
+        SDK initialization
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+    
+  
+  
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3" type="checkbox" id="__nav_3" checked>
+      
+      <label class="md-nav__link" for="__nav_3">
+        Usage Guides
+        <span class="md-nav__icon md-icon"></span>
+      </label>
+      <nav class="md-nav" aria-label="Usage Guides" data-md-level="1">
+        <label class="md-nav__title" for="__nav_3">
+          <span class="md-nav__icon md-icon"></span>
+          Usage Guides
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="aens.html" class="md-nav__link">
+        æternity naming system
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+    
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          Contracts
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="contracts.html" class="md-nav__link md-nav__link--active">
+        Contracts
+      </a>
+      
+        
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#introduction" class="md-nav__link">
+    Introduction
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#contract-interaction" class="md-nav__link">
+    Contract interaction
+  </a>
+  
+    <nav class="md-nav" aria-label="Contract interaction">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#compile-a-contract" class="md-nav__link">
+    Compile a contract
+  </a>
+  
+    <nav class="md-nav" aria-label="Compile a contract">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#handle-includes" class="md-nav__link">
+    Handle includes
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#deploy-a-contract" class="md-nav__link">
+    Deploy a contract
+  </a>
+  
+    <nav class="md-nav" aria-label="Deploy a contract">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#convenient-way" class="md-nav__link">
+    Convenient way
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#explicit-way" class="md-nav__link">
+    Explicit way
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#call-a-contract-read-only" class="md-nav__link">
+    Call a contract (read-only)
+  </a>
+  
+    <nav class="md-nav" aria-label="Call a contract (read-only)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#convenient-way_1" class="md-nav__link">
+    Convenient way
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#explicit-way_1" class="md-nav__link">
+    Explicit way
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#call-a-contract-stateful" class="md-nav__link">
+    Call a contract (stateful)
+  </a>
+  
+    <nav class="md-nav" aria-label="Call a contract (stateful)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#convenient-way_2" class="md-nav__link">
+    Convenient way
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#explicit-way_2" class="md-nav__link">
+    Explicit way
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#additional-topics" class="md-nav__link">
+    Additional topics
+  </a>
+  
+    <nav class="md-nav" aria-label="Additional topics">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#gas-estimation-via-dry-run" class="md-nav__link">
+    Gas estimation via dry-run
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#contracttxoptions" class="md-nav__link">
+    ContractTxOptions
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#sophia-type-mapping" class="md-nav__link">
+    Sophia type-mapping
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#plugins" class="md-nav__link">
+    Plugins
+  </a>
+  
+    <nav class="md-nav" aria-label="Plugins">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#contraect-maven-plugin" class="md-nav__link">
+    contraect-maven-plugin
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="ga.html" class="md-nav__link">
+        Generalized Accounts
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="mdw.html" class="md-nav__link">
+        Middleware
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="oracles.html" class="md-nav__link">
+        Oracles
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="payingfortx.html" class="md-nav__link">
+        PayingForTx
+      </a>
+    </li>
+  
+
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../example-apps.html" class="md-nav__link">
+        Example applications
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="https://www.javadoc.io/doc/com.kryptokrauts/aepp-sdk-java" class="md-nav__link">
+        Javadoc
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../changelog.html" class="md-nav__link">
+        Changelog
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../contribute.html" class="md-nav__link">
+        Contribute
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#introduction" class="md-nav__link">
+    Introduction
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#contract-interaction" class="md-nav__link">
+    Contract interaction
+  </a>
+  
+    <nav class="md-nav" aria-label="Contract interaction">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#compile-a-contract" class="md-nav__link">
+    Compile a contract
+  </a>
+  
+    <nav class="md-nav" aria-label="Compile a contract">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#handle-includes" class="md-nav__link">
+    Handle includes
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#deploy-a-contract" class="md-nav__link">
+    Deploy a contract
+  </a>
+  
+    <nav class="md-nav" aria-label="Deploy a contract">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#convenient-way" class="md-nav__link">
+    Convenient way
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#explicit-way" class="md-nav__link">
+    Explicit way
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#call-a-contract-read-only" class="md-nav__link">
+    Call a contract (read-only)
+  </a>
+  
+    <nav class="md-nav" aria-label="Call a contract (read-only)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#convenient-way_1" class="md-nav__link">
+    Convenient way
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#explicit-way_1" class="md-nav__link">
+    Explicit way
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#call-a-contract-stateful" class="md-nav__link">
+    Call a contract (stateful)
+  </a>
+  
+    <nav class="md-nav" aria-label="Call a contract (stateful)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#convenient-way_2" class="md-nav__link">
+    Convenient way
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#explicit-way_2" class="md-nav__link">
+    Explicit way
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#additional-topics" class="md-nav__link">
+    Additional topics
+  </a>
+  
+    <nav class="md-nav" aria-label="Additional topics">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#gas-estimation-via-dry-run" class="md-nav__link">
+    Gas estimation via dry-run
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#contracttxoptions" class="md-nav__link">
+    ContractTxOptions
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#sophia-type-mapping" class="md-nav__link">
+    Sophia type-mapping
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#plugins" class="md-nav__link">
+    Plugins
+  </a>
+  
+    <nav class="md-nav" aria-label="Plugins">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#contraect-maven-plugin" class="md-nav__link">
+    contraect-maven-plugin
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          <div class="md-content" data-md-component="content">
+            <article class="md-content__inner md-typeset">
+              
+                
+                  <a href="https://github.com/kryptokrauts/aepp-sdk-java/edit/master/docs/usage-guides/contracts.md" title="Edit this page" class="md-content__button md-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20.71 7.04c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.37-.39-1.02-.39-1.41 0l-1.84 1.83 3.75 3.75M3 17.25V21h3.75L17.81 9.93l-3.75-3.75L3 17.25z"/></svg>
+                  </a>
+                
+                
+                <h1 id="contracts">Contracts</h1>
+<h2 id="introduction">Introduction</h2>
+<p>The smart contract language of the æternity blockchain is <a href="https://aeternity.com/aesophia">Sophia</a>. It is a functional language in the ML family, strongly typed and has restricted mutable state.</p>
+<p>Before interacting with contracts using the SDK you should get familiar with Sophia itself first. Have a look into <a href="https://github.com/aeternity/aepp-sophia-examples">aepp-sophia-examples</a> and start rapid prototyping using <a href="https://studio.aepps.com">AEstudio</a>.</p>
+<p>The SDK needs to interact with following components in order to enable smart contract interactions on the æternity blockchain:</p>
+<ul>
+<li><a href="https://github.com/aeternity/aeternity">æternity</a> (host your own one or use the public testnet node at <code>https://testnet.aeternity.io</code>)</li>
+<li><a href="https://github.com/aeternity/aesophia_http">aesophia_http</a> (host your own one or use the public compiler at <code>https://compiler.aepps.com</code>)</li>
+</ul>
+<p>Note:</p>
+<ul>
+<li>For production deployments you should <strong><em>always</em></strong> host these services by yourself.</li>
+<li>We highly recommend the usage of the <a href="#contraect-maven-plugin">contraect-maven-plugin</a> for smart contract interaction.</li>
+</ul>
+<h2 id="contract-interaction">Contract interaction</h2>
+<p>For the example interaction following contract is being used:</p>
+<div class="highlight"><pre><span></span><code><span class="ow">@</span><span class="n">compiler</span><span class="w"> </span><span class="ow">&gt;=</span><span class="w"> </span><span class="mi">6</span><span class="w"></span>
+
+<span class="k">include</span><span class="w"> </span><span class="s2">&quot;String.aes&quot;</span><span class="w"></span>
+
+<span class="k">contract</span><span class="w"> </span><span class="nf">ChatBot</span><span class="w"> </span><span class="ow">=</span><span class="w"></span>
+
+<span class="w">    </span><span class="k">record</span><span class="w"> </span><span class="nb">state</span><span class="w"> </span><span class="ow">=</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">last_name</span><span class="ow">:</span><span class="w"> </span><span class="kt">string</span><span class="w"> </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">    </span><span class="k">datatype</span><span class="w"> </span><span class="kt">event</span><span class="w"> </span><span class="ow">=</span><span class="w"> </span><span class="nf">Greeting</span><span class="p">(</span><span class="kt">string</span><span class="p">)</span><span class="w"></span>
+
+<span class="w">    </span><span class="k">entrypoint</span><span class="w"> </span><span class="n">init</span><span class="p">()</span><span class="w"> </span><span class="ow">=</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">last_name</span><span class="w"> </span><span class="ow">=</span><span class="w"> </span><span class="s2">&quot;&quot;</span><span class="w"> </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">    </span><span class="k">entrypoint</span><span class="w"> </span><span class="n">greet</span><span class="p">(</span><span class="n">name</span><span class="ow">:</span><span class="w"> </span><span class="kt">string</span><span class="p">)</span><span class="w"> </span><span class="ow">:</span><span class="w"> </span><span class="kt">string</span><span class="w"> </span><span class="ow">=</span><span class="w"></span>
+<span class="w">        </span><span class="nc">Chain</span><span class="p">.</span><span class="n">event</span><span class="p">(</span><span class="nf">Greeting</span><span class="p">(</span><span class="n">name</span><span class="p">))</span><span class="w"></span>
+<span class="w">        </span><span class="nc">String</span><span class="p">.</span><span class="n">concat</span><span class="p">(</span><span class="s2">&quot;Hello, &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">name</span><span class="p">)</span><span class="w"></span>
+
+<span class="w">    </span><span class="k">stateful</span><span class="w"> </span><span class="k">entrypoint</span><span class="w"> </span><span class="n">greet_and_remember</span><span class="p">(</span><span class="n">name</span><span class="ow">:</span><span class="w"> </span><span class="kt">string</span><span class="p">)</span><span class="w"> </span><span class="ow">:</span><span class="w"> </span><span class="kt">string</span><span class="w"> </span><span class="ow">=</span><span class="w"></span>
+<span class="w">        </span><span class="nc">Chain</span><span class="p">.</span><span class="n">event</span><span class="p">(</span><span class="nf">Greeting</span><span class="p">(</span><span class="n">name</span><span class="p">))</span><span class="w"></span>
+<span class="w">        </span><span class="nb">put</span><span class="p">(</span><span class="nb">state</span><span class="p">{</span><span class="n">last_name</span><span class="ow">=</span><span class="n">name</span><span class="p">})</span><span class="w"></span>
+<span class="w">        </span><span class="nc">String</span><span class="p">.</span><span class="n">concat</span><span class="p">(</span><span class="s2">&quot;Hello, &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">name</span><span class="p">)</span><span class="w"></span>
+</code></pre></div>
+<h3 id="compile-a-contract">Compile a contract</h3>
+<p>By using the <a href="https://github.com/kryptokrauts/aepp-sdk-java/blob/master/src/main/java/com/kryptokrauts/aeternity/sdk/service/compiler/CompilerService.java">CompilerService</a>
+you can easily interact with the hosted Sophia http compiler and get the bytecode in return.</p>
+<div class="highlight"><pre><span></span><code><span class="n">String</span> <span class="n">sourceCode</span> <span class="o">=</span> <span class="s">&quot;...&quot;</span><span class="p">;</span> <span class="c1">// use source code of ChatBot contract</span>
+<span class="n">String</span> <span class="n">bytecode</span> <span class="o">=</span> <span class="n">aeternityService</span><span class="p">.</span><span class="na">compiler</span><span class="p">.</span><span class="na">blockingCompile</span><span class="p">(</span><span class="n">sourceCode</span><span class="p">,</span> <span class="kc">null</span><span class="p">)</span>
+                                           <span class="p">.</span><span class="na">getResult</span><span class="p">();</span>
+</code></pre></div>
+<h4 id="handle-includes">Handle includes</h4>
+<p>In case your contract contains custom includes (contracts/interfaces placed in other files) you need to provide a map in the <code>fileSystem</code> param with the name of the include as key and the source code of the include as value.</p>
+<h3 id="deploy-a-contract">Deploy a contract</h3>
+<p>When you have the bytecode you are basically ready to deploy the contract. This example contract doesn't expect any param in the <code>init</code> method.
+In this case you don't have to use the <code>CompilerService</code> to encode the calldata. You can simply use a default constant for the empty calldata.</p>
+<h4 id="convenient-way">Convenient way</h4>
+<div class="highlight"><pre><span></span><code><span class="n">ContractTxResult</span> <span class="n">contractTxResult</span> <span class="o">=</span> <span class="n">aeternityService</span><span class="p">.</span><span class="na">transactions</span><span class="p">.</span><span class="na">blockingContractCreate</span><span class="p">(</span><span class="n">sourceCode</span><span class="p">);</span>
+<span class="n">String</span> <span class="n">contractId</span> <span class="o">=</span> <span class="n">contractTxResult</span><span class="p">.</span><span class="na">getCallResult</span><span class="p">().</span><span class="na">getContractId</span><span class="p">();</span>
+</code></pre></div>
+<h4 id="explicit-way">Explicit way</h4>
+<div class="highlight"><pre><span></span><code><span class="c1">// build the tx model with all the required attributes</span>
+<span class="n">ContractCreateTransactionModel</span> <span class="n">contractCreate</span> <span class="o">=</span>
+  <span class="n">ContractCreateTransactionModel</span><span class="p">.</span><span class="na">builder</span><span class="p">()</span>
+      <span class="c1">// in case the init entrypoint doesn&#39;t require a param you can simply use this constant value</span>
+      <span class="p">.</span><span class="na">callData</span><span class="p">(</span><span class="n">BaseConstants</span><span class="p">.</span><span class="na">CONTRACT_EMPTY_INIT_CALLDATA</span><span class="p">)</span>
+      <span class="p">.</span><span class="na">contractByteCode</span><span class="p">(</span><span class="n">byteCode</span><span class="p">)</span>
+      <span class="p">.</span><span class="na">nonce</span><span class="p">(</span><span class="n">aeternityService</span><span class="p">.</span><span class="na">accounts</span><span class="p">.</span><span class="na">blockingGetNextNonce</span><span class="p">())</span>
+      <span class="p">.</span><span class="na">ownerId</span><span class="p">(</span><span class="n">aeternityService</span><span class="p">.</span><span class="na">keyPairAddress</span><span class="p">)</span>
+      <span class="p">.</span><span class="na">build</span><span class="p">();</span>
+
+<span class="c1">// by default this action will wait until the tx is included in a block)</span>
+<span class="n">PostTransactionResult</span> <span class="n">createTxResult</span> <span class="o">=</span>
+  <span class="n">aeternityService</span><span class="p">.</span><span class="na">transactions</span><span class="p">.</span><span class="na">blockingPostTransaction</span><span class="p">(</span><span class="n">contractCreate</span><span class="p">);</span>
+
+<span class="c1">// after the tx is included you can fetch the tx-info to determine the contractId</span>
+<span class="n">TransactionInfoResult</span> <span class="n">createTxInfoResult</span> <span class="o">=</span>
+  <span class="n">aeternityService</span><span class="p">.</span><span class="na">info</span><span class="p">.</span><span class="na">blockingGetTransactionInfoByHash</span><span class="p">(</span><span class="n">createTxResult</span><span class="p">.</span><span class="na">getTxHash</span><span class="p">());</span>
+<span class="n">String</span> <span class="n">contractId</span> <span class="o">=</span> <span class="n">createTxInfoResult</span><span class="p">.</span><span class="na">getCallInfo</span><span class="p">().</span><span class="na">getContractId</span><span class="p">();</span>
+</code></pre></div>
+<h3 id="call-a-contract-read-only">Call a contract (read-only)</h3>
+<h4 id="convenient-way_1">Convenient way</h4>
+<div class="highlight"><pre><span></span><code><span class="n">AeternityService</span> <span class="n">readOnlyService</span> <span class="o">=</span> <span class="k">new</span> <span class="n">AeternityServiceFactory</span><span class="p">().</span><span class="na">getService</span><span class="p">();</span>
+<span class="n">Object</span> <span class="n">decodedResult</span> <span class="o">=</span> <span class="n">readOnlyService</span><span class="p">.</span><span class="na">transactions</span><span class="p">.</span><span class="na">blockingReadOnlyContractCall</span><span class="p">(</span>
+                                  <span class="n">contractId</span><span class="p">,</span>
+                                  <span class="s">&quot;greet&quot;</span><span class="p">,</span>
+                                  <span class="n">sourceCode</span><span class="p">,</span>
+                                  <span class="n">ContractTxOptions</span><span class="p">.</span><span class="na">builder</span><span class="p">()</span>
+                                      <span class="p">.</span><span class="na">params</span><span class="p">(</span><span class="n">List</span><span class="p">.</span><span class="na">of</span><span class="p">(</span><span class="k">new</span> <span class="n">SophiaString</span><span class="p">(</span><span class="s">&quot;kryptokrauts&quot;</span><span class="p">)))</span>
+                                      <span class="p">.</span><span class="na">build</span><span class="p">());</span>
+<span class="n">log</span><span class="p">.</span><span class="na">info</span><span class="p">(</span><span class="n">decodedResult</span><span class="p">.</span><span class="na">toString</span><span class="p">());</span> <span class="c1">// &quot;Hello, kryptokrauts&quot;</span>
+</code></pre></div>
+<h4 id="explicit-way_1">Explicit way</h4>
+<div class="highlight"><pre><span></span><code><span class="n">AeternityService</span> <span class="n">readOnlyService</span> <span class="o">=</span> <span class="k">new</span> <span class="n">AeternityServiceFactory</span><span class="p">().</span><span class="na">getService</span><span class="p">();</span>
+<span class="n">String</span> <span class="n">callData</span> <span class="o">=</span>
+    <span class="n">readOnlyService</span>
+        <span class="p">.</span><span class="na">compiler</span>
+        <span class="p">.</span><span class="na">blockingEncodeCalldata</span><span class="p">(</span>
+            <span class="n">sourceCode</span><span class="p">,</span> <span class="s">&quot;greet&quot;</span><span class="p">,</span> <span class="n">Arrays</span><span class="p">.</span><span class="na">asList</span><span class="p">(</span><span class="s">&quot;\&quot;kryptokrauts\&quot;&quot;</span><span class="p">),</span> <span class="kc">null</span><span class="p">)</span>
+        <span class="p">.</span><span class="na">getResult</span><span class="p">();</span>
+<span class="n">ContractCallTransactionModel</span> <span class="n">contractCall</span> <span class="o">=</span>
+    <span class="n">ContractCallTransactionModel</span><span class="p">.</span><span class="na">builder</span><span class="p">()</span>
+        <span class="p">.</span><span class="na">contractId</span><span class="p">(</span><span class="n">contractId</span><span class="p">)</span>
+        <span class="p">.</span><span class="na">callData</span><span class="p">(</span><span class="n">callData</span><span class="p">)</span>
+        <span class="p">.</span><span class="na">build</span><span class="p">();</span>
+
+<span class="n">DryRunTransactionResult</span> <span class="n">dryRunResult</span> <span class="o">=</span>
+    <span class="n">readOnlyService</span><span class="p">.</span><span class="na">transactions</span><span class="p">.</span><span class="na">blockingDryRunContractTx</span><span class="p">(</span><span class="n">contractCall</span><span class="p">,</span> <span class="kc">true</span><span class="p">);</span>
+
+<span class="n">ObjectResultWrapper</span> <span class="n">resultWrapper</span> <span class="o">=</span>
+    <span class="n">readOnlyService</span><span class="p">.</span><span class="na">compiler</span><span class="p">.</span><span class="na">blockingDecodeCallResult</span><span class="p">(</span>
+        <span class="n">sourceCode</span><span class="p">,</span>
+        <span class="s">&quot;greet&quot;</span><span class="p">,</span>
+        <span class="n">dryRunResult</span><span class="p">.</span><span class="na">getContractCallObject</span><span class="p">().</span><span class="na">getReturnType</span><span class="p">(),</span>
+        <span class="n">dryRunResult</span><span class="p">.</span><span class="na">getContractCallObject</span><span class="p">().</span><span class="na">getReturnValue</span><span class="p">(),</span>
+        <span class="kc">null</span><span class="p">);</span>
+
+<span class="n">log</span><span class="p">.</span><span class="na">info</span><span class="p">(</span><span class="n">resultWrapper</span><span class="p">.</span><span class="na">getResult</span><span class="p">().</span><span class="na">toString</span><span class="p">());</span> <span class="c1">// &quot;Hello, kryptokrauts&quot;</span>
+</code></pre></div>
+<h3 id="call-a-contract-stateful">Call a contract (stateful)</h3>
+<h4 id="convenient-way_2">Convenient way</h4>
+<p>When using the convenient way by calling <code>blockingStatefulContractCall</code>
+you will receive an object <code>ContractTxResult</code> which includes all important information (e.g. tx-hash, gas used, ...) about the stateful contract call.</p>
+<div class="highlight"><pre><span></span><code><span class="n">ContractTxResult</span> <span class="n">contractTxResult</span> <span class="o">=</span> <span class="n">aeternityService</span><span class="p">.</span><span class="na">transactions</span>
+          <span class="p">.</span><span class="na">blockingStatefulContractCall</span><span class="p">(</span><span class="n">contractId</span><span class="p">,</span> <span class="s">&quot;greet_and_remember&quot;</span><span class="p">,</span>
+              <span class="n">sourceCode</span><span class="p">,</span> <span class="n">ContractTxOptions</span><span class="p">.</span><span class="na">builder</span><span class="p">()</span>
+                  <span class="p">.</span><span class="na">params</span><span class="p">(</span><span class="n">List</span><span class="p">.</span><span class="na">of</span><span class="p">(</span><span class="k">new</span> <span class="n">SophiaString</span><span class="p">(</span><span class="s">&quot;kryptokrauts&quot;</span><span class="p">)))</span>
+                  <span class="p">.</span><span class="na">build</span><span class="p">());</span>
+</code></pre></div>
+<h4 id="explicit-way_2">Explicit way</h4>
+<div class="highlight"><pre><span></span><code><span class="c1">// obtain the calldata by calling the http compiler</span>
+<span class="n">String</span> <span class="n">callData</span> <span class="o">=</span>
+  <span class="n">aeternityService</span>
+      <span class="p">.</span><span class="na">compiler</span>
+      <span class="p">.</span><span class="na">blockingEncodeCalldata</span><span class="p">(</span>
+          <span class="n">chatBotSource</span><span class="p">,</span> <span class="s">&quot;greet_and_remember&quot;</span><span class="p">,</span> <span class="n">Arrays</span><span class="p">.</span><span class="na">asList</span><span class="p">(</span><span class="s">&quot;\&quot;kryptokrauts\&quot;&quot;</span><span class="p">),</span> <span class="kc">null</span><span class="p">)</span>
+      <span class="p">.</span><span class="na">getResult</span><span class="p">();</span>
+
+<span class="c1">// build the contract call tx model</span>
+<span class="n">ContractCallTransactionModel</span> <span class="n">contractCall</span> <span class="o">=</span>
+  <span class="n">ContractCallTransactionModel</span><span class="p">.</span><span class="na">builder</span><span class="p">()</span>
+      <span class="p">.</span><span class="na">callerId</span><span class="p">(</span><span class="n">aeternityService</span><span class="p">.</span><span class="na">keyPairAddress</span><span class="p">)</span>
+      <span class="p">.</span><span class="na">contractId</span><span class="p">(</span><span class="n">contractId</span><span class="p">)</span>
+      <span class="p">.</span><span class="na">callData</span><span class="p">(</span><span class="n">callData</span><span class="p">)</span>
+      <span class="p">.</span><span class="na">nonce</span><span class="p">(</span><span class="n">aeternityService</span><span class="p">.</span><span class="na">accounts</span><span class="p">.</span><span class="na">blockingGetNextNonce</span><span class="p">())</span>
+      <span class="p">.</span><span class="na">build</span><span class="p">();</span>
+
+<span class="cm">/**</span>
+<span class="cm">* optional: if you know that the default of 25000 is sufficient you don&#39;t need a dry-run at all</span>
+<span class="cm">*/</span>
+<span class="n">DryRunTransactionResult</span> <span class="n">dryRunResult</span> <span class="o">=</span>
+  <span class="n">aeternityService</span><span class="p">.</span><span class="na">transactions</span><span class="p">.</span><span class="na">blockingDryRunContractTx</span><span class="p">(</span><span class="n">contractCall</span><span class="p">,</span> <span class="kc">false</span><span class="p">);</span>
+<span class="cm">/**</span>
+<span class="cm">* determine gasUsed via dry-run and add a margin to make sure the tx gets mined.</span>
+<span class="cm">* ideally you implement this as a one-time action and monitor gas usage over time.</span>
+<span class="cm">* the margin is not required but recommended. if the provided gasLimit is insufficient</span>
+<span class="cm">* the tx will fail and consumed gas will be payed anyway. so you can lose funds</span>
+<span class="cm">*/</span>
+<span class="n">BigInteger</span> <span class="n">gasLimitWithMargin</span> <span class="o">=</span> <span class="k">new</span> <span class="n">BigDecimal</span><span class="p">(</span>
+  <span class="n">dryRunResult</span><span class="p">.</span><span class="na">getContractCallObject</span><span class="p">().</span><span class="na">getGasUsed</span><span class="p">())</span>
+  <span class="p">.</span><span class="na">multiply</span><span class="p">(</span><span class="k">new</span> <span class="n">BigDecimal</span><span class="p">(</span><span class="mf">1.5f</span><span class="p">))</span>
+  <span class="p">.</span><span class="na">toBigInteger</span><span class="p">();</span>
+<span class="c1">// set the gasLimitWithMargin before broadcasting the transaction</span>
+<span class="n">contractCall</span> <span class="o">=</span> <span class="n">contractCall</span><span class="p">.</span><span class="na">toBuilder</span><span class="p">().</span><span class="na">gasLimit</span><span class="p">(</span><span class="n">gasLimitWithMargin</span><span class="p">).</span><span class="na">build</span><span class="p">();</span>
+
+<span class="c1">// broadcast the tx</span>
+<span class="n">PostTransactionResult</span> <span class="n">txResult</span> <span class="o">=</span> <span class="n">aeternityService</span><span class="p">.</span><span class="na">transactions</span>
+  <span class="p">.</span><span class="na">blockingPostTransaction</span><span class="p">(</span><span class="n">contractCall</span><span class="p">);</span>
+
+<span class="c1">// obtain the tx-info</span>
+<span class="n">TransactionInfoResult</span> <span class="n">infoResult</span> <span class="o">=</span> <span class="n">aeternityService</span><span class="p">.</span><span class="na">info</span>
+  <span class="p">.</span><span class="na">blockingGetTransactionInfoByHash</span><span class="p">(</span><span class="n">txResult</span><span class="p">.</span><span class="na">getTxHash</span><span class="p">());</span>
+
+<span class="c1">// decode the return value by calling the http compiler</span>
+<span class="n">ObjectResultWrapper</span> <span class="n">resultWrapper</span> <span class="o">=</span>
+  <span class="n">aeternityService</span><span class="p">.</span><span class="na">compiler</span><span class="p">.</span><span class="na">blockingDecodeCallResult</span><span class="p">(</span>
+      <span class="n">chatBotSource</span><span class="p">,</span>
+      <span class="s">&quot;greet_and_remember&quot;</span><span class="p">,</span>
+      <span class="n">infoResult</span><span class="p">.</span><span class="na">getCallInfo</span><span class="p">().</span><span class="na">getReturnType</span><span class="p">(),</span>
+      <span class="n">infoResult</span><span class="p">.</span><span class="na">getCallInfo</span><span class="p">().</span><span class="na">getReturnValue</span><span class="p">(),</span>
+      <span class="kc">null</span><span class="p">);</span>
+
+<span class="n">_logger</span><span class="p">.</span><span class="na">info</span><span class="p">(</span><span class="n">resultWrapper</span><span class="p">.</span><span class="na">getResult</span><span class="p">().</span><span class="na">toString</span><span class="p">());</span> <span class="c1">// &quot;Hello, kryptokrauts&quot;</span>
+</code></pre></div>
+<h3 id="additional-topics">Additional topics</h3>
+<h4 id="gas-estimation-via-dry-run">Gas estimation via dry-run</h4>
+<ul>
+<li>It is reasonable to estimate the gas consumption for a contract call using the dry-run feature of the node at least once
+    and provide a specific offset (e.g. multiplied by 1.25 or 2) as default to ensure that contract calls are mined.
+    Depending on the logic of the contract the gas consumption of a specific contract call can vary
+    and therefore you should monitor the gas consumption and increase the default for the respective contract call
+    accordingly over time.</li>
+<li>The default gas value of <code>25000</code> should cover all trivial stateful contract calls.
+    In case transactions start running out of gas you should proceed the way described above
+    and estimate the required gas using the dry-run feature.</li>
+</ul>
+<h4 id="contracttxoptions">ContractTxOptions</h4>
+<p>In the convenience methods you can always provide tx-options and define some or all of following attributes:</p>
+<ul>
+<li><code>params</code> (the list of params to be passed, default: <code>null</code>)<ul>
+<li>check the Sophia type-mapping table below</li>
+</ul>
+</li>
+<li><code>amount</code> (the amount in ættos to be passed, default <code>ZERO</code>)</li>
+<li><code>gasLimit</code> (the custom gasLimit, default: <code>25000</code>)</li>
+<li><code>gasPrice</code> (the custom gasPrice to be used in the tx instead of the default <code>1000000000</code>)</li>
+<li><code>nonce</code> (the custom nonce to be used in the tx, default: automatically determined by the sdk)</li>
+<li><code>ttl</code> (the custom ttl, default: <code>ZERO</code>)</li>
+<li><code>filesystem</code> (the includes-map for the contract, default: <code>null</code>)<ul>
+<li>key = include-name</li>
+<li>value = source code of the include</li>
+</ul>
+</li>
+</ul>
+<h4 id="sophia-type-mapping">Sophia type-mapping</h4>
+<p>The following mapping table indicates what Java types have to be passed for the respective Sophia entrypoint parameters.</p>
+<p>If you use the convenience methods you only need to make sure the params reflect the required types in Sophia.
+The convenience methods use the <code>toCompilerInput</code> method of <a href="https://github.com/kryptokrauts/aepp-sdk-java/blob/master/src/main/java/com/kryptokrauts/aeternity/sdk/domain/sophia/SophiaTypeTransformer.java">SophiaTypeTransformer</a>
+to automatically transform the Java type into the representation the Sophia compiler expects it to be.</p>
+<p>The reverse mapping not fully covered by the SDK. You need to analyze the result object and map/handle it accordingly.
+For some types there is also a reverse mapping implemented. To make use of this you have to call the <code>getMappedResult</code> method
+of the SophiaTypeTransformer and provide the expected type explicitely.</p>
+<p>If want full type support, please refer to the <a href="https://github.com/kryptokrauts/contraect-maven-plugin">contraect-maven-plugin</a> which will generate a class out of your contract
+with all types and methods under the hood to easily interact with your contract.</p>
+<table>
+<thead>
+<tr>
+<th><strong>Sophia type</strong></th>
+<th><strong>Java type</strong></th>
+<th><strong>Sophia example value</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>address</td>
+<td><code>String</code></td>
+<td><code>ak_2gx9MEFxKvY9vMG5YnqnXWv1hCsX7rgnfvBLJS4aQurustR1rt</code></td>
+</tr>
+<tr>
+<td>bool</td>
+<td><code>Boolean</code></td>
+<td><code>true</code>, <code>false</code></td>
+</tr>
+<tr>
+<td>bytes(8)</td>
+<td><code>SophiaBytes</code></td>
+<td><code>#fedcba9876543210</code></td>
+</tr>
+<tr>
+<td>Chain.ttl</td>
+<td><code>SophiaChainTTL</code></td>
+<td><code>FixedTTL(1050)</code>, <code>RelativeTTL(50)</code></td>
+</tr>
+<tr>
+<td>contract</td>
+<td><code>String</code></td>
+<td><code>ct_Ez6MyeTMm17YnTnDdHTSrzMEBKmy7Uz2sXu347bTDPgVH2ifJ</code></td>
+</tr>
+<tr>
+<td>hash</td>
+<td><code>SophiaHash</code></td>
+<td><code>#000102030405060708090a0b0c0d0e0f000102030405060708090a0b0c0d0e0f</code></td>
+</tr>
+<tr>
+<td>int</td>
+<td><code>Integer</code> / <code>Long</code> / <code>BigInteger</code></td>
+<td><code>1337</code>, <code>1337</code></td>
+</tr>
+<tr>
+<td>list(string)</td>
+<td><code>List&lt;SophiaString&gt;</code></td>
+<td><code>["a", "b", "c"]</code></td>
+</tr>
+<tr>
+<td>map(string, string)</td>
+<td><code>Map&lt;SophiaString, SophiaString&gt;</code></td>
+<td><code>{["foo"] = "bar", ["x"] = "yz"}</code></td>
+</tr>
+<tr>
+<td>option(string)</td>
+<td><code>Optional&lt;SophiaString&gt;</code></td>
+<td><code>Some("kryptokrauts")</code>, <code>None</code></td>
+</tr>
+<tr>
+<td>oracle('a, 'b)</td>
+<td><code>String</code></td>
+<td><code>ok_2YNyxd6TRJPNrTcEDCe9ra59SVUdp9FR9qWC5msKZWYD9bP9z5</code></td>
+</tr>
+<tr>
+<td>oracle_query('a, 'b)</td>
+<td><code>String</code></td>
+<td><code>oq_2oRvyowJuJnEkxy58Ckkw77XfWJrmRgmGaLzhdqb67SKEL1gPY</code></td>
+</tr>
+<tr>
+<td>signature</td>
+<td><code>SophiaSignature</code></td>
+<td><code>#000102030405060708090a0b0c0d0e0f000102030405060708090a0b0c0d0e0f000102030405060708090a0b0c0d0e0f000102030405060708090a0b0c0d0e0f</code></td>
+</tr>
+<tr>
+<td>string</td>
+<td><code>SophiaString</code></td>
+<td><code>"This is a string"</code></td>
+</tr>
+<tr>
+<td>tuple</td>
+<td><code>SophiaTuple</code></td>
+<td><code>(42, "Foo", true)</code></td>
+</tr>
+</tbody>
+</table>
+<h2 id="plugins">Plugins</h2>
+<h3 id="contraect-maven-plugin">contraect-maven-plugin</h3>
+<p>To provide an even more convenient way to interact with smart contracts on the æternity blockchain
+we developed a plugin that uses the <a href="https://aeternity.com/aesophia/latest/aeso_aci">ACI</a> of contracts
+written in Sophia as input to generate Java classes.
+The generated classes make use of the aepp-sdk-java and provide methods to deploy contracts and call the respective entrypoint functions.</p>
+<p>In contrast to plain SDK usage the plugin provides you type-safe param and return values.</p>
+<p><strong>Links</strong>:</p>
+<ul>
+<li><a href="https://github.com/kryptokrauts/contraect-maven-plugin">https://github.com/kryptokrauts/contraect-maven-plugin</a></li>
+<li><a href="https://github.com/kryptokrauts/contraect-showcase-maven">https://github.com/kryptokrauts/contraect-showcase-maven</a></li>
+</ul>
+                
+              
+              
+                
+
+
+              
+            </article>
+          </div>
+        </div>
+        
+      </main>
+      
+        
+<footer class="md-footer">
+  
+    <nav class="md-footer__inner md-grid" aria-label="Footer">
+      
+        
+        <a href="aens.html" class="md-footer__link md-footer__link--prev" aria-label="Previous: æternity naming system" rel="prev">
+          <div class="md-footer__button md-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
+          </div>
+          <div class="md-footer__title">
+            <div class="md-ellipsis">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              æternity naming system
+            </div>
+          </div>
+        </a>
+      
+      
+        
+        <a href="ga.html" class="md-footer__link md-footer__link--next" aria-label="Next: Generalized Accounts" rel="next">
+          <div class="md-footer__title">
+            <div class="md-ellipsis">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              Generalized Accounts
+            </div>
+          </div>
+          <div class="md-footer__button md-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11H4z"/></svg>
+          </div>
+        </a>
+      
+    </nav>
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-footer-copyright">
+        
+        Made with
+        <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+          Material for MkDocs
+        </a>
+        
+      </div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    <script id="__config" type="application/json">{"base": "..", "features": ["content.tabs.link", "search.highlight", "search.share", "search.suggest"], "translations": {"clipboard.copy": "Copy to clipboard", "clipboard.copied": "Copied to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.placeholder": "Type to start searching", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.term.missing": "Missing", "select.version.title": "Select version"}, "search": "../assets/javascripts/workers/search.477d984a.min.js", "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.82b56eb2.min.js"></script>
+      
+    
+  </body>
+</html>
