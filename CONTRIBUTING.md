@@ -1,1 +1,1 @@
-Contribution Guide can be found [here](https://kryptokrauts.gitbook.io/aepp-sdk-java/contribution-guide)
+Contribution Guide can be found [here](docs/contribute.md).
