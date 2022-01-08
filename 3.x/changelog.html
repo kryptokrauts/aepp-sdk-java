@@ -429,6 +429,13 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#general-changes" class="md-nav__link">
+    General changes
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#breaking-changes" class="md-nav__link">
     Breaking changes
   </a>
@@ -438,6 +445,13 @@
           <li class="md-nav__item">
   <a href="#new-features" class="md-nav__link">
     New features
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#refactoring" class="md-nav__link">
+    Refactoring
   </a>
   
 </li>
@@ -503,7 +517,7 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#refactoring" class="md-nav__link">
+  <a href="#refactoring_1" class="md-nav__link">
     Refactoring
   </a>
   
@@ -544,7 +558,7 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#general-changes" class="md-nav__link">
+  <a href="#general-changes_1" class="md-nav__link">
     General changes
   </a>
   
@@ -564,7 +578,7 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#general-changes_1" class="md-nav__link">
+  <a href="#general-changes_2" class="md-nav__link">
     General changes
   </a>
   
@@ -598,7 +612,7 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#general-changes_2" class="md-nav__link">
+  <a href="#general-changes_3" class="md-nav__link">
     General changes
   </a>
   
@@ -645,7 +659,7 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#general-changes_3" class="md-nav__link">
+  <a href="#general-changes_4" class="md-nav__link">
     General changes
   </a>
   
@@ -733,6 +747,13 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#general-changes" class="md-nav__link">
+    General changes
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#breaking-changes" class="md-nav__link">
     Breaking changes
   </a>
@@ -742,6 +763,13 @@
           <li class="md-nav__item">
   <a href="#new-features" class="md-nav__link">
     New features
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#refactoring" class="md-nav__link">
+    Refactoring
   </a>
   
 </li>
@@ -807,7 +835,7 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#refactoring" class="md-nav__link">
+  <a href="#refactoring_1" class="md-nav__link">
     Refactoring
   </a>
   
@@ -848,7 +876,7 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#general-changes" class="md-nav__link">
+  <a href="#general-changes_1" class="md-nav__link">
     General changes
   </a>
   
@@ -868,7 +896,7 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#general-changes_1" class="md-nav__link">
+  <a href="#general-changes_2" class="md-nav__link">
     General changes
   </a>
   
@@ -902,7 +930,7 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#general-changes_2" class="md-nav__link">
+  <a href="#general-changes_3" class="md-nav__link">
     General changes
   </a>
   
@@ -949,7 +977,7 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#general-changes_3" class="md-nav__link">
+  <a href="#general-changes_4" class="md-nav__link">
     General changes
   </a>
   
@@ -999,15 +1027,53 @@
                 
                 <h1 id="changelog">Changelog</h1>
 <h2 id="v300"><a href="https://github.com/kryptokrauts/aepp-sdk-java/releases/tag/v3.0.0">v3.0.0</a></h2>
-<p>This is a major release that underwent a huge refactoring. It supports the most important latest changes of aeternity.</p>
+<p>This is a major release that underwent a huge refactoring. It supports the most important latest changes of aeternity. It is fully compatible with the latest Iris hardfork.</p>
+<h3 id="general-changes">General changes</h3>
+<ul>
+<li><a href="https://github.com/kryptokrauts/aepp-sdk-java/pull/196">#196</a>
+, <a href="https://github.com/kryptokrauts/aepp-sdk-java/pull/218">#218</a>
+, <a href="https://github.com/kryptokrauts/aepp-sdk-java/pull/219">#219</a>
+, <a href="https://github.com/kryptokrauts/aepp-sdk-java/pull/220">#220</a>
+, <a href="https://github.com/kryptokrauts/aepp-sdk-java/pull/221">#221</a>
+, <a href="https://github.com/kryptokrauts/aepp-sdk-java/pull/222">#222</a>
+, <a href="https://github.com/kryptokrauts/aepp-sdk-java/pull/223">#223</a>
+ SDK documentation via MkDocs including versioning with Mike</li>
+<li><a href="https://github.com/kryptokrauts/aepp-sdk-java/pull/217">#217</a> Improved Javadocs</li>
+<li>Updated dependencies</li>
+</ul>
 <h3 id="breaking-changes">Breaking changes</h3>
 <ul>
-<li>dropped support for Java 8, now targeting Java 15+</li>
-<li>TODO ...</li>
+<li><a href="https://github.com/kryptokrauts/aepp-sdk-java/pull/144">#144</a> Revisited handling of keypairs:<ul>
+<li>Introduced <code>KeyPair</code> class, dropped <code>BaseKeyPair</code> class</li>
+<li>Introduced <code>HdWallet</code> and <code>HdKeyPair</code>. These changes include a fix for a bug in the key derivation that derived wrong keypairs.</li>
+</ul>
+</li>
+<li><a href="https://github.com/kryptokrauts/aepp-sdk-java/pull/177">#177</a> Discarded Java 8 in favor of Java 15+</li>
+<li><a href="https://github.com/kryptokrauts/aepp-sdk-java/pull/183">#183</a> Middleware: dropped <code>indaex</code> (formerly <code>aeternal</code>) in favor of <code>mdw</code></li>
+<li><a href="https://github.com/kryptokrauts/aepp-sdk-java/pull/206">#206</a> Renamed <code>gas</code> to <code>gasLimit</code> in all transaction model classes</li>
 </ul>
 <h3 id="new-features">New features</h3>
 <ul>
-<li>support of PayingForTx</li>
+<li><a href="https://github.com/kryptokrauts/aepp-sdk-java/pull/155">#155</a> New transaction type <code>PayingForTx</code></li>
+<li><a href="https://github.com/kryptokrauts/aepp-sdk-java/pull/157">#157</a> Arbitrary pointer-keys for AENS pointers</li>
+<li><a href="https://github.com/kryptokrauts/aepp-sdk-java/pull/159">#159</a> External (protected) dry-run endpoint</li>
+<li><a href="https://github.com/kryptokrauts/aepp-sdk-java/pull/171">#171</a> Convenient methods to create delegation signatures</li>
+<li><a href="https://github.com/kryptokrauts/aepp-sdk-java/pull/184">#184</a> Retrieve next nonce with new API endpoint that provides different strategies</li>
+<li><a href="https://github.com/kryptokrauts/aepp-sdk-java/pull/188">#188</a> Force <code>deposit</code> to be <code>ZERO</code> in ContractCreateTx</li>
+<li><a href="https://github.com/kryptokrauts/aepp-sdk-java/pull/192">#192</a> New method <code>computeGAInnerTxHash</code> for usage of Generalized Accounts</li>
+<li><a href="https://github.com/kryptokrauts/aepp-sdk-java/pull/200">#200</a> Limit max amount of pointers to 32. Introduce constant <code>AENS.MAX_TTL</code>.</li>
+<li><a href="https://github.com/kryptokrauts/aepp-sdk-java/pull/201">#201</a> Support for <code>NameTransferTx</code></li>
+<li><a href="https://github.com/kryptokrauts/aepp-sdk-java/pull/211">#211</a> Convenient methods for contract related transaction types to easily:<ul>
+<li>deploy a contract</li>
+<li>perform a stateful contract call</li>
+<li>perform a read-only dry-run call</li>
+</ul>
+</li>
+</ul>
+<h3 id="refactoring">Refactoring</h3>
+<ul>
+<li><a href="https://github.com/kryptokrauts/aepp-sdk-java/pull/176">#176</a> OpenAPI (OAS3) API (<code>/v3</code>) in favor of old swagger API (<code>/v2</code>)</li>
+<li>Introduced default values in the model classes of each tx-type</li>
 </ul>
 <h2 id="v221"><a href="https://github.com/kryptokrauts/aepp-sdk-java/releases/tag/v2.2.1">v2.2.1</a></h2>
 <p>This release ships an enhancement.</p>
@@ -1062,7 +1128,7 @@
 </ul>
 <h2 id="v210"><a href="https://github.com/kryptokrauts/aepp-sdk-java/releases/tag/v2.1.0">v2.1.0</a></h2>
 <p>This release ships some fixes and enhancements. Additionally we renamed some attributes and model-classes. If you already used <a href="https://github.com/kryptokrauts/aepp-sdk-java/releases/tag/v2.0.0">v2.0.0</a> it might be needed to fix these changes.</p>
-<h3 id="refactoring">Refactoring</h3>
+<h3 id="refactoring_1">Refactoring</h3>
 <ul>
 <li><a href="https://github.com/kryptokrauts/aepp-sdk-java/issues/86">#86</a> add "payable" attribute to AccountResult-model</li>
 </ul>
@@ -1120,7 +1186,7 @@
 </ul>
 </li>
 </ul>
-<h3 id="general-changes">General changes</h3>
+<h3 id="general-changes_1">General changes</h3>
 <ul>
 <li><a href="https://github.com/kryptokrauts/aepp-sdk-java/issues/60">#60</a> update tuweni to stable release version</li>
 <li><a href="https://github.com/kryptokrauts/aepp-sdk-java/issues/57">#57</a> support contracts and oracles as ÆNS pointers</li>
@@ -1128,7 +1194,7 @@
 <li><a href="https://github.com/kryptokrauts/aepp-sdk-java/issues/45">#45</a> update of node (<code>v4.1.0</code>) and compiler (<code>v3.2.0</code>)</li>
 </ul>
 <h2 id="v120"><a href="https://github.com/kryptokrauts/aepp-sdk-java/releases/tag/v1.2.0">v1.2.0</a></h2>
-<h3 id="general-changes_1">General changes</h3>
+<h3 id="general-changes_2">General changes</h3>
 <ul>
 <li><a href="https://github.com/kryptokrauts/aepp-sdk-java/issues/5">#5</a> included a specific <code>com.google.guava</code> version (<code>27.0.1-jre</code>)<ul>
 <li>maven users shouldn't need to that in their own projects anymore</li>
@@ -1182,7 +1248,7 @@
 </ul>
 </li>
 </ul>
-<h3 id="general-changes_2">General changes</h3>
+<h3 id="general-changes_3">General changes</h3>
 <ul>
 <li><a href="https://github.com/kryptokrauts/aepp-sdk-java/issues/13">#13</a> upgrade to new æternity release 2.0.0 (<code>Minerva</code>)</li>
 </ul>
@@ -1213,7 +1279,7 @@
 </li>
 </ul>
 <h2 id="v101"><a href="https://github.com/kryptokrauts/aepp-sdk-java/releases/tag/v1.0.1">v1.0.1</a></h2>
-<h3 id="general-changes_3">General changes</h3>
+<h3 id="general-changes_4">General changes</h3>
 <ul>
 <li>return Single instead of Observable for responses that return only one object</li>
 <li>switch from bouncycastle 1.61-beta to the release version (no more need to manually add it)</li>
