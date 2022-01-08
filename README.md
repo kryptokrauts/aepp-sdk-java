@@ -17,12 +17,6 @@ The **aepp-sdk-java** is a community developed Java SDK to interact with the æt
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.kryptokrauts/aepp-sdk-java/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.kryptokrauts/aepp-sdk-java)
 - [changelog](docs/changelog.md)
 
-🚧 **Important** 🚧
-- 3.0.0 is under development and close to be released
-- The 3.0.0-RC1 was a test-release that doesn't reflect the current state of development
-- The documentation reflects the latest state of development
-- If you're new here we recommend to use [3.0.0-SNAPSHOT](https://kryptokrauts.github.io/aepp-sdk-java/index.html#snapshot) until 3.0.0 is released
-
 ## Documentation
 The documentation placed in the `/docs` folder is generated via MkDocs and served via gh-pages:
 - https://kryptokrauts.github.io/aepp-sdk-java

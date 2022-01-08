@@ -2,14 +2,46 @@
 
 ## [v3.0.0](https://github.com/kryptokrauts/aepp-sdk-java/releases/tag/v3.0.0)
 
-This is a major release that underwent a huge refactoring. It supports the most important latest changes of aeternity.
+This is a major release that underwent a huge refactoring. It supports the most important latest changes of aeternity. It is fully compatible with the latest Iris hardfork.
+
+### General changes
+- [#196](https://github.com/kryptokrauts/aepp-sdk-java/pull/196)
+, [#218](https://github.com/kryptokrauts/aepp-sdk-java/pull/218)
+, [#219](https://github.com/kryptokrauts/aepp-sdk-java/pull/219)
+, [#220](https://github.com/kryptokrauts/aepp-sdk-java/pull/220)
+, [#221](https://github.com/kryptokrauts/aepp-sdk-java/pull/221)
+, [#222](https://github.com/kryptokrauts/aepp-sdk-java/pull/222)
+, [#223](https://github.com/kryptokrauts/aepp-sdk-java/pull/223)
+ SDK documentation via MkDocs including versioning with Mike
+- [#217](https://github.com/kryptokrauts/aepp-sdk-java/pull/217) Improved Javadocs
+- Updated dependencies
 
 ### Breaking changes
-- dropped support for Java 8, now targeting Java 15+
-- TODO ...
+- [#144](https://github.com/kryptokrauts/aepp-sdk-java/pull/144) Revisited handling of keypairs:
+    - Introduced `KeyPair` class, dropped `BaseKeyPair` class
+    - Introduced `HdWallet` and `HdKeyPair`. These changes include a fix for a bug in the key derivation that derived wrong keypairs.
+- [#177](https://github.com/kryptokrauts/aepp-sdk-java/pull/177) Discarded Java 8 in favor of Java 15+
+- [#183](https://github.com/kryptokrauts/aepp-sdk-java/pull/183) Middleware: dropped `indaex` (formerly `aeternal`) in favor of `mdw`
+- [#206](https://github.com/kryptokrauts/aepp-sdk-java/pull/206) Renamed `gas` to `gasLimit` in all transaction model classes
 
 ### New features
-- support of PayingForTx
+- [#155](https://github.com/kryptokrauts/aepp-sdk-java/pull/155) New transaction type `PayingForTx`
+- [#157](https://github.com/kryptokrauts/aepp-sdk-java/pull/157) Arbitrary pointer-keys for AENS pointers
+- [#159](https://github.com/kryptokrauts/aepp-sdk-java/pull/159) External (protected) dry-run endpoint
+- [#171](https://github.com/kryptokrauts/aepp-sdk-java/pull/171) Convenient methods to create delegation signatures
+- [#184](https://github.com/kryptokrauts/aepp-sdk-java/pull/184) Retrieve next nonce with new API endpoint that provides different strategies
+- [#188](https://github.com/kryptokrauts/aepp-sdk-java/pull/188) Force `deposit` to be `ZERO` in ContractCreateTx
+- [#192](https://github.com/kryptokrauts/aepp-sdk-java/pull/192) New method `computeGAInnerTxHash` for usage of Generalized Accounts
+- [#200](https://github.com/kryptokrauts/aepp-sdk-java/pull/200) Limit max amount of pointers to 32. Introduce constant `AENS.MAX_TTL`.
+- [#201](https://github.com/kryptokrauts/aepp-sdk-java/pull/201) Support for `NameTransferTx`
+- [#211](https://github.com/kryptokrauts/aepp-sdk-java/pull/211) Convenient methods for contract related transaction types to easily:
+    - deploy a contract
+    - perform a stateful contract call
+    - perform a read-only dry-run call
+    
+### Refactoring
+- [#176](https://github.com/kryptokrauts/aepp-sdk-java/pull/176) OpenAPI (OAS3) API (`/v3`) in favor of old swagger API (`/v2`)
+- Introduced default values in the model classes of each tx-type
 
 ## [v2.2.1](https://github.com/kryptokrauts/aepp-sdk-java/releases/tag/v2.2.1)
 
