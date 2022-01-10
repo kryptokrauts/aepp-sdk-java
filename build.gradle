@@ -33,7 +33,7 @@ googleJavaFormat {
 
 ext {
     vertxVersion = "3.9.10"
-    jacksonVersion = "2.9.8"
+    jacksonVersion = "2.13.1"
 
     lombokVersion = "1.18.20"
 
@@ -201,8 +201,8 @@ dependencies {
     compile "com.fasterxml.jackson.core:jackson-databind:${jacksonVersion}"
     compile "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:${jacksonVersion}"
 
-    // guava (we explicitely use this version to avoid loading wrong transitive dependency when using our SDK with maven)
-    compile "com.google.guava:guava:27.0.1-jre"
+    // guava
+    compile "com.google.guava:guava:31.0.1-jre"
 
     // tests
     testCompileOnly "org.projectlombok:lombok:${lombokVersion}"
