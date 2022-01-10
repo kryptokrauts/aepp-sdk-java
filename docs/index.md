@@ -29,13 +29,13 @@ The latest release always reflects the state of the [master](https://github.com/
 <dependency>
     <groupId>com.kryptokrauts</groupId>
     <artifactId>aepp-sdk-java</artifactId>
-    <version>3.0.0</version>
+    <version>3.0.1</version>
 </dependency>
 ```
 
 #### Gradle
 ```gradle
-compile "com.kryptokrauts:aepp-sdk-java:3.0.0"
+compile "com.kryptokrauts:aepp-sdk-java:3.0.1"
 ```
 
 ### Snapshot
@@ -55,7 +55,7 @@ It is published with the version defined in `gradle.properties`.
   <dependency>
     <groupId>com.kryptokrauts</groupId>
     <artifactId>aepp-sdk-java</artifactId>
-    <version>3.0.0-SNAPSHOT</version>
+    <version>3.0.2-SNAPSHOT</version>
   </dependency>
 </dependencies>
 ```
@@ -67,5 +67,5 @@ repositories {
   maven { url "https://oss.sonatype.org/content/repositories/snapshots" }
 }
 
-compile "com.kryptokrauts:aepp-sdk-java:3.0.0-SNAPSHOT"
+compile "com.kryptokrauts:aepp-sdk-java:3.0.2-SNAPSHOT"
 ```
