@@ -1,0 +1,1389 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="The official documentation of the aepp-sdk-java provided by kryptokrauts.com
+">
+      
+      
+      
+      
+      <link rel="icon" href="assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.2.3, mkdocs-material-7.1.9">
+    
+    
+      
+        <title>Changelog - aepp-sdk-java</title>
+      
+    
+    
+      <link rel="stylesheet" href="assets/stylesheets/main.ca7ac06f.min.css">
+      
+        
+        <link rel="stylesheet" href="assets/stylesheets/palette.f1a3b89f.min.css">
+        
+      
+    
+    
+    
+      
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,400i,700%7CRoboto+Mono&display=fallback">
+        <style>:root{--md-text-font-family:"Roboto";--md-code-font-family:"Roboto Mono"}</style>
+      
+    
+    
+    
+    
+      
+
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="green" data-md-color-accent="green">
+  
+    
+    <script>function __prefix(e){return new URL(".",location).pathname+"."+e}function __get(e,t=localStorage){return JSON.parse(t.getItem(__prefix(e)))}</script>
+    
+      <script>var palette=__get("__palette");if(null!==palette&&"object"==typeof palette.color)for(var key in palette.color)document.body.setAttribute("data-md-color-"+key,palette.color[key])</script>
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#changelog" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+      <header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="index.html" title="aepp-sdk-java" class="md-header__button md-logo" aria-label="aepp-sdk-java" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54z"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            aepp-sdk-java
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Changelog
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      <form class="md-header__option" data-md-component="palette">
+        
+          
+          
+          <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="green" data-md-color-accent="green"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_1">
+          
+            <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_2" hidden>
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m17.75 4.09-2.53 1.94.91 3.06-2.63-1.81-2.63 1.81.91-3.06-2.53-1.94L12.44 4l1.06-3 1.06 3 3.19.09m3.5 6.91-1.64 1.25.59 1.98-1.7-1.17-1.7 1.17.59-1.98L15.75 11l2.06-.05L18.5 9l.69 1.95 2.06.05m-2.28 4.95c.83-.08 1.72 1.1 1.19 1.85-.32.45-.66.87-1.08 1.27C15.17 23 8.84 23 4.94 19.07c-3.91-3.9-3.91-10.24 0-14.14.4-.4.82-.76 1.27-1.08.75-.53 1.93.36 1.85 1.19-.27 2.86.69 5.83 2.89 8.02a9.96 9.96 0 0 0 8.02 2.89m-1.64 2.02a12.08 12.08 0 0 1-7.8-3.47c-2.17-2.19-3.33-5-3.49-7.82-2.81 3.14-2.7 7.96.31 10.98 3.02 3.01 7.84 3.12 10.98.31z"/></svg>
+            </label>
+          
+        
+          
+          
+          <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="green" data-md-color-accent="green"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_2">
+          
+            <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_1" hidden>
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 7a5 5 0 0 1 5 5 5 5 0 0 1-5 5 5 5 0 0 1-5-5 5 5 0 0 1 5-5m0 2a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3m0-7 2.39 3.42C13.65 5.15 12.84 5 12 5c-.84 0-1.65.15-2.39.42L12 2M3.34 7l4.16-.35A7.2 7.2 0 0 0 5.94 8.5c-.44.74-.69 1.5-.83 2.29L3.34 7m.02 10 1.76-3.77a7.131 7.131 0 0 0 2.38 4.14L3.36 17M20.65 7l-1.77 3.79a7.023 7.023 0 0 0-2.38-4.15l4.15.36m-.01 10-4.14.36c.59-.51 1.12-1.14 1.54-1.86.42-.73.69-1.5.83-2.29L20.64 17M12 22l-2.41-3.44c.74.27 1.55.44 2.41.44.82 0 1.63-.17 2.37-.44L12 22z"/></svg>
+            </label>
+          
+        
+      </form>
+    
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5z"/></svg>
+      </label>
+      
+<div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" data-md-state="active" required>
+      <label class="md-search__icon md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5z"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
+      </label>
+      <button type="reset" class="md-search__icon md-icon" aria-label="Clear" tabindex="-1">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z"/></svg>
+      </button>
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+      <div class="md-header__source">
+        
+<a href="https://github.com/kryptokrauts/aepp-sdk-java/" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    kryptokrauts/aepp-sdk-java
+  </div>
+</a>
+      </div>
+    
+  </nav>
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="index.html" title="aepp-sdk-java" class="md-nav__button md-logo" aria-label="aepp-sdk-java" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54z"/></svg>
+
+    </a>
+    aepp-sdk-java
+  </label>
+  
+    <div class="md-nav__source">
+      
+<a href="https://github.com/kryptokrauts/aepp-sdk-java/" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    kryptokrauts/aepp-sdk-java
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="index.html" class="md-nav__link">
+        Getting Started
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="sdk-initialization.html" class="md-nav__link">
+        SDK initialization
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3" type="checkbox" id="__nav_3" >
+      
+      <label class="md-nav__link" for="__nav_3">
+        Usage Guides
+        <span class="md-nav__icon md-icon"></span>
+      </label>
+      <nav class="md-nav" aria-label="Usage Guides" data-md-level="1">
+        <label class="md-nav__title" for="__nav_3">
+          <span class="md-nav__icon md-icon"></span>
+          Usage Guides
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="usage-guides/aens.html" class="md-nav__link">
+        æternity naming system
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="usage-guides/contracts.html" class="md-nav__link">
+        Contracts
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="usage-guides/ga.html" class="md-nav__link">
+        Generalized Accounts
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="usage-guides/mdw.html" class="md-nav__link">
+        Middleware
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="usage-guides/oracles.html" class="md-nav__link">
+        Oracles
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="usage-guides/payingfortx.html" class="md-nav__link">
+        PayingForTx
+      </a>
+    </li>
+  
+
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="example-apps.html" class="md-nav__link">
+        Example applications
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="https://www.javadoc.io/doc/com.kryptokrauts/aepp-sdk-java" class="md-nav__link">
+        Javadoc
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+    
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          Changelog
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="changelog.html" class="md-nav__link md-nav__link--active">
+        Changelog
+      </a>
+      
+        
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#v301" class="md-nav__link">
+    v3.0.1
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#v300" class="md-nav__link">
+    v3.0.0
+  </a>
+  
+    <nav class="md-nav" aria-label="v3.0.0">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#general-changes" class="md-nav__link">
+    General changes
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#breaking-changes" class="md-nav__link">
+    Breaking changes
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#new-features" class="md-nav__link">
+    New features
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#refactoring" class="md-nav__link">
+    Refactoring
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#v221" class="md-nav__link">
+    v2.2.1
+  </a>
+  
+    <nav class="md-nav" aria-label="v2.2.1">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#enhancements" class="md-nav__link">
+    Enhancements
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#v220" class="md-nav__link">
+    v2.2.0
+  </a>
+  
+    <nav class="md-nav" aria-label="v2.2.0">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#fixes" class="md-nav__link">
+    Fixes
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#enhancements_1" class="md-nav__link">
+    Enhancements
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#v210" class="md-nav__link">
+    v2.1.0
+  </a>
+  
+    <nav class="md-nav" aria-label="v2.1.0">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#refactoring_1" class="md-nav__link">
+    Refactoring
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#fixes_1" class="md-nav__link">
+    Fixes
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#enhancements_2" class="md-nav__link">
+    Enhancements
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#v200" class="md-nav__link">
+    v2.0.0
+  </a>
+  
+    <nav class="md-nav" aria-label="v2.0.0">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#breaking-changes-and-new-features" class="md-nav__link">
+    Breaking changes and new features
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#general-changes_1" class="md-nav__link">
+    General changes
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#v120" class="md-nav__link">
+    v1.2.0
+  </a>
+  
+    <nav class="md-nav" aria-label="v1.2.0">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#general-changes_2" class="md-nav__link">
+    General changes
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#new-features_1" class="md-nav__link">
+    New features
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#v110" class="md-nav__link">
+    v1.1.0
+  </a>
+  
+    <nav class="md-nav" aria-label="v1.1.0">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#breaking-changes_1" class="md-nav__link">
+    Breaking changes
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#general-changes_3" class="md-nav__link">
+    General changes
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#new-features_2" class="md-nav__link">
+    New features
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#v102" class="md-nav__link">
+    v1.0.2
+  </a>
+  
+    <nav class="md-nav" aria-label="v1.0.2">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#fixes_2" class="md-nav__link">
+    Fixes
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#v101" class="md-nav__link">
+    v1.0.1
+  </a>
+  
+    <nav class="md-nav" aria-label="v1.0.1">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#general-changes_4" class="md-nav__link">
+    General changes
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#v100" class="md-nav__link">
+    v1.0.0
+  </a>
+  
+    <nav class="md-nav" aria-label="v1.0.0">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#initial-functionalities" class="md-nav__link">
+    Initial functionalities
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="contribute.html" class="md-nav__link">
+        Contribute
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#v301" class="md-nav__link">
+    v3.0.1
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#v300" class="md-nav__link">
+    v3.0.0
+  </a>
+  
+    <nav class="md-nav" aria-label="v3.0.0">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#general-changes" class="md-nav__link">
+    General changes
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#breaking-changes" class="md-nav__link">
+    Breaking changes
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#new-features" class="md-nav__link">
+    New features
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#refactoring" class="md-nav__link">
+    Refactoring
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#v221" class="md-nav__link">
+    v2.2.1
+  </a>
+  
+    <nav class="md-nav" aria-label="v2.2.1">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#enhancements" class="md-nav__link">
+    Enhancements
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#v220" class="md-nav__link">
+    v2.2.0
+  </a>
+  
+    <nav class="md-nav" aria-label="v2.2.0">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#fixes" class="md-nav__link">
+    Fixes
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#enhancements_1" class="md-nav__link">
+    Enhancements
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#v210" class="md-nav__link">
+    v2.1.0
+  </a>
+  
+    <nav class="md-nav" aria-label="v2.1.0">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#refactoring_1" class="md-nav__link">
+    Refactoring
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#fixes_1" class="md-nav__link">
+    Fixes
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#enhancements_2" class="md-nav__link">
+    Enhancements
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#v200" class="md-nav__link">
+    v2.0.0
+  </a>
+  
+    <nav class="md-nav" aria-label="v2.0.0">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#breaking-changes-and-new-features" class="md-nav__link">
+    Breaking changes and new features
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#general-changes_1" class="md-nav__link">
+    General changes
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#v120" class="md-nav__link">
+    v1.2.0
+  </a>
+  
+    <nav class="md-nav" aria-label="v1.2.0">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#general-changes_2" class="md-nav__link">
+    General changes
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#new-features_1" class="md-nav__link">
+    New features
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#v110" class="md-nav__link">
+    v1.1.0
+  </a>
+  
+    <nav class="md-nav" aria-label="v1.1.0">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#breaking-changes_1" class="md-nav__link">
+    Breaking changes
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#general-changes_3" class="md-nav__link">
+    General changes
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#new-features_2" class="md-nav__link">
+    New features
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#v102" class="md-nav__link">
+    v1.0.2
+  </a>
+  
+    <nav class="md-nav" aria-label="v1.0.2">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#fixes_2" class="md-nav__link">
+    Fixes
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#v101" class="md-nav__link">
+    v1.0.1
+  </a>
+  
+    <nav class="md-nav" aria-label="v1.0.1">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#general-changes_4" class="md-nav__link">
+    General changes
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#v100" class="md-nav__link">
+    v1.0.0
+  </a>
+  
+    <nav class="md-nav" aria-label="v1.0.0">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#initial-functionalities" class="md-nav__link">
+    Initial functionalities
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          <div class="md-content" data-md-component="content">
+            <article class="md-content__inner md-typeset">
+              
+                
+                  <a href="https://github.com/kryptokrauts/aepp-sdk-java/edit/master/docs/changelog.md" title="Edit this page" class="md-content__button md-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20.71 7.04c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.37-.39-1.02-.39-1.41 0l-1.84 1.83 3.75 3.75M3 17.25V21h3.75L17.81 9.93l-3.75-3.75L3 17.25z"/></svg>
+                  </a>
+                
+                
+                <h1 id="changelog">Changelog</h1>
+<h2 id="v301"><a href="https://github.com/kryptokrauts/aepp-sdk-java/releases/tag/v3.0.1">v3.0.1</a></h2>
+<p>This is a minor release to address potential vulnerabilities in third party dependencies. It's highly recommended to update to this version.</p>
+<h2 id="v300"><a href="https://github.com/kryptokrauts/aepp-sdk-java/releases/tag/v3.0.0">v3.0.0</a></h2>
+<p>This is a major release that underwent a huge refactoring. It supports the most important latest changes of aeternity. It is fully compatible with the latest Iris hardfork.</p>
+<h3 id="general-changes">General changes</h3>
+<ul>
+<li><a href="https://github.com/kryptokrauts/aepp-sdk-java/pull/196">#196</a>
+, <a href="https://github.com/kryptokrauts/aepp-sdk-java/pull/218">#218</a>
+, <a href="https://github.com/kryptokrauts/aepp-sdk-java/pull/219">#219</a>
+, <a href="https://github.com/kryptokrauts/aepp-sdk-java/pull/220">#220</a>
+, <a href="https://github.com/kryptokrauts/aepp-sdk-java/pull/221">#221</a>
+, <a href="https://github.com/kryptokrauts/aepp-sdk-java/pull/222">#222</a>
+, <a href="https://github.com/kryptokrauts/aepp-sdk-java/pull/223">#223</a>
+ SDK documentation via MkDocs including versioning with Mike</li>
+<li><a href="https://github.com/kryptokrauts/aepp-sdk-java/pull/217">#217</a> Improved Javadocs</li>
+<li>Updated dependencies</li>
+</ul>
+<h3 id="breaking-changes">Breaking changes</h3>
+<ul>
+<li><a href="https://github.com/kryptokrauts/aepp-sdk-java/pull/144">#144</a> Revisited handling of keypairs:<ul>
+<li>Introduced <code>KeyPair</code> class, dropped <code>BaseKeyPair</code> class</li>
+<li>Introduced <code>HdWallet</code> and <code>HdKeyPair</code>. These changes include a fix for a bug in the key derivation that derived wrong keypairs.</li>
+</ul>
+</li>
+<li><a href="https://github.com/kryptokrauts/aepp-sdk-java/pull/177">#177</a> Discarded Java 8 in favor of Java 15+</li>
+<li><a href="https://github.com/kryptokrauts/aepp-sdk-java/pull/183">#183</a> Middleware: dropped <code>indaex</code> (formerly <code>aeternal</code>) in favor of <code>mdw</code></li>
+<li><a href="https://github.com/kryptokrauts/aepp-sdk-java/pull/206">#206</a> Renamed <code>gas</code> to <code>gasLimit</code> in all transaction model classes</li>
+</ul>
+<h3 id="new-features">New features</h3>
+<ul>
+<li><a href="https://github.com/kryptokrauts/aepp-sdk-java/pull/155">#155</a> New transaction type <code>PayingForTx</code></li>
+<li><a href="https://github.com/kryptokrauts/aepp-sdk-java/pull/157">#157</a> Arbitrary pointer-keys for AENS pointers</li>
+<li><a href="https://github.com/kryptokrauts/aepp-sdk-java/pull/159">#159</a> External (protected) dry-run endpoint</li>
+<li><a href="https://github.com/kryptokrauts/aepp-sdk-java/pull/171">#171</a> Convenient methods to create delegation signatures</li>
+<li><a href="https://github.com/kryptokrauts/aepp-sdk-java/pull/184">#184</a> Retrieve next nonce with new API endpoint that provides different strategies</li>
+<li><a href="https://github.com/kryptokrauts/aepp-sdk-java/pull/188">#188</a> Force <code>deposit</code> to be <code>ZERO</code> in ContractCreateTx</li>
+<li><a href="https://github.com/kryptokrauts/aepp-sdk-java/pull/192">#192</a> New method <code>computeGAInnerTxHash</code> for usage of Generalized Accounts</li>
+<li><a href="https://github.com/kryptokrauts/aepp-sdk-java/pull/200">#200</a> Limit max amount of pointers to 32. Introduce constant <code>AENS.MAX_TTL</code>.</li>
+<li><a href="https://github.com/kryptokrauts/aepp-sdk-java/pull/201">#201</a> Support for <code>NameTransferTx</code></li>
+<li><a href="https://github.com/kryptokrauts/aepp-sdk-java/pull/211">#211</a> Convenient methods for contract related transaction types to easily:<ul>
+<li>deploy a contract</li>
+<li>perform a stateful contract call</li>
+<li>perform a read-only dry-run call</li>
+</ul>
+</li>
+</ul>
+<h3 id="refactoring">Refactoring</h3>
+<ul>
+<li><a href="https://github.com/kryptokrauts/aepp-sdk-java/pull/176">#176</a> OpenAPI (OAS3) API (<code>/v3</code>) in favor of old swagger API (<code>/v2</code>)</li>
+<li>Introduced default values in the model classes of each tx-type</li>
+</ul>
+<h2 id="v221"><a href="https://github.com/kryptokrauts/aepp-sdk-java/releases/tag/v2.2.1">v2.2.1</a></h2>
+<p>This release ships an enhancement.</p>
+<h3 id="enhancements">Enhancements</h3>
+<ul>
+<li><a href="https://github.com/kryptokrauts/aepp-sdk-java/issues/116">#116</a> support includes for compiling, deploying and calling contracts<ul>
+<li>we identified this was missing when developing the <a href="https://github.com/kryptokrauts/contraect-maven-plugin">contraect-maven-plugin</a></li>
+</ul>
+</li>
+</ul>
+<h2 id="v220"><a href="https://github.com/kryptokrauts/aepp-sdk-java/releases/tag/v2.2.0">v2.2.0</a></h2>
+<p>This release ships some fixes and enhancements.</p>
+<h3 id="fixes">Fixes</h3>
+<ul>
+<li><a href="https://github.com/kryptokrauts/aepp-sdk-java/issues/91">#91</a> show exception details on compiler and aeternal errors</li>
+<li><a href="https://github.com/kryptokrauts/aepp-sdk-java/issues/95">#95</a> fix default values in BaseConstants</li>
+</ul>
+<h3 id="enhancements_1">Enhancements</h3>
+<ul>
+<li><a href="https://github.com/kryptokrauts/aepp-sdk-java/issues/96">#96</a> add ResultWrapper for standard java types returned from service calls to omit exceptions being ignored</li>
+<li><a href="https://github.com/kryptokrauts/aepp-sdk-java/issues/97">#97</a> introduce configurable way to wait for tx being included in a block<ul>
+<li>this is currently covered by the following properties and only relevant in <code>blockingPostTransaction</code> calls<ul>
+<li><code>waitForTxIncludedInBlockEnabled</code> (default=true)</li>
+<li><code>numTrialsToWaitForTxIncludedInBlock</code> (default=60)</li>
+<li><code>millisBetweenTrialsToWaitForTxIncludedInBlock</code> (default=1000)</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="https://github.com/kryptokrauts/aepp-sdk-java/issues/98">#98</a> provide a (more) user-friendly way to handle unit conversions<ul>
+<li>we introduced a <code>UnitConversionService</code>-Interface with a <code>DefaultUnitConversionService</code>-Implementation that makes it a bit easier to handle conversions from <code>AE</code> to <code>aettos</code> or custom tokens that may have less decimals</li>
+</ul>
+</li>
+<li><a href="https://github.com/kryptokrauts/aepp-sdk-java/issues/99">#99</a> prevent exceptions for TxModel classes</li>
+<li><a href="https://github.com/kryptokrauts/aepp-sdk-java/issues/107">#107</a> wait for confirmation of transaction<ul>
+<li>now it is possible to wait for a transaction to be confirmed</li>
+<li>this is an asynchronous operation and can be configured through the following properties:<ul>
+<li><code>numOfConfirmations</code> (default=10)<ul>
+<li>the number of confirmations (KeyBlocks) until a transaction is considered confirmed</li>
+<li>this value can also be explicitly set as method parameter</li>
+</ul>
+</li>
+<li><code>millisBetweenTrailsToWaitForConfirmation</code> (default=10000)</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="https://github.com/kryptokrauts/aepp-sdk-java/issues/111">#111</a> add "payloadDecoded" attribute to SpendTransactionModel<ul>
+<li>now the payload for a SpendTx is automatically decoded</li>
+</ul>
+</li>
+</ul>
+<h2 id="v210"><a href="https://github.com/kryptokrauts/aepp-sdk-java/releases/tag/v2.1.0">v2.1.0</a></h2>
+<p>This release ships some fixes and enhancements. Additionally we renamed some attributes and model-classes. If you already used <a href="https://github.com/kryptokrauts/aepp-sdk-java/releases/tag/v2.0.0">v2.0.0</a> it might be needed to fix these changes.</p>
+<h3 id="refactoring_1">Refactoring</h3>
+<ul>
+<li><a href="https://github.com/kryptokrauts/aepp-sdk-java/issues/86">#86</a> add "payable" attribute to AccountResult-model</li>
+</ul>
+<h3 id="fixes_1">Fixes</h3>
+<ul>
+<li><a href="https://github.com/kryptokrauts/aepp-sdk-java/issues/85">#85</a> AeternalService: fix case-sensitive comparison of domains</li>
+<li><a href="https://github.com/kryptokrauts/aepp-sdk-java/issues/88">#88</a> replace Optional.orElse with Optional.orElseGet in the AccountServiceImpl</li>
+</ul>
+<h3 id="enhancements_2">Enhancements</h3>
+<ul>
+<li><a href="https://github.com/kryptokrauts/aepp-sdk-java/issues/84">#84</a> add missing ÆNS related AeternalService functionalities<ul>
+<li>we added the possibility to query for active names
+   and search for a name (which allows to receive e.g. the owner of a name)</li>
+</ul>
+</li>
+<li><a href="https://github.com/kryptokrauts/aepp-sdk-java/issues/87">#87</a> add support to receive byteCode for given contractId</li>
+</ul>
+<h2 id="v200"><a href="https://github.com/kryptokrauts/aepp-sdk-java/releases/tag/v2.0.0">v2.0.0</a></h2>
+<h3 id="breaking-changes-and-new-features">Breaking changes and new features</h3>
+<ul>
+<li><a href="https://github.com/kryptokrauts/aepp-sdk-java/issues/77">#77</a> integrate middleware <code>aeternal</code> and allow to query ÆNS auction related information</li>
+<li><a href="https://github.com/kryptokrauts/aepp-sdk-java/issues/72">#72</a> add method to post transactions with a custom private key </li>
+<li><a href="https://github.com/kryptokrauts/aepp-sdk-java/issues/70">#70</a> adapt TLD changes (<code>.chain</code> instead of <code>.aet</code>)</li>
+<li><a href="https://github.com/kryptokrauts/aepp-sdk-java/issues/68">#68</a> refactoring: rename contractBaseUrl to compilerBaseUrl</li>
+<li><a href="https://github.com/kryptokrauts/aepp-sdk-java/issues/65">#65</a> refactoring: allow posting of signed transactions (string)</li>
+<li><a href="https://github.com/kryptokrauts/aepp-sdk-java/issues/64">#64</a> ÆNS: auction-related functionalities<ul>
+<li>calculate the next minimum fee for a running auction</li>
+</ul>
+</li>
+<li><a href="https://github.com/kryptokrauts/aepp-sdk-java/issues/63">#63</a> refactoring: dryRun actions</li>
+<li><a href="https://github.com/kryptokrauts/aepp-sdk-java/issues/56">#56</a> Lima related changes:<ul>
+<li>update to new node version <code>v5.x.x</code></li>
+<li>ÆNS auctions:<ul>
+<li>TLD: <code>.aet</code> instead of <code>.test</code></li>
+<li><code>nameFee</code> calculation</li>
+<li>adapt changes in generation of <code>commitmentId</code> and <code>nameId</code></li>
+<li>update version of <code>NameClaimTx</code></li>
+</ul>
+</li>
+<li>update to new compiler version <code>v4.x.x</code>:<ul>
+<li>adapt sophia contracts to compile with new version</li>
+</ul>
+</li>
+<li>FATE-VM:<ul>
+<li>make the compiler-backend configurable (<code>AEVM</code> / <code>FATE</code>)</li>
+<li>introduce <code>VirtualMachine</code> enum and add it to the <code>ServiceConfiguration</code> so that the services in the SDK use the correct <code>vmVersion</code> and <code>abiVersion</code> combination and the correct <code>backend</code> in the compiler</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="https://github.com/kryptokrauts/aepp-sdk-java/issues/44">#44</a> major refactoring:<ul>
+<li>introduced model classes to be independent from the swagger-generated classes</li>
+<li>discarded the <code>TransactionFactory</code> -&gt; for each transaction-type a model class was introduced which can be created following the builder-pattern</li>
+<li>introduced the <code>AeternityService</code> which serves as entrypoint to access other services and needs to be instantiated through the <code>AeternityServiceFactory</code> by passing the <code>AeternityServiceConfiguration</code> </li>
+</ul>
+</li>
+</ul>
+<h3 id="general-changes_1">General changes</h3>
+<ul>
+<li><a href="https://github.com/kryptokrauts/aepp-sdk-java/issues/60">#60</a> update tuweni to stable release version</li>
+<li><a href="https://github.com/kryptokrauts/aepp-sdk-java/issues/57">#57</a> support contracts and oracles as ÆNS pointers</li>
+<li><a href="https://github.com/kryptokrauts/aepp-sdk-java/issues/49">#49</a> provide guidelines for contributors</li>
+<li><a href="https://github.com/kryptokrauts/aepp-sdk-java/issues/45">#45</a> update of node (<code>v4.1.0</code>) and compiler (<code>v3.2.0</code>)</li>
+</ul>
+<h2 id="v120"><a href="https://github.com/kryptokrauts/aepp-sdk-java/releases/tag/v1.2.0">v1.2.0</a></h2>
+<h3 id="general-changes_2">General changes</h3>
+<ul>
+<li><a href="https://github.com/kryptokrauts/aepp-sdk-java/issues/5">#5</a> included a specific <code>com.google.guava</code> version (<code>27.0.1-jre</code>)<ul>
+<li>maven users shouldn't need to that in their own projects anymore</li>
+</ul>
+</li>
+<li><a href="https://github.com/kryptokrauts/aepp-sdk-java/issues/24">#24</a> replaced <code>net.consensys.cava</code> dependency by <code>org.apache.tuweni</code><ul>
+<li>the project is now being maintained by the apache software foundation</li>
+</ul>
+</li>
+<li><a href="https://github.com/kryptokrauts/aepp-sdk-java/issues/25">#25</a> upgraded SDK setup to make use of æternity release 3.0.1 (<code>Fortuna</code>)</li>
+<li><a href="https://github.com/kryptokrauts/aepp-sdk-java/issues/27">#27</a> added goggles to docker-compose setup in order to enable easy tx verification in our local setup</li>
+<li><a href="https://github.com/kryptokrauts/aepp-sdk-java/issues/31">#31</a> we included our <code>PaymentSplitter.aes</code> contract into the test-resources and wrote an integration test to make sure our contract functionalities work</li>
+<li><a href="https://github.com/kryptokrauts/aepp-sdk-java/issues/32">#32</a> we made some changes regarding our release-notes<ul>
+<li>in future you will find all information in this changelog-file</li>
+<li>there won't be a specific file for a certain release anymore</li>
+</ul>
+</li>
+<li><a href="https://github.com/kryptokrauts/aepp-sdk-java/issues/35">#35</a> in future you will find the SDK documentation on gitbook:<ul>
+<li><a href="https://kryptokrauts.gitbook.io/aepp-sdk-java/">https://kryptokrauts.gitbook.io/aepp-sdk-java/</a></li>
+</ul>
+</li>
+<li><a href="https://github.com/kryptokrauts/aepp-sdk-java/issues/36">#36</a> upgraded SDK setup to make use of æternity release 3.3.0 (<code>Fortuna</code>)  </li>
+</ul>
+<h3 id="new-features_1">New features</h3>
+<ul>
+<li><a href="https://github.com/kryptokrauts/aepp-sdk-java/issues/7">#7</a> AENs support<ul>
+<li>from now on it is possible to make use of the æternity naming system</li>
+</ul>
+</li>
+<li><a href="https://github.com/kryptokrauts/aepp-sdk-java/issues/10">#10</a> contract support<ul>
+<li>from now on it is possible to create and interact with æternity smart contracts</li>
+<li>while developing the contract support we identified some problems with the RLP encoding when trying to encode a <code>BigInteger.ZERO</code><ul>
+<li>in the past it wasn't possible to use a <code>TTL</code> with value <code>0</code> in any transaction type</li>
+<li>this is now solved :-)</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="https://github.com/kryptokrauts/aepp-sdk-java/issues/28">#28</a> added support for sophia compiler<ul>
+<li>we now provide a <code>CompilerServiceFactory</code> that allows to get an Instance of <code>SophiaCompilerServiceImpl</code></li>
+<li>this service was needed to enable creation of smart contracts with the SDK</li>
+</ul>
+</li>
+<li><a href="https://github.com/kryptokrauts/aepp-sdk-java/issues/40">#40</a> added service method to generate ACI for Smart Contracts</li>
+</ul>
+<h2 id="v110"><a href="https://github.com/kryptokrauts/aepp-sdk-java/releases/tag/v1.1.0">v1.1.0</a></h2>
+<h3 id="breaking-changes_1">Breaking changes</h3>
+<ul>
+<li>Transactions are now created through a central <code>TransactionFactory</code><ul>
+<li>this refactoring breaks implementations that used older versions of the SDK</li>
+</ul>
+</li>
+</ul>
+<h3 id="general-changes_3">General changes</h3>
+<ul>
+<li><a href="https://github.com/kryptokrauts/aepp-sdk-java/issues/13">#13</a> upgrade to new æternity release 2.0.0 (<code>Minerva</code>)</li>
+</ul>
+<h2 id="new-features_2">New features</h2>
+<ul>
+<li><a href="https://github.com/kryptokrauts/aepp-sdk-java/issues/6">#6</a> HD wallet support (BIP44, BIP32 + BIP39)<ul>
+<li>it is now possible to create and recover HD wallets</li>
+</ul>
+</li>
+<li><a href="https://github.com/kryptokrauts/aepp-sdk-java/issues/11">#11</a> Fees (gas cost) calculation<ul>
+<li>æternity release 2.0.0 (<code>Minerva</code>) introduced a new fee structure</li>
+<li>the SDK now provides an automated fee calculation if the user doesn't provide a fee on his/her own</li>
+</ul>
+</li>
+</ul>
+<h2 id="v102"><a href="https://github.com/kryptokrauts/aepp-sdk-java/releases/tag/v1.0.2">v1.0.2</a></h2>
+<h3 id="fixes_2">Fixes</h3>
+<ul>
+<li><a href="https://github.com/kryptokrauts/aepp-sdk-java/issues/4">#4</a> create a transaction on testnet<ul>
+<li>we used <code>ae_devnet</code> instead of <code>ae_uat</code> before</li>
+<li>now we support 3 networks:<ul>
+<li>DEVNET (<code>ae_devnet</code>)</li>
+<li>TESTNET (<code>ae_uat</code>)</li>
+<li>MAINNET (<code>ae_mainnet</code>)</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h2 id="v101"><a href="https://github.com/kryptokrauts/aepp-sdk-java/releases/tag/v1.0.1">v1.0.1</a></h2>
+<h3 id="general-changes_4">General changes</h3>
+<ul>
+<li>return Single instead of Observable for responses that return only one object</li>
+<li>switch from bouncycastle 1.61-beta to the release version (no more need to manually add it)</li>
+</ul>
+<h2 id="v100"><a href="https://github.com/kryptokrauts/aepp-sdk-java/releases/tag/v1.0.0">v1.0.0</a></h2>
+<p>Initial release of our Java SDK to interact with the æternity blockchain.</p>
+<h3 id="initial-functionalities">Initial functionalities</h3>
+<ul>
+<li>generate and recover KeyPair</li>
+<li>generate and recover Keystore-JSON</li>
+<li>create and sign spendTx</li>
+<li>various utils (crypto, encoding, signing)</li>
+</ul>
+                
+              
+              
+                
+
+
+              
+            </article>
+          </div>
+        </div>
+        
+      </main>
+      
+        
+<footer class="md-footer">
+  
+    <nav class="md-footer__inner md-grid" aria-label="Footer">
+      
+        
+        <a href="example-apps.html" class="md-footer__link md-footer__link--prev" aria-label="Previous: Example applications" rel="prev">
+          <div class="md-footer__button md-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
+          </div>
+          <div class="md-footer__title">
+            <div class="md-ellipsis">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              Example applications
+            </div>
+          </div>
+        </a>
+      
+      
+        
+        <a href="contribute.html" class="md-footer__link md-footer__link--next" aria-label="Next: Contribute" rel="next">
+          <div class="md-footer__title">
+            <div class="md-ellipsis">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              Contribute
+            </div>
+          </div>
+          <div class="md-footer__button md-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11H4z"/></svg>
+          </div>
+        </a>
+      
+    </nav>
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-footer-copyright">
+        
+        Made with
+        <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+          Material for MkDocs
+        </a>
+        
+      </div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    <script id="__config" type="application/json">{"base": ".", "features": ["content.tabs.link", "search.highlight", "search.share", "search.suggest"], "translations": {"clipboard.copy": "Copy to clipboard", "clipboard.copied": "Copied to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.placeholder": "Type to start searching", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.term.missing": "Missing", "select.version.title": "Select version"}, "search": "assets/javascripts/workers/search.477d984a.min.js", "version": {"provider": "mike"}}</script>
+    
+    
+      <script src="assets/javascripts/bundle.82b56eb2.min.js"></script>
+      
+    
+  </body>
+</html>

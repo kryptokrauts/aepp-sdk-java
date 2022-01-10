@@ -1,0 +1,862 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="The official documentation of the aepp-sdk-java provided by kryptokrauts.com
+">
+      
+      
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.2.3, mkdocs-material-7.1.9">
+    
+    
+      
+        <title>Oracles - aepp-sdk-java</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.ca7ac06f.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.f1a3b89f.min.css">
+        
+      
+    
+    
+    
+      
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,400i,700%7CRoboto+Mono&display=fallback">
+        <style>:root{--md-text-font-family:"Roboto";--md-code-font-family:"Roboto Mono"}</style>
+      
+    
+    
+    
+    
+      
+
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="green" data-md-color-accent="green">
+  
+    
+    <script>function __prefix(e){return new URL("..",location).pathname+"."+e}function __get(e,t=localStorage){return JSON.parse(t.getItem(__prefix(e)))}</script>
+    
+      <script>var palette=__get("__palette");if(null!==palette&&"object"==typeof palette.color)for(var key in palette.color)document.body.setAttribute("data-md-color-"+key,palette.color[key])</script>
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#oracles" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+      <header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../index.html" title="aepp-sdk-java" class="md-header__button md-logo" aria-label="aepp-sdk-java" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54z"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            aepp-sdk-java
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Oracles
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      <form class="md-header__option" data-md-component="palette">
+        
+          
+          
+          <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="green" data-md-color-accent="green"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_1">
+          
+            <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_2" hidden>
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m17.75 4.09-2.53 1.94.91 3.06-2.63-1.81-2.63 1.81.91-3.06-2.53-1.94L12.44 4l1.06-3 1.06 3 3.19.09m3.5 6.91-1.64 1.25.59 1.98-1.7-1.17-1.7 1.17.59-1.98L15.75 11l2.06-.05L18.5 9l.69 1.95 2.06.05m-2.28 4.95c.83-.08 1.72 1.1 1.19 1.85-.32.45-.66.87-1.08 1.27C15.17 23 8.84 23 4.94 19.07c-3.91-3.9-3.91-10.24 0-14.14.4-.4.82-.76 1.27-1.08.75-.53 1.93.36 1.85 1.19-.27 2.86.69 5.83 2.89 8.02a9.96 9.96 0 0 0 8.02 2.89m-1.64 2.02a12.08 12.08 0 0 1-7.8-3.47c-2.17-2.19-3.33-5-3.49-7.82-2.81 3.14-2.7 7.96.31 10.98 3.02 3.01 7.84 3.12 10.98.31z"/></svg>
+            </label>
+          
+        
+          
+          
+          <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="green" data-md-color-accent="green"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_2">
+          
+            <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_1" hidden>
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 7a5 5 0 0 1 5 5 5 5 0 0 1-5 5 5 5 0 0 1-5-5 5 5 0 0 1 5-5m0 2a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3m0-7 2.39 3.42C13.65 5.15 12.84 5 12 5c-.84 0-1.65.15-2.39.42L12 2M3.34 7l4.16-.35A7.2 7.2 0 0 0 5.94 8.5c-.44.74-.69 1.5-.83 2.29L3.34 7m.02 10 1.76-3.77a7.131 7.131 0 0 0 2.38 4.14L3.36 17M20.65 7l-1.77 3.79a7.023 7.023 0 0 0-2.38-4.15l4.15.36m-.01 10-4.14.36c.59-.51 1.12-1.14 1.54-1.86.42-.73.69-1.5.83-2.29L20.64 17M12 22l-2.41-3.44c.74.27 1.55.44 2.41.44.82 0 1.63-.17 2.37-.44L12 22z"/></svg>
+            </label>
+          
+        
+      </form>
+    
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5z"/></svg>
+      </label>
+      
+<div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" data-md-state="active" required>
+      <label class="md-search__icon md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5z"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
+      </label>
+      <button type="reset" class="md-search__icon md-icon" aria-label="Clear" tabindex="-1">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z"/></svg>
+      </button>
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+      <div class="md-header__source">
+        
+<a href="https://github.com/kryptokrauts/aepp-sdk-java/" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    kryptokrauts/aepp-sdk-java
+  </div>
+</a>
+      </div>
+    
+  </nav>
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../index.html" title="aepp-sdk-java" class="md-nav__button md-logo" aria-label="aepp-sdk-java" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54z"/></svg>
+
+    </a>
+    aepp-sdk-java
+  </label>
+  
+    <div class="md-nav__source">
+      
+<a href="https://github.com/kryptokrauts/aepp-sdk-java/" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    kryptokrauts/aepp-sdk-java
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../index.html" class="md-nav__link">
+        Getting Started
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../sdk-initialization.html" class="md-nav__link">
+        SDK initialization
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+    
+  
+  
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3" type="checkbox" id="__nav_3" checked>
+      
+      <label class="md-nav__link" for="__nav_3">
+        Usage Guides
+        <span class="md-nav__icon md-icon"></span>
+      </label>
+      <nav class="md-nav" aria-label="Usage Guides" data-md-level="1">
+        <label class="md-nav__title" for="__nav_3">
+          <span class="md-nav__icon md-icon"></span>
+          Usage Guides
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="aens.html" class="md-nav__link">
+        æternity naming system
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="contracts.html" class="md-nav__link">
+        Contracts
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="ga.html" class="md-nav__link">
+        Generalized Accounts
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="mdw.html" class="md-nav__link">
+        Middleware
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+    
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          Oracles
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="oracles.html" class="md-nav__link md-nav__link--active">
+        Oracles
+      </a>
+      
+        
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#introduction" class="md-nav__link">
+    Introduction
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1-oracle-register" class="md-nav__link">
+    1. Oracle: register
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-some-party-query-an-oracle-and-poll-for-response" class="md-nav__link">
+    2. Some party: query an oracle and poll for response
+  </a>
+  
+    <nav class="md-nav" aria-label="2. Some party: query an oracle and poll for response">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#query" class="md-nav__link">
+    Query
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#poll-for-response" class="md-nav__link">
+    Poll for response
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-oracle-poll-for-queries-and-respond" class="md-nav__link">
+    3. Oracle: poll for queries and respond
+  </a>
+  
+    <nav class="md-nav" aria-label="3. Oracle: poll for queries and respond">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#poll-for-queries-respond" class="md-nav__link">
+    Poll for queries &amp; respond
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-oracle-extend" class="md-nav__link">
+    4. Oracle: extend
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#delegate-signature-to-contract-oracle-interface" class="md-nav__link">
+    Delegate signature to contract (Oracle interface)
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="payingfortx.html" class="md-nav__link">
+        PayingForTx
+      </a>
+    </li>
+  
+
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../example-apps.html" class="md-nav__link">
+        Example applications
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="https://www.javadoc.io/doc/com.kryptokrauts/aepp-sdk-java" class="md-nav__link">
+        Javadoc
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../changelog.html" class="md-nav__link">
+        Changelog
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../contribute.html" class="md-nav__link">
+        Contribute
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#introduction" class="md-nav__link">
+    Introduction
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1-oracle-register" class="md-nav__link">
+    1. Oracle: register
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-some-party-query-an-oracle-and-poll-for-response" class="md-nav__link">
+    2. Some party: query an oracle and poll for response
+  </a>
+  
+    <nav class="md-nav" aria-label="2. Some party: query an oracle and poll for response">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#query" class="md-nav__link">
+    Query
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#poll-for-response" class="md-nav__link">
+    Poll for response
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-oracle-poll-for-queries-and-respond" class="md-nav__link">
+    3. Oracle: poll for queries and respond
+  </a>
+  
+    <nav class="md-nav" aria-label="3. Oracle: poll for queries and respond">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#poll-for-queries-respond" class="md-nav__link">
+    Poll for queries &amp; respond
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-oracle-extend" class="md-nav__link">
+    4. Oracle: extend
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#delegate-signature-to-contract-oracle-interface" class="md-nav__link">
+    Delegate signature to contract (Oracle interface)
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          <div class="md-content" data-md-component="content">
+            <article class="md-content__inner md-typeset">
+              
+                
+                  <a href="https://github.com/kryptokrauts/aepp-sdk-java/edit/master/docs/usage-guides/oracles.md" title="Edit this page" class="md-content__button md-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20.71 7.04c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.37-.39-1.02-.39-1.41 0l-1.84 1.83 3.75 3.75M3 17.25V21h3.75L17.81 9.93l-3.75-3.75L3 17.25z"/></svg>
+                  </a>
+                
+                
+                <h1 id="oracles">Oracles</h1>
+<h2 id="introduction">Introduction</h2>
+<p>This guide shows you how to perform all the operations that you need within the lifecycle of <a href="https://aeternity.com/protocol/oracles">oracles</a> using the SDK.</p>
+<h2 id="1-oracle-register">1. Oracle: register</h2>
+<p>You register an oracle that responds with the temperature of the city that is included in the query.
+This guide uses an example response of <a href="https://api.openweathermap.org">https://api.openweathermap.org</a>.</p>
+<div class="highlight"><pre><span></span><code><span class="n">KeyPair</span> <span class="n">oracleKeyPair</span> <span class="o">=</span> <span class="p">...</span>
+<span class="n">BigInteger</span> <span class="n">nonce</span> <span class="o">=</span> <span class="n">aeternityService</span>
+                            <span class="p">.</span><span class="na">accounts</span>
+                            <span class="p">.</span><span class="na">blockingGetNextNonce</span><span class="p">(</span><span class="n">oracleKeyPair</span><span class="p">.</span><span class="na">getAddress</span><span class="p">());</span>
+
+<span class="n">OracleRegisterTransactionModel</span> <span class="n">oracleRegisterTx</span> <span class="o">=</span>
+    <span class="n">OracleRegisterTransactionModel</span><span class="p">.</span><span class="na">builder</span><span class="p">()</span>
+        <span class="p">.</span><span class="na">accountId</span><span class="p">(</span><span class="n">oracleKeyPair</span><span class="p">.</span><span class="na">getAddress</span><span class="p">())</span>
+        <span class="p">.</span><span class="na">nonce</span><span class="p">(</span><span class="n">nonce</span><span class="p">)</span>
+        <span class="c1">// lives for 5000 keyblocks if it isn&#39;t extended</span>
+        <span class="p">.</span><span class="na">oracleTtl</span><span class="p">(</span><span class="n">BigInteger</span><span class="p">.</span><span class="na">valueOf</span><span class="p">(</span><span class="mi">5000</span><span class="p">))</span>
+        <span class="c1">// using delta instead of fixed block height</span>
+        <span class="p">.</span><span class="na">oracleTtlType</span><span class="p">(</span><span class="n">OracleTTLType</span><span class="p">.</span><span class="na">DELTA</span><span class="p">)</span>
+        <span class="c1">// fee in aettos a caller needs to pay</span>
+        <span class="p">.</span><span class="na">queryFee</span><span class="p">(</span><span class="n">BigInteger</span><span class="p">.</span><span class="na">valueOf</span><span class="p">(</span><span class="mi">100</span><span class="p">))</span>
+        <span class="p">.</span><span class="na">queryFormat</span><span class="p">(</span><span class="s">&quot;string&quot;</span><span class="p">)</span>
+        <span class="p">.</span><span class="na">responseFormat</span><span class="p">(</span><span class="s">&quot;string&quot;</span><span class="p">)</span>
+        <span class="p">.</span><span class="na">build</span><span class="p">();</span>
+
+<span class="n">aeternityService</span><span class="p">.</span><span class="na">transactions</span><span class="p">.</span><span class="na">blockingPostTransaction</span><span class="p">(</span>
+    <span class="n">oracleRegisterTx</span><span class="p">,</span> <span class="n">oracleKeyPair</span><span class="p">.</span><span class="na">getEncodedPrivateKey</span><span class="p">());</span>
+</code></pre></div>
+<p>Note:</p>
+<ul>
+<li>By default the oracle will exist for the next 5000 KeyBlocks.</li>
+<li>If you intend to keep your oracle running longer you should increase the <code>oracleTtl</code> and/or set up a service that automatically extends the TTL before it expires.</li>
+<li>The <code>oracleId</code> will be similar to the address of the account that registered the Oracle.</li>
+<li>The only difference is the prefix that will be <code>ok_</code> instead of <code>ak_</code></li>
+<li>This means that each account can only host 1 oracle. It's not possible to manage multiple oracles using the same account.</li>
+</ul>
+<h2 id="2-some-party-query-an-oracle-and-poll-for-response">2. Some party: query an oracle and poll for response</h2>
+<h3 id="query">Query</h3>
+<p>After the oracle has been registered and as long as it isn't expired, everybody that knows the <code>oracleId</code> can query it.</p>
+<div class="highlight"><pre><span></span><code><span class="n">KeyPair</span> <span class="n">callerKeyPair</span> <span class="o">=</span> <span class="p">...</span>
+<span class="n">BigInteger</span> <span class="n">nonce</span> <span class="o">=</span> <span class="n">aeternityService</span>
+                            <span class="p">.</span><span class="na">accounts</span>
+                            <span class="p">.</span><span class="na">blockingGetNextNonce</span><span class="p">(</span><span class="n">callerKeyPair</span><span class="p">.</span><span class="na">getAddress</span><span class="p">());</span>
+<span class="n">String</span> <span class="n">oracleId</span> <span class="o">=</span> <span class="s">&quot;ok_...&quot;</span><span class="p">;</span>
+<span class="n">String</span> <span class="n">queryString</span> <span class="o">=</span> <span class="s">&quot;{\&quot;lat\&quot;:48.78,\&quot;lon\&quot;:9.18}&quot;</span><span class="p">;</span>
+
+<span class="n">OracleQueryTransactionModel</span> <span class="n">oracleQueryTx</span> <span class="o">=</span>
+    <span class="n">OracleQueryTransactionModel</span><span class="p">.</span><span class="na">builder</span><span class="p">()</span>
+        <span class="p">.</span><span class="na">senderId</span><span class="p">(</span><span class="n">callerKeyPair</span><span class="p">.</span><span class="na">getAddress</span><span class="p">())</span>
+        <span class="p">.</span><span class="na">oracleId</span><span class="p">(</span><span class="n">oracleId</span><span class="p">)</span>
+        <span class="p">.</span><span class="na">nonce</span><span class="p">(</span><span class="n">nonce</span><span class="p">)</span>
+        <span class="p">.</span><span class="na">query</span><span class="p">(</span><span class="n">queryString</span><span class="p">)</span>
+        <span class="c1">// fee needs to fit the fee defined by the oracle</span>
+        <span class="p">.</span><span class="na">queryFee</span><span class="p">(</span><span class="n">BigInteger</span><span class="p">.</span><span class="na">valueOf</span><span class="p">(</span><span class="mi">100</span><span class="p">))</span>
+        <span class="c1">// oracle can respond within the next 50 keyblocks</span>
+        <span class="p">.</span><span class="na">queryTtl</span><span class="p">(</span><span class="n">BigInteger</span><span class="p">.</span><span class="na">valueOf</span><span class="p">(</span><span class="mi">50</span><span class="p">))</span>
+        <span class="p">.</span><span class="na">queryTtlType</span><span class="p">(</span><span class="n">OracleTTLType</span><span class="p">.</span><span class="na">DELTA</span><span class="p">)</span>
+        <span class="c1">// response will be available 100 keyblocks</span>
+        <span class="c1">// before being garbage collected together with the query</span>
+        <span class="p">.</span><span class="na">responseTtl</span><span class="p">(</span><span class="n">BigInteger</span><span class="p">.</span><span class="na">valueOf</span><span class="p">(</span><span class="mi">100</span><span class="p">))</span>
+        <span class="p">.</span><span class="na">build</span><span class="p">();</span>
+
+<span class="n">aeternityService</span><span class="p">.</span><span class="na">transactions</span><span class="p">.</span><span class="na">blockingPostTransaction</span><span class="p">(</span>
+    <span class="n">oracleQueryTx</span><span class="p">,</span> <span class="n">callerKeyPair</span><span class="p">.</span><span class="na">getEncodedPrivateKey</span><span class="p">());</span>
+</code></pre></div>
+<p>Note:</p>
+<ul>
+<li>You should fetch (or know) the required fee for the query to the oracle.</li>
+<li>If you don't provide a sufficient fee the transaction is invalid.</li>
+</ul>
+<h3 id="poll-for-response">Poll for response</h3>
+<p>After broadcasting the OracleQueryTx you can poll for the response to that specific query like this:</p>
+<div class="highlight"><pre><span></span><code><span class="c1">// using the same nonce and oracleId as like in the OracleQueryTx</span>
+<span class="n">String</span> <span class="n">queryId</span> <span class="o">=</span> <span class="n">EncodingUtils</span><span class="p">.</span><span class="na">queryId</span><span class="p">(</span><span class="n">callerKeyPair</span><span class="p">.</span><span class="na">getAddress</span><span class="p">(),</span> <span class="n">nonce</span><span class="p">,</span> <span class="n">oracleId</span><span class="p">);</span>
+<span class="n">String</span> <span class="n">response</span> <span class="o">=</span> <span class="kc">null</span><span class="p">;</span>
+<span class="c1">// wait for the response</span>
+<span class="k">while</span><span class="p">(</span><span class="n">response</span> <span class="o">==</span> <span class="kc">null</span> <span class="o">||</span> <span class="n">response</span><span class="p">.</span><span class="na">isEmpty</span><span class="p">())</span> <span class="p">{</span>
+    <span class="n">OracleQueryResult</span> <span class="n">oracleQueryResult</span> <span class="o">=</span>
+        <span class="k">this</span><span class="p">.</span><span class="na">aeternityService</span><span class="p">.</span><span class="na">oracles</span><span class="p">.</span><span class="na">blockingGetOracleQuery</span><span class="p">(</span><span class="n">oracleId</span><span class="p">,</span> <span class="n">queryId</span><span class="p">);</span>
+    <span class="n">response</span> <span class="o">=</span> <span class="n">oracleQueryResult</span><span class="p">.</span><span class="na">getResponse</span><span class="p">();</span>
+<span class="p">}</span>
+<span class="c1">// do something with the response</span>
+</code></pre></div>
+<p>Note:</p>
+<ul>
+<li>The <code>OracleQueryResult</code> will only contain the response property if the Oracle responded.</li>
+</ul>
+<h2 id="3-oracle-poll-for-queries-and-respond">3. Oracle: poll for queries and respond</h2>
+<h3 id="poll-for-queries-respond">Poll for queries &amp; respond</h3>
+<p>Typically the oracle itself polls for its own queries and responds as soon as possible:</p>
+<div class="highlight"><pre><span></span><code><span class="c1">// fetch oracle queries</span>
+<span class="n">OracleQueriesResult</span> <span class="n">oracleQueriesResult</span> <span class="o">=</span>
+    <span class="k">this</span><span class="p">.</span><span class="na">aeternityService</span><span class="p">.</span><span class="na">oracles</span><span class="p">.</span><span class="na">blockingGetOracleQueries</span><span class="p">(</span>
+        <span class="n">oracleKeyPair</span><span class="p">.</span><span class="na">getOracleAddress</span><span class="p">());</span>
+
+<span class="c1">// typically the oracle would respond to all queries it didn&#39;t already respond to</span>
+<span class="c1">// in this case it only responds to the first query in the list</span>
+<span class="n">OracleQueryResult</span> <span class="n">oracleQueryResult</span> <span class="o">=</span>
+    <span class="n">oracleQueriesResult</span><span class="p">.</span><span class="na">getQueryResults</span><span class="p">().</span><span class="na">get</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
+
+<span class="n">String</span> <span class="n">responseString</span> <span class="o">=</span> <span class="s">&quot;{\&quot;coord\&quot;:{\&quot;lon\&quot;:9.18,\&quot;lat\&quot;:48.78},\&quot;weather\&quot;:[{\&quot;id\&quot;:310,\&quot;main\&quot;:\&quot;Drizzle\&quot;,\&quot;description\&quot;:\&quot;light intensity drizzle rain\&quot;,\&quot;icon\&quot;:\&quot;09n\&quot;}],\&quot;base\&quot;:\&quot;stations\&quot;,\&quot;main\&quot;:{\&quot;temp\&quot;:282.56,\&quot;pressure\&quot;:1021,\&quot;humidity\&quot;:93,\&quot;temp_min\&quot;:279.82,\&quot;temp_max\&quot;:285.37},\&quot;visibility\&quot;:7000,\&quot;wind\&quot;:{\&quot;speed\&quot;:4.1,\&quot;deg\&quot;:330},\&quot;clouds\&quot;:{\&quot;all\&quot;:90},\&quot;dt\&quot;:1572217099,\&quot;sys\&quot;:{\&quot;type\&quot;:1,\&quot;id\&quot;:1274,\&quot;country\&quot;:\&quot;DE\&quot;,\&quot;sunrise\&quot;:1572156074,\&quot;sunset\&quot;:1572192774},\&quot;timezone\&quot;:3600,\&quot;id\&quot;:2825297,\&quot;name\&quot;:\&quot;Stuttgart\&quot;,\&quot;cod\&quot;:200}&quot;</span><span class="p">;</span>
+
+<span class="n">BigInteger</span> <span class="n">nonce</span> <span class="o">=</span> <span class="n">aeternityService</span>
+                            <span class="p">.</span><span class="na">accounts</span>
+                            <span class="p">.</span><span class="na">blockingGetNextNonce</span><span class="p">(</span><span class="n">oracleKeyPair</span><span class="p">.</span><span class="na">getAddress</span><span class="p">());</span>
+<span class="n">OracleRespondTransactionModel</span> <span class="n">oracleRespondTx</span> <span class="o">=</span>
+    <span class="n">OracleRespondTransactionModel</span><span class="p">.</span><span class="na">builder</span><span class="p">()</span>
+        <span class="p">.</span><span class="na">oracleId</span><span class="p">(</span><span class="n">oracleKeyPair</span><span class="p">.</span><span class="na">getOracleAddress</span><span class="p">())</span>
+        <span class="p">.</span><span class="na">queryId</span><span class="p">(</span><span class="n">oracleQueryResult</span><span class="p">.</span><span class="na">getId</span><span class="p">())</span>
+        <span class="p">.</span><span class="na">nonce</span><span class="p">(</span><span class="n">nonce</span><span class="p">)</span>
+        <span class="p">.</span><span class="na">response</span><span class="p">(</span><span class="n">responseString</span><span class="p">)</span>
+        <span class="p">.</span><span class="na">responseTtl</span><span class="p">(</span><span class="n">BigInteger</span><span class="p">.</span><span class="na">valueOf</span><span class="p">(</span><span class="mi">100</span><span class="p">))</span>
+        <span class="p">.</span><span class="na">build</span><span class="p">();</span>
+
+<span class="n">aeternityService</span><span class="p">.</span><span class="na">transactions</span><span class="p">.</span><span class="na">blockingPostTransaction</span><span class="p">(</span>
+    <span class="n">oracleRespondTx</span><span class="p">,</span> <span class="n">oracleKeyPair</span><span class="p">.</span><span class="na">getEncodedPrivateKey</span><span class="p">());</span>
+</code></pre></div>
+<p>Note:</p>
+<ul>
+<li>The oracle itself would probably either use an API to get the current temperature for a certain city or ideally directly communicate with measuring devices located in that specific city.</li>
+<li>If the oracle responds in time it will automatically get the provided query fee credited to its account.</li>
+</ul>
+<h2 id="4-oracle-extend">4. Oracle: extend</h2>
+<p>As mentioned above an Oracle has a certain TTL that can be specified when registering it. You might want to extend the TTL of the oracle before it expires. You can do that as follows:</p>
+<div class="highlight"><pre><span></span><code><span class="n">BigInteger</span> <span class="n">nonce</span> <span class="o">=</span> <span class="n">aeternityService</span>
+                            <span class="p">.</span><span class="na">accounts</span>
+                            <span class="p">.</span><span class="na">blockingGetNextNonce</span><span class="p">(</span><span class="n">oracleKeyPair</span><span class="p">.</span><span class="na">getAddress</span><span class="p">());</span>
+
+<span class="n">OracleExtendTransactionModel</span> <span class="n">oracleExtendTx</span> <span class="o">=</span>
+    <span class="n">OracleExtendTransactionModel</span><span class="p">.</span><span class="na">builder</span><span class="p">()</span>
+        <span class="p">.</span><span class="na">nonce</span><span class="p">(</span><span class="n">nonce</span><span class="p">)</span>
+        <span class="p">.</span><span class="na">oracleId</span><span class="p">(</span><span class="n">oracleKeyPair</span><span class="p">.</span><span class="na">getOracleAddress</span><span class="p">())</span>
+        <span class="c1">// extend the oracle ttl for another 100 keyblocks</span>
+        <span class="p">.</span><span class="na">relativeTtl</span><span class="p">(</span><span class="n">BigInteger</span><span class="p">.</span><span class="na">valueOf</span><span class="p">(</span><span class="mi">100</span><span class="p">))</span>
+        <span class="p">.</span><span class="na">build</span><span class="p">();</span>
+
+<span class="n">aeternityService</span><span class="p">.</span><span class="na">transactions</span><span class="p">.</span><span class="na">blockingPostTransaction</span><span class="p">(</span>
+    <span class="n">oracleExtendTx</span><span class="p">,</span> <span class="n">oracleKeyPair</span><span class="p">.</span><span class="na">getEncodedPrivateKey</span><span class="p">());</span>
+</code></pre></div>
+<h2 id="delegate-signature-to-contract-oracle-interface">Delegate signature to contract (Oracle interface)</h2>
+<p>It is possible to authorize a Sophia contract to manage an Oracle on behalf of your account. In order to achieve that you need to provide a delegation signature to the contract. The contract will then be able to use the <a href="https://aeternity.com/aesophia/latest/sophia_stdlib/#oracle">Oracle interface</a> and perform Oracle related actions on behalf of your account.
+This functionality could for example be used to build an AENS marketplace.</p>
+<p>The <a href="https://github.com/kryptokrauts/aepp-sdk-java/blob/master/src/main/java/com/kryptokrauts/aeternity/sdk/service/delegation/DelegationService.java">DelegationService</a>
+can be used to produce the signatures that can be used to delegate control for certain actions to a smart contract. </p>
+<p>Examples how to delegate signatures to a contract can be found in our <a href="https://github.com/kryptokrauts/contraect-showcase-maven">contract-maven-showcase</a>.</p>
+                
+              
+              
+                
+
+
+              
+            </article>
+          </div>
+        </div>
+        
+      </main>
+      
+        
+<footer class="md-footer">
+  
+    <nav class="md-footer__inner md-grid" aria-label="Footer">
+      
+        
+        <a href="mdw.html" class="md-footer__link md-footer__link--prev" aria-label="Previous: Middleware" rel="prev">
+          <div class="md-footer__button md-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
+          </div>
+          <div class="md-footer__title">
+            <div class="md-ellipsis">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              Middleware
+            </div>
+          </div>
+        </a>
+      
+      
+        
+        <a href="payingfortx.html" class="md-footer__link md-footer__link--next" aria-label="Next: PayingForTx" rel="next">
+          <div class="md-footer__title">
+            <div class="md-ellipsis">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              PayingForTx
+            </div>
+          </div>
+          <div class="md-footer__button md-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11H4z"/></svg>
+          </div>
+        </a>
+      
+    </nav>
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-footer-copyright">
+        
+        Made with
+        <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+          Material for MkDocs
+        </a>
+        
+      </div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    <script id="__config" type="application/json">{"base": "..", "features": ["content.tabs.link", "search.highlight", "search.share", "search.suggest"], "translations": {"clipboard.copy": "Copy to clipboard", "clipboard.copied": "Copied to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.placeholder": "Type to start searching", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.term.missing": "Missing", "select.version.title": "Select version"}, "search": "../assets/javascripts/workers/search.477d984a.min.js", "version": {"provider": "mike"}}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.82b56eb2.min.js"></script>
+      
+    
+  </body>
+</html>
