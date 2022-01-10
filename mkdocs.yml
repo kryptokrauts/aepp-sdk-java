@@ -37,6 +37,8 @@ theme:
 
 extra:
   repo_icon: 'github'
+  version:
+    provider: mike
 
 markdown_extensions:
   - pymdownx.highlight
