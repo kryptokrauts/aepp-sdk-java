@@ -1,5 +1,9 @@
 # Changelog
 
+## [v3.0.1](https://github.com/kryptokrauts/aepp-sdk-java/releases/tag/v3.0.1)
+
+This is a minor release to address potential vulnerabilities in third party dependencies. It's highly recommended to update to this version.
+
 ## [v3.0.0](https://github.com/kryptokrauts/aepp-sdk-java/releases/tag/v3.0.0)
 
 This is a major release that underwent a huge refactoring. It supports the most important latest changes of aeternity. It is fully compatible with the latest Iris hardfork.
