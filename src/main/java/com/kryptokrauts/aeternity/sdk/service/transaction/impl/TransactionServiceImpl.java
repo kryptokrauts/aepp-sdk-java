@@ -12,6 +12,7 @@ import com.kryptokrauts.aeternity.sdk.constants.Network;
 import com.kryptokrauts.aeternity.sdk.constants.SerializationTags;
 import com.kryptokrauts.aeternity.sdk.domain.ObjectResultWrapper;
 import com.kryptokrauts.aeternity.sdk.domain.StringResultWrapper;
+import com.kryptokrauts.aeternity.sdk.domain.secret.KeyPair;
 import com.kryptokrauts.aeternity.sdk.domain.sophia.SophiaTypeTransformer;
 import com.kryptokrauts.aeternity.sdk.exception.AException;
 import com.kryptokrauts.aeternity.sdk.exception.InvalidParameterException;
@@ -324,6 +325,10 @@ public class TransactionServiceImpl implements TransactionService {
     if (sourceCode == null || txOptions == null) {
       throw new InvalidParameterException("Arguments must not be null.");
     }
+    KeyPair keyPair =
+        txOptions.getCustomKeyPair() != null
+            ? txOptions.getCustomKeyPair()
+            : this.config.getKeyPair();
     String entrypoint = "init";
     String byteCode =
         this.compilerService.blockingCompile(sourceCode, txOptions.getFilesystem()).getResult();
@@ -339,12 +344,12 @@ public class TransactionServiceImpl implements TransactionService {
     nonce =
         txOptions.getNonce() != null
             ? txOptions.getNonce()
-            : this.accountService.blockingGetNextNonce();
+            : this.accountService.blockingGetNextNonce(keyPair.getAddress());
     ContractCreateTransactionModel contractCreateModel =
         new ContractCreateTransactionModel(
             byteCode,
             callData,
-            this.config.getKeyPair().getAddress(),
+            keyPair.getAddress(),
             txOptions.getAmount(),
             nonce,
             txOptions.getGasLimit(),
@@ -375,7 +380,7 @@ public class TransactionServiceImpl implements TransactionService {
       contractCreateModel = contractCreateModel.toBuilder().gasLimit(gasLimitWithMargin).build();
     }
     PostTransactionResult contractCreatePostTxResult =
-        this.blockingPostTransaction(contractCreateModel);
+        this.blockingPostTransaction(contractCreateModel, keyPair.getEncodedPrivateKey());
     if (contractCreatePostTxResult == null) {
       throw new RuntimeException("Unexpected error: transaction not broadcasted.");
     }
@@ -475,6 +480,10 @@ public class TransactionServiceImpl implements TransactionService {
     if (contractId == null || entrypoint == null || sourceCode == null || txOptions == null) {
       throw new InvalidParameterException("Arguments must not be null.");
     }
+    KeyPair keyPair =
+        txOptions.getCustomKeyPair() != null
+            ? txOptions.getCustomKeyPair()
+            : this.config.getKeyPair();
     String calldata =
         this.compilerService
             .blockingEncodeCalldata(
@@ -487,12 +496,12 @@ public class TransactionServiceImpl implements TransactionService {
     nonce =
         txOptions.getNonce() != null
             ? txOptions.getNonce()
-            : this.accountService.blockingGetNextNonce();
+            : this.accountService.blockingGetNextNonce(keyPair.getAddress());
     ContractCallTransactionModel contractCallModel =
         new ContractCallTransactionModel(
             contractId,
             calldata,
-            this.config.getKeyPair().getAddress(),
+            keyPair.getAddress(),
             txOptions.getAmount(),
             nonce,
             txOptions.getGasLimit(),
@@ -523,7 +532,7 @@ public class TransactionServiceImpl implements TransactionService {
       contractCallModel = contractCallModel.toBuilder().gasLimit(gasLimitWithMargin).build();
     }
     PostTransactionResult contractCallPostTxResult =
-        this.blockingPostTransaction(contractCallModel);
+        this.blockingPostTransaction(contractCallModel, keyPair.getEncodedPrivateKey());
     if (contractCallPostTxResult == null) {
       throw new RuntimeException("Unexpected error: transaction not broadcasted.");
     }

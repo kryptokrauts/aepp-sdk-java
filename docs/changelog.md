@@ -1,5 +1,11 @@
 # Changelog
 
+## NEXT (unreleased)
+
+### New features
+- [#230](https://github.com/kryptokrauts/aepp-sdk-java/issues/230) allow usage of custom KeyPair in stateful convenience methods (`ContractCreateTx` & `ContractCallTx`)
+
+
 ## [v3.0.1](https://github.com/kryptokrauts/aepp-sdk-java/releases/tag/v3.0.1)
 
 This is a minor release to address potential vulnerabilities in third party dependencies. It's highly recommended to update to this version.

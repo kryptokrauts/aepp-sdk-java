@@ -1,0 +1,11 @@
+contract StatefulTest =
+
+    record state = { last_caller: address }
+
+    stateful entrypoint init() = { last_caller = Call.caller }
+
+    stateful entrypoint remember_caller() =
+        put(state{last_caller=Call.caller})
+
+    entrypoint get_last_caller() : address =
+        state.last_caller
