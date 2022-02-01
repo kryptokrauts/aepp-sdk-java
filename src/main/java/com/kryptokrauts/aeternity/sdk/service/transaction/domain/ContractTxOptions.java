@@ -1,5 +1,6 @@
 package com.kryptokrauts.aeternity.sdk.service.transaction.domain;
 
+import com.kryptokrauts.aeternity.sdk.domain.secret.KeyPair;
 import java.math.BigInteger;
 import java.util.List;
 import java.util.Map;
@@ -38,4 +39,13 @@ public class ContractTxOptions {
    * only needed if there are custom includes defined in the contract source
    */
   private Map<String, String> filesystem;
+
+  /**
+   * by default the {@link com.kryptokrauts.aeternity.sdk.service.aeternity.impl.AeternityService}
+   * will use the KeyPair configured in the {@link
+   * com.kryptokrauts.aeternity.sdk.service.aeternity.AeternityServiceConfiguration}
+   *
+   * <p>if a custom KeyPair is provided, it will be used instead
+   */
+  private KeyPair customKeyPair;
 }
